@@ -1,4 +1,11 @@
 import type { Template } from "../../types.ts";
+import type { Attributes } from "./mod.ts";
+
+type StyledComponent<T> = {
+  (props?: T): Template & {
+    (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+  };
+};
 
 export type StyleInput = string | Record<string, string | number | undefined>;
 
@@ -29,7 +36,14 @@ export interface HTMLAttributes {
 }
 
 // Типы для детей элементов
-export type ElementChild = string | number | Template | null | undefined;
+export type ElementChild =
+  | string
+  | number
+  | boolean
+  | null
+  | undefined
+  | Template
+  | StyledComponent<Attributes>;
 export type ElementChildren = ElementChild[];
 
 // Фабрика элементов

@@ -15,14 +15,24 @@ export function styled<T extends Attributes>(
 ) {
   return (strings: TemplateStringsArray, ...values: ElementChild[]) => {
     const className = generateUniqueClass();
-    const cssContent = strings.reduce(
-      (result, str, i) => result + str + (values[i] || ""),
-      ""
-    );
+    const tag = elementFactory.name.toLowerCase();
 
-    const processedCss = cssContent
-      .replace(/&/g, `.${className}`)
-      .replace(/^([^@&.])/gm, `.${className} $1`);
+    // Собираем CSS и заменяем селекторы
+    let css = strings
+      .reduce((result, str, i) => {
+        const value = values[i];
+        if (value && typeof value === "function" && "rootClass" in value()) {
+          return result + str + `.${value().rootClass}`;
+        }
+        return result + str + (value || "");
+      }, "")
+      .trim();
+
+    // Заменяем & на класс
+    css = css
+      .replace(/&\s*{/g, `.${className} {`)
+      .replace(/&\s*\${/g, `.${className} .`)
+      .replace(/&\s+\./g, `.${className} .`);
 
     const styledComponent = ((props: T = {} as T) => {
       const existingClass = props.class || "";
@@ -31,10 +41,15 @@ export function styled<T extends Attributes>(
         class: `${className} ${existingClass}`.trim(),
       });
 
-      const baseTemplate = elementFn(strings, ...values);
+      const emptyTemplate = Object.assign([""], {
+        raw: [""],
+      }) as TemplateStringsArray;
+
+      const baseTemplate = elementFn(emptyTemplate);
+
       const template: Template = {
         ...baseTemplate,
-        css: processedCss,
+        css,
         rootClass: className,
       };
 
@@ -43,7 +58,7 @@ export function styled<T extends Attributes>(
           if (!newStrings) return template;
           return {
             ...elementFn(newStrings, ...newValues),
-            css: processedCss,
+            css,
             rootClass: className,
           };
         },
