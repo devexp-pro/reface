@@ -22,23 +22,25 @@ export interface HTMLAttributes {
   tabindex?: number;
   "aria-label"?: string;
   "aria-hidden"?: boolean;
-  "data-testid"?: string;
   [key: `data-${string}`]: string | number | boolean | undefined;
   [key: string]: unknown;
 }
 
 // События
+export type EventHandler = `${string}(${string})` | undefined;
+
 export interface EventAttributes {
-  onClick?: string;
-  onChange?: string;
-  onSubmit?: string;
-  onInput?: string;
-  onKeyDown?: string;
-  onKeyUp?: string;
-  onFocus?: string;
-  onBlur?: string;
-  onMouseEnter?: string;
-  onMouseLeave?: string;
+  onClick?: EventHandler;
+  onChange?: EventHandler;
+  onSubmit?: EventHandler;
+  onInput?: EventHandler;
+  onKeyDown?: EventHandler;
+  onKeyUp?: EventHandler;
+  onFocus?: EventHandler;
+  onBlur?: EventHandler;
+  onMouseEnter?: EventHandler;
+  onMouseLeave?: EventHandler;
+  [key: `on${Capitalize<string>}`]: EventHandler;
 }
 
 // HTMX атрибуты
@@ -119,4 +121,31 @@ export interface SVGAttributes extends Attributes {
   stroke?: string;
   "stroke-width"?: number | string;
   d?: string;
+}
+
+// Медиа атрибуты
+export interface MediaAttributes extends Attributes {
+  src?: string;
+  controls?: boolean;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  preload?: "none" | "metadata" | "auto";
+}
+
+// Табличные атрибуты
+export interface TableCellAttributes extends Attributes {
+  colspan?: number;
+  rowspan?: number;
+  headers?: string;
+}
+
+// Дополнительные ARIA атрибуты
+export interface AriaAttributes {
+  "aria-expanded"?: boolean;
+  "aria-controls"?: string;
+  "aria-selected"?: boolean;
+  "aria-current"?: boolean | "page" | "step" | "location" | "date" | "time";
+  "aria-describedby"?: string;
+  role?: string;
 }
