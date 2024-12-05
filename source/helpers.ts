@@ -28,21 +28,7 @@ export const render = (template: Template | Array<Template | any>): string => {
     return template.map(render).join("");
   }
 
-  if (template.tag) {
-    const content = template.str.reduce((acc, part, i) => {
-      const arg = template.args[i];
-      if (arg?.isTemplate) {
-        return acc + part + render(arg);
-      }
-      return acc + part + (arg || "");
-    }, "");
-
-    return `<${template.tag}${template.attributes || ""}>${content}</${
-      template.tag
-    }>`;
-  }
-
-  return template.str.reduce((acc, part, i) => {
+  let content = template.str.reduce((acc, part, i) => {
     const arg = template.args[i];
     if (arg?.isTemplate) {
       return acc + part + render(arg);
@@ -52,6 +38,18 @@ export const render = (template: Template | Array<Template | any>): string => {
     }
     return acc + part + (arg || "");
   }, "");
+
+  if (template.css) {
+    content = `<style>${template.css}</style>${content}`;
+  }
+
+  if (template.tag) {
+    return `<${template.tag}${template.attributes || ""}>${content}</${
+      template.tag
+    }>`;
+  }
+
+  return content;
 };
 
 export const GET = (path: string) => `get|${path}`;

@@ -57,6 +57,7 @@ export type Template = {
   args: Array<any | Template>;
   tag?: string;
   attributes?: string;
+  css?: string;
 };
 
 export type Style = {
