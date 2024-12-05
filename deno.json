@@ -16,7 +16,8 @@
     "./resources/styles": "./source/resources/styles.ts",
     "./resources/icons": "./source/resources/icons.ts",
     "./resources/fonts": "./source/resources/fonts.ts",
-    "./types": "./source/types.ts"
+    "./types": "./source/types.ts",
+    "./dom": "./source/dom/mod.ts"
   },
   "imports": {
     "$/": "./source/",
@@ -34,7 +35,9 @@
     "ex4": "deno run --allow-all --watch=./examples/ex4.ts ./examples/ex4.ts",
     "ex5": "deno run --allow-all --watch=./examples/ex5.ts ./examples/ex5.ts",
     "ex6": "deno run --allow-all --watch=./examples/ex6.ts ./examples/ex6.ts",
-    "pub-dry": "deno publish --dry-run --allow-slow-types"
+    "pub-dry": "deno publish --dry-run --allow-slow-types",
+    "test": "deno test source/dom/tests/",
+    "test:watch": "deno test --watch source/dom/tests/"
   },
   "fmt": {
     "exclude": [
