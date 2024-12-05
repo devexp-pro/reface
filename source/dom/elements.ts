@@ -66,4 +66,4 @@ export function createElementFactory<T extends Attributes>(tag: string) {
 export const div = createElementFactory<Attributes>("div");
 export const button = createElementFactory<Attributes>("button");
 export const input = createElementFactory<Attributes>("input");
-// ... другие элементы
+export const span = createElementFactory<Attributes>("span");

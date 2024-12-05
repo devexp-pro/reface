@@ -43,5 +43,10 @@
     "exclude": [
       "./source/versions.ts"
     ]
+  },
+  "compilerOptions": {
+    "jsx": "react",
+    "jsxFactory": "createElement",
+    "jsxFragmentFactory": "Fragment"
   }
 }
