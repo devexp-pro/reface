@@ -58,6 +58,7 @@ export type Template = {
   tag?: string;
   attributes?: string;
   css?: string;
+  rootClass?: string;
 };
 
 export type Style = {

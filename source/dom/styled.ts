@@ -1,19 +1,13 @@
 import { createElementFactory } from "./elements.ts";
 import type { Attributes } from "./types.ts";
-import { salt } from "../helpers.ts";
+import { generateUniqueClass } from "../utils.ts";
 import type { Template } from "../types.ts";
-
-type StyledComponent = {
-  className: string;
-  style: string;
-  factory: ReturnType<typeof createElementFactory>;
-};
 
 export function styled<T extends Attributes>(
   elementFactory: ReturnType<typeof createElementFactory<T>>
 ) {
   return (strings: TemplateStringsArray, ...values: any[]) => {
-    const className = `s${salt()}`;
+    const className = generateUniqueClass();
     const cssContent = strings.reduce(
       (result, str, i) => result + str + (values[i] || ""),
       ""
@@ -30,10 +24,27 @@ export function styled<T extends Attributes>(
         class: `${className} ${existingClass}`.trim(),
       });
 
-      // Добавляем CSS в Template
       template.css = processedCss;
+      template.rootClass = className;
 
       return template;
     };
+  };
+}
+
+export function css(strings: TemplateStringsArray, ...values: any[]) {
+  const cssContent = strings.reduce(
+    (result, str, i) => result + str + (values[i] || ""),
+    ""
+  );
+
+  return (component: Template) => {
+    const className = component.rootClass || generateUniqueClass();
+    const processedCss = cssContent.replace(/\${Component}/g, `.${className}`);
+
+    component.css = (component.css || "") + processedCss;
+    component.rootClass = className;
+
+    return component;
   };
 }
