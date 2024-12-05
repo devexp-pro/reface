@@ -19,10 +19,3 @@ export function styles(...args: StyleInput[]): string {
 
   return result.join(" ");
 }
-
-export function cssVar(name: string, value?: string): string {
-  if (value === undefined) {
-    return `var(--${name})`;
-  }
-  return `--${name}: ${value}`;
-}

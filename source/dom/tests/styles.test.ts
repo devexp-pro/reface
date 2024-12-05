@@ -1,5 +1,6 @@
 import { assert } from "@std/assert";
-import { styles, cssVar } from "../styles.ts";
+import { styles } from "../styles.ts";
+import { cssVar } from "../css.ts";
 
 Deno.test("styles function", async (t) => {
   await t.step("handles string inputs", () => {

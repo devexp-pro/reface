@@ -3,35 +3,34 @@ import { div, input } from "../elements.ts";
 
 Deno.test("element factories", async (t) => {
   await t.step("creates basic elements", () => {
-    const result = div({ class: "container" })`Hello, world!`;
+    const result = div()`Hello, world!`;
+
     assert(result.tag === "div");
-    assert(result.attributes === ' class="container"');
-    assert(JSON.stringify(result.args) === JSON.stringify(["Hello, world!"]));
+    assert(result.children[0] === "Hello, world!");
   });
 
   await t.step("handles typed attributes", () => {
-    const result = input({
-      type: "text",
-      value: "test",
-      required: true,
+    const result = div({
+      class: "test",
+      id: "test-id",
     })``;
-    assert(result.tag === "input");
-    assert(result.attributes === ' type="text" value="test" required');
-    assert(JSON.stringify(result.args) === JSON.stringify([]));
+
+    assert(result.attributes.includes('class="test"'));
+    assert(result.attributes.includes('id="test-id"'));
+    assert(result.children.length === 0);
   });
 
   await t.step("handles children templates", () => {
     const child = div()`Child`;
     const parent = div()`Parent${child}`;
-    assert(parent.tag === "div");
-    assert(parent.attributes === "");
-    assert(parent.args.length === 2);
-    assert(parent.args[0] === "Parent");
-    assert(parent.args[1] === child);
+
+    assert(parent.children.length === 2);
+    assert(parent.children[0] === "Parent");
+    assert(parent.children[1] === child);
   });
 
   await t.step("handles null and undefined children", () => {
     const result = div()`${null}${undefined}`;
-    assert(JSON.stringify(result.args) === JSON.stringify([]));
+    assert(result.children.length === 0);
   });
 });

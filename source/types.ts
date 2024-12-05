@@ -51,15 +51,16 @@ export type PageProps = {
   query: Record<string, string>;
 };
 
-export type Template = {
-  isTemplate: boolean;
+export interface Template {
+  tag: string;
+  attributes: string;
+  children: unknown[];
+  css: string;
+  rootClass: string;
+  isTemplate: true;
   str: TemplateStringsArray;
-  args: Array<any | Template>;
-  tag?: string;
-  attributes?: string;
-  css?: string;
-  rootClass?: string;
-};
+  args: (string | Template)[];
+}
 
 export type Style = {
   isStyle: boolean;
