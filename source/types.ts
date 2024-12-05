@@ -19,7 +19,7 @@ export type RestHandlers = {
 };
 
 export type RestHandler = (
-  req: RefaceRequest,
+  req: RefaceRequest
   // log: (...args: any[]) => void; TODO: add luminous logger
 ) => Promise<RefaceResponse>;
 
@@ -55,6 +55,8 @@ export type Template = {
   isTemplate: boolean;
   str: TemplateStringsArray;
   args: Array<any | Template>;
+  tag?: string;
+  attributes?: string;
 };
 
 export type Style = {
@@ -76,13 +78,11 @@ export type RpcCalls<R> = {
 };
 
 export type RpcHandlers<R> = {
-  [key in keyof R]: (
-    _: {
-      args: R[key];
-      // req: RefaceRequest; TODO: add req
-      // log: (...args: any[]) => void; TODO: add luminous logger
-    },
-  ) => Promise<{
+  [key in keyof R]: (_: {
+    args: R[key];
+    // req: RefaceRequest; TODO: add req
+    // log: (...args: any[]) => void; TODO: add luminous logger
+  }) => Promise<{
     html?: string;
     status?: number;
   }>;
@@ -90,22 +90,20 @@ export type RpcHandlers<R> = {
 
 export type Island<R, P> = {
   name?: string;
-  template: (
-    args: {
-      props: P;
-      rpc: RpcCalls<R>;
-      // log: (...args: any[]) => void; TODO: add luminous logger
-      rest: {
-        hx: (
-          name: string | "self",
-          method: "get" | "post" | "put" | "delete" | "patch",
-          route: string,
-        ) => string;
-      };
-      partial?: (name: string) => string; // TODO: add partial
-      island?: (name: string) => string; // TODO: add island
-    },
-  ) => Template;
+  template: (args: {
+    props: P;
+    rpc: RpcCalls<R>;
+    // log: (...args: any[]) => void; TODO: add luminous logger
+    rest: {
+      hx: (
+        name: string | "self",
+        method: "get" | "post" | "put" | "delete" | "patch",
+        route: string
+      ) => string;
+    };
+    partial?: (name: string) => string; // TODO: add partial
+    island?: (name: string) => string; // TODO: add island
+  }) => Template;
   rpc?: RpcHandlers<R>;
   rest?: RestHandlers;
 };

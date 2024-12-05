@@ -16,7 +16,8 @@
     "./resources/styles": "./source/resources/styles.ts",
     "./resources/icons": "./source/resources/icons.ts",
     "./resources/fonts": "./source/resources/fonts.ts",
-    "./types": "./source/types.ts"
+    "./types": "./source/types.ts",
+    "./dom": "./source/dom/mod.ts"
   },
   "imports": {
     "$/": "./source/",
