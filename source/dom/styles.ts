@@ -1,5 +1,4 @@
-// Утилиты для работы со стилями
-export type StyleInput = string | Record<string, string | number | undefined>;
+import type { StyleInput } from "./types.ts";
 
 export function styles(...args: StyleInput[]): string {
   const result: string[] = [];

@@ -7,6 +7,16 @@ import type {
   AnchorAttributes,
   FormAttributes,
   SVGAttributes,
+  TitleAttributes,
+  MetaAttributes,
+  LinkAttributes,
+  StyleAttributes,
+  ScriptAttributes,
+  BaseAttributes,
+  NoscriptAttributes,
+  CanvasAttributes,
+  DialogAttributes,
+  TimeAttributes,
 } from "./types.ts";
 import { attrs } from "./attributes.ts";
 
@@ -118,7 +128,7 @@ export const blockquote = createElementFactory<Attributes>("blockquote");
 // Интерактивные элементы
 export const details = createElementFactory<Attributes>("details");
 export const summary = createElementFactory<Attributes>("summary");
-export const dialog = createElementFactory<Attributes>("dialog");
+export const dialog = createElementFactory<DialogAttributes>("dialog");
 export const menu = createElementFactory<Attributes>("menu");
 export const menuitem = createElementFactory<Attributes>("menuitem");
 
@@ -136,3 +146,16 @@ export const datalist = createElementFactory<Attributes>("datalist");
 export const output = createElementFactory<Attributes>("output");
 export const progress = createElementFactory<Attributes>("progress");
 export const meter = createElementFactory<Attributes>("meter");
+
+// Элементы для <head>
+export const title = createElementFactory<TitleAttributes>("title");
+export const meta = createElementFactory<MetaAttributes>("meta");
+export const link = createElementFactory<LinkAttributes>("link");
+export const style = createElementFactory<StyleAttributes>("style");
+export const script = createElementFactory<ScriptAttributes>("script");
+export const base = createElementFactory<BaseAttributes>("base");
+export const noscript = createElementFactory<NoscriptAttributes>("noscript");
+
+// Специальные элементы
+export const canvas = createElementFactory<CanvasAttributes>("canvas");
+export const time = createElementFactory<TimeAttributes>("time");

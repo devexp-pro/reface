@@ -1,5 +1,6 @@
 import type { Template } from "../types.ts";
-import type { StyleInput } from "./styles.ts";
+
+export type StyleInput = string | Record<string, string | number | undefined>;
 
 // Базовые типы для значений классов
 export type ClassValue = {
@@ -30,6 +31,7 @@ export interface HTMLAttributes {
 // События
 export type EventHandler = `${string}(${string})` | undefined;
 
+// TODO: Подумать на тему того, чтобы не использовать EventHandler
 export interface EventAttributes {
   onClick?: EventHandler;
   onChange?: EventHandler;
@@ -143,12 +145,64 @@ export interface TableCellAttributes extends Attributes {
 
 // Дополнительные ARIA атрибуты
 export interface AriaAttributes {
+  // Роли и состояния
+  role?:
+    | "button"
+    | "checkbox"
+    | "dialog"
+    | "gridcell"
+    | "link"
+    | "menuitem"
+    | "menuitemcheckbox"
+    | "menuitemradio"
+    | "option"
+    | "progressbar"
+    | "radio"
+    | "scrollbar"
+    | "searchbox"
+    | "slider"
+    | "spinbutton"
+    | "switch"
+    | "tab"
+    | "tabpanel"
+    | "textbox"
+    | "treeitem";
   "aria-expanded"?: boolean;
-  "aria-controls"?: string;
+  "aria-pressed"?: boolean | "mixed";
   "aria-selected"?: boolean;
-  "aria-current"?: boolean | "page" | "step" | "location" | "date" | "time";
+  "aria-checked"?: boolean | "mixed";
+  "aria-disabled"?: boolean;
+  "aria-hidden"?: boolean;
+  "aria-invalid"?: boolean | "grammar" | "spelling";
+  "aria-required"?: boolean;
+
+  // Взаимосвязи
+  "aria-controls"?: string;
   "aria-describedby"?: string;
-  role?: string;
+  "aria-labelledby"?: string;
+  "aria-owns"?: string;
+  "aria-flowto"?: string;
+
+  // Живые регионы
+  "aria-live"?: "off" | "polite" | "assertive";
+  "aria-atomic"?: boolean;
+  "aria-relevant"?: "additions" | "removals" | "text" | "all";
+  "aria-busy"?: boolean;
+
+  // Drag & Drop
+  "aria-grabbed"?: boolean;
+  "aria-dropeffect"?: "none" | "copy" | "move" | "link" | "execute" | "popup";
+
+  // Значения и диапазоны
+  "aria-valuemin"?: number;
+  "aria-valuemax"?: number;
+  "aria-valuenow"?: number;
+  "aria-valuetext"?: string;
+
+  // Структура документа
+  "aria-level"?: number;
+  "aria-setsize"?: number;
+  "aria-posinset"?: number;
 }
 
 export interface IframeAttributes extends Attributes {
@@ -177,4 +231,66 @@ export interface MeterAttributes extends Attributes {
 
 export interface DetailsAttributes extends Attributes {
   open?: boolean;
+}
+
+// Типы для элементов <head>
+export interface TitleAttributes extends Attributes {}
+
+export interface MetaAttributes extends Attributes {
+  charset?: string;
+  name?: string;
+  content?: string;
+  httpEquiv?: string;
+}
+
+export interface LinkAttributes extends Attributes {
+  rel?: string;
+  href?: string;
+  type?: string;
+  media?: string;
+  integrity?: string;
+  crossorigin?: "anonymous" | "use-credentials";
+}
+
+export interface StyleAttributes extends Attributes {
+  type?: string;
+  media?: string;
+}
+
+export interface ScriptAttributes extends Attributes {
+  src?: string;
+  type?: string;
+  async?: boolean;
+  defer?: boolean;
+  integrity?: string;
+  crossorigin?: "anonymous" | "use-credentials";
+}
+
+export interface BaseAttributes extends Attributes {
+  href?: string;
+  target?: "_blank" | "_self" | "_parent" | "_top";
+}
+
+export interface NoscriptAttributes extends Attributes {}
+
+// Canvas и специальные элементы
+export interface CanvasAttributes extends Attributes {
+  width?: number;
+  height?: number;
+  // WebGL контекст
+  webgl?: boolean;
+  webgl2?: boolean;
+  // 2D контекст
+  alpha?: boolean;
+  desynchronized?: boolean;
+  willReadFrequently?: boolean;
+}
+
+export interface DialogAttributes extends Attributes {
+  open?: boolean;
+  returnValue?: string;
+}
+
+export interface TimeAttributes extends Attributes {
+  datetime?: string;
 }
