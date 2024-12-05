@@ -1,18 +1,24 @@
-import type { Template } from "$/types.ts";
+import type {
+  Attributes,
+  ClassInput,
+  ElementChildren,
+  ElementFactory,
+  InputAttributes,
+  ImageAttributes,
+  AnchorAttributes,
+  FormAttributes,
+  SVGAttributes,
+} from "./types.ts";
 
-export type ClassValue = {
-  [key: string]: boolean;
-};
-
-export function classNames(...args: (string | ClassValue | undefined)[]) {
+export function classNames(...args: ClassInput[]): string {
   const classes: string[] = [];
 
   args.forEach((arg) => {
     if (!arg) return;
 
     if (typeof arg === "string") {
-      classes.push(arg);
-    } else {
+      classes.push(...arg.split(" ").filter(Boolean));
+    } else if (typeof arg === "object") {
       Object.entries(arg).forEach(([key, value]) => {
         if (value) classes.push(key);
       });
@@ -22,14 +28,13 @@ export function classNames(...args: (string | ClassValue | undefined)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export type Attributes = {
-  [key: string]: string | number | boolean | undefined;
-};
-
 export function attrs(attributes: Attributes): string {
   return Object.entries(attributes)
     .filter(([_, value]) => value !== undefined)
     .map(([key, value]) => {
+      if (key === "class") {
+        value = classNames(value);
+      }
       if (value === true) return key;
       if (value === false) return "";
       return `${key}="${value}"`;
@@ -38,11 +43,14 @@ export function attrs(attributes: Attributes): string {
     .join(" ");
 }
 
-type ElementChildren = string | Template | null | undefined;
-
-function createElementFactory(tag: string) {
-  return (attrs: Attributes = {}) => {
-    return (strings: TemplateStringsArray, ...values: ElementChildren[]) => {
+function createElementFactory<T extends Attributes = Attributes>(
+  tag: string
+): (
+  attrs?: T
+) => (...args: [TemplateStringsArray, ...ElementChildren]) => Template {
+  return (attrsObj: T = {} as T) => {
+    const attributes = attrs(attrsObj);
+    return (strings: TemplateStringsArray, ...values: ElementChildren) => {
       const children = values.map((value) => {
         if (value === null || value === undefined) return "";
         if (typeof value === "string") return value;
@@ -51,8 +59,6 @@ function createElementFactory(tag: string) {
         }
         return String(value);
       });
-
-      const attributes = attrs(attrs);
 
       return {
         isTemplate: true,
@@ -65,34 +71,39 @@ function createElementFactory(tag: string) {
   };
 }
 
-// HTML элементы
-export const div = createElementFactory("div");
-export const span = createElementFactory("span");
-export const p = createElementFactory("p");
-export const a = createElementFactory("a");
-export const button = createElementFactory("button");
-export const input = createElementFactory("input");
-export const form = createElementFactory("form");
-export const label = createElementFactory("label");
-export const select = createElementFactory("select");
-export const option = createElementFactory("option");
-export const textarea = createElementFactory("textarea");
-export const img = createElementFactory("img");
-export const pre = createElementFactory("pre");
-export const code = createElementFactory("code");
+// HTML элементы с типизированными атрибутами
+export const input = createElementFactory<InputAttributes>("input");
+export const img = createElementFactory<ImageAttributes>("img");
+export const a = createElementFactory<AnchorAttributes>("a");
+export const form = createElementFactory<FormAttributes>("form");
+
+// Обычные HTML элементы
+export const div = createElementFactory<Attributes>("div");
+export const span = createElementFactory<Attributes>("span");
+export const p = createElementFactory<Attributes>("p");
+export const button = createElementFactory<Attributes>("button");
+export const label = createElementFactory<Attributes>("label");
+export const select = createElementFactory<Attributes>("select");
+export const option = createElementFactory<Attributes>("option");
+export const textarea = createElementFactory<Attributes>("textarea");
+export const pre = createElementFactory<Attributes>("pre");
+export const code = createElementFactory<Attributes>("code");
 
 // Семантические элементы
-export const header = createElementFactory("header");
-export const nav = createElementFactory("nav");
-export const main = createElementFactory("main");
-export const footer = createElementFactory("footer");
-export const section = createElementFactory("section");
-export const article = createElementFactory("article");
-export const aside = createElementFactory("aside");
+export const header = createElementFactory<Attributes>("header");
+export const nav = createElementFactory<Attributes>("nav");
+export const main = createElementFactory<Attributes>("main");
+export const footer = createElementFactory<Attributes>("footer");
+export const section = createElementFactory<Attributes>("section");
+export const article = createElementFactory<Attributes>("article");
+export const aside = createElementFactory<Attributes>("aside");
 
 // SVG элементы
-export const svg = createElementFactory("svg");
-export const path = createElementFactory("path");
-export const circle = createElementFactory("circle");
-export const rect = createElementFactory("rect");
-export const line = createElementFactory("line");
+export const svg = createElementFactory<SVGAttributes>("svg");
+export const path = createElementFactory<SVGAttributes>("path");
+export const circle = createElementFactory<SVGAttributes>("circle");
+export const rect = createElementFactory<SVGAttributes>("rect");
+export const line = createElementFactory<SVGAttributes>("line");
+
+// Реэкспорт типов
+export * from "./types.ts";
