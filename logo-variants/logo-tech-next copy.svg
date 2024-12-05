@@ -1,0 +1,60 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="eyeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3182CE"/>
+      <stop offset="100%" style="stop-color:#63B3ED"/>
+    </linearGradient>
+    <linearGradient id="glowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3182CE;stop-opacity:0.1"/>
+      <stop offset="100%" style="stop-color:#63B3ED;stop-opacity:0"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Фоновое свечение -->
+  <circle cx="100" cy="35" r="25" 
+          fill="url(#glowGradient)" 
+          filter="url(#glow)"/>
+
+  <!-- Основной символ - глаз -->
+  <g transform="translate(70, 20)">
+    <!-- Внешний контур -->
+    <path d="M0 15 
+             A30 30 0 0 1 60 15
+             A30 30 0 0 1 0 15"
+          stroke="url(#eyeGradient)"
+          stroke-width="2"
+          fill="none"/>
+    
+    <!-- Внутренний ромб -->
+    <path d="M30 5 L45 15 L30 25 L15 15 Z" 
+          fill="url(#eyeGradient)"
+          opacity="0.9"/>
+  </g>
+
+  <!-- Название -->
+  <g transform="translate(45, 65)">
+    <text font-family="system-ui, -apple-system, sans-serif" 
+          font-size="32" 
+          font-weight="700"
+          letter-spacing="-1">
+      <tspan fill="#3182CE">Re</tspan>
+      <tspan fill="#63B3ED">Face</tspan>
+    </text>
+  </g>
+
+  <!-- Подзаголовок -->
+  <text x="100" y="75" 
+        text-anchor="middle"
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="11"
+        font-weight="500"
+        letter-spacing="3"
+        fill="#4A5568"
+        text-transform="uppercase">
+    template engine
+  </text>
+</svg> 

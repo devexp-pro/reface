@@ -1,0 +1,40 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Основной фон для логотипа -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2B6CB0;stop-opacity:0.1"/>
+      <stop offset="100%" style="stop-color:#4299E1;stop-opacity:0.1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Фоновая фигура -->
+  <rect x="10" y="10" width="180" height="60" rx="8" fill="url(#bgGradient)"/>
+
+  <!-- Декоративные элементы - символизируют компоненты -->
+  <g transform="translate(20, 20)" opacity="0.2">
+    <path d="M0 0 L15 0 L15 15 L0 15 Z" fill="#2B6CB0"/>
+    <path d="M20 5 L35 5 L35 20 L20 20 Z" fill="#4299E1"/>
+  </g>
+
+  <!-- Основной символ - стилизованные < > -->
+  <g transform="translate(75, 15)">
+    <path d="M0 15 L12 0 L24 0 L12 15 L24 30 L12 30 L0 15Z" fill="#2B6CB0"/>
+    <path d="M30 0 L42 15 L30 30 L18 30 L30 15 L18 0 L30 0Z" fill="#4299E1"/>
+  </g>
+
+  <!-- Название -->
+  <g transform="translate(45, 60)">
+    <text font-family="system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" letter-spacing="-0.5">
+      <tspan fill="#2B6CB0">Re</tspan>
+      <tspan fill="#4299E1">Face</tspan>
+    </text>
+  </g>
+
+  <!-- Подзаголовок -->
+  <text x="100" y="75" text-anchor="middle" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="11" 
+        fill="#718096">
+    template engine
+  </text>
+</svg> 

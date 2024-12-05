@@ -1,0 +1,41 @@
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2B6CB0;stop-opacity:0.05"/>
+      <stop offset="100%" style="stop-color:#4299E1;stop-opacity:0.05"/>
+    </linearGradient>
+    <linearGradient id="symbolGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2B6CB0"/>
+      <stop offset="100%" style="stop-color:#4299E1"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="10" y="10" width="180" height="60" rx="12" 
+        fill="url(#bgGradient)"
+        filter="drop-shadow(0 4px 6px rgba(43, 108, 176, 0.1))"/>
+
+  <g transform="translate(20, 20)" opacity="0.1" stroke="#4299E1" stroke-width="0.5">
+    <path d="M0 0 L15 0 M0 5 L15 5 M0 10 L15 10 M0 15 L15 15"/>
+    <path d="M0 0 L0 15 M5 0 L5 15 M10 0 L10 15 M15 0 L15 15"/>
+  </g>
+
+  <g transform="translate(70, 15)">
+    <path d="M0 15 C0 15, 8 0, 24 0 L24 0 L12 15 L24 30 L12 30 C12 30, 0 20, 0 15Z" 
+          fill="url(#symbolGradient)"/>
+    <path d="M30 0 C46 0, 54 15, 54 15 C54 15, 46 30, 30 30 L18 30 L30 15 L18 0Z" 
+          fill="url(#symbolGradient)" opacity="0.8"/>
+  </g>
+
+  <g transform="translate(45, 60)">
+    <text font-family="system-ui, -apple-system, sans-serif" 
+          font-size="26" font-weight="600" letter-spacing="-0.8">
+      <tspan fill="#2B6CB0">Re</tspan>
+      <tspan fill="#4299E1">Face</tspan>
+    </text>
+  </g>
+
+  <text x="100" y="75" text-anchor="middle" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="11" font-weight="500" letter-spacing="0.5"
+        fill="#64748B">template engine</text>
+</svg> 
