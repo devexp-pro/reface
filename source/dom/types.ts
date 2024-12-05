@@ -1,4 +1,4 @@
-import type { Template } from "$/types.ts";
+import type { Template } from "../types.ts";
 
 // Базовые типы для значений классов
 export type ClassValue = {
@@ -9,7 +9,8 @@ export type ClassInput =
   | string
   | Record<string, boolean | undefined | null>
   | null
-  | undefined;
+  | undefined
+  | boolean;
 
 // HTML атрибуты
 export interface HTMLAttributes {

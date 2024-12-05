@@ -1,3 +1,4 @@
+import type { Template } from "../types.ts";
 import type {
   Attributes,
   ClassInput,
@@ -33,7 +34,7 @@ export function attrs(attributes: Attributes): string {
     .filter(([_, value]) => value !== undefined)
     .map(([key, value]) => {
       if (key === "class") {
-        value = classNames(value);
+        value = classNames(value as ClassInput);
       }
       if (value === true) return key;
       if (value === false) return "";
@@ -51,19 +52,32 @@ function createElementFactory<T extends Attributes = Attributes>(
   return (attrsObj: T = {} as T) => {
     const attributes = attrs(attrsObj);
     return (strings: TemplateStringsArray, ...values: ElementChildren) => {
-      const children = values.map((value) => {
-        if (value === null || value === undefined) return "";
-        if (typeof value === "string") return value;
-        if (value && typeof value === "object" && "isTemplate" in value) {
-          return value;
+      const result: (string | Template)[] = [];
+
+      for (let i = 0; i < strings.length; i++) {
+        const str = strings[i];
+        if (str.trim()) result.push(str);
+
+        if (i < values.length) {
+          const value = values[i];
+          if (value === null || value === undefined) {
+            continue;
+          } else if (typeof value === "string" || typeof value === "number") {
+            const strValue = String(value).trim();
+            if (strValue) result.push(strValue);
+          } else if (typeof value === "object" && "isTemplate" in value) {
+            result.push(value);
+          } else {
+            const strValue = String(value).trim();
+            if (strValue) result.push(strValue);
+          }
         }
-        return String(value);
-      });
+      }
 
       return {
         isTemplate: true,
         str: strings,
-        args: children,
+        args: result,
         tag,
         attributes: attributes ? ` ${attributes}` : "",
       };
