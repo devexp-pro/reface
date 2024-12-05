@@ -55,4 +55,31 @@ Deno.test("attrs function", async (t) => {
     assert(attrs({ id: undefined }) === "");
     assert(attrs({ id: "test", title: undefined }) === 'id="test"');
   });
+
+  await t.step("handles style attribute", () => {
+    assert(attrs({ style: "color: red;" }) === 'style="color: red;"');
+    assert(
+      attrs({ style: { color: "red", fontSize: "16px" } }) ===
+        'style="color: red; fontSize: 16px;"'
+    );
+    assert(
+      attrs({
+        style: {
+          color: "red",
+          backgroundColor: "blue",
+          margin: 0,
+        },
+      }) === 'style="color: red; backgroundColor: blue; margin: 0;"'
+    );
+  });
+
+  await t.step("handles mixed attributes", () => {
+    assert(
+      attrs({
+        class: { active: true },
+        style: { color: "red" },
+        id: "test",
+      }) === 'class="active" style="color: red;" id="test"'
+    );
+  });
 });

@@ -1,4 +1,5 @@
 import type { Template } from "../types.ts";
+import type { StyleInput } from "./styles.ts";
 
 // Базовые типы для значений классов
 export type ClassValue = {
@@ -15,7 +16,7 @@ export type ClassInput =
 // HTML атрибуты
 export interface HTMLAttributes {
   class?: string | ClassValue;
-  style?: string;
+  style?: string | StyleInput;
   id?: string;
   title?: string;
   role?: string;
@@ -148,4 +149,32 @@ export interface AriaAttributes {
   "aria-current"?: boolean | "page" | "step" | "location" | "date" | "time";
   "aria-describedby"?: string;
   role?: string;
+}
+
+export interface IframeAttributes extends Attributes {
+  src?: string;
+  srcdoc?: string;
+  allow?: string;
+  allowfullscreen?: boolean;
+  loading?: "lazy" | "eager";
+  name?: string;
+  sandbox?: string;
+}
+
+export interface ProgressAttributes extends Attributes {
+  value?: number;
+  max?: number;
+}
+
+export interface MeterAttributes extends Attributes {
+  value?: number;
+  min?: number;
+  max?: number;
+  low?: number;
+  high?: number;
+  optimum?: number;
+}
+
+export interface DetailsAttributes extends Attributes {
+  open?: boolean;
 }

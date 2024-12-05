@@ -102,3 +102,37 @@ export const li = createElementFactory<Attributes>("li");
 export const video = createElementFactory<Attributes>("video");
 export const audio = createElementFactory<Attributes>("audio");
 export const source = createElementFactory<Attributes>("source");
+
+// Текстовые элементы
+export const h1 = createElementFactory<Attributes>("h1");
+export const h2 = createElementFactory<Attributes>("h2");
+export const h3 = createElementFactory<Attributes>("h3");
+export const h4 = createElementFactory<Attributes>("h4");
+export const h5 = createElementFactory<Attributes>("h5");
+export const h6 = createElementFactory<Attributes>("h6");
+export const strong = createElementFactory<Attributes>("strong");
+export const em = createElementFactory<Attributes>("em");
+export const small = createElementFactory<Attributes>("small");
+export const blockquote = createElementFactory<Attributes>("blockquote");
+
+// Интерактивные элементы
+export const details = createElementFactory<Attributes>("details");
+export const summary = createElementFactory<Attributes>("summary");
+export const dialog = createElementFactory<Attributes>("dialog");
+export const menu = createElementFactory<Attributes>("menu");
+export const menuitem = createElementFactory<Attributes>("menuitem");
+
+// Встраиваемый контент
+export const iframe = createElementFactory<Attributes>("iframe");
+export const object = createElementFactory<Attributes>("object");
+export const embed = createElementFactory<Attributes>("embed");
+export const picture = createElementFactory<Attributes>("picture");
+
+// Формы
+export const fieldset = createElementFactory<Attributes>("fieldset");
+export const legend = createElementFactory<Attributes>("legend");
+export const optgroup = createElementFactory<Attributes>("optgroup");
+export const datalist = createElementFactory<Attributes>("datalist");
+export const output = createElementFactory<Attributes>("output");
+export const progress = createElementFactory<Attributes>("progress");
+export const meter = createElementFactory<Attributes>("meter");

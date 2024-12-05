@@ -1,5 +1,6 @@
 // Функции для работы с атрибутами
 import type { Attributes, ClassInput } from "./types.ts";
+import { styles, type StyleInput } from "./styles.ts";
 
 export function classNames(...args: ClassInput[]): string {
   const classes: string[] = [];
@@ -25,6 +26,8 @@ export function attrs(attributes: Attributes): string {
     .map(([key, value]) => {
       if (key === "class") {
         value = classNames(value as ClassInput);
+      } else if (key === "style" && typeof value === "object") {
+        value = styles(value as StyleInput);
       }
       if (value === true) return key;
       if (value === false) return "";
