@@ -1,4 +1,4 @@
-import type { StyleInput } from "./types.ts";
+import type { StyleInput } from "./types/mod.ts";
 
 export function styles(...args: StyleInput[]): string {
   const result: string[] = [];

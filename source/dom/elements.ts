@@ -1,7 +1,6 @@
 import type { Template } from "../types.ts";
 import type {
   Attributes,
-  ElementChildren,
   InputAttributes,
   ImageAttributes,
   AnchorAttributes,
@@ -17,7 +16,8 @@ import type {
   CanvasAttributes,
   DialogAttributes,
   TimeAttributes,
-} from "./types.ts";
+  ElementChildren,
+} from "./types/mod.ts";
 import { attrs } from "./attributes.ts";
 
 export function createElementFactory<T extends Attributes = Attributes>(
