@@ -4,15 +4,18 @@ import { createElementFactory } from "../elements/mod.ts";
 import { generateUniqueClass } from "../utils.ts";
 import type { ElementChild } from "../dom/types/base.ts";
 import type { StyledComponent } from "./types.ts";
+import * as elements from "../elements/mod.ts";
 
-export function styled<T extends Attributes>(
+type ElementsMap = typeof elements;
+
+function createStyled<T extends Attributes>(
   elementFactory: ReturnType<typeof createElementFactory<T>>
 ) {
   return (strings: TemplateStringsArray, ...values: ElementChild[]) => {
     const className = generateUniqueClass();
     const tag = elementFactory.name.toLowerCase();
 
-    // Собираем CSS и заменяем селекторы
+    // CSS processing logic...
     let css = strings
       .reduce((result, str, i) => {
         const value = values[i];
@@ -23,7 +26,6 @@ export function styled<T extends Attributes>(
       }, "")
       .trim();
 
-    // Заменяем & на класс
     css = css
       .replace(/&\s*{/g, `.${className} {`)
       .replace(/&\s*\${/g, `.${className} .`)
@@ -67,4 +69,29 @@ export function styled<T extends Attributes>(
   };
 }
 
+// Создаем базовую функцию styled
+export function styled<T extends Attributes>(
+  component: ReturnType<typeof createElementFactory<T>> | StyledComponent<T>
+) {
+  return createStyled(component);
+}
+
+// Добавляем методы для каждого HTML элемента
+type StyledElements = {
+  [K in keyof ElementsMap]: ReturnType<typeof createStyled<any>>;
+};
+
+const styledElements = Object.entries(elements).reduce(
+  (acc, [key, element]) => ({
+    ...acc,
+    [key]: createStyled(element),
+  }),
+  {}
+) as StyledElements;
+
+// Объединяем базовую функцию с методами элементов
+export const styledApi = Object.assign(styled, styledElements);
+
+// Экспортируем как default и named export
+export default styledApi;
 export { css } from "../dom/css.ts";

@@ -21,7 +21,8 @@ All notable changes to this project will be documented in this file.
 
 #### Styled Components (`/styled`)
 
-- `styled(element)`: Creates styled component
+- `styled(element)`: Creates styled component from existing element or component
+- `styled.{element}`: Direct element styled components (e.g. `styled.div`)
 - `css`: Template literal tag for CSS
 - `cssVar(name, value?)`: CSS variable helper
 
