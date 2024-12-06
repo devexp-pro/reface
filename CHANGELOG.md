@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 - `css`: Template literal tag for CSS
 - `cssVar(name, value?)`: CSS variable helper
 
-#### Element Functions
+#### DOM API
 
 - HTML elements: `div()`, `span()`, `button()`, etc.
 - SVG elements: `svg()`, `path()`, `circle()`, etc.
