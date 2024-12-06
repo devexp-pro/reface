@@ -1,15 +1,5 @@
 /**
- * Base HTML attributes
- */
-export interface HTMLAttributes extends Record<string, unknown> {
-  class?: string;
-  id?: string;
-  style?: string;
-  [key: `data-${string}`]: string | number | boolean | undefined;
-}
-
-/**
- * Base template interface for all components
+ * Base template interface
  */
 export interface Template {
   tag: string;
@@ -20,6 +10,16 @@ export interface Template {
   str: TemplateStringsArray;
   args: (string | Template)[];
   rootClass: string;
+}
+
+/**
+ * Base HTML attributes
+ */
+export interface HTMLAttributes {
+  class?: string;
+  id?: string;
+  style?: string;
+  [key: `data-${string}`]: string | number | boolean | undefined;
 }
 
 /**
@@ -43,3 +43,8 @@ export type ElementFactory<A> = {
   ) => Template;
   (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
 };
+
+/**
+ * Template generator function
+ */
+export type TemplateGenerator<T> = (props: T) => Template;

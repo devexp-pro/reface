@@ -1,45 +1,50 @@
-import type {
-  Island,
-  RpcDefinition,
-  Style,
-  TemplateGenerator,
-} from "$/types.ts";
+// Framework
+export { Reface } from "./reface/mod.ts";
+export type { RefaceOptions } from "./reface/mod.ts";
 
-import { Reface } from "./Reface.ts";
+// Core
+export {
+  render,
+  type Template,
+  type ElementChild,
+  type ElementFactory,
+  type HTMLAttributes,
+  type TemplateGenerator,
+} from "./core/mod.ts";
 
-const component = <T>(generate: TemplateGenerator<T>): TemplateGenerator<T> =>
-  generate;
+// Elements
+export {
+  styled,
+  css,
+  cssVar,
+  keyframes,
+  // Base elements
+  div,
+  span,
+  p,
+  button,
+  // Types
+  type StyledComponent,
+  type StyledFactory,
+} from "./elements/mod.ts";
 
-const island = <R extends RpcDefinition, P = {}>(
-  _: Island<R, P>
-): TemplateGenerator<P> => Reface.addIsland(_);
+// Layouts
+export { clean, twa, type Layout, type LayoutOptions } from "./layouts/mod.ts";
 
-export const inlineStyle = <P = undefined>(
-  _: P extends undefined ? () => Style : (prop: P) => Style
-) => {
-  return (props: P) => {
-    const data = _(props);
+// JSX
+export { createElement, Fragment } from "./jsx/mod.ts";
 
-    let result = "";
+// Component helpers
+export function component<T>(
+  generate: TemplateGenerator<T>
+): TemplateGenerator<T> {
+  return generate;
+}
 
-    for (let i = 0; i < data.str.length; i++) {
-      result += data.str[i];
-
-      if (i < data.args.length) {
-        result += data.args[i];
-      }
-    }
-
-    // return result;
-    return `style="${result}"`.trim().replace(/\n/g, "");
-  };
-};
-
-export { component, island, Reface };
-export * from "./core/render.ts";
-export * from "./helpers/mod.ts";
-export * from "$/types.ts";
-export * from "$/layouts/mod.ts";
-export * from "$/html/mod.ts";
-
-export * as elements from "./elements/mod.ts";
+/**
+ * Response helper
+ */
+export const RESPONSE = (html?: string | Template, status?: number) => ({
+  html: typeof html === "string" ? html : html ? render(html) : undefined,
+  status,
+});
