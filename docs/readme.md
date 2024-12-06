@@ -1,233 +1,138 @@
-<div style="display: flex; justify-content: center;">
-  <img src="./_assets/logo.svg" alt="Reface" style="width: 300px; height: auto;" />
+<div align="center">
+  <img src="./assets/logo.svg" alt="Reface" width="300" />
+  <h1>Reface</h1>
+  <p><strong>Modern Template Engine for Server-Side Applications</strong></p>
 </div>
 
-# Reface Framework
+## Overview
 
-Reface is a lightweight framework for building interactive web applications with server-side rendering and islands architecture.
+Reface is a modern template engine that combines several powerful approaches:
 
-## Core Concepts
+- **Server-Side Rendering** - All templates are rendered on the server
+- **Islands Architecture** - Interactive parts are isolated and hydrated
+- **Type Safety** - Full TypeScript support with compile-time checks
+- **Multiple APIs** - Choose the approach that fits your needs
 
-### Islands Architecture
+## Features
 
-Reface uses the islands architecture pattern, where most of the page is static HTML with interactive "islands" that can be hydrated with JavaScript functionality.
+### 🎨 Multiple Styling Approaches
 
-### Server-Side Rendering
+- Styled Components with CSS nesting
+- CSS-in-JS with theme support
+- Global styles and CSS variables
+- Dynamic styling based on props
 
-All components are rendered on the server, providing excellent performance and SEO benefits.
+### 🔧 Flexible Template Creation
 
-## Documentation
+- Tagged template literals
+- JSX support
+- Functional approach
+- Component composition
 
-- [DOM API](./dom/readme.md)
-  - [Html](./dom/html.md)
-  - [CSS](./dom/css.md)
-  - [Styled()](./dom/styled.md)
-  - [DOM](./dom/dom.md)
-  - [JSX/TSX](./dom/jsx.md)
-- [Components API](./components.md)
-- [Layouts API](./layouts.md)
+### 🛡️ Type Safety
 
-## Basic Usage
+- Full TypeScript support
+- Type inference
+- Compile-time checks
+- Attribute validation
 
-```tsx
-import { Hono } from "@hono/hono";
-import { Reface, clean, island, component } from "@vseplet/reface";
+### 🚀 Modern Development
 
-// Create an interactive component (island)
-const Counter = island<{ increment: null }, { initial: number }>({
-  template: ({ props, rpc }) => (
-    <div>
-      <span id="count">{props.initial}</span>
-      <button {...rpc.hx.increment()}>+1</button>
-    </div>
-  ),
-  rpc: {
-    increment: async () => {
-      const newCount = currentCount + 1;
-      return RESPONSE(<span>{newCount}</span>);
-    },
-  },
-});
+- Zero runtime dependencies
+- Tree-shakeable
+- SSR ready
+- Small bundle size
 
-// Create a page
-const Home = component(() => (
+## Quick Start
+
+1. Install Reface:
+
+```bash
+# Using npm
+npm install @vseplet/reface
+
+# Using Deno
+import { Reface } from "@vseplet/reface";
+```
+
+2. Create your first application:
+
+```typescript
+import { Reface, clean } from "@vseplet/reface";
+
+// Create a styled component
+const Button = styled.button`
+  & {
+    background: blue;
+    color: white;
+    padding: 1rem;
+  }
+`;
+
+// Create a page component
+const HomePage = component(() => (
   <div class="container">
     <h1>Welcome to Reface</h1>
-    <Counter initial={0} />
+    <Button>Click me!</Button>
   </div>
 ));
 
 // Setup the application
-const app = new Hono().route(
-  "/",
-  new Reface({
-    layout: clean({
-      htmx: true,
-      bootstrap: true,
-    }),
-  })
-    .page("/", Home)
-    .hono()
-);
+const app = new Reface({
+  layout: clean({
+    htmx: true,
+    bootstrap: true,
+  }),
+}).page("/", HomePage);
 
+// Start the server
 Deno.serve(app.fetch);
 ```
 
-## Key Features
+## Documentation
 
-### Islands
+### Core Concepts
 
-Interactive components with their own state and behavior:
+- [Application Setup](./core/readme.md)
+- [Component System](./core/components.md)
+- [Server Integration](./core/server.md)
 
-```tsx
-const RandomJoke = island<{ joke: null }, { interval: number }>({
-  template: ({ props, rpc }) => (
-    <div {...rpc.hx.joke()} hx-trigger={`load, every ${props.interval}s`}>
-      <p id="joke-text"></p>
-    </div>
-  ),
-  rpc: {
-    joke: async () => {
-      const joke = await fetchJoke();
-      return RESPONSE(<p>{joke}</p>);
-    },
-  },
-});
-```
+### Template Creation
+
+- [HTML Templates](./html/templates.md)
+- [Elements API](./html/elements.md)
+- [Attributes](./html/attributes.md)
+
+### Styling
+
+- [Styled Components](./styled/components.md)
+- [CSS API](./styled/css.md)
+- [Theme System](./styled/theme.md)
+
+### JSX Support
+
+- [JSX Runtime](./jsx/runtime.md)
+- [TypeScript Integration](./jsx/types.md)
 
 ### Layouts
 
-Pre-defined layouts with common dependencies:
+- [Clean Layout](./layouts/clean.md)
+- [TWA Layout](./layouts/twa.md)
+- [Custom Layouts](./layouts/custom.md)
 
-```typescript
-new Reface({
-  layout: clean({
-    htmx: true, // Include HTMX
-    bootstrap: true, // Include Bootstrap
-    jsonEnc: true, // Enable JSON encoding
-    hyperscript: true, // Include Hyperscript
-    title: "My App", // Page title
-    head: `
-      <link rel="stylesheet" href="/custom.css">
-    `,
-  }),
-});
-```
+## Examples
 
-### RPC Handlers
+Check out our [examples directory](../examples) for complete applications:
 
-Server-side handlers for island interactions:
+- [📚 Docs Viewer](../examples/docs-viewer) - Documentation site with markdown support
+- [✅ Todo App](../examples/todo) - Classic todo application
+- [💬 Chat App](../examples/chat) - Real-time chat application
+- [📝 Blog](../examples/blog) - Blog with SSR and islands
 
-```tsx
-const Form = island<{ submit: { name: string } }, void>({
-  template: ({ rpc }) => (
-    <form {...rpc.hx.submit()}>
-      <input name="name" />
-      <button type="submit">Send</button>
-    </form>
-  ),
-  rpc: {
-    submit: async ({ args }) => {
-      await saveToDatabase(args.name);
-      return RESPONSE(<p>Saved: {args.name}</p>);
-    },
-  },
-});
-```
+## Contributing
 
-### REST Handlers
+We welcome contributions! Please see our [contributing guide](../CONTRIBUTING.md) for details.
 
-API endpoints for islands:
+## License
 
-```tsx
-const DataList = island<{}, void>({
-  template: ({ rest }) => (
-    <div {...rest.hx("self", "get", "/data")}>Loading...</div>
-  ),
-  rest: {
-    [GET("/data")]: async (req) => {
-      const data = await fetchData();
-      return RESPONSE(
-        <ul>
-          {data.map((item) => (
-            <li>{item}</li>
-          ))}
-        </ul>
-      );
-    },
-  },
-});
-```
-
-## Practical Examples
-
-### Data Table with Filtering
-
-```tsx
-const DataTable = island<{ filter: { query: string } }, { data: Array<Item> }>({
-  template: ({ props, rpc }) => (
-    <div class="data-table">
-      <input
-        type="search"
-        placeholder="Search..."
-        {...rpc.hx.filter()}
-        hx-trigger="input changed delay:500ms"
-        hx-target="#results"
-      />
-      <div id="results">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {props.data.map((item) => (
-              <tr>
-                <td>{item.id}</td>
-                <td>{item.name}</td>
-                <td>{item.status}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  ),
-  rpc: {
-    filter: async ({ args }) => {
-      const filtered = await filterData(args.query);
-      return RESPONSE(
-        <tbody>
-          {filtered.map((item) => (
-            <tr>
-              <td>{item.id}</td>
-              <td>{item.name}</td>
-              <td>{item.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      );
-    },
-  },
-});
-```
-
-## Integration with Web Frameworks
-
-Reface can be integrated with various web frameworks:
-
-```typescript
-// Hono
-const app = new Hono().route("/", reface.hono());
-
-// Oak (coming soon)
-const app = new Oak().use("/", reface.oak());
-
-// Express (coming soon)
-const app = express().use("/", reface.express());
-```
-
-For more detailed examples and use cases, check out our [examples directory](../../examples).
+MIT © [Reface](../LICENSE)
