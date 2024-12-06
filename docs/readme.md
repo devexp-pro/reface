@@ -1,7 +1,7 @@
 # Reface Documentation
 
 <div align="center">
-  <img src="./assets/logo.svg" alt="Reface" width="300" />
+  <img src="./_assets/logo.svg" alt="Reface" width="300" />
   <h1>Reface</h1>
   <p><strong>Modern Template Engine for Server-Side Applications</strong></p>
 </div>
