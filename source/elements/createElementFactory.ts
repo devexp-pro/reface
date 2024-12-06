@@ -1,5 +1,5 @@
-import type { ElementChild } from "../dom/types/base.ts";
-import type { Attributes } from "../dom/types/mod.ts";
+import type { ElementChild } from "../types/base.ts";
+import type { Attributes } from "../types/mod.ts";
 import type { Template } from "../types.ts";
 
 /**

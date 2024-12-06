@@ -1,4 +1,4 @@
-import type { Template } from "../../types.ts";
+import type { Template } from "../types.ts";
 import type { Attributes } from "./mod.ts";
 
 // Базовые типы для стилей

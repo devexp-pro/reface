@@ -6,8 +6,8 @@ import type {
   StyleFunction,
   StyleInterpolation,
 } from "./types.ts";
-import { createElementFactory } from "../elements/mod.ts";
-import { generateUniqueClass } from "../utils.ts";
+import { createElementFactory } from "../elements/createElementFactory.ts";
+import { generateClassName } from "../helpers/mod.ts";
 import * as elements from "../elements/mod.ts";
 
 /**
@@ -18,7 +18,7 @@ function createStyled<T extends Attributes>(
 ) {
   return (strings: TemplateStringsArray, ...values: StyleInterpolation[]) => {
     // Generate unique class for component
-    const className = generateUniqueClass();
+    const className = generateClassName();
     const tag = elementFactory.name.toLowerCase();
 
     // Process CSS template
@@ -134,4 +134,4 @@ export const styledApi = Object.assign(styled, styledElements);
 export default styledApi;
 
 // Export CSS helper
-export { css } from "../dom/css.ts";
+export { css } from "./css.ts";

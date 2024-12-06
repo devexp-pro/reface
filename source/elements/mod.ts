@@ -1,5 +1,5 @@
 import { createElementFactory } from "./createElementFactory.ts";
-import type { ElementFactory } from "../dom/types/base.ts";
+import type { ElementFactory } from "../types/base.ts";
 import type {
   HTMLAttributes,
   FormAttributes,

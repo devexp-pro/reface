@@ -1,4 +1,4 @@
-import { generateUniqueClass } from "../utils.ts";
+import { generateClassName } from "../helpers/generateClassName.ts";
 import type { Template } from "../types.ts";
 
 export function css(strings: TemplateStringsArray, ...values: unknown[]) {
@@ -8,7 +8,7 @@ export function css(strings: TemplateStringsArray, ...values: unknown[]) {
   );
 
   return (component: Template) => {
-    const className = component.rootClass || generateUniqueClass();
+    const className = component.rootClass || generateClassName();
     const processedCss = cssContent.replace(/\${Component}/g, `.${className}`);
 
     component.css = (component.css || "") + processedCss;

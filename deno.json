@@ -37,8 +37,8 @@
     "ex5": "deno run --allow-all --watch=./examples/ex5.ts ./examples/ex5.ts",
     "ex6": "deno run --allow-all --watch=./examples/ex6.ts ./examples/ex6.ts",
     "pub-dry": "deno publish --dry-run --allow-slow-types",
-    "test": "deno test source/dom/tests/",
-    "test:watch": "deno test --watch source/dom/tests/",
+    "test": "deno test source/__tests__/",
+    "test:watch": "deno test --watch source/__tests__/",
     "docs": "deno run --allow-all --watch=./examples/docs-viewer/main.tsx ./examples/docs-viewer/main.tsx"
   },
   "fmt": {
