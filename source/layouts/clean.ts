@@ -1,15 +1,17 @@
-import type { Layout, LayoutOptions } from "../types.ts";
+import type { Layout, LayoutOptions } from "./types.ts";
 
+/**
+ * Clean layout options
+ */
 export interface CleanLayoutOptions extends LayoutOptions {
   htmx?: boolean;
   bootstrap?: boolean;
-  head?: string;
-  title?: string;
-  description?: string;
-  favicon?: string;
 }
 
-export function clean(options: CleanLayoutOptions = {}) {
+/**
+ * Clean layout - minimal HTML5 boilerplate
+ */
+export function clean(options: CleanLayoutOptions = {}): Layout {
   return (content: string) => `
     <!DOCTYPE html>
     <html>

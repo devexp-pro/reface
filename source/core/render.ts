@@ -1,4 +1,4 @@
-import type { Template } from "../types/mod.ts";
+import type { Template } from "./Template.ts";
 
 /**
  * Renders a template to HTML string

@@ -4,7 +4,7 @@ import type {
   HTMLAttributes,
   Template,
 } from "../core/Template.ts";
-import { attributes } from "../html/attributes.ts";
+import { attributes } from "../html/mod.ts";
 
 /**
  * Creates an element factory function for a given tag

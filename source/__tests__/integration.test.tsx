@@ -1,8 +1,12 @@
-import { createElement } from "../jsx/mod.ts";
+import {
+  createElement,
+  render,
+  styled,
+  component,
+  type Template,
+} from "../mod.ts";
 import { assertEquals } from "@std/assert";
 import pretty from "npm:pretty@2.0.0";
-import { component, island, RESPONSE, render } from "../mod.ts";
-import { styled } from "../styled/mod.ts";
 
 // Helper for HTML comparison
 function compareHTML(actual: string, expected: string) {

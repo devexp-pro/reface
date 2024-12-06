@@ -1,27 +1,17 @@
 import type {
-  HTMLAttributes,
   ElementChild,
   ElementFactory,
+  HTMLAttributes,
   Template,
-} from "../types/base.ts";
-import type {
-  StyledComponent,
-  StyledFactory,
-  StyleInterpolation,
-  StyledAPI,
-} from "./types.ts";
-
-import { createElementFactory } from "../elements/createElementFactory.ts";
-import { generateClassName } from "../helpers/mod.ts";
-import { attributes } from "../html/attributes.ts";
-import { render } from "../core/render.ts";
-import * as elements from "../elements/mod.ts";
+} from "../core/mod.ts";
+import { generateClassName, processStyles, attributes } from "../html/mod.ts";
+import * as elements from "./base.ts";
 
 /**
  * Creates a styled component
  */
 function createStyled<T extends HTMLAttributes>(
-  elementFactory: ReturnType<typeof createElementFactory<T>>
+  elementFactory: ElementFactory<T>
 ): StyledFactory<T> {
   return (strings: TemplateStringsArray, ...values: StyleInterpolation[]) => {
     const className = generateClassName();
@@ -56,7 +46,7 @@ function createStyled<T extends HTMLAttributes>(
             };
           }
 
-          // Получаем текст из strings
+          // Get text from strings
           const text = strings.join("");
           const allChildren = text ? [text, ...children] : children;
 
@@ -93,51 +83,11 @@ function createStyled<T extends HTMLAttributes>(
   };
 }
 
-/**
- * Process style template and interpolations
- */
-function processStyles(
-  strings: TemplateStringsArray,
-  values: StyleInterpolation[],
-  className: string
-): string {
-  // Process interpolations
-  let css = strings
-    .reduce((result, str, i) => {
-      const value = values[i];
-      if (!value) return result + str;
-
-      // Handle functions
-      if (typeof value === "function") {
-        return result + str + `.${value().rootClass}`;
-      }
-
-      // Handle nested styles
-      if (typeof value === "object" && "css" in value) {
-        return result + str + value.css;
-      }
-
-      return result + str + String(value);
-    }, "")
-    .trim();
-
-  // Process selectors
-  css = css
-    // Replace & with class name
-    .replace(/&\s*{/g, `.${className} {`)
-    // Handle nested selectors
-    .replace(/&\s*(\${|\.)/g, `.${className} $1`)
-    // Handle direct class selectors
-    .replace(/&\s+\./g, `.${className} .`);
-
-  return css;
-}
-
-// Create styled API with element methods
+// Create styled API
 const styledElements = Object.entries(elements).reduce(
   (acc, [key, element]) => ({
     ...acc,
-    [key]: createStyled(element as ElementFactory<HTMLAttributes>),
+    [key]: createStyled(element),
   }),
   {}
 ) as StyledAPI;
@@ -145,12 +95,9 @@ const styledElements = Object.entries(elements).reduce(
 // Export combined API
 export const styled = Object.assign(
   <T extends HTMLAttributes>(
-    component: ReturnType<typeof createElementFactory<T>> | StyledComponent<T>
+    component: ElementFactory<T> | StyledComponent<T>
   ): StyledFactory<T> => createStyled(component),
   styledElements
 ) as StyledAPI;
 
-export default styled;
-
-// Export CSS helpers
 export { css, cssVar, keyframes } from "./css.ts";

@@ -1,10 +1,11 @@
-import { createElement, Fragment } from "../../source/jsx/mod.ts";
-
+import {
+  createElement,
+  Fragment,
+  Reface,
+  styled,
+  clean,
+} from "../../source/mod.ts";
 import { Hono } from "@hono/hono";
-
-import { Reface } from "../../source/Reface.ts";
-import { clean } from "../../source/layouts/clean.ts";
-import { styled } from "../../source/styled/mod.ts";
 import { loadDocs, type DocSection } from "./utils/docs.ts";
 
 // Styled components
