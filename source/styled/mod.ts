@@ -39,6 +39,10 @@ function createStyled<T extends HTMLAttributes>(
           strings?: TemplateStringsArray,
           ...children: ElementChild[]
         ): Template => {
+          const emptyTemplate = Object.assign([""], {
+            raw: [""],
+          }) as TemplateStringsArray;
+
           if (!strings) {
             return {
               tag,
@@ -46,13 +50,17 @@ function createStyled<T extends HTMLAttributes>(
               children: [],
               css,
               isTemplate: true,
-              str: Object.assign([""], { raw: [""] }) as TemplateStringsArray,
+              str: emptyTemplate,
               args: [],
               rootClass: className,
             };
           }
 
-          const processedChildren = children.map((child) =>
+          // Получаем текст из strings
+          const text = strings.join("");
+          const allChildren = text ? [text, ...children] : children;
+
+          const processedChildren = allChildren.map((child) =>
             child === null || child === undefined
               ? ""
               : typeof child === "string" ||
@@ -64,11 +72,11 @@ function createStyled<T extends HTMLAttributes>(
           return {
             tag,
             attributes: attributes(mergedProps),
-            children,
+            children: processedChildren,
             css,
             isTemplate: true,
-            str: strings,
-            args: processedChildren,
+            str: emptyTemplate,
+            args: [],
             rootClass: className,
           };
         };

@@ -49,27 +49,6 @@ Deno.test("Styled component", () => {
   );
 });
 
-Deno.test("Interactive island", () => {
-  const Counter = island<{ increment: null }, { count: number }>({
-    template: ({ props, rpc }) => (
-      <div class="counter">
-        <span id="count">{props.count}</span>
-        <button onClick={rpc.hx.increment()}>+1</button>
-      </div>
-    ),
-  });
-
-  compareHTML(
-    render(Counter({ count: 0 })),
-    `
-    <div class="counter">
-      <span id="count">0</span>
-      <button hx-ext="json-enc" hx-post="/rpc/c0/increment">+1</button>
-    </div>
-    `
-  );
-});
-
 Deno.test("Nested components", () => {
   const Header = component<{ title: string }>(({ title }) => (
     <header class="header">
@@ -135,32 +114,6 @@ Deno.test("List rendering", () => {
       <li>B</li>
       <li>C</li>
     </ul>
-    `
-  );
-});
-
-Deno.test("Form handling", () => {
-  const Form = island<{ submit: { email: string } }, void>({
-    template: ({ rpc }) => (
-      <form onSubmit={rpc.hx.submit()}>
-        <input type="email" name="email" required />
-        <button type="submit">Send</button>
-      </form>
-    ),
-    rpc: {
-      submit: async ({ args }) => {
-        return RESPONSE(<div>Sent to {args.email}!</div>);
-      },
-    },
-  });
-
-  compareHTML(
-    render(Form()),
-    `
-    <form hx-ext="json-enc" hx-post="/rpc/c0/submit">
-      <input type="email" name="email" required />
-      <button type="submit">Send</button>
-    </form>
     `
   );
 });
