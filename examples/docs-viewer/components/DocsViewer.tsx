@@ -22,7 +22,7 @@ export function DocsViewer({ sections, currentPath = "" }: DocsViewerProps): Tem
     <Container>
       <Header>
         <img src="/_assets/logo.svg" alt="Reface Logo" />
-        <h1>Reface Documentation</h1>
+        <h1>Reface – Documentation</h1>
       </Header>
       
       <Layout>

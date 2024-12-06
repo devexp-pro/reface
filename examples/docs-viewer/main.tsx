@@ -1,9 +1,10 @@
+import { createElement } from "../../source/mod.ts";
+
 import { Reface, clean } from "../../source/mod.ts";
 import { Hono } from "@hono/hono";
 import { loadDocs } from "./utils/docs.ts";
 import { DocsViewer } from "./components/DocsViewer.tsx";
-
-import { createElement } from "../../source/mod.ts";
+import { LiveReload } from "./utils/live-reload.ts";
 
 // App initialization
 const sections = await loadDocs("./docs");
@@ -11,6 +12,10 @@ const sections = await loadDocs("./docs");
 if (!sections.length) {
   console.error("No documentation sections found!");
 }
+
+// Инициализируем live reload
+const isDev = Deno.env.get("DENO_ENV") !== "production";
+const liveReload = isDev ? new LiveReload(["./docs", "./examples"]) : null;
 
 const reface = new Reface({
   layout: clean({
@@ -20,17 +25,21 @@ const reface = new Reface({
     htmx: true,
     bootstrap: true,
     head: `
-      <link rel="stylesheet" href="https://esm.sh/prismjs@1.29.0/themes/prism.css">
-      <script src="https://esm.sh/prismjs@1.29.0/components/prism-core.min.js"></script>
-      <script src="https://esm.sh/prismjs@1.29.0/components/prism-markup.min.js"></script>
-      <script src="https://esm.sh/prismjs@1.29.0/components/prism-typescript.min.js"></script>
-      <script src="https://esm.sh/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+      ${liveReload?.getScript() || ""}
     `,
   }),
 });
 
 const app = new Hono()
   .get("/", (c) => c.redirect("/docs"))
+  // Live reload WebSocket endpoint
+  .get("/_live", (c) => {
+    if (!liveReload) return c.text("Live reload disabled");
+    
+    const { response, socket } = Deno.upgradeWebSocket(c.req.raw);
+    liveReload.handleSocket(socket);
+    return response;
+  })
   .route("/docs", 
     reface
       .page("/", () => <DocsViewer sections={sections} />)
@@ -49,4 +58,5 @@ const app = new Hono()
       .hono()
   );
 
-Deno.serve(app.fetch);
+console.log(`Server running at http://localhost:8000 (${isDev ? "development" : "production"} mode)`);
+await Deno.serve(app.fetch);
