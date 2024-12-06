@@ -1,14 +1,8 @@
-import { div, button, span } from "../elements.ts";
+import * as elements from "../elements.ts";
 import type { ElementChild } from "../types/base.ts";
 import type { JSXProps } from "./types.ts";
 import type { Attributes } from "../types/mod.ts";
 import type { Template } from "../../types.ts";
-
-const elements = {
-  div,
-  button,
-  span,
-};
 
 function processChildren(children: ElementChild[]): ElementChild[] {
   return children
@@ -24,39 +18,57 @@ function processChildren(children: ElementChild[]): ElementChild[] {
     .flat();
 }
 
+function processAttributes(props: JSXProps | null): string {
+  if (!props) return "";
+
+  const attrs: Record<string, unknown> = { ...props };
+  delete attrs.children;
+
+  if ("class" in attrs) {
+    attrs.className = attrs.class;
+    delete attrs.class;
+  }
+
+  return Object.entries(attrs)
+    .map(([key, value]) => {
+      if (key === "innerHTML") return "";
+      if (value === true) return key;
+      if (value === false || value === null || value === undefined) return "";
+      return `${key}="${value}"`;
+    })
+    .filter(Boolean)
+    .join(" ");
+}
+
 export function createElement(
   tag: keyof typeof elements | Function,
   props: JSXProps | null,
   ...children: ElementChild[]
-) {
+): Template {
   const processedChildren = processChildren(children);
 
-  // Обработка styled компонентов
+  // Обработка компонентов
   if (typeof tag === "function") {
-    const template = Object.assign([""], {
-      raw: [""],
-    }) as TemplateStringsArray;
-    const component = tag(props || {})(template);
-    return {
-      ...component,
-      children: processedChildren,
-    };
+    return tag(props || {});
   }
 
-  // Обработка обычных HTML элементов
+  // Обработка HTML элементов
   const elementFn = elements[tag];
-  const attributes = props || ({} as Attributes);
+  if (!elementFn) {
+    throw new Error(`Unknown element: ${String(tag)}`);
+  }
 
-  // Удаляем children из props
-  delete (attributes as JSXProps).children;
+  const attributes = processAttributes(props);
+  const innerHTML = props?.innerHTML || "";
 
-  const template = Object.assign([""], {
-    raw: [""],
-  }) as TemplateStringsArray;
-
-  const element = elementFn(attributes)(template);
   return {
-    ...element,
-    children: processedChildren,
+    tag: String(tag),
+    attributes,
+    children: innerHTML ? [innerHTML] : processedChildren,
+    css: "",
+    isTemplate: true,
+    str: [""] as unknown as TemplateStringsArray,
+    args: [],
+    rootClass: "",
   };
 }
