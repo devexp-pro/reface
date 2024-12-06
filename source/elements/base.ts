@@ -11,19 +11,17 @@ export const article = createElementFactory<HTMLAttributes>("article");
 export const header = createElementFactory<HTMLAttributes>("header");
 export const nav = createElementFactory<HTMLAttributes>("nav");
 
-// Media elements
-export const img = createElementFactory<
-  HTMLAttributes & {
-    src?: string;
-    alt?: string;
-  }
->("img");
-
 // Typography
 export const h1 = createElementFactory<HTMLAttributes>("h1");
 export const h2 = createElementFactory<HTMLAttributes>("h2");
 export const h3 = createElementFactory<HTMLAttributes>("h3");
 export const h4 = createElementFactory<HTMLAttributes>("h4");
+
+// Text formatting
+export const pre = createElementFactory<HTMLAttributes>("pre");
+export const code = createElementFactory<HTMLAttributes>("code");
+export const strong = createElementFactory<HTMLAttributes>("strong");
+export const em = createElementFactory<HTMLAttributes>("em");
 
 // Lists
 export const ul = createElementFactory<HTMLAttributes>("ul");
@@ -36,3 +34,11 @@ export const a = createElementFactory<
     href?: string;
   }
 >("a");
+
+// Media
+export const img = createElementFactory<
+  HTMLAttributes & {
+    src?: string;
+    alt?: string;
+  }
+>("img");

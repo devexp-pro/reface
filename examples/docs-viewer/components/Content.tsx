@@ -1,61 +1,84 @@
+import { createElement } from "../../../source/mod.ts";
+
 import { styled } from "../../../source/mod.ts";
 
-export const Content = styled.main`
+// Базовые стили для заголовков
+const headingStyles = `
+  color: #0f172a;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 2.5rem 0 1rem;
+  line-height: var(--leading-tight);
+`;
+
+const ContentH1 = styled.h1`
   & {
-    flex: 1;
-    max-width: 48rem;
-    margin: 0 auto;
-  }
-
-  & h1, & h2, & h3 {
-    color: #0f172a;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    margin: 2.5rem 0 1rem;
-  }
-
-  & h1 {
-    font-size: 2.25rem;
+    ${headingStyles}
+    font-size: var(--text-4xl);
     margin-top: 0;
   }
+`;
 
-  & h2 {
-    font-size: 1.875rem;
+const ContentH2 = styled.h2`
+  & {
+    ${headingStyles}
+    font-size: var(--text-3xl);
   }
+`;
 
-  & h3 {
-    font-size: 1.5rem;
+const ContentH3 = styled.h3`
+  & {
+    ${headingStyles}
+    font-size: var(--text-2xl);
   }
+`;
 
-  & p {
-    line-height: 1.75;
+const ContentParagraph = styled.p`
+  & {
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
     color: #334155;
     margin: 1.25rem 0;
   }
+`;
 
-  & code {
+const ContentCode = styled.code`
+  & {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
     background: #f1f5f9;
     padding: 0.2rem 0.4rem;
     border-radius: 0.25rem;
-    font-size: 0.875em;
     color: #0f172a;
-    font-family: ui-monospace, monospace;
   }
+`;
 
-  & pre {
+const ContentPre = styled.pre`
+  & {
     background: #0f172a;
     color: #e2e8f0;
     padding: 1.25rem;
     border-radius: 0.5rem;
     overflow-x: auto;
     margin: 1.5rem 0;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
   }
 
-  & pre code {
+  & ${ContentCode} {
     background: none;
     color: inherit;
     padding: 0;
-    font-size: 0.875rem;
+  }
+`;
+
+export const Content = styled.main`
+  & {
+    flex: 1;
+    max-width: 48rem;
+    margin: 0 auto;
+    font-family: var(--font-sans);
   }
 `;
 
@@ -82,7 +105,7 @@ export const TableOfContents = styled.nav`
   }
 
   & h4 {
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -104,8 +127,8 @@ export const TableOfContents = styled.nav`
     display: block;
     color: #64748b;
     text-decoration: none;
-    font-size: 0.875rem;
-    line-height: 1.25;
+    font-size: var(--text-sm);
+    line-height: var(--leading-normal);
     transition: color 0.2s;
   }
 
@@ -118,4 +141,14 @@ export const TableOfContents = styled.nav`
       display: none;
     }
   }
-`; 
+`;
+
+// Экспортируем компоненты для использования в markdown
+export const contentComponents = {
+  h1: ContentH1,
+  h2: ContentH2,
+  h3: ContentH3,
+  p: ContentParagraph,
+  code: ContentCode,
+  pre: ContentPre,
+}; 

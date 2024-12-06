@@ -21,8 +21,8 @@ export function DocsViewer({ sections, currentPath = "" }: DocsViewerProps): Tem
   return (
     <Container>
       <Header>
-        <img src="/_assets/logo.svg" alt="Reface Logo" />
-        <h1>Reface – Documentation</h1>
+        <img src="/assets/logo.svg" alt="Reface Logo" />
+        <h1>Reface Documentation</h1>
       </Header>
       
       <Layout>

@@ -1,0 +1,30 @@
+/* Inter для основного текста */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+/* JetBrains Mono для кода */
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
+
+:root {
+  /* Font stacks */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", sans-serif;
+  --font-mono: "JetBrains Mono", Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
+
+  /* Font sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Line heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.375;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+  --leading-loose: 2;
+}

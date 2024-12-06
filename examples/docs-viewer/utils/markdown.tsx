@@ -1,19 +1,7 @@
+import { createElement, ol, ul, li, a, img, p } from "../../../source/mod.ts";
+
 import { marked } from "https://esm.sh/marked@9.1.5";
-import {
-  div,
-  p,
-  h1,
-  h2,
-  h3,
-  h4,
-  ul,
-  ol,
-  li,
-  a,
-  img,
-  createElement,
-  type Template,
-} from "../../../source/mod.ts";
+import { contentComponents } from "../components/Content.tsx";
 
 interface Heading {
   level: number;
@@ -32,13 +20,20 @@ function createTemplate(tokens: marked.Token[]): Template {
   for (const token of tokens) {
     switch (token.type) {
       case "paragraph":
-        elements.push(p()`${token.text}`);
+        elements.push(<contentComponents.p>{token.text}</contentComponents.p>);
         break;
 
       case "heading":
+        const HeadingComponent = [
+          contentComponents.h1,
+          contentComponents.h2,
+          contentComponents.h3
+        ][token.depth - 1] || contentComponents.h3;
+        
         const slug = token.text.toLowerCase().replace(/[^\w]+/g, "-");
-        const HeadingComponent = [h1, h2, h3, h4][token.depth - 1] || h4;
-        elements.push(HeadingComponent({ id: slug })`${token.text}`);
+        elements.push(
+          <HeadingComponent id={slug}>{token.text}</HeadingComponent>
+        );
         break;
 
       case "list":
@@ -58,9 +53,13 @@ function createTemplate(tokens: marked.Token[]): Template {
         break;
 
       case "code":
-        elements.push(div({ class: "code-block" })`
-          <pre><code class="language-${token.lang}">${token.text}</code></pre>
-        `);
+        elements.push(
+          <contentComponents.pre>
+            <contentComponents.code className={`language-${token.lang}`}>
+              {token.text}
+            </contentComponents.code>
+          </contentComponents.pre>
+        );
         break;
 
       default:
