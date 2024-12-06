@@ -1,5 +1,7 @@
 # HTML Templates
 
+[← Home](../readme.md) | [Elements API](./elements.md)
+
 HTML Templates in Reface provide a type-safe way to create HTML markup using tagged template literals.
 
 ## Basic Usage
@@ -214,7 +216,14 @@ const clean = html` <div>${sanitize(rawHtml)}</div> `;
    - Comment complex logic
    - Follow consistent formatting
 
-For more information about specific features, see:
+## Related Sections
 
-- [Attributes](./attributes.md)
-- [Components](../core/components.md)
+- [Elements API](./elements.md) - Type-safe HTML element creation
+- [Attributes](./attributes.md) - HTML attribute handling
+- [JSX Runtime](../jsx/runtime.md) - Alternative JSX syntax
+- [Styled Components](../styled/components.md) - CSS-in-JS styling
+
+## Navigation
+
+- Previous: [← Application Setup](../core/readme.md)
+- Next: [Elements API →](./elements.md)

@@ -1,5 +1,7 @@
 # CSS API
 
+[← Home](../readme.md) | [← Styled Components](./components.md) | [Theme System →](./theme.md)
+
 CSS API in Reface provides tools for working with styles, from basic CSS to advanced dynamic styling.
 
 ## Basic Usage
@@ -209,3 +211,15 @@ For more information, see:
 
 - [Styled Components](./components.md)
 - [Theme System](./theme.md)
+
+## Related Sections
+
+- [Styled Components](./components.md) - Component styling
+- [Theme System](./theme.md) - Theme variables
+- [Elements API](../html/elements.md) - HTML elements
+- [JSX Runtime](../jsx/runtime.md) - JSX styling
+
+## Navigation
+
+- Previous: [← Styled Components](./components.md)
+- Next: [Theme System →](./theme.md)

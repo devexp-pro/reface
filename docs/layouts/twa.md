@@ -1,5 +1,7 @@
 # TWA Layout
 
+[← Home](../readme.md) | [← Clean Layout](./clean.md) | [Custom Layout →](./custom.md)
+
 TWA (Telegram Web App) layout provides a specialized setup for creating Telegram Mini Apps with proper integration and styling.
 
 ## Basic Usage
@@ -210,7 +212,14 @@ const UserProfile = island<
 });
 ```
 
-For more information, see:
+## Related Sections
 
-- [Clean Layout](./clean.md)
-- [Custom Layouts](./custom.md)
+- [Clean Layout](./clean.md) - Basic layout setup
+- [Custom Layouts](./custom.md) - Custom layout creation
+- [Theme System](../styled/theme.md) - Theme integration
+- [Styled Components](../styled/components.md) - Component styling
+
+## Navigation
+
+- Previous: [← Clean Layout](./clean.md)
+- Next: [Custom Layout →](./custom.md)

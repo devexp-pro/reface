@@ -1,5 +1,7 @@
 # Custom Layouts
 
+[← Home](../readme.md) | [← TWA Layout](./twa.md)
+
 Custom layouts allow you to create your own layout system with full control over HTML structure and dependencies.
 
 ## Basic Usage
@@ -246,7 +248,14 @@ const blog = layout<BlogLayoutOptions>((options) => {
 });
 ```
 
-For more information, see:
+## Related Sections
 
-- [Clean Layout](./clean.md)
-- [TWA Layout](./twa.md)
+- [Clean Layout](./clean.md) - Basic layout example
+- [TWA Layout](./twa.md) - TWA layout example
+- [Theme System](../styled/theme.md) - Theme integration
+- [Styled Components](../styled/components.md) - Component styling
+
+## Navigation
+
+- Previous: [← TWA Layout](./twa.md)
+- Next: [Home →](../readme.md)

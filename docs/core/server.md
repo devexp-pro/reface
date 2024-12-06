@@ -1,5 +1,7 @@
 # Server Integration
 
+[← Home](../readme.md) | [← Component System](./components.md) | [HTML Templates →](../html/templates.md)
+
 Reface provides adapters for popular web servers, making it easy to integrate with your existing infrastructure.
 
 ## Available Adapters
@@ -232,3 +234,14 @@ For more information, see:
 
 - [Application Setup](./readme.md)
 - [Components](./components.md)
+
+## Related Sections
+
+- [Core API](./readme.md) - Application setup
+- [Component System](./components.md) - Component creation
+- [HTML Templates](../html/templates.md) - Template rendering
+
+## Navigation
+
+- Previous: [← Component System](./components.md)
+- Next: [HTML Templates →](../html/templates.md)

@@ -1,5 +1,7 @@
 # Core API
 
+[← Home](../readme.md) | [Component System →](./components.md)
+
 Core API provides the foundation for building applications with Reface. It includes application setup, server adapters, and the component system.
 
 ## Application Setup
@@ -144,3 +146,14 @@ For more detailed information about specific features, check out:
 - [Render Pipeline](./render.md)
 - [Server Integration](./server.md)
 - [Component System](./components.md)
+
+## Related Sections
+
+- [HTML Templates](../html/templates.md) - Basic template creation
+- [JSX Runtime](../jsx/runtime.md) - JSX support
+- [Server Integration](./server.md) - Server adapters
+
+## Navigation
+
+- Previous: [← Home](../readme.md)
+- Next: [Component System →](./components.md)

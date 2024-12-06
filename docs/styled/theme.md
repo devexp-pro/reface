@@ -1,5 +1,7 @@
 # Theme System
 
+[← Home](../readme.md) | [← CSS API](./css.md) | [Clean Layout →](../layouts/clean.md)
+
 Theme system in Reface provides a way to manage design tokens and create consistent styling across your application.
 
 ## Basic Usage
@@ -223,3 +225,15 @@ For more information, see:
 
 - [CSS API](./css.md)
 - [Styled Components](./components.md)
+
+## Related Sections
+
+- [CSS API](./css.md) - CSS features
+- [Styled Components](./components.md) - Component styling
+- [Clean Layout](../layouts/clean.md) - Layout theming
+- [TWA Layout](../layouts/twa.md) - TWA theming
+
+## Navigation
+
+- Previous: [← CSS API](./css.md)
+- Next: [Clean Layout →](../layouts/clean.md)

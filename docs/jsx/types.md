@@ -1,5 +1,7 @@
 # JSX Types
 
+[← Home](../readme.md) | [← JSX Runtime](./runtime.md) | [Styled Components →](../styled/components.md)
+
 Reface provides comprehensive TypeScript support for JSX, ensuring type safety across your application.
 
 ## Basic Types
@@ -212,3 +214,15 @@ For more information, see:
 
 - [JSX Runtime](./runtime.md)
 - [Components](../core/components.md)
+
+## Related Sections
+
+- [JSX Runtime](./runtime.md) - JSX syntax and usage
+- [Component System](../core/components.md) - Component types
+- [Elements API](../html/elements.md) - HTML element types
+- [Styled Components](../styled/components.md) - Style types
+
+## Navigation
+
+- Previous: [← JSX Runtime](./runtime.md)
+- Next: [Styled Components →](../styled/components.md)

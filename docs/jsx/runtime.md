@@ -1,4 +1,6 @@
-# JSX in Reface
+# JSX Runtime
+
+[← Home](../readme.md) | [← Attributes](../html/attributes.md) | [JSX Types →](./types.md)
 
 JSX support in Reface provides a familiar React-like syntax for creating templates with full TypeScript support.
 
@@ -222,3 +224,15 @@ For more information, see:
 
 - [Components](../core/components.md)
 - [Styled Components](../styled/components.md)
+
+## Related Sections
+
+- [JSX Types](./types.md) - TypeScript support for JSX
+- [Component System](../core/components.md) - Component creation
+- [Elements API](../html/elements.md) - HTML elements
+- [Styled Components](../styled/components.md) - Styling with JSX
+
+## Navigation
+
+- Previous: [← HTML Attributes](../html/attributes.md)
+- Next: [JSX Types →](./types.md)

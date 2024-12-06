@@ -1,5 +1,7 @@
 # Component System
 
+[← Home](../readme.md) | [← Core API](./readme.md) | [Server Integration →](./server.md)
+
 Reface's component system provides two main types of components: static components and interactive islands. Both types support JSX and template literals syntax.
 
 ## Static Components
@@ -192,7 +194,13 @@ const ContactForm = island<
 });
 ```
 
-For more information about specific features, see:
+## Related Sections
 
-- [Render Pipeline](./render.md)
-- [Server Integration](./server.md)
+- [JSX Types](../jsx/types.md) - TypeScript support for components
+- [HTML Templates](../html/templates.md) - Template creation
+- [Styled Components](../styled/components.md) - Component styling
+
+## Navigation
+
+- Previous: [← Core API](./readme.md)
+- Next: [Server Integration →](./server.md)

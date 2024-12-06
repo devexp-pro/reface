@@ -1,5 +1,7 @@
 # Clean Layout
 
+[← Home](../readme.md) | [← Theme System](../styled/theme.md) | [TWA Layout →](./twa.md)
+
 Clean layout provides a minimal setup for web applications with optional dependencies.
 
 ## Basic Usage
@@ -202,7 +204,14 @@ const app = new Reface({
 });
 ```
 
-For more information, see:
+## Related Sections
 
-- [TWA Layout](./twa.md)
-- [Custom Layouts](./custom.md)
+- [Theme System](../styled/theme.md) - Theme integration
+- [TWA Layout](./twa.md) - TWA specific layout
+- [Custom Layouts](./custom.md) - Custom layout creation
+- [Styled Components](../styled/components.md) - Component styling
+
+## Navigation
+
+- Previous: [← Theme System](../styled/theme.md)
+- Next: [TWA Layout →](./twa.md)
