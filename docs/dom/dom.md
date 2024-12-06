@@ -1,23 +1,23 @@
-# DOM API в Reface
+# DOM Elements API in Reface
 
-DOM API предоставляет удобный способ создания HTML элементов в функциональном стиле с типизацией и вспомогательными утилитами.
+DOM Elements API provides a functional approach to creating HTML elements with type safety and utility helpers.
 
-## Основные элементы
+## Basic Elements
 
-### Создание элементов
+### Creating Elements
 
-Каждый HTML элемент представлен функцией, которая принимает атрибуты и возвращает шаблонный литерал:
+Each HTML element is represented by a function that accepts attributes and returns a template literal:
 
 ```typescript
 import { div, span, a, button } from "@vseplet/reface/dom";
 
-// Простой div
+// Simple div
 div()`Hello World`;
 
-// Div с атрибутами
-div({ id: "greeting", class: "message" })`  Hello World`;
+// Div with attributes
+div({ id: "greeting", class: "message" })`Hello World`;
 
-// Вложенные элементы
+// Nested elements
 div({ class: "card" })`
   ${h1()`Title`}
   ${p()`Content`}
@@ -25,24 +25,24 @@ div({ class: "card" })`
 `;
 ```
 
-## Утилиты для работы с классами
+## Class Utilities
 
-### Управление классами
+### Class Management
 
-Для управления классами элементов используется встроенный атрибут `class`. Он поддерживает как строковые значения, так и объекты с условиями:
+The built-in `class` attribute supports both string values and conditional objects:
 
-### Примеры использования class
+### Class Examples
 
 ```typescript
 import { div } from "@vseplet/reface/dom";
 
-// Простое строковое значение
+// Simple string value
 div({ class: "card" })`Content`;
 
-// Несколько классов
+// Multiple classes
 div({ class: "card primary large" })`Content`;
 
-// Условные классы через объект
+// Conditional classes via object
 div({
   class: {
     card: true,
@@ -52,16 +52,16 @@ div({
   },
 })`Content`;
 
-// Комбинирование строк и объектов
+// Combining strings and objects
 div({
   class: [
-    "card", // базовый класс
-    props.className, // классы из пропсов
+    "card", // base class
+    props.className, // classes from props
     {
       "card--active": isActive,
       "card--disabled": isDisabled,
     },
-    size && `card--${size}`, // условный класс с модификатором
+    size && `card--${size}`, // conditional class with modifier
     {
       "card--loading": isLoading,
       "card--error": hasError,
@@ -69,7 +69,7 @@ div({
   ],
 })`Content`;
 
-// Практический пример компонента кнопки
+// Practical button component example
 const Button = component<{
   primary?: boolean;
   size?: "small" | "medium" | "large";
@@ -86,41 +86,42 @@ const Button = component<{
   }) =>
     button({
       class: [
-        "button", // базовый класс
-        className, // внешние классы
-        `button--${size}`, // модификатор размера
+        "button", // base class
+        className, // external classes
+        `button--${size}`, // size modifier
         {
-          "button--primary": primary, // вариант кнопки
+          "button--primary": primary, // button variant
           "button--disabled": disabled,
           "button--loading": loading,
         },
       ],
       disabled,
-    })`    ${loading ? "Loading..." : "Click me"}
- `
+    })`${loading ? "Loading..." : "Click me"}`
 );
 
-// Использование компонента Button
+// Using Button component
 const App = component(
-  () => div()`  ${Button({ primary: true, size: "large" })}
-  ${Button({ disabled: true })}
-  ${Button({ loading: true, className: "custom-button" })}`
+  () => div()`
+    ${Button({ primary: true, size: "large" })}
+    ${Button({ disabled: true })}
+    ${Button({ loading: true, className: "custom-button" })}
+  `
 );
 ```
 
-## Работа со стилями
+## Working with Styles
 
-### Работа со стилями
+### Style Management
 
-Для управления стилями элементов используется встроенный атрибут `style`. Он поддерживает как строковые значения, так и объекты для определения инлайн-стилей:
+The built-in `style` attribute supports both string values and objects for defining inline styles:
 
 ```typescript
 import { div } from "@vseplet/reface/dom";
 
-// Простое строковое значение
+// Simple string value
 div({ style: "background: white; padding: 1rem;" })`Content`;
 
-// Использование объекта для стилей
+// Using object for styles
 div({
   style: {
     background: "white",
@@ -130,40 +131,39 @@ div({
   },
 })`Content`;
 
-// Динамические стили
+// Dynamic styles
 const Button = component<{ primary?: boolean }>(
-  ({ primary }) => button({
-    style: {
-      background: primary ? "blue" : "gray",
-      color: "white",
-      padding: "0.5rem 1rem",
-      border: "none",
-      borderRadius: "4px",
-    },
-  })`
-    Click me
-  `
+  ({ primary }) =>
+    button({
+      style: {
+        background: primary ? "blue" : "gray",
+        color: "white",
+        padding: "0.5rem 1rem",
+        border: "none",
+        borderRadius: "4px",
+      },
+    })`Click me`
 );
 
-// Использование компонента Button
+// Using Button component
 const App = component(
   () => div()`
-  ${Button({ primary: true })}
-  ${Button({ primary: false })}
-`
+    ${Button({ primary: true })}
+    ${Button({ primary: false })}
+  `
 );
 ```
 
-### Примеры использования style
+### Style Examples
 
 ```typescript
-// Базовое использование
+// Basic usage
 div({ style: "color: red; font-size: 16px;" }); // => style="color: red; font-size: 16px;"
 
-// Использование объекта
+// Using object
 div({ style: { color: "red", fontSize: "16px" } }); // => style="color: red; font-size: 16px;"
 
-// Динамические стили
+// Dynamic styles
 const isActive = true;
 div({
   style: {
@@ -172,47 +172,45 @@ div({
   },
 }); // => style="color: green; font-weight: bold;"
 
-// Комбинирование строк и объектов
+// Combining strings and objects
 div({
   style: ["display: flex;", { justifyContent: "center", alignItems: "center" }],
 }); // => style="display: flex; justify-content: center; align-items: center;"
 
-// Практические примеры
+// Practical examples
 const Card = component<{ highlighted?: boolean }>(
-  ({ highlighted }) => div({
-    style: {
-      background: "white",
-      padding: "1rem",
-      borderRadius: "8px",
-      boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-      border: highlighted ? "2px solid blue" : "none",
-    },
-  })`
-    Card Content
-  `
+  ({ highlighted }) =>
+    div({
+      style: {
+        background: "white",
+        padding: "1rem",
+        borderRadius: "8px",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+        border: highlighted ? "2px solid blue" : "none",
+      },
+    })`Card Content`
 );
 
 const Badge = component<{ count: number }>(
-  ({ count }) => span({
-    style: {
-      display: "inline-block",
-      padding: "0.25rem 0.5rem",
-      background: count > 0 ? "red" : "gray",
-      color: "white",
-      borderRadius: "12px",
-    },
-  })`
-    ${count}
-  `
+  ({ count }) =>
+    span({
+      style: {
+        display: "inline-block",
+        padding: "0.25rem 0.5rem",
+        background: count > 0 ? "red" : "gray",
+        color: "white",
+        borderRadius: "12px",
+      },
+    })`${count}`
 );
 ```
 
-## Типизация
+## Type Safety
 
-DOM API полностью типизирован, что обеспечивает безопасность типов и автодополнение в IDE:
+The DOM API is fully typed, providing type safety and IDE autocompletion:
 
 ```typescript
-// Типизированные атрибуты для input
+// Typed input attributes
 const SearchInput = component(
   () =>
     input({
@@ -224,21 +222,20 @@ const SearchInput = component(
     })``
 );
 
-// Типизированные атрибуты для ссылок
+// Typed link attributes
 const Link = component(
   () =>
     a({
       href: "https://example.com",
       target: "_blank",
       rel: "noopener noreferrer",
-    })`    Visit site
- `
+    })`Visit site`
 );
 ```
 
-## Работа с событиями
+## Event Handling
 
-DOM API поддерживает все стандартные события HTML:
+DOM API supports all standard HTML events:
 
 ```typescript
 const InteractiveButton = component(
@@ -247,14 +244,13 @@ const InteractiveButton = component(
       onClick: "handleClick(event)",
       onMouseEnter: "handleHover(event)",
       onMouseLeave: "handleLeave(event)",
-    })`    Hover me
- `
+    })`Hover me`
 );
 ```
 
-## ARIA и доступность
+## ARIA and Accessibility
 
-DOM API включает поддержку ARIA-атрибутов для создания доступных компонентов:
+DOM API includes support for ARIA attributes to create accessible components:
 
 ```typescript
 const Modal = component(
@@ -265,96 +261,63 @@ const Modal = component(
       "aria-labelledby": "modal-title",
       "aria-describedby": "modal-content",
     })`
-    ${h2({ id: "modal-title" })`Modal Title`}
-    ${div({ id: "modal-content" })`Modal content`}
-  `
+      ${h2({ id: "modal-title" })`Modal Title`}
+      ${div({ id: "modal-content" })`Modal content`}
+    `
 );
 ```
 
-## Практические примеры
+## Conclusion
 
-### Карточка продукта
+The DOM Elements API in Reface provides a powerful and flexible foundation for building web interfaces. Its key strengths include:
 
-```typescript
-const ProductCard = component<{
-  title: string;
-  price: number;
-  isAvailable: boolean;
-}>(
-  ({ title, price, isAvailable }) =>
-    div({
-      class: classNames("product-card", {
-        available: isAvailable,
-        "sold-out": !isAvailable,
-      }),
-      style: {
-        padding: "1rem",
-        border: "1px solid #eee",
-        borderRadius: "8px",
-      },
-    })`
-    ${h3({ class: "title" })`${title}`}
-    ${div({ class: "price" })`$${price}`}
-    ${button({
-      disabled: !isAvailable,
-      class: classNames("buy-button", {
-        disabled: !isAvailable,
-      }),
-    })`
-${isAvailable ? "Buy Now" : "Sold Out"}
-`}
-  `
-);
-```
+### Type Safety
 
-### Форма с валидацией
+- Full TypeScript support for all HTML elements and attributes
+- Compile-time checking of props and attributes
+- IDE autocompletion and documentation
 
-```typescript
-const LoginForm = component(
-  () =>
-    form({
-      class: "login-form",
-      onSubmit: "handleSubmit(event)",
-      style: {
-        display: "flex",
-        flexDirection: "column",
-        gap: "1rem",
-      },
-    })`
-    ${div({ class: "form-group" })`
-${label({ for: "email" })`Email:`}
-${input({
-  id: "email",
-  type: "email",
-  required: true,
-  placeholder: "Enter your email",
-})``}
-    `}
+### Flexibility
 
-    ${div({ class: "form-group" })`
-      ${label({ for: "password" })`Password:`}
-      ${input({
-        id: "password",
-        type: "password",
-        required: true,
-        minLength: 6,
-        placeholder: "Enter your password",
-      })``}
-    `}
+- Functional approach to element creation
+- Support for both string and object-based styling
+- Easy composition of elements and components
 
-    ${button({
-      type: "submit",
-      class: classNames("submit-button", {
-        loading: isLoading,
-      }),
-    })`
-      ${isLoading ? "Loading..." : "Login"}
-    `}
+### Performance
 
-`
-);
-```
+- Minimal runtime overhead
+- Efficient updates through template caching
+- Small bundle size with tree-shaking support
 
-## Заключение
+### Developer Experience
 
-DOM API в Reface предоставляет мощный и типобезопасный способ создания HTML-элементов с поддержкой современных возможностей CSS и JavaScript. Использование утилит `classNames` и `styles` делает работу с классами и стилями более удобной и предсказуемой.
+- Intuitive API that follows HTML conventions
+- Comprehensive attribute type definitions
+- Built-in support for accessibility features
+
+### Best Practices
+
+1. **Component Organization**
+
+   - Keep components small and focused
+   - Use composition for complex interfaces
+   - Maintain clear separation of concerns
+
+2. **Type Safety**
+
+   - Always define proper types for component props
+   - Utilize TypeScript's type inference
+   - Keep type definitions up to date
+
+3. **Performance**
+
+   - Create element factories outside render functions
+   - Use memoization for expensive computations
+   - Avoid unnecessary nesting of elements
+
+4. **Accessibility**
+   - Include proper ARIA attributes
+   - Maintain semantic HTML structure
+   - Test with screen readers
+
+The DOM Elements API serves as a foundation for other Reface APIs like Styled Components and JSX support, providing a consistent and powerful way to build modern web applications.

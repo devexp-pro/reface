@@ -1,12 +1,12 @@
-# Использование `styled` API в Reface
+# Using `styled` API in Reface
 
-`styled` API позволяет создавать компоненты с изолированными стилями, используя современный CSS с поддержкой вложенности. Это делает стилизацию компонентов более удобной и декларативной.
+The `styled` API allows you to create components with isolated styles using modern CSS with nesting support. This makes component styling more convenient and declarative.
 
-## Основы использования
+## Basic Usage
 
-### Создание стилизованного компонента
+### Creating a Styled Component
 
-Вы можете создать стилизованный компонент, используя функцию `styled`. Она принимает фабрику элемента и возвращает новую фабрику с добавленными стилями.
+You can create a styled component using the `styled` function. It takes an element factory and returns a new factory with added styles.
 
 ```typescript
 import { styled, button, span } from "@vseplet/reface/dom";
@@ -33,19 +33,19 @@ const StyledButton = styled(button)`
   }
 `;
 
-// Использование компонента
+// Using the component
 const MyComponent = component(
   () =>
     StyledButton({ onClick: "alert('clicked')" })`
-    Click me
-    ${span({ class: "icon" })`👋`}
-  `
+      Click me
+      ${span({ class: "icon" })`👋`}
+    `
 );
 ```
 
-### Вложенные стили
+### Nested Styles
 
-С помощью `&` вы можете создавать вложенные стили, которые применяются к дочерним элементам или псевдоклассам.
+Using `&` you can create nested styles that apply to child elements or pseudo-classes.
 
 ```typescript
 const Card = styled(div)`
@@ -72,9 +72,9 @@ const Card = styled(div)`
 `;
 ```
 
-### Использование медиа-запросов
+### Using Media Queries
 
-Вы можете использовать медиа-запросы для адаптивной стилизации компонентов.
+You can use media queries for responsive component styling.
 
 ```typescript
 const ResponsiveBox = styled(div)`
@@ -92,9 +92,9 @@ const ResponsiveBox = styled(div)`
 `;
 ```
 
-### Композиция стилей
+### Style Composition
 
-Вы можете комбинировать стилизованные компоненты для создания более сложных компонентов.
+You can combine styled components to create more complex components.
 
 ```typescript
 const BaseButton = styled(button)`
@@ -129,9 +129,9 @@ const SecondaryButton = styled(BaseButton)`
 `;
 ```
 
-### Динамические стили
+### Dynamic Styles
 
-Вы можете использовать пропсы для создания динамических стилей.
+You can use props to create dynamic styles.
 
 ```typescript
 const DynamicButton = styled(button)`
@@ -144,31 +144,31 @@ const DynamicButton = styled(button)`
   }
 `;
 
-// Использование
+// Usage
 DynamicButton({ primary: true })`Click me`;
 ```
 
-## Советы и рекомендации
+## Tips and Recommendations
 
-1. **Изоляция стилей**
+1. **Style Isolation**
 
-   - Используйте уникальные классы для компонентов
-   - Избегайте глобальных стилей
-   - Используйте вложенность для организации стилей
+   - Use unique classes for components
+   - Avoid global styles
+   - Use nesting for style organization
 
-2. **Производительность**
+2. **Performance**
 
-   - Создавайте стилизованные компоненты вне рендер-функций
-   - Используйте кэширование для часто используемых стилей
+   - Create styled components outside render functions
+   - Use caching for frequently used styles
 
-3. **Организация кода**
-   - Группируйте связанные стили вместе
-   - Используйте композицию для переиспользования стилей
-   - Следуйте принципу DRY (Don't Repeat Yourself)
+3. **Code Organization**
+   - Group related styles together
+   - Use composition for style reuse
+   - Follow the DRY (Don't Repeat Yourself) principle
 
-## Примеры использования
+## Usage Examples
 
-### Форма с стилизованными компонентами
+### Form with Styled Components
 
 ```typescript
 const Form = styled(form)`
@@ -209,17 +209,17 @@ const SubmitButton = styled(button)`
   }
 `;
 
-// Использование
+// Usage
 const LoginForm = component(
   () =>
     Form()`
-    ${Input({ type: "email", placeholder: "Email" })}
-    ${Input({ type: "password", placeholder: "Password" })}
-    ${SubmitButton({ type: "submit" })`Login`}
-  `
+      ${Input({ type: "email", placeholder: "Email" })}
+      ${Input({ type: "password", placeholder: "Password" })}
+      ${SubmitButton({ type: "submit" })`Login`}
+    `
 );
 ```
 
-## Заключение
+## Conclusion
 
-styled API в Reface предоставляет мощный и гибкий способ стилизации компонентов, сохраняя при этом изоляцию и удобство использования. Это позволяет создавать более чистый и поддерживаемый код.
+The styled API in Reface provides a powerful and flexible way to style components while maintaining isolation and ease of use. This allows you to create cleaner and more maintainable code.

@@ -1,8 +1,8 @@
-# JSX в Reface
+# JSX in Reface
 
-JSX в Reface позволяет писать шаблоны в декларативном стиле, похожем на React. Это делает код более читаемым и удобным для разработчиков, знакомых с React.
+JSX in Reface allows you to write templates in a declarative, React-like style. This makes the code more readable and familiar for developers with React experience.
 
-## Настройка
+## Setup
 
 ### tsconfig.json
 
@@ -16,28 +16,28 @@ JSX в Reface позволяет писать шаблоны в декларат
 }
 ```
 
-### Импорты
+### Imports
 
 ```typescript
 import { createElement } from "@vseplet/reface/dom/jsx/runtime";
 ```
 
-## Базовое использование
+## Basic Usage
 
-### Элементы
+### Elements
 
 ```typescript
-// Простые элементы
+// Simple elements
 const template = <div>Hello World</div>;
 
-// С атрибутами
+// With attributes
 const template = (
   <div class="container" id="main">
     <button onClick="handleClick()">Click me</button>
   </div>
 );
 
-// Вложенные элементы
+// Nested elements
 const template = (
   <div class="card">
     <h1>Title</h1>
@@ -46,7 +46,7 @@ const template = (
 );
 ```
 
-### Выражения
+### Expressions
 
 ```typescript
 const name = "World";
@@ -54,19 +54,19 @@ const isActive = true;
 
 const template = (
   <div>
-    {/* Интерполяция переменных */}
+    {/* Variable interpolation */}
     <h1>Hello, {name}!</h1>
 
-    {/* Условный рендеринг */}
+    {/* Conditional rendering */}
     {isActive && <span>Active</span>}
 
-    {/* Тернарный оператор */}
+    {/* Ternary operator */}
     <div class={isActive ? "active" : "inactive"}>Status</div>
   </div>
 );
 ```
 
-### Списки
+### Lists
 
 ```typescript
 const items = ["Apple", "Banana", "Orange"];
@@ -82,7 +82,7 @@ const template = (
 
 ## Styled Components
 
-JSX отлично работает со styled компонентами:
+JSX works seamlessly with styled components:
 
 ```typescript
 import { styled, div, button } from "@vseplet/reface/dom";
@@ -106,7 +106,7 @@ const Card = styled(div)`
   }
 `;
 
-// Использование в JSX
+// Usage with JSX
 const template = (
   <Card>
     <h2>Card Title</h2>
@@ -116,9 +116,9 @@ const template = (
 );
 ```
 
-## Компоненты
+## Components
 
-### Функциональные компоненты
+### Functional Components
 
 ```typescript
 import { component } from "@vseplet/reface/dom";
@@ -135,7 +135,7 @@ const Button = component<ButtonProps>(({ text, onClick, primary }) => (
   </button>
 ));
 
-// Использование
+// Usage
 const App = component(() => (
   <div>
     <Button text="Primary" primary onClick="handlePrimary()" />
@@ -144,7 +144,7 @@ const App = component(() => (
 ));
 ```
 
-### Композиция компонентов
+### Component Composition
 
 ```typescript
 const Header = component<{ title: string }>(({ title }) => (
@@ -170,7 +170,7 @@ const Layout = component<{ title: string }>(({ title }) => (
 ));
 ```
 
-## Обработка событий
+## Event Handling
 
 ```typescript
 const Form = component(() => (
@@ -181,17 +181,17 @@ const Form = component(() => (
 ));
 ```
 
-## Типизация
+## Type Safety
 
-### Встроенные элементы
+### Built-in Elements
 
 ```typescript
-// Автоматическая типизация HTML атрибутов
+// Automatic HTML attribute typing
 const element = <div class="container" id="main" />;
 const input = <input type="text" required minLength={6} />;
 ```
 
-### Пользовательские компоненты
+### Custom Components
 
 ```typescript
 interface CardProps {
@@ -207,32 +207,34 @@ const Card = component<CardProps>(({ title, content, className }) => (
   </div>
 ));
 
-// TypeScript проверит все пропсы
+// TypeScript will check all props
 const App = component(() => (
   <Card title="Hello" content="This is a card" className="custom-card" />
 ));
 ```
 
-## Лучшие практики
+## Best Practices
 
-1. **Именование компонентов**
+1. **Component Naming**
 
-   - Используйте PascalCase для имен компонентов
-   - Используйте camelCase для пропсов
+   - Use PascalCase for component names
+   - Use camelCase for props
 
-2. **Типизация**
+2. **Type Safety**
 
-   - Всегда определяйте интерфейсы для пропсов
-   - Используйте строгую типизацию
+   - Always define interfaces for props
+   - Use strict typing
 
-3. **Структура**
+3. **Structure**
 
-   - Разбивайте большие компоненты на маленькие
-   - Группируйте связанные компоненты в модули
+   - Break down large components into smaller ones
+   - Group related components into modules
 
-4. **Стилизация**
-   - Используйте styled components для изоляции стилей
-   - Избегайте глобальных стилей
+4. **Styling**
+
+   - Use styled components for style isolation
+   - Avoid global styles
+
      ```
 
      ```

@@ -1,34 +1,33 @@
-# HTML Template API в Reface
+# HTML Template API in Reface
 
-HTML Template API - это основной способ создания шаблонов в Reface. Он использует tagged template literals для создания HTML-разметки с поддержкой интерполяции и типизации.
+HTML Template API is the primary way to create templates in Reface. It uses tagged template literals to create HTML markup with support for interpolation and type safety.
 
-## Основы использования
+## Basic Usage
 
-### Создание простых шаблонов
+### Creating Simple Templates
 
 ```typescript
 import { html } from "@vseplet/reface";
 
-// Простой шаблон
-const template = html` <div>Hello, World!</div> `;
+// Simple template
+const template = html`<div>Hello, World!</div>`;
 
-// Шаблон с интерполяцией
+// Template with interpolation
 const name = "User";
-const greeting = html` <div>Hello, ${name}!</div> `;
+const greeting = html`<div>Hello, ${name}!</div>`;
 
-// Вложенные шаблоны
+// Nested templates
 const header = html`<header>Site Header</header>`;
 const footer = html`<footer>Site Footer</footer>`;
 
 const page = html`
   ${header}
-
   <main>Content</main>
   ${footer}
 `;
 ```
 
-### Условный рендеринг
+### Conditional Rendering
 
 ```typescript
 const isLoggedIn = true;
@@ -42,24 +41,24 @@ const header = html`
   </header>
 `;
 
-// Условный рендеринг с &&
+// Conditional rendering with &&
 const notification = html`
-  <div>${hasError && html` <div class="error">Error occurred!</div> `}</div>
+  <div>${hasError && html`<div class="error">Error occurred!</div>`}</div>
 `;
 ```
 
-### Циклы и списки
+### Loops and Lists
 
 ```typescript
 const items = ["Apple", "Banana", "Orange"];
 
 const list = html`
   <ul>
-    ${items.map((item) => html` <li>${item}</li> `)}
+    ${items.map((item) => html`<li>${item}</li>`)}
   </ul>
 `;
 
-// С индексом и условиями
+// With index and conditions
 const todos = [
   { id: 1, text: "Buy milk", done: true },
   { id: 2, text: "Write docs", done: false },
@@ -76,36 +75,34 @@ const todoList = html`
 `;
 ```
 
-## Компоненты
+## Components
 
-### Создание компонентов
+### Creating Components
 
 ```typescript
 import { component } from "@vseplet/reface";
 
-// Простой компонент
-const Greeting = component(() => html` <div>Hello, World!</div> `);
+// Simple component
+const Greeting = component(() => html`<div>Hello, World!</div>`);
 
-// Компонент с пропсами
+// Component with props
 const Button = component<{
   text: string;
   onClick?: string;
-}>(({ text, onClick }) => html` <button onclick="${onClick}">${text}</button>`);
+}>(({ text, onClick }) => html`<button onclick="${onClick}">${text}</button>`);
 
-// Использование компонентов
+// Using components
 const App = component(
-  () =>
-    html` ${Greeting()} ${Button({
-      text: "Click me",
-      onClick: "handleClick()",
-    })}`
+  () => html`
+    ${Greeting()} ${Button({ text: "Click me", onClick: "handleClick()" })}
+  `
 );
 ```
 
-### Композиция компонентов
+### Component Composition
 
 ```typescript
-// Компонент заголовка
+// Header component
 const Header = component<{ title: string }>(
   ({ title }) => html`
     <header>
@@ -114,7 +111,7 @@ const Header = component<{ title: string }>(
   `
 );
 
-// Компонент навигации
+// Navigation component
 const Navigation = component(
   () => html`
     <nav>
@@ -125,31 +122,31 @@ const Navigation = component(
   `
 );
 
-// Компонент макета
+// Layout component
 const Layout = component<{
   title: string;
   children: Template;
 }>(
   ({ title, children }) => html`
     ${Header({ title })} ${Navigation()}
-
     <main>${children}</main>
   `
 );
 
-// Использование
+// Usage
 const Page = component(
-  () =>
-    html` ${Layout({
+  () => html`
+    ${Layout({
       title: "Welcome",
-      children: html` <div>Page content</div> `,
-    })}`
+      children: html`<div>Page content</div>`,
+    })}
+  `
 );
 ```
 
-## Работа с атрибутами
+## Working with Attributes
 
-### Динамические атрибуты
+### Dynamic Attributes
 
 ```typescript
 const Button = component<{
@@ -161,7 +158,7 @@ const Button = component<{
   `
 );
 
-// Динамические data-атрибуты
+// Dynamic data attributes
 const Card = component<{ id: string }>(
   ({ id }) => html`
     <div data-id="${id}" data-testid="card-${id}">Card content</div>
@@ -169,92 +166,39 @@ const Card = component<{ id: string }>(
 );
 ```
 
-## Безопасность
+## Security
 
-HTML Template API автоматически экранирует строки для предотвращения XSS-атак:
+HTML Template API automatically escapes strings to prevent XSS attacks:
 
 ```typescript
 const userInput = '<script>alert("XSS")</script>';
 
-// Безопасный вывод
-const safe = html` <div>${userInput}</div> `; // Строка будет экранирована
+// Safe output
+const safe = html`<div>${userInput}</div>`; // String will be escaped
 
-// Если нужно вставить HTML (используйте осторожно!)
-const trusted = html` <div>${html(userInput)}</div> `;
+// If you need to insert HTML (use with caution!)
+const trusted = html`<div>${html(userInput)}</div>`;
 ```
 
-## Лучшие практики
+## Best Practices
 
-1. **Разделение логики**
+1. **Logic Separation**
 
-   - Выносите сложную логику в отдельные функции
-   - Используйте компоненты для переиспользования кода
+   - Move complex logic to separate functions
+   - Use components for code reuse
 
-2. **Типизация**
+2. **Type Safety**
 
-   - Всегда определяйте типы пропсов для компонентов
-   - Используйте строгую типизацию для улучшения безопасности
+   - Always define prop types for components
+   - Use strict typing for better safety
 
-3. **Производительность**
+3. **Performance**
 
-   - Избегайте ненужных вложенных шаблонов
-   - Используйте мемоизацию для тяжелых вычислений
+   - Avoid unnecessary nested templates
+   - Use memoization for heavy computations
 
-4. **Организация кода**
-   - Группируйте связанные компоненты
-   - Следуйте принципу единой ответственности
+4. **Code Organization**
+   - Group related components
+   - Follow the single responsibility principle
 
-## Примеры использования
-
-### Форма с валидацией
-
-```typescript
-const LoginForm = component(
-  () => html`
-    <form onsubmit="handleSubmit(event)">
-      <div>
-        <label for="email">Email:</label>
-        <input
-          type="email"
-          id="email"
-          required
-          placeholder="Enter your email"
-        />
-      </div>
-
-      <div>
-        <label for="password">Password:</label>
-        <input
-          type="password"
-          id="password"
-          required
-          minlength="6"
-          placeholder="Enter your password"
-        />
-      </div>
-
-      <button type="submit">Login</button>
-    </form>
-  `
-);
-```
-
-### Список с фильтрацией
-
-```typescript
-const FilterableList = component<{ items: string[] }>(
-  ({ items }) => html`
-    <div>
-      <input
-        type="text"
-        placeholder="Search..."
-        oninput="handleFilter(event)"
-      />
-
-      <ul>
-        ${items.map((item) => html` <li>${item}</li> `)}
-      </ul>
-    </div>
-  `
-);
-```
+Want me to continue with the other documentation files?

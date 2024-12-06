@@ -1,14 +1,14 @@
-# CSS API в Reface
+# CSS API in Reface
 
-CSS API предоставляет мощные инструменты для стилизации компонентов с поддержкой изоляции стилей и современного CSS.
+CSS API provides powerful tools for styling components with support for style isolation and modern CSS features.
 
-## Основные концепции
+## Core Concepts
 
-Каждый компонент может иметь уникальный `rootClass`, который используется для изоляции стилей. Это позволяет применять стили к конкретным компонентам без влияния на другие части приложения.
+Each component can have a unique `rootClass` which is used for style isolation. This allows styles to be applied to specific components without affecting other parts of the application.
 
 ## styled API
 
-### Базовое использование
+### Basic Usage
 
 ```typescript
 import { styled, div } from "@vseplet/reface/dom";
@@ -26,15 +26,11 @@ const Card = styled(div)`
   }
 `;
 
-// Использование
-const App = component(
-  () =>
-    Card()`    Hello World
- `
-);
+// Usage
+const App = component(() => Card()`Hello World`);
 ```
 
-### Вложенные селекторы
+### Nested Selectors
 
 ```typescript
 const Container = styled(div)`
@@ -59,7 +55,7 @@ const Container = styled(div)`
 `;
 ```
 
-### Композиция компонентов
+### Component Composition
 
 ```typescript
 const Button = styled(button)`
@@ -82,10 +78,9 @@ const Card = styled(div)`
   }
 `;
 
-// Использование
+// Usage
 const App = component(
-  () =>
-    Card()`
+  () => Card()`
     Some content
     ${Button()`Click me`}
   `
@@ -94,20 +89,16 @@ const App = component(
 
 ## css API
 
-CSS API позволяет применять стили к существующим компонентам без их модификации.
+The CSS API allows you to apply styles to existing components without modifying them.
 
-### Базовое использование
+### Basic Usage
 
 ```typescript
 import { css } from "@vseplet/reface/dom";
 
-const MyComponent = component(
-  () =>
-    div({ class: "my-component" })`    Content
- `
-);
+const MyComponent = component(() => div({ class: "my-component" })`Content`);
 
-// Применяем стили к компоненту
+// Apply styles to component
 const StyledComponent = css`
   ${MyComponent} {
     color: red;
@@ -120,7 +111,7 @@ const StyledComponent = css`
 `(MyComponent);
 ```
 
-### Медиа-запросы
+### Media Queries
 
 ```typescript
 const ResponsiveComponent = css`
@@ -137,9 +128,9 @@ const ResponsiveComponent = css`
 `(MyComponent);
 ```
 
-## Практические примеры
+## Practical Examples
 
-### Тема для компонентов
+### Component Theme
 
 ```typescript
 const theme = {
@@ -174,7 +165,7 @@ const ThemedCard = styled(div)`
 `;
 ```
 
-### Компонент с состояниями
+### Component with States
 
 ```typescript
 const StatusButton = styled(button)`
@@ -207,10 +198,14 @@ const StatusButton = styled(button)`
   }
 `;
 
-// Использование
+// Usage
 const App = component(
   () => html`
     ${StatusButton({ class: "success" })`Success`} ${StatusButton({
+      class: "error",
+    })`Error`} ${StatusButton({ class: "loading" })`Loading...`} ${StatusButton(
+      { class: "success" }
+    )`Success`} ${StatusButton({
       class: "error",
     })`Error`} ${StatusButton({ class: "loading" })`Loading...`}
   `

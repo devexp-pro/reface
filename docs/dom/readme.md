@@ -2,83 +2,83 @@
   <img src="./logo.svg" alt="DOM API" style="width: 300px; height: auto;" />
 </div>
 
-# DOM API в Reface
+# DOM API in Reface
 
-DOM API в Reface предоставляет мощный и гибкий способ создания веб-интерфейсов с использованием различных подходов к разработке. Этот модуль объединяет несколько API, которые можно использовать как по отдельности, так и комбинировать для достижения наилучшего результата.
+Reface's DOM API provides a powerful and flexible way to create web interfaces using various development approaches. This module combines several APIs that can be used separately or combined for the best results.
 
-## Обзор API
+## API Overview
 
 ### [HTML Template API](./html.md)
 
-HTML Template API - это базовый способ создания шаблонов с использованием tagged template literals. Он предоставляет:
+HTML Template API is the basic way to create templates using tagged template literals. It provides:
 
-- Интуитивный синтаксис для создания HTML
-- Безопасную интерполяцию данных
-- Поддержку условного рендеринга и циклов
+- Intuitive syntax for HTML creation
+- Safe data interpolation
+- Support for conditional rendering and loops
 
 ### [DOM Elements API](./dom.md)
 
-DOM Elements API предлагает функциональный подход к созданию элементов:
+DOM Elements API offers a functional approach to creating elements:
 
-- Типобезопасное создание HTML элементов
-- Удобная работа с атрибутами и классами
-- Встроенная поддержка ARIA и доступности
+- Type-safe HTML element creation
+- Convenient work with attributes and classes
+- Built-in ARIA and accessibility support
 
 ### [Styled Components](./styled.md)
 
-Styled Components API позволяет создавать компоненты с изолированными стилями:
+Styled Components API allows you to create components with isolated styles:
 
-- Современный CSS с поддержкой вложенности
-- Динамические стили на основе пропсов
-- Композиция стилей и компонентов
+- Modern CSS with nesting support
+- Dynamic styles based on props
+- Style and component composition
 
 ### [JSX](./jsx.md)
 
-JSX поддержка для тех, кто предпочитает React-подобный синтаксис:
+JSX support for those who prefer React-like syntax:
 
-- Знакомый синтаксис для React разработчиков
-- Полная интеграция со всеми другими API
-- Строгая типизация компонентов
+- Familiar syntax for React developers
+- Full integration with all other APIs
+- Strict component typing
 
 ### [CSS API](./css.md)
 
-CSS API для глобальных стилей и темизации:
+CSS API for global styles and theming:
 
-- Управление глобальными стилями
-- Создание и использование тем
-- Динамическое применение стилей
+- Global style management
+- Theme creation and usage
+- Dynamic style application
 
-## Выбор подхода
+## Choosing an Approach
 
-1. **HTML Template API** подойдет, если вы:
+1. **HTML Template API** is suitable if you:
 
-   - Предпочитаете работать с чистым HTML
-   - Хотите максимальной производительности
-   - Используете простые шаблоны
+   - Prefer working with pure HTML
+   - Want maximum performance
+   - Use simple templates
 
-2. **DOM Elements API** лучший выбор, когда:
+2. **DOM Elements API** is the best choice when:
 
-   - Нужен функциональный подход
-   - Важна типобезопасность
-   - Требуется тонкий контроль над атрибутами
+   - Need a functional approach
+   - Type safety is important
+   - Fine control over attributes is required
 
-3. **Styled Components** отлично подходит для:
+3. **Styled Components** is perfect for:
 
-   - Создания переиспользуемых компонентов
-   - Изоляции стилей
-   - Динамической стилизации
+   - Creating reusable components
+   - Style isolation
+   - Dynamic styling
 
-4. **JSX** будет полезен, если вы:
-   - Имеете опыт работы с React
-   - Предпочитаете декларативный стиль
-   - Работаете в большой команде
+4. **JSX** will be useful if you:
+   - Have experience with React
+   - Prefer declarative style
+   - Work in a large team
 
-## Комбинирование подходов
+## Combining Approaches
 
-Все API в DOM модуле можно комбинировать:
+All APIs in the DOM module can be combined:
 
 ```typescript
-// Использование JSX со Styled Components
+// Using JSX with Styled Components
 const StyledButton = styled(button)`
   & {
     background: blue;
@@ -86,7 +86,7 @@ const StyledButton = styled(button)`
   }
 `;
 
-// Компонент с JSX и HTML Template
+// Component with JSX and HTML Template
 const Card = component(() => (
   <div class="card">
     ${html`<h2>Title</h2>`}
@@ -95,31 +95,31 @@ const Card = component(() => (
 ));
 ```
 
-## Лучшие практики
+## Best Practices
 
-1. **Выбор API**
+1. **API Selection**
 
-   - Используйте тот API, который лучше подходит для конкретной задачи
-   - Не бойтесь комбинировать разные подходы
-   - Придерживайтесь единого стиля в рамках компонента
+   - Use the API that best suits your specific task
+   - Don't be afraid to combine different approaches
+   - Maintain a consistent style within a component
 
-2. **Производительность**
+2. **Performance**
 
-   - Создавайте компоненты за пределами функций рендеринга
-   - Используйте мемоизацию где это необходимо
-   - Избегайте излишней вложенности
+   - Create components outside render functions
+   - Use memoization where necessary
+   - Avoid excessive nesting
 
-3. **Типизация**
+3. **Type Safety**
 
-   - Всегда определяйте типы пропсов
-   - Используйте строгую типизацию
-   - Проверяйте типы при компиляции
+   - Always define prop types
+   - Use strict typing
+   - Check types at compile time
 
-4. **Организация кода**
-   - Группируйте связанные компоненты
-   - Разделяйте логику и представление
-   - Следуйте принципам SOLID
+4. **Code Organization**
+   - Group related components
+   - Separate logic and presentation
+   - Follow SOLID principles
 
-## Заключение
+## Conclusion
 
-DOM API в Reface предоставляет гибкий набор инструментов для создания современных веб-интерфейсов. Благодаря различным подходам к разработке, вы можете выбрать тот стиль, который лучше всего подходит для вашего проекта или команды, сохраняя при этом все преимущества типобезопасности и производительности.
+Reface's DOM API provides a flexible set of tools for creating modern web interfaces. With various development approaches, you can choose the style that best suits your project or team while maintaining all the benefits of type safety and performance.
