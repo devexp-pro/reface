@@ -1,87 +1,54 @@
-import type {
-  HTMLAttributes,
-  ElementChild,
-  Template,
-  ButtonAttributes,
-  InputAttributes,
-  FormAttributes,
-  AnchorAttributes,
-  ImgAttributes,
-} from "../types/mod.ts";
+import type { HTMLAttributes } from "../core/Template.ts";
 
-// Base JSX Props
-export interface JSXProps extends HTMLAttributes {
-  children?: ElementChild | ElementChild[];
-  innerHTML?: string;
+// HTML Element Attributes
+export interface HTMLElementAttributes extends HTMLAttributes {
+  ref?: any;
+  key?: string | number;
+  dangerouslySetInnerHTML?: { __html: string };
 }
 
-// Event handler types
-export type JSXEventHandler = string | ((event: Event) => void);
-
-// Element interface
-export interface JSXElement extends Template {
-  props: JSXProps;
+// Specific Element Attributes
+export interface HTMLDivAttributes extends HTMLElementAttributes {}
+export interface HTMLSpanAttributes extends HTMLElementAttributes {}
+export interface HTMLButtonAttributes extends HTMLElementAttributes {
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
 }
+export interface HTMLInputAttributes extends HTMLElementAttributes {
+  type?: string;
+  value?: string | number;
+  checked?: boolean;
+  placeholder?: string;
+}
+// ... другие специфичные атрибуты
 
-// Intrinsic elements declaration
+// JSX Namespace
 declare global {
   namespace JSX {
+    // Element types
+    interface Element {
+      type: string | Function;
+      props: any;
+      children: Element[];
+    }
+
+    // IntrinsicElements map
     interface IntrinsicElements {
-      // Document structure
-      div: JSXProps;
-      span: JSXProps;
-      p: JSXProps;
-      main: JSXProps;
-      section: JSXProps;
-      article: JSXProps;
-      aside: JSXProps;
-      nav: JSXProps;
-      header: JSXProps;
-      footer: JSXProps;
+      div: HTMLDivAttributes;
+      span: HTMLSpanAttributes;
+      button: HTMLButtonAttributes;
+      input: HTMLInputAttributes;
+      // ... все HTML элементы
+    }
 
-      // Headings
-      h1: JSXProps;
-      h2: JSXProps;
-      h3: JSXProps;
-      h4: JSXProps;
-      h5: JSXProps;
-      h6: JSXProps;
+    // Component attributes
+    interface ElementAttributesProperty {
+      props: {};
+    }
 
-      // Forms
-      form: FormAttributes;
-      input: InputAttributes;
-      button: ButtonAttributes;
-      textarea: JSXProps & {
-        rows?: number;
-        cols?: number;
-      };
-      select: JSXProps & {
-        multiple?: boolean;
-      };
-      option: JSXProps & {
-        value: string;
-        selected?: boolean;
-      };
-      label: JSXProps;
-
-      // Links
-      a: AnchorAttributes;
-
-      // Lists
-      ul: JSXProps;
-      ol: JSXProps;
-      li: JSXProps;
-
-      // Media
-      img: ImgAttributes;
-      video: JSXProps & {
-        src?: string;
-        controls?: boolean;
-      };
-      audio: JSXProps & {
-        src?: string;
-        controls?: boolean;
-      };
+    // Children
+    interface ElementChildrenAttribute {
+      children: {};
     }
   }
 }

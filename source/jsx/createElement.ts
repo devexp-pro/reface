@@ -3,8 +3,32 @@ import type {
   ElementFactory,
   HTMLAttributes,
   Template,
-} from "../core/mod.ts";
+} from "../core/Template.ts";
 import * as elements from "../elements/mod.ts";
+
+/**
+ * Process props including spread
+ */
+function processProps(props: Record<string, unknown> | null): HTMLAttributes {
+  if (!props) return {};
+
+  const result: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(props)) {
+    // Handle spread
+    if (key === "__spread") {
+      Object.assign(result, value);
+      continue;
+    }
+
+    // Handle special props
+    if (key === "ref" || key === "key") continue;
+
+    result[key] = value;
+  }
+
+  return result as HTMLAttributes;
+}
 
 /**
  * Creates a Template from JSX
@@ -15,6 +39,7 @@ export function createElement(
   ...children: ElementChild[]
 ): Template {
   try {
+    const processedProps = processProps(props);
     // Process children to handle arrays
     const processedChildren = children.flatMap((child) => {
       // Handle arrays (e.g. from map)
@@ -31,7 +56,7 @@ export function createElement(
         const styledComponent = tag as ElementFactory<HTMLAttributes> & {
           className: string;
         };
-        const template = styledComponent(props || {});
+        const template = styledComponent(processedProps);
 
         if (typeof template === "function") {
           return template(
@@ -47,7 +72,7 @@ export function createElement(
 
       // Handle regular components
       return tag({
-        ...props,
+        ...processedProps,
         children:
           processedChildren.length === 1
             ? processedChildren[0]
@@ -62,7 +87,7 @@ export function createElement(
     }
 
     // Create template
-    const template = elementFn(props || {});
+    const template = elementFn(processedProps);
     if (typeof template === "function") {
       return template(
         Object.assign([""], { raw: [""] }) as TemplateStringsArray,
