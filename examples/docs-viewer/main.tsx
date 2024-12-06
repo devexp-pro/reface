@@ -2,7 +2,7 @@ import { createElement } from "../../source/mod.ts";
 import { Reface, clean } from "../../source/mod.ts";
 import { Hono } from "@hono/hono";
 import { serveStatic } from "https://deno.land/x/hono@v3.11.7/middleware.ts";
-import { loadDocs } from "./utils/docs.ts";
+import { loadDocs } from "./utils/docs.tsx";
 import { DocsViewer } from "./components/DocsViewer.tsx";
 import { LiveReload } from "./utils/live-reload.ts";
 

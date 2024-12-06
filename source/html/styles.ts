@@ -6,8 +6,24 @@ import type { Template } from "../core/Template.ts";
 export type StyleInterpolation =
   | string
   | number
-  | (() => Template)
-  | { css: string };
+  | boolean
+  | undefined
+  | null
+  | (() => Template);
+
+function processSelectors(css: string, className: string): string {
+  return (
+    css
+      // Замена & { на .className {
+      .replace(/&\s*{/g, `.${className} {`)
+      // Замена & .class на .className .class
+      .replace(/&\s+\./g, `.${className} .`)
+      // Замена &:pseudo на .className:pseudo
+      .replace(/&([:.])/g, `.${className}$1`)
+      // Замена & .class на .className .class
+      .replace(/&\s+([^{]+)/g, `.${className} $1`)
+  );
+}
 
 /**
  * Process style template and interpolations
@@ -17,34 +33,14 @@ export function processStyles(
   values: StyleInterpolation[],
   className: string
 ): string {
-  // Process interpolations
-  let css = strings
-    .reduce((result, str, i) => {
-      const value = values[i];
-      if (!value) return result + str;
-
-      // Handle functions
-      if (typeof value === "function") {
-        return result + str + `.${value().rootClass}`;
-      }
-
-      // Handle nested styles
-      if (typeof value === "object" && "css" in value) {
-        return result + str + value.css;
-      }
-
-      return result + str + String(value);
-    }, "")
-    .trim();
+  // Combine strings and values
+  let css = strings.reduce((result, str, i) => {
+    const value = values[i];
+    return result + str + (value !== undefined ? value : "");
+  }, "");
 
   // Process selectors
-  css = css
-    // Replace & with class name
-    .replace(/&\s*{/g, `.${className} {`)
-    // Handle nested selectors
-    .replace(/&\s*(\${|\.)/g, `.${className} $1`)
-    // Handle direct class selectors
-    .replace(/&\s+\./g, `.${className} .`);
+  css = processSelectors(css, className);
 
   return css;
 }

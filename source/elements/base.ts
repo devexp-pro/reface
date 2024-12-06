@@ -22,11 +22,29 @@ export const pre = createElementFactory<HTMLAttributes>("pre");
 export const code = createElementFactory<HTMLAttributes>("code");
 export const strong = createElementFactory<HTMLAttributes>("strong");
 export const em = createElementFactory<HTMLAttributes>("em");
+export const blockquote = createElementFactory<HTMLAttributes>("blockquote");
 
 // Lists
 export const ul = createElementFactory<HTMLAttributes>("ul");
 export const ol = createElementFactory<HTMLAttributes>("ol");
 export const li = createElementFactory<HTMLAttributes>("li");
+
+// Table elements
+export const table = createElementFactory<HTMLAttributes>("table");
+export const thead = createElementFactory<HTMLAttributes>("thead");
+export const tbody = createElementFactory<HTMLAttributes>("tbody");
+export const tr = createElementFactory<HTMLAttributes>("tr");
+export const th = createElementFactory<HTMLAttributes>("th");
+export const td = createElementFactory<HTMLAttributes>("td");
+
+// Form elements
+export const input = createElementFactory<
+  HTMLAttributes & {
+    type?: string;
+    checked?: boolean;
+    disabled?: boolean;
+  }
+>("input");
 
 // Links
 export const a = createElementFactory<
@@ -40,5 +58,9 @@ export const img = createElementFactory<
   HTMLAttributes & {
     src?: string;
     alt?: string;
+    title?: string;
   }
 >("img");
+
+// Other
+export const hr = createElementFactory<HTMLAttributes>("hr");

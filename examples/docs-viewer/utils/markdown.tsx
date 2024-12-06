@@ -1,5 +1,4 @@
-import { createElement, ol, ul, li, a, img, p } from "../../../source/mod.ts";
-
+import { createElement, Fragment, type Template } from "../../../source/mod.ts";
 import { marked } from "https://esm.sh/marked@9.1.5";
 import { contentComponents } from "../components/Content.tsx";
 
@@ -14,62 +13,151 @@ export interface ParsedMarkdown {
   headings: Heading[];
 }
 
-function createTemplate(tokens: marked.Token[]): Template {
-  const elements: Template[] = [];
-
-  for (const token of tokens) {
-    switch (token.type) {
-      case "paragraph":
-        elements.push(<contentComponents.p>{token.text}</contentComponents.p>);
-        break;
-
-      case "heading":
-        const HeadingComponent = [
-          contentComponents.h1,
-          contentComponents.h2,
-          contentComponents.h3
-        ][token.depth - 1] || contentComponents.h3;
-        
-        const slug = token.text.toLowerCase().replace(/[^\w]+/g, "-");
-        elements.push(
-          <HeadingComponent id={slug}>{token.text}</HeadingComponent>
-        );
-        break;
-
-      case "list":
-        const ListComponent = token.ordered ? ol : ul;
-        const items = token.items.map((item) => li()`${item.text}`);
-        elements.push(ListComponent()`${items.join("")}`);
-        break;
-
-      case "link":
-        elements.push(a({ href: token.href })`${token.text}`);
-        break;
-
-      case "image":
-        elements.push(
-          img({ src: token.href, alt: token.text })`${token.title || ""}`
-        );
-        break;
-
-      case "code":
-        elements.push(
-          <contentComponents.pre>
-            <contentComponents.code className={`language-${token.lang}`}>
-              {token.text}
-            </contentComponents.code>
-          </contentComponents.pre>
-        );
-        break;
-
-      default:
-        if ("text" in token) {
-          elements.push(p()`${token.text}`);
-        }
-    }
+// Обработка встроенных элементов
+function processInlineContent(tokens: marked.Token[] | string): Template[] {
+  if (typeof tokens === "string") {
+    return [tokens];
   }
 
-  return <div>{elements}</div>;
+  return tokens.map(token => {
+    switch (token.type) {
+      case "strong": {
+        const content = processInlineContent(token.tokens || [token.text]);
+        return <contentComponents.strong>{content}</contentComponents.strong>;
+      }
+
+      case "em": {
+        const content = processInlineContent(token.tokens || [token.text]);
+        return <contentComponents.em>{content}</contentComponents.em>;
+      }
+
+      case "link": {
+        const content = processInlineContent(token.tokens || [token.text]);
+        return <contentComponents.a href={token.href}>{content}</contentComponents.a>;
+      }
+
+      case "image":
+        return <contentComponents.img 
+          src={token.href} 
+          alt={token.text}
+          title={token.title}
+        />;
+
+      case "codespan":
+        return <contentComponents.code>{token.text}</contentComponents.code>;
+
+      case "text":
+      default:
+        return token.text;
+    }
+  });
+}
+
+function processListItems(items: marked.Token.ListItem[]): Template[] {
+  return items.map(item => {
+    const content = processInlineContent(item.tokens || [item.text]);
+    const checkbox = item.task && (
+      <input 
+        type="checkbox" 
+        checked={item.checked}
+        disabled
+      />
+    );
+
+    // Рекурсивно обрабатываем вложенные списки
+    const nestedList = item.items && (
+      <contentComponents.ul>
+        {processListItems(item.items)}
+      </contentComponents.ul>
+    );
+
+    return (
+      <contentComponents.li>
+        {checkbox}
+        {content}
+        {nestedList}
+      </contentComponents.li>
+    );
+  });
+}
+
+// Обработка отдельного токена
+function processToken(token: marked.Token): Template {
+  switch (token.type) {
+    case "paragraph":
+      return <contentComponents.p>
+        {processInlineContent(token.tokens || [token.text])}
+      </contentComponents.p>;
+
+    case "heading": {
+      const HeadingComponent = [
+        contentComponents.h1,
+        contentComponents.h2,
+        contentComponents.h3
+      ][token.depth - 1] || contentComponents.h3;
+      
+      const slug = token.text.toLowerCase().replace(/[^\w]+/g, "-");
+      const content = processInlineContent(token.tokens || [token.text]);
+      
+      return <HeadingComponent id={slug}>{content}</HeadingComponent>;
+    }
+
+    case "list": {
+      const ListComponent = token.ordered ? contentComponents.ol : contentComponents.ul;
+      return (
+        <ListComponent>
+          {processListItems(token.items)}
+        </ListComponent>
+      );
+    }
+
+    case "code":
+      return <contentComponents.pre>
+        <contentComponents.code className={`language-${token.lang || ''}`}>
+          {token.text}
+        </contentComponents.code>
+      </contentComponents.pre>;
+
+    case "blockquote":
+      return <contentComponents.blockquote>
+        {processMarkdownContent(token.text)}
+      </contentComponents.blockquote>;
+
+    case "hr":
+      return <contentComponents.hr />;
+
+    case "table":
+      return <contentComponents.table>
+        <thead>
+          <tr>
+            {token.header.map(cell => (
+              <th>{processInlineContent(cell.tokens || [cell.text])}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {token.rows.map(row => (
+            <tr>
+              {row.map(cell => (
+                <td>{processInlineContent(cell.tokens || [cell.text])}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </contentComponents.table>;
+
+    default:
+      if ("text" in token) {
+        return <contentComponents.p>{token.text}</contentComponents.p>;
+      }
+      return <></>;
+  }
+}
+
+// Рекурсивная функция для обработки вложенного markdown
+function processMarkdownContent(content: string): Template[] {
+  const tokens = marked.lexer(content);
+  return tokens.map(processToken);
 }
 
 export function parseMarkdown(content: string): ParsedMarkdown {
@@ -88,10 +176,10 @@ export function parseMarkdown(content: string): ParsedMarkdown {
   });
 
   // Создаем Template из токенов
-  const parsedContent = createTemplate(tokens);
+  const elements = tokens.map(processToken);
 
   return {
-    content: parsedContent,
+    content: <div>{elements}</div>,
     headings,
   };
 }

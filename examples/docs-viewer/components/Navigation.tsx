@@ -1,64 +1,110 @@
+import { createElement, Fragment, type Template } from "../../../source/mod.ts";
 import { styled } from "../../../source/mod.ts";
+import type { DocSection } from "../utils/docs.ts";
 
-export const Navigation = styled.nav`
+interface NavigationProps {
+  sections: DocSection[];
+  currentPath?: string;
+}
+
+const NavContainer = styled.nav`
   & {
     width: 16rem;
-    position: sticky;
-    top: 5rem;
-    height: calc(100vh - 5rem);
-    overflow-y: auto;
-    padding-right: 1rem;
+    padding: 1rem;
+    border-right: 1px solid #e2e8f0;
+  }
+`;
+
+const Section = styled.div`
+  & {
+    margin-bottom: 2rem;
   }
 
-  & h3 {
-    font-size: 0.875rem;
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const SectionTitle = styled.h3`
+  & {
+    font-size: var(--text-sm);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #64748b;
-    margin: 2rem 0 0.5rem;
+    margin: 0 0 0.75rem;
   }
+`;
 
-  & h3:first-child {
-    margin-top: 0;
-  }
-
-  & ul {
+const NavList = styled.ul`
+  & {
     list-style: none;
     padding: 0;
     margin: 0;
   }
+`;
 
-  & li {
+const NavItem = styled.li`
+  & {
     margin: 0.25rem 0;
   }
 
   & a {
     display: block;
-    padding: 0.375rem 0.75rem;
-    color: #334155;
+    padding: 0.25rem 0;
+    color: #64748b;
     text-decoration: none;
-    border-radius: 0.375rem;
-    font-size: 0.875rem;
-    transition: all 0.2s;
+    font-size: var(--text-sm);
+    transition: color 0.2s;
   }
 
   & a:hover {
-    background: #f1f5f9;
     color: #0f172a;
   }
 
   & a.active {
-    background: #e2e8f0;
-    color: #0f172a;
+    color: #2563eb;
     font-weight: 500;
   }
 
-  @media (max-width: 768px) {
-    & {
-      width: 100%;
-      height: auto;
-      position: static;
-    }
+  & ul {
+    margin-left: 1rem;
   }
-`; 
+`;
+
+function renderNavItems(pages: DocSection["pages"], currentPath?: string, parentPath = ""): Template {
+  return (
+    <NavList>
+      {pages.map(page => {
+        const fullPath = parentPath ? `${parentPath}/${page.path}` : page.path;
+        const isActive = currentPath === fullPath;
+        const hasChildren = page.children && page.children.length > 0;
+
+        return (
+          <NavItem>
+            <a 
+              href={`/docs/${fullPath}`}
+              class={isActive ? "active" : ""}
+            >
+              {page.title}
+            </a>
+            {hasChildren? renderNavItems(page.children, currentPath, fullPath) : ''}
+          </NavItem>
+        );
+      })}
+    </NavList>
+  );
+}
+
+export function Navigation({ sections, currentPath }: NavigationProps): Template {
+  return (
+    <NavContainer>
+      {sections.map(section => (
+        <Section>
+          <SectionTitle>{section.title}</SectionTitle>
+          {renderNavItems(section.pages, currentPath)}
+        </Section>
+      ))}
+    </NavContainer>
+  );
+} 

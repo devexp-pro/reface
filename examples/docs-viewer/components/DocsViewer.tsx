@@ -1,8 +1,4 @@
-import {
-  createElement,
-  Fragment,
-  type Template,
-} from "../../../source/mod.ts";
+import { createElement, Fragment, type Template } from "../../../source/mod.ts";
 import { Container, Header, Layout } from "./Layout.tsx";
 import { Navigation } from "./Navigation.tsx";
 import { Content, DocContent, TableOfContents } from "./Content.tsx";
@@ -26,29 +22,7 @@ export function DocsViewer({ sections, currentPath = "" }: DocsViewerProps): Tem
       </Header>
       
       <Layout>
-        <Navigation>
-          {sections.map(section => (
-            <div>
-              <h3>{section.title}</h3>
-              <ul>
-                {section.pages.map(page => {
-                  const fullPath = `${section.title}/${page.path}`;
-                  return (
-                    <li>
-                      <a 
-                        href={`/${fullPath}`}
-                        class={currentPath === fullPath ? "active" : ""}
-                      >
-                        {page.title}
-                      </a>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ))}
-        </Navigation>
-
+        <Navigation sections={sections} currentPath={currentPath} />
         <Content>
           {currentPage ? (
             <>

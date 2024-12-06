@@ -1,4 +1,4 @@
-import { createElement } from "../../../source/mod.ts";
+import { createElement, Fragment } from "../../../source/mod.ts";
 
 import { styled } from "../../../source/mod.ts";
 
@@ -93,6 +93,102 @@ export const DocContent = styled.div`
   }
 `;
 
+
+const ContentOl = styled.ol`
+  & {
+    list-style-type: decimal;
+    padding-left: 1.5rem;
+    margin: 1rem 0;
+  }
+`;
+
+const ContentUl = styled.ul`
+  & {
+    list-style-type: disc;
+    padding-left: 1.5rem;
+    margin: 1rem 0;
+  }
+`;
+
+const ContentLi = styled.li`
+  & {
+    margin: 0.5rem 0;
+    line-height: var(--leading-relaxed);
+  }
+
+  & input[type="checkbox"] {
+    margin-right: 0.5rem;
+  }
+`;
+
+const ContentBlockquote = styled.blockquote`
+  & {
+    border-left: 4px solid #e2e8f0;
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    color: #64748b;
+  }
+`;
+
+const ContentHr = styled.hr`
+  & {
+    border: none;
+    border-top: 1px solid #e2e8f0;
+    margin: 2rem 0;
+  }
+`;
+
+const ContentTable = styled.table`
+  & {
+    width: 100%;
+    margin: 1.5rem 0;
+    border-collapse: collapse;
+  }
+
+  & th,
+  & td {
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    text-align: left;
+  }
+
+  & th {
+    background: #f8fafc;
+    font-weight: 600;
+  }
+`;
+
+const ContentStrong = styled.strong`
+  & {
+    font-weight: 600;
+  }
+`;
+
+const ContentEm = styled.em`
+  & {
+    font-style: italic;
+  }
+`;
+
+const ContentA = styled.a`
+  & {
+    color: #2563eb;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  &:hover {
+    color: #1d4ed8;
+    text-decoration: underline;
+  }
+
+  &:focus {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+`;
+
 export const TableOfContents = styled.nav`
   & {
     position: fixed;
@@ -123,23 +219,51 @@ export const TableOfContents = styled.nav`
     margin: 0.25rem 0;
   }
 
-  & a {
+  & ${ContentA} {
     display: block;
-    color: #64748b;
-    text-decoration: none;
     font-size: var(--text-sm);
     line-height: var(--leading-normal);
-    transition: color 0.2s;
-  }
+    color: #64748b;
 
-  & a:hover {
-    color: #0f172a;
+    &:hover {
+      color: #0f172a;
+      text-decoration: none;
+    }
+
+    &:focus {
+      color: #0f172a;
+      outline: 2px solid #94a3b8;
+      outline-offset: 2px;
+      border-radius: 2px;
+    }
   }
 
   @media (max-width: 1280px) {
     & {
       display: none;
     }
+  }
+`;
+
+const ContentImg = styled.img`
+  & {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin: 1.5rem 0;
+  }
+
+  &[title] {
+    margin-bottom: 0.5rem;
+  }
+
+  &[title]::after {
+    content: attr(title);
+    display: block;
+    text-align: center;
+    font-size: var(--text-sm);
+    color: #64748b;
+    margin-top: 0.5rem;
   }
 `;
 
@@ -151,4 +275,14 @@ export const contentComponents = {
   p: ContentParagraph,
   code: ContentCode,
   pre: ContentPre,
+  ol: ContentOl,
+  ul: ContentUl,
+  li: ContentLi,
+  blockquote: ContentBlockquote,
+  hr: ContentHr,
+  table: ContentTable,
+  strong: ContentStrong,
+  em: ContentEm,
+  a: ContentA,
+  img: ContentImg,
 }; 
