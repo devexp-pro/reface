@@ -12,6 +12,17 @@ Reface uses the islands architecture pattern, where most of the page is static H
 
 All components are rendered on the server, providing excellent performance and SEO benefits.
 
+## Documentation
+
+- [DOM API](./dom/readme.md)
+  - [Html](./dom/html.md)
+  - [CSS](./dom/css.md)
+  - [Styled()](./dom/styled.md)
+  - [DOM](./dom/dom.md)
+  - [JSX/TSX](./dom/jsx.md)
+- [Components API](./components.md)
+- [Layouts API](./layouts.md)
+
 ## Basic Usage
 
 ```tsx
