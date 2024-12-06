@@ -1,74 +1,92 @@
-import type { Template } from "../types.ts";
-import type { Attributes } from "../types/mod.ts";
-import type { ElementChild } from "../types/base.ts";
+import type {
+  HTMLAttributes,
+  ElementChild,
+  ElementFactory,
+  Template,
+} from "../types/base.ts";
 import type {
   StyledComponent,
-  StyleFunction,
+  StyledFactory,
   StyleInterpolation,
+  StyledAPI,
 } from "./types.ts";
+
 import { createElementFactory } from "../elements/createElementFactory.ts";
 import { generateClassName } from "../helpers/mod.ts";
+import { attributes } from "../html/attributes.ts";
+import { render } from "../core/render.ts";
 import * as elements from "../elements/mod.ts";
 
 /**
- * Creates a styled component factory
+ * Creates a styled component
  */
-function createStyled<T extends Attributes>(
+function createStyled<T extends HTMLAttributes>(
   elementFactory: ReturnType<typeof createElementFactory<T>>
-) {
+): StyledFactory<T> {
   return (strings: TemplateStringsArray, ...values: StyleInterpolation[]) => {
-    // Generate unique class for component
     const className = generateClassName();
-    const tag = elementFactory.name.toLowerCase();
-
-    // Process CSS template
+    const tag = elementFactory.name?.toLowerCase() || "div";
     const css = processStyles(strings, values, className);
 
-    // Create styled component
-    const styledComponent = ((props: T = {} as T) => {
-      // Merge classes
-      const existingClass = props.class || "";
-      const mergedProps = {
-        ...props,
-        class: `${className} ${existingClass}`.trim(),
-      };
+    const styledComponent = Object.assign(
+      ((props: T = {} as T) => {
+        const mergedProps = {
+          ...props,
+          class: `${className} ${props.class || ""}`.trim(),
+        };
 
-      // Create base template
-      const baseTemplate = elementFactory(mergedProps)(
-        Object.assign([""], { raw: [""] }) as TemplateStringsArray
-      );
+        const factory = (
+          strings?: TemplateStringsArray,
+          ...children: ElementChild[]
+        ): Template => {
+          if (!strings) {
+            return {
+              tag,
+              attributes: attributes(mergedProps),
+              children: [],
+              css,
+              isTemplate: true,
+              str: Object.assign([""], { raw: [""] }) as TemplateStringsArray,
+              args: [],
+              rootClass: className,
+            };
+          }
 
-      // Create styled template
-      const template: Template = {
-        ...baseTemplate,
-        css,
-        rootClass: className,
-      };
+          const processedChildren = children.map((child) =>
+            child === null || child === undefined
+              ? ""
+              : typeof child === "string" ||
+                (typeof child === "object" && "isTemplate" in child)
+              ? child
+              : String(child)
+          );
 
-      // Add template function
-      return Object.assign(
-        (strings?: TemplateStringsArray, ...values: ElementChild[]) => {
-          if (!strings) return template;
           return {
-            ...elementFactory(mergedProps)(strings, ...values),
+            tag,
+            attributes: attributes(mergedProps),
+            children,
             css,
+            isTemplate: true,
+            str: strings,
+            args: processedChildren,
             rootClass: className,
           };
-        },
-        template
-      );
-    }) as StyledComponent<T>;
+        };
 
-    // Add metadata
-    styledComponent.className = className;
-    styledComponent.displayName = `styled.${tag}`;
+        return Object.assign(factory, factory());
+      }) as unknown as StyledComponent<T>,
+      {
+        className,
+        displayName: `styled.${tag}`,
+      }
+    );
 
     return styledComponent;
   };
 }
 
 /**
- * Processes style template and interpolations
+ * Process style template and interpolations
  */
 function processStyles(
   strings: TemplateStringsArray,
@@ -81,9 +99,9 @@ function processStyles(
       const value = values[i];
       if (!value) return result + str;
 
-      // Handle style functions
+      // Handle functions
       if (typeof value === "function") {
-        return result + str + `.${(value as StyleFunction)().rootClass}`;
+        return result + str + `.${value().rootClass}`;
       }
 
       // Handle nested styles
@@ -107,31 +125,24 @@ function processStyles(
   return css;
 }
 
-/**
- * Base styled function for extending components
- */
-export function styled<T extends Attributes>(
-  component: ReturnType<typeof createElementFactory<T>> | StyledComponent<T>
-) {
-  return createStyled(component);
-}
-
 // Create styled API with element methods
-type StyledElements = {
-  [K in keyof typeof elements]: ReturnType<typeof createStyled<any>>;
-};
-
 const styledElements = Object.entries(elements).reduce(
   (acc, [key, element]) => ({
     ...acc,
-    [key]: createStyled(element),
+    [key]: createStyled(element as ElementFactory<HTMLAttributes>),
   }),
   {}
-) as StyledElements;
+) as StyledAPI;
 
 // Export combined API
-export const styledApi = Object.assign(styled, styledElements);
-export default styledApi;
+export const styled = Object.assign(
+  <T extends HTMLAttributes>(
+    component: ReturnType<typeof createElementFactory<T>> | StyledComponent<T>
+  ): StyledFactory<T> => createStyled(component),
+  styledElements
+) as StyledAPI;
 
-// Export CSS helper
-export { css } from "./css.ts";
+export default styled;
+
+// Export CSS helpers
+export { css, cssVar, keyframes } from "./css.ts";

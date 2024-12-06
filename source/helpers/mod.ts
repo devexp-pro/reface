@@ -6,6 +6,8 @@ import type {
   Template,
 } from "$types";
 
+import { render } from "../core/render.ts";
+
 export * from "./generateClassName.ts";
 
 export const css = (str: TemplateStringsArray, ...args: any[]): Style => ({
@@ -19,40 +21,12 @@ export const salt = (name?: string) =>
     ? `${name}_${(Math.random() * 10000000000) | 0}`
     : "s" + ((Math.random() * 10000000000) | 0);
 
-export const render = (template: Template | Array<Template | any>): string => {
-  if (Array.isArray(template)) {
-    return template.map(render).join("");
-  }
-
-  let content = template.str.reduce((acc, part, i) => {
-    const arg = template.args[i];
-    if (arg?.isTemplate) {
-      return acc + part + render(arg);
-    }
-    if (Array.isArray(arg)) {
-      return acc + part + arg.map(render).join("");
-    }
-    return acc + part + (arg || "");
-  }, "");
-
-  if (template.css) {
-    content = `<style>${template.css}</style>${content}`;
-  }
-
-  if (template.tag) {
-    return `<${template.tag}${template.attributes || ""}>${content}</${
-      template.tag
-    }>`;
-  }
-
-  return content;
-};
-
 export const GET = (path: string) => `get|${path}`;
 export const POST = (path: string) => `post|${path}`;
 export const PUT = (path: string) => `put|${path}`;
 export const PATCH = (path: string) => `patch|${path}`;
 export const DELETE = (path: string) => `delete|${path}`;
+
 export const RESPONSE = (
   html?: string | Template | Array<Template | any>,
   status?: number

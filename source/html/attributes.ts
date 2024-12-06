@@ -1,7 +1,14 @@
 // Функции для работы с атрибутами
-import type { Attributes, ClassInput, StyleInput } from "../types/mod.ts";
-import { styles } from "../styled/styles.ts";
+import type {
+  HTMLAttributes,
+  ClassInput,
+  StyleInput,
+  ClassValue,
+} from "../types/base.ts";
 
+/**
+ * Converts class values to string
+ */
 export function classNames(...args: ClassInput[]): string {
   const classes: string[] = [];
 
@@ -17,20 +24,52 @@ export function classNames(...args: ClassInput[]): string {
     }
   });
 
-  return classes.filter(Boolean).join(" ");
+  return classes.join(" ");
 }
 
-export function attrs(attributes: Attributes): string {
-  return Object.entries(attributes)
-    .filter(([_, value]) => value !== undefined)
+/**
+ * Converts attributes object to string
+ */
+export function attributes(attrs: HTMLAttributes): string {
+  if (!attrs) return "";
+
+  const result: Record<string, unknown> = { ...attrs };
+
+  // Handle className -> class conversion
+  if ("className" in result) {
+    const className = result.className as ClassValue;
+    if (className) {
+      result.class = classNames(className);
+    }
+    delete result.className;
+  }
+
+  // Handle class attribute
+  if (result.class) {
+    result.class = classNames(result.class as ClassValue);
+  }
+
+  // Convert to HTML attributes
+  return Object.entries(result)
     .map(([key, value]) => {
-      if (key === "class") {
-        value = classNames(value as ClassInput);
-      } else if (key === "style" && typeof value === "object") {
-        value = styles(value as StyleInput);
-      }
+      // Skip internal props
+      if (key === "children" || key === "innerHTML") return "";
+
+      // Handle boolean attributes
       if (value === true) return key;
-      if (value === false) return "";
+      if (value === false || value === null || value === undefined) return "";
+
+      // Handle objects (e.g. style)
+      if (typeof value === "object") {
+        if (key === "style" && value) {
+          value = Object.entries(value as StyleInput)
+            .map(([k, v]) => `${k}:${v}`)
+            .join(";");
+        } else {
+          value = JSON.stringify(value);
+        }
+      }
+
       return `${key}="${value}"`;
     })
     .filter(Boolean)

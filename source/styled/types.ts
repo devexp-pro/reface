@@ -1,5 +1,9 @@
-import type { Template } from "../types.ts";
-import type { ElementChild } from "../types/base.ts";
+import type {
+  HTMLAttributes,
+  ElementFactory,
+  Template,
+  ElementChild,
+} from "../types/base.ts";
 
 /**
  * Style function that returns a template
@@ -16,23 +20,33 @@ export type StyleInterpolation =
   | { css: string };
 
 /**
+ * Factory for creating styled components
+ */
+export type StyledFactory<T extends HTMLAttributes> = (
+  strings: TemplateStringsArray,
+  ...values: StyleInterpolation[]
+) => StyledComponent<T>;
+
+/**
  * Styled component type
  */
-export interface StyledComponent<Props = {}> {
-  (props?: Props): Template & {
-    (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
-  };
+export interface StyledComponent<T extends HTMLAttributes>
+  extends ElementFactory<T> {
+  (props?: T): (
+    strings: TemplateStringsArray,
+    ...children: ElementChild[]
+  ) => Template;
+  (strings: TemplateStringsArray, ...children: ElementChild[]): Template;
   className: string;
   displayName?: string;
 }
 
 /**
- * CSS helper function type
+ * Combined styled API type
  */
-export interface CSSHelper {
-  (strings: TemplateStringsArray, ...values: StyleInterpolation[]): string;
-  <Props>(
-    strings: TemplateStringsArray,
-    ...values: Array<StyleInterpolation | ((props: Props) => string | number)>
-  ): (props: Props) => string;
+export interface StyledAPI {
+  <T extends HTMLAttributes>(
+    component: ElementFactory<T> | StyledComponent<T>
+  ): StyledFactory<T>;
+  [key: string]: StyledFactory<any>;
 }

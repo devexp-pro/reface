@@ -36,6 +36,7 @@ export const inlineStyle = <P = undefined>(
 };
 
 export { component, island, Reface };
+export * from "./core/render.ts";
 export * from "./helpers/mod.ts";
 export * from "$/types.ts";
 export * from "$/layouts/mod.ts";

@@ -8,8 +8,6 @@ export interface HtmxAttributes {
   "hx-target"?: string;
   "hx-swap"?: string;
   "hx-trigger"?: string;
-  "hx-vals"?: string;
-  "hx-push-url"?: string;
-  "hx-select"?: string;
   "hx-ext"?: string;
+  "hx-vals"?: string;
 }

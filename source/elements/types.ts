@@ -1,24 +1,6 @@
-export interface HTMLAttributes {
-  class?: string | ClassValue;
-  style?: string | StyleInput;
-  id?: string;
-  title?: string;
-  role?: string;
-  tabindex?: number;
-  "aria-label"?: string;
-  "aria-hidden"?: boolean;
-  [key: `data-${string}`]: string | number | boolean | undefined;
-  [key: string]: unknown;
-}
+import type { HTMLAttributes } from "../types/base.ts";
 
-// Специфичные атрибуты для элементов
-export interface AnchorAttributes extends HTMLAttributes {
-  href: string;
-  target?: "_blank" | "_self" | "_parent" | "_top";
-  rel?: string;
-  download?: string;
-}
-
+// Button attributes
 export interface ButtonAttributes extends HTMLAttributes {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
@@ -26,8 +8,9 @@ export interface ButtonAttributes extends HTMLAttributes {
   name?: string;
 }
 
-export interface InputAttributes extends FormAttributes {
-  type:
+// Input attributes
+export interface InputAttributes extends HTMLAttributes {
+  type?:
     | "text"
     | "password"
     | "email"
@@ -54,32 +37,19 @@ export interface InputAttributes extends FormAttributes {
   max?: number | string;
   step?: number | string;
   pattern?: string;
+  name?: string;
 }
 
-export interface TextareaAttributes extends FormAttributes {
-  rows?: number;
-  cols?: number;
-  wrap?: "soft" | "hard";
-  readonly?: boolean;
-  required?: boolean;
-  placeholder?: string;
+// Anchor attributes
+export interface AnchorAttributes extends HTMLAttributes {
+  href?: string;
+  target?: "_blank" | "_self" | "_parent" | "_top";
+  rel?: string;
+  download?: string;
 }
 
-export interface SelectAttributes extends FormAttributes {
-  multiple?: boolean;
-  size?: number;
-  required?: boolean;
-  disabled?: boolean;
-}
-
-export interface OptionAttributes extends HTMLAttributes {
-  value: string;
-  selected?: boolean;
-  disabled?: boolean;
-  label?: string;
-}
-
-export interface ImgAttributes extends MediaAttributes {
+// Image attributes
+export interface ImgAttributes extends HTMLAttributes {
   src: string;
   alt: string;
   width?: number | string;
@@ -87,12 +57,46 @@ export interface ImgAttributes extends MediaAttributes {
   loading?: "eager" | "lazy";
 }
 
-export interface VideoAttributes extends MediaAttributes {
-  src?: string;
-  controls?: boolean;
-  autoplay?: boolean;
-  loop?: boolean;
-  muted?: boolean;
-  poster?: string;
-  preload?: "none" | "metadata" | "auto";
+// Table attributes
+export interface TableAttributes extends HTMLAttributes {
+  border?: number;
+  cellPadding?: number | string;
+  cellSpacing?: number | string;
+}
+
+// Form attributes
+export interface FormAttributes extends HTMLAttributes {
+  action?: string;
+  method?: "get" | "post";
+  enctype?: string;
+  target?: string;
+  noValidate?: boolean;
+}
+
+// Select attributes
+export interface SelectAttributes extends HTMLAttributes {
+  multiple?: boolean;
+  size?: number;
+  required?: boolean;
+  disabled?: boolean;
+  name?: string;
+}
+
+// Option attributes
+export interface OptionAttributes extends HTMLAttributes {
+  value: string;
+  selected?: boolean;
+  disabled?: boolean;
+  label?: string;
+}
+
+// Textarea attributes
+export interface TextareaAttributes extends HTMLAttributes {
+  rows?: number;
+  cols?: number;
+  wrap?: "soft" | "hard";
+  readonly?: boolean;
+  required?: boolean;
+  placeholder?: string;
+  name?: string;
 }

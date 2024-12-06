@@ -1,21 +1,18 @@
-import type { Template } from "../types.ts";
-import type { ElementChild } from "../types/base.ts";
 import type {
   HTMLAttributes,
-  EventAttributes,
-  HtmxAttributes,
-  AriaAttributes,
+  ElementChild,
+  Template,
+  ButtonAttributes,
+  InputAttributes,
+  FormAttributes,
+  AnchorAttributes,
+  ImgAttributes,
 } from "../types/mod.ts";
 
-// Base props interface
-export interface JSXProps
-  extends HTMLAttributes,
-    EventAttributes,
-    HtmxAttributes,
-    AriaAttributes {
+// Base JSX Props
+export interface JSXProps extends HTMLAttributes {
   children?: ElementChild | ElementChild[];
   innerHTML?: string;
-  [key: `data-${string}`]: string | number | boolean | undefined;
 }
 
 // Event handler types
@@ -51,34 +48,40 @@ declare global {
       h6: JSXProps;
 
       // Forms
-      form: JSXProps;
-      input: JSXProps;
-      button: JSXProps;
-      textarea: JSXProps;
-      select: JSXProps;
-      option: JSXProps;
+      form: FormAttributes;
+      input: InputAttributes;
+      button: ButtonAttributes;
+      textarea: JSXProps & {
+        rows?: number;
+        cols?: number;
+      };
+      select: JSXProps & {
+        multiple?: boolean;
+      };
+      option: JSXProps & {
+        value: string;
+        selected?: boolean;
+      };
       label: JSXProps;
 
       // Links
-      a: JSXProps & { href?: string };
+      a: AnchorAttributes;
 
       // Lists
       ul: JSXProps;
       ol: JSXProps;
       li: JSXProps;
 
-      // Tables
-      table: JSXProps;
-      thead: JSXProps;
-      tbody: JSXProps;
-      tr: JSXProps;
-      th: JSXProps;
-      td: JSXProps;
-
       // Media
-      img: JSXProps & { src: string; alt: string };
-      video: JSXProps;
-      audio: JSXProps;
+      img: ImgAttributes;
+      video: JSXProps & {
+        src?: string;
+        controls?: boolean;
+      };
+      audio: JSXProps & {
+        src?: string;
+        controls?: boolean;
+      };
     }
   }
 }

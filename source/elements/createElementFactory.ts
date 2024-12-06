@@ -1,26 +1,71 @@
-import type { ElementChild } from "../types/base.ts";
-import type { Attributes } from "../types/mod.ts";
-import type { Template } from "../types.ts";
+import type {
+  ElementChild,
+  ElementFactory,
+  HTMLAttributes,
+  Template,
+} from "../types/base.ts";
+import { attributes } from "../html/attributes.ts";
 
 /**
  * Creates an element factory function for a given tag
- * @param tag HTML tag name
- * @returns Element factory function
  */
-export function createElementFactory<A extends Attributes = Attributes>(
+export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
   tag: string
-) {
-  return (attributes?: A) =>
-    (strings: TemplateStringsArray, ...values: ElementChild[]): Template => {
-      return {
+): ElementFactory<A> {
+  const factory = {
+    [tag]: function (
+      attributesOrStrings?: A | TemplateStringsArray,
+      ...values: ElementChild[]
+    ):
+      | Template
+      | ((
+          strings: TemplateStringsArray,
+          ...values: ElementChild[]
+        ) => Template) {
+      // Handle template literal call
+      if (attributesOrStrings instanceof Array) {
+        return {
+          tag,
+          attributes: "",
+          children: values,
+          css: "",
+          isTemplate: true,
+          str: attributesOrStrings,
+          args: values.map((v) =>
+            v === null || v === undefined
+              ? ""
+              : typeof v === "string" ||
+                (typeof v === "object" && "isTemplate" in v)
+              ? v
+              : String(v)
+          ),
+          rootClass: "",
+        };
+      }
+
+      // Handle attributes call
+      return (
+        strings: TemplateStringsArray,
+        ...templateValues: ElementChild[]
+      ): Template => ({
         tag,
-        attributes: attributes ? attributes.toString() : "",
-        children: values,
+        attributes: attributesOrStrings ? attributes(attributesOrStrings) : "",
+        children: templateValues,
         css: "",
         isTemplate: true,
         str: strings,
-        args: values,
+        args: templateValues.map((v) =>
+          v === null || v === undefined
+            ? ""
+            : typeof v === "string" ||
+              (typeof v === "object" && "isTemplate" in v)
+            ? v
+            : String(v)
+        ),
         rootClass: "",
-      };
-    };
+      });
+    },
+  }[tag];
+
+  return factory as ElementFactory<A>;
 }

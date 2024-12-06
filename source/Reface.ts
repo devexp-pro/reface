@@ -11,7 +11,7 @@ import type {
 } from "$types";
 
 import { type Context, Hono } from "@hono/hono";
-import { render } from "./helpers/mod.ts";
+import { render } from "./core/render.ts";
 
 export class Reface {
   private layout: Layout;

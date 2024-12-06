@@ -1,13 +1,15 @@
 import { createElement } from "../jsx/mod.ts";
-
 import { assertEquals } from "@std/assert";
-import { format } from "npm:pretty@2.0.0";
+import pretty from "npm:pretty@2.0.0";
 import { component, island, RESPONSE, render } from "../mod.ts";
 import { styled } from "../styled/mod.ts";
 
 // Helper for HTML comparison
 function compareHTML(actual: string, expected: string) {
-  assertEquals(format(actual, { ocd: true }), format(expected, { ocd: true }));
+  assertEquals(
+    pretty(actual, { ocd: true }),
+    pretty(expected, { ocd: true })
+  );
 }
 
 Deno.test("Basic JSX rendering", () => {
@@ -37,15 +39,13 @@ Deno.test("Styled component", () => {
 
   compareHTML(
     render(Button({ class: "primary" })`Click me`),
-    `
-    <button class="c0 primary">Click me</button>
-    <style>
-      .c0 {
-        background: blue;
-        color: white;
-      }
-    </style>
-    `
+    `<button class="c0 primary">Click me</button>
+<style>
+  .c0 {
+    background: blue;
+    color: white;
+  }
+</style>`
   );
 });
 
@@ -54,7 +54,7 @@ Deno.test("Interactive island", () => {
     template: ({ props, rpc }) => (
       <div class="counter">
         <span id="count">{props.count}</span>
-        <button {...rpc.hx.increment()}>+1</button>
+        <button onClick={rpc.hx.increment()}>+1</button>
       </div>
     ),
   });
@@ -142,7 +142,7 @@ Deno.test("List rendering", () => {
 Deno.test("Form handling", () => {
   const Form = island<{ submit: { email: string } }, void>({
     template: ({ rpc }) => (
-      <form {...rpc.hx.submit()}>
+      <form onSubmit={rpc.hx.submit()}>
         <input type="email" name="email" required />
         <button type="submit">Send</button>
       </form>
@@ -155,7 +155,7 @@ Deno.test("Form handling", () => {
   });
 
   compareHTML(
-    render(Form({})),
+    render(Form()),
     `
     <form hx-ext="json-enc" hx-post="/rpc/c0/submit">
       <input type="email" name="email" required />
