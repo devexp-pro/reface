@@ -1,7 +1,7 @@
 import { assertHtml } from "./utils.ts";
 
-import { div, button } from "../elements.ts";
-import { styled } from "../styled.ts";
+import { div, button } from "../../elements/mod.ts";
+import { styled } from "../../styled/mod.ts";
 import { render } from "../render.ts";
 
 Deno.test("DOM integration", async (t) => {

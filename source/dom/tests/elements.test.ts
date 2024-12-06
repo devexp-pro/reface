@@ -1,5 +1,5 @@
 import { assert } from "@std/assert";
-import { div, input } from "../elements.ts";
+import { div, input } from "../../elements/mod.ts";
 
 Deno.test("element factories", async (t) => {
   await t.step("creates basic elements", () => {

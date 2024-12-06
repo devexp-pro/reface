@@ -11,7 +11,7 @@ import type {
 } from "$types";
 
 import { type Context, Hono } from "@hono/hono";
-import { render } from "$/helpers.ts";
+import { render } from "./helpers/mod.ts";
 
 export class Reface {
   private layout: Layout;
@@ -73,7 +73,7 @@ export class Reface {
   constructor(
     private options: {
       layout: Layout;
-    },
+    }
   ) {
     this.layout = options.layout;
   }
@@ -122,31 +122,29 @@ export class Reface {
         const route = `/api/${name}${path}`;
         const api = `/api/${name}`;
         // @ts-ignore
-        router[method](
-          route,
-          async (c: Context) => {
-            const contentType = c.req.header("content-type");
-            const formData = contentType &&
-                (contentType.includes("multipart/form-data") ||
-                  contentType.includes("application/x-www-form-urlencoded"))
+        router[method](route, async (c: Context) => {
+          const contentType = c.req.header("content-type");
+          const formData =
+            contentType &&
+            (contentType.includes("multipart/form-data") ||
+              contentType.includes("application/x-www-form-urlencoded"))
               ? await c.req.formData()
               : new FormData();
 
-            const request: RefaceRequest = {
-              api,
-              route,
-              params: c.req.param(),
-              query: c.req.query(),
-              headers: c.req.header(),
-              formData,
-            };
+          const request: RefaceRequest = {
+            api,
+            route,
+            params: c.req.param(),
+            query: c.req.query(),
+            headers: c.req.header(),
+            formData,
+          };
 
-            const response = await handler(request);
-            return c.html(response.html || "", {
-              status: response.status || 200,
-            });
-          },
-        );
+          const response = await handler(request);
+          return c.html(response.html || "", {
+            status: response.status || 200,
+          });
+        });
       }
     }
     // create rpc routes

@@ -1,9 +1,8 @@
-import { createElement } from "../../jsx/mod.ts";
-
 import { assertEquals } from "@std/assert";
 import { render } from "../render.ts";
+import { createElement } from "../../jsx/mod.ts";
 import { styled } from "../../styled/mod.ts";
-import { button } from "../../elements/mod.ts";
+
 Deno.test("JSX", async (t) => {
   await t.step("renders basic elements", () => {
     const template = (
@@ -20,9 +19,7 @@ Deno.test("JSX", async (t) => {
 
   await t.step("works with styled components", () => {
     const Button = styled(button)`
-& {
-  color: blue;
-}
+      color: blue;
     `;
 
     const template = (
@@ -38,9 +35,9 @@ Deno.test("JSX", async (t) => {
       html,
       `<div><button class="${buttonClass} primary">Submit</button></div>
 <style>
-.${buttonClass} {
-  color: blue;
-}
+  .${buttonClass} {
+    color: blue;
+  }
 </style>`
     );
   });

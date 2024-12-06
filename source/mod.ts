@@ -7,19 +7,15 @@ import type {
 
 import { Reface } from "./Reface.ts";
 
-const component = <T>(
-  generate: TemplateGenerator<T>,
-): TemplateGenerator<T> => generate;
+const component = <T>(generate: TemplateGenerator<T>): TemplateGenerator<T> =>
+  generate;
 
-const island = <
-  R extends RpcDefinition,
-  P = {},
->(
-  _: Island<R, P>,
+const island = <R extends RpcDefinition, P = {}>(
+  _: Island<R, P>
 ): TemplateGenerator<P> => Reface.addIsland(_);
 
 export const inlineStyle = <P = undefined>(
-  _: P extends undefined ? () => Style : (prop: P) => Style,
+  _: P extends undefined ? () => Style : (prop: P) => Style
 ) => {
   return (props: P) => {
     const data = _(props);
@@ -40,6 +36,9 @@ export const inlineStyle = <P = undefined>(
 };
 
 export { component, island, Reface };
-export * from "$/helpers.ts";
+export * from "./helpers/mod.ts";
 export * from "$/types.ts";
 export * from "$/layouts/mod.ts";
+export * from "$/html/mod.ts";
+
+export * as elements from "./elements/mod.ts";

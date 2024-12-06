@@ -1,14 +1,9 @@
 import type { Template } from "../types.ts";
-import type { Attributes } from "./types/mod.ts";
-import { createElementFactory } from "./elements.ts";
+import type { Attributes } from "../dom/types/mod.ts";
+import { createElementFactory } from "../elements/mod.ts";
 import { generateUniqueClass } from "../utils.ts";
-import type { ElementChild } from "./types/base.ts";
-
-type StyledComponent<T> = {
-  (props?: T): Template & {
-    (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
-  };
-};
+import type { ElementChild } from "../dom/types/base.ts";
+import type { StyledComponent } from "./types.ts";
 
 export function styled<T extends Attributes>(
   elementFactory: ReturnType<typeof createElementFactory<T>>
@@ -72,4 +67,4 @@ export function styled<T extends Attributes>(
   };
 }
 
-export { css } from "./css.ts";
+export { css } from "../dom/css.ts";

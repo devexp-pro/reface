@@ -5,7 +5,7 @@ import type { HtmxAttributes } from "./htmx.ts";
 export * from "./base.ts";
 export * from "./events.ts";
 export * from "./htmx.ts";
-export * from "./elements.ts";
+export * from "../../elements/types.ts";
 export * from "./aria.ts";
 
 // Объединяем все атрибуты

@@ -1,5 +1,5 @@
 import { assert } from "@std/assert";
-import { classNames, attrs } from "../attributes.ts";
+import { classNames, attrs } from "../../html/attributes.ts";
 
 Deno.test("classNames function", async (t) => {
   await t.step("handles strings", () => {

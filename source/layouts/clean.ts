@@ -1,5 +1,5 @@
 // deno-lint-ignore-file no-unused-vars
-import { layout } from "$/helpers.ts";
+import { layout } from "../helpers/mod.ts";
 import { alpinejs, htmx, hyperscript, jsonEnc } from "$/resources/scripts.ts";
 import { bootstrapIcons } from "$/resources/icons.ts";
 import { bluma, bootstrap } from "$/resources/styles.ts";

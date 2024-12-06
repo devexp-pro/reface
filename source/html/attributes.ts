@@ -1,6 +1,6 @@
 // Функции для работы с атрибутами
-import type { Attributes, ClassInput, StyleInput } from "./types/mod.ts";
-import { styles } from "./styles.ts";
+import type { Attributes, ClassInput, StyleInput } from "../dom/types/mod.ts";
+import { styles } from "../dom/styles.ts";
 
 export function classNames(...args: ClassInput[]): string {
   const classes: string[] = [];

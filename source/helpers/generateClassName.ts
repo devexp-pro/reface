@@ -1,5 +1,5 @@
 let classCounter = 0;
 
-export function generateUniqueClass(): string {
+export function generateClassName(): string {
   return `c${classCounter++}`;
 }

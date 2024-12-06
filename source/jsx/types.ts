@@ -1,10 +1,10 @@
-import type { Template } from "../../types.ts";
-import type { ElementChild } from "../types/base.ts";
+import type { Template } from "../types.ts";
+import type { ElementChild } from "../dom/types/base.ts";
 import type {
   HTMLAttributes,
   EventAttributes,
   HtmxAttributes,
-} from "../types/mod.ts";
+} from "../dom/types/mod.ts";
 
 export interface JSXProps
   extends HTMLAttributes,

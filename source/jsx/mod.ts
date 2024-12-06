@@ -1,8 +1,8 @@
-import * as elements from "../elements.ts";
-import type { ElementChild } from "../types/base.ts";
+import * as elements from "../elements/mod.ts";
+import type { ElementChild } from "../dom/types/base.ts";
 import type { JSXProps } from "./types.ts";
-import type { Attributes } from "../types/mod.ts";
-import type { Template } from "../../types.ts";
+import type { Attributes } from "../dom/types/mod.ts";
+import type { Template } from "../types.ts";
 
 function processChildren(children: ElementChild[]): ElementChild[] {
   return children

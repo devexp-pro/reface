@@ -6,11 +6,7 @@ import type {
   Template,
 } from "$types";
 
-export const html = (str: TemplateStringsArray, ...args: any[]) => ({
-  isTemplate: true,
-  str,
-  args,
-});
+export * from "./generateClassName.ts";
 
 export const css = (str: TemplateStringsArray, ...args: any[]): Style => ({
   isStyle: true,

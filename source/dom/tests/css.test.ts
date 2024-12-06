@@ -1,6 +1,6 @@
 import { assert } from "@std/assert";
-import { styled, css } from "../styled.ts";
-import { div, button } from "../elements.ts";
+import { styled, css } from "../../styled/mod.ts";
+import { div, button } from "../../elements/mod.ts";
 
 Deno.test("css - applies styles to component", () => {
   const Button = styled(button)`

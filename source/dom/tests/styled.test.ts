@@ -1,6 +1,6 @@
 import { assert } from "@std/assert";
-import { styled } from "../styled.ts";
-import { div } from "../elements.ts";
+import { styled } from "../../styled/mod.ts";
+import { div } from "../../elements/mod.ts";
 
 Deno.test("styled - applies styles with extra class", () => {
   const StyledDiv = styled(div)`
