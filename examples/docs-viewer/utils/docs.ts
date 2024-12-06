@@ -1,6 +1,5 @@
 import { walk } from "https://deno.land/std@0.210.0/fs/walk.ts";
-import { join } from "https://deno.land/std@0.210.0/path/mod.ts";
-import { parseMarkdown, type ParsedMarkdown } from "./markdown.ts";
+import { parseMarkdown, type ParsedMarkdown } from "./markdown.tsx";
 
 export interface DocPage {
   path: string;
