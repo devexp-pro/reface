@@ -5,6 +5,14 @@ export interface HTMLElementAttributes extends HTMLAttributes {
   ref?: any;
   key?: string | number;
   dangerouslySetInnerHTML?: { __html: string };
+  children?:
+    | string
+    | number
+    | boolean
+    | null
+    | undefined
+    | Element
+    | Array<Element>;
 }
 
 // Specific Element Attributes
@@ -38,7 +46,32 @@ declare global {
       span: HTMLSpanAttributes;
       button: HTMLButtonAttributes;
       input: HTMLInputAttributes;
-      // ... все HTML элементы
+      // Document structure
+      p: HTMLElementAttributes;
+      main: HTMLElementAttributes;
+      header: HTMLElementAttributes;
+      nav: HTMLElementAttributes;
+
+      // Media
+      img: HTMLElementAttributes & {
+        src?: string;
+        alt?: string;
+      };
+
+      // Typography
+      h1: HTMLElementAttributes;
+      h2: HTMLElementAttributes;
+      h3: HTMLElementAttributes;
+      h4: HTMLElementAttributes;
+
+      // Links
+      a: HTMLElementAttributes & {
+        href?: string;
+      };
+
+      // Lists
+      ul: HTMLElementAttributes;
+      li: HTMLElementAttributes;
     }
 
     // Component attributes

@@ -24,15 +24,11 @@ export async function loadDocs(docsDir: string): Promise<DocSection[]> {
       exts: [".md"],
       skip: [/_/], // Skip files/folders starting with _
     })) {
-      console.log("Found file:", entry.path);
-
       const content = await Deno.readTextFile(entry.path);
       const relativePath = entry.path
         .replace(docsDir + "/", "")
         .replace(/\.md$/, "");
       const [section, ...rest] = relativePath.split("/");
-
-      console.log("Processing:", { relativePath, section, rest });
 
       // Parse markdown
       const parsed = parseMarkdown(content);

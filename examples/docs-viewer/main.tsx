@@ -4,11 +4,40 @@ import {
   Reface,
   styled,
   clean,
+  type Template,
 } from "../../source/mod.ts";
 import { Hono } from "@hono/hono";
-import { loadDocs, type DocSection } from "./utils/docs.ts";
 
-// Styled components
+// Types
+interface DocContent {
+  content: string;
+  headings: Array<{
+    level: number;
+    text: string;
+    slug: string;
+  }>;
+}
+
+interface DocPage {
+  title: string;
+  path: string;
+  content: DocContent;
+}
+
+interface DocSection {
+  title: string;
+  pages: DocPage[];
+}
+
+interface DocsViewerProps {
+  sections: DocSection[];
+  currentPath?: string;
+}
+
+// Utils
+import { loadDocs } from "./utils/docs.ts";
+
+// Components
 const Container = styled.div`
   & {
     max-width: 1200px;
@@ -121,24 +150,11 @@ const DocContent = styled.div`
   }
 `;
 
-interface DocsViewerProps {
-  sections: DocSection[];
-  currentPath?: string;
-}
-
 const DocsViewer = ({ sections, currentPath = "" }: DocsViewerProps) => {
-  console.log("Current path:", currentPath);
-
-  console.log("Sections:", sections[0].pages[0]);
-
   // Find current page
   const currentPage = sections
-    .flatMap(s => s.pages.map(p => ({
-      ...p,
-    })))
+    .flatMap(s => s.pages)
     .find(p => p.path === currentPath);
-
-  console.log("Current page:", currentPage);
 
   return (
     <Container>
@@ -174,9 +190,9 @@ const DocsViewer = ({ sections, currentPath = "" }: DocsViewerProps) => {
         <Content>
           {currentPage ? (
             <>
-              <DocContent 
-                dangerouslySetInnerHTML={{ __html: currentPage.content.content }} 
-              />
+              <DocContent>
+                {currentPage.content.content}
+              </DocContent>
               <TableOfContents>
                 <h4>On this page</h4>
                 <ul>
@@ -199,19 +215,12 @@ const DocsViewer = ({ sections, currentPath = "" }: DocsViewerProps) => {
   );
 };
 
-// Load docs at startup
+// App initialization
 const sections = await loadDocs("./docs");
 
 if (!sections.length) {
   console.error("No documentation sections found!");
 }
-
-console.log("Loaded sections:", 
-  sections.map(s => ({
-    title: s.title,
-    pages: s.pages.map(p => ({ title: p.title, path: p.path }))
-  }))
-);
 
 const reface = new Reface({
   layout: clean({
@@ -231,21 +240,16 @@ const reface = new Reface({
 });
 
 const app = new Hono()
-  // Redirect root to docs
   .get("/", (c) => c.redirect("/docs"))
-  // Handle docs routes
   .route("/docs", 
     reface
-      // Главная страница документации
       .page("/", () => <DocsViewer sections={sections} />)
-      // Страница раздела
       .page("/:section", ({ params }) => (
         <DocsViewer 
           sections={sections} 
           currentPath={params.section}
         />
       ))
-      // Страница документа
       .page("/:section/:path", ({ params }) => (
         <DocsViewer 
           sections={sections} 
