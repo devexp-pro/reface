@@ -2,7 +2,7 @@ import { createElement, Fragment, type Template } from "../../../source/mod.ts";
 import { Container, Header, Layout } from "./Layout.tsx";
 import { Navigation } from "./Navigation.tsx";
 import { Content, DocContent, TableOfContents } from "./Content.tsx";
-import type { DocSection } from "../utils/docs.ts";
+import type { DocSection } from "../utils/docs.tsx";
 
 interface DocsViewerProps {
   sections: DocSection[];

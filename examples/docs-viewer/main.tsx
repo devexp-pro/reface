@@ -7,11 +7,15 @@ import { DocsViewer } from "./components/DocsViewer.tsx";
 import { LiveReload } from "./utils/live-reload.ts";
 
 // App initialization
-const sections = await loadDocs("./docs");
+const sections = await loadDocs(".");
 
 if (!sections.length) {
   console.error("No documentation sections found!");
+  console.log("Make sure you have documentation files in ./docs directory");
+  Deno.exit(1);
 }
+
+console.log(sections);
 
 // Инициализируем live reload
 const isDev = Deno.env.get("DENO_ENV") !== "production";
@@ -54,12 +58,20 @@ const app = new Hono()
           currentPath={params.section}
         />
       ))
-      .page("/:section/:path", ({ params }) => (
-        <DocsViewer 
-          sections={sections} 
-          currentPath={params.section + "/" + params.path} 
-        />
-      ))
+      .page("/:section/*", ({ params }) => {
+        // Безопасно обрабатываем путь
+        const restPath = params["*"] || "";
+        const path = params.section + (restPath ? `/${restPath}` : "");
+        
+        console.log("Requested path:", path); // Для отладки
+        
+        return (
+          <DocsViewer 
+            sections={sections} 
+            currentPath={path}
+          />
+        );
+      })
       .hono()
   );
 

@@ -1,6 +1,6 @@
 import { createElement, Fragment, type Template } from "../../../source/mod.ts";
 import { styled } from "../../../source/mod.ts";
-import type { DocSection } from "../utils/docs.ts";
+import type { DocSection } from "../utils/docs.tsx";
 
 interface NavigationProps {
   sections: DocSection[];
