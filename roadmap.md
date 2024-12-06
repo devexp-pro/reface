@@ -1,44 +1,118 @@
+# Reface Roadmap
+
+## Project Structure
+
 ```
 source/
-├── core/                    # Базовый уровень - работа с Template
-│   ├── mod.ts              # Экспорты
-│   ├── Template.ts         # Типы и интерфейсы
-│   └── render.ts           # Функция рендеринга Template -> HTML
+├── reface/         # Framework level
+│   ├── Reface.ts   # Main framework class
+│   ├── types.ts    # Framework types
+│   └── mod.ts      # Public API
 │
-├── html/                    # HTML уровень - работа со строками
-│   ├── mod.ts              # Экспорты
-│   ├── attributes.ts       # attributes() - конвертация атрибутов в строку
-│   ├── classes.ts          # generateClassName(), classNames() - работа с классами
-│   └── styles.ts           # processStyles() - обработка CSS строк
+├── core/           # Core level - Template engine
+│   ├── Template.ts # Template interface & types
+│   ├── types.ts    # RPC & Island types
+│   ├── render.ts   # Render engine
+│   └── mod.ts      # Public API
 │
-├── elements/               # Elements API - создание элементов
-│   ├── mod.ts             # Экспорты
-│   ├── factory.ts         # createElementFactory() - фабрика элементов
-│   ├── base.ts            # Базовые HTML элементы (div, span и т.д.)
-│   ├── styled.ts          # styled API для CSS-in-JS
-│   └── css.ts             # css(), cssVar(), keyframes() - CSS утилиты
+├── html/           # HTML level - string manipulation
+│   ├── attributes.ts # HTML attributes
+│   ├── classes.ts   # Class names
+│   ├── styles.ts    # CSS processing
+│   └── mod.ts       # Public API
 │
-├── jsx/                   # JSX уровень
-│   ├── mod.ts            # Экспорты
-│   ├── createElement.ts   # createElement() - создание элементов из JSX
-│   └── Fragment.ts       # Fragment компонент
+├── elements/       # Elements level - components
+│   ├── factory.ts   # Element factory
+│   ├── base.ts      # HTML elements
+│   ├── styled.ts    # Styled components
+│   ├── css.ts       # CSS utilities
+│   └── mod.ts       # Public API
 │
-├── layouts/              # Layouts уровень
-│   ├── mod.ts           # Экспорты
-│   ├── clean.ts         # Clean layout
-│   └── twa.ts           # TWA layout
+├── jsx/           # JSX level
+│   ├── createElement.ts
+│   ├── Fragment.ts
+│   └── mod.ts
 │
-└── Reface.ts           # Основной класс приложения
+├── layouts/       # Layouts level
+│   ├── types.ts
+│   ├── clean.ts
+│   ├── twa.ts
+│   └── mod.ts
+│
+└── mod.ts        # Main public API
 ```
 
-Принципы:
+## Core Concepts
 
-- Один файл = одна функция/тип
-- Четкое разделение уровней:
-  - core: Template и его рендеринг
-  - html: работа со строками HTML/CSS
-  - elements: создание элементов
-  - jsx: JSX интеграция
-  - layouts: шаблоны страниц
-- Каждый уровень имеет свой mod.ts для экспортов
-- Зависимости идут снизу вверх (core -> html -> elements -> jsx)
+1. **Modular Architecture**
+
+   - Each module has its own responsibility
+   - Clear boundaries between modules
+   - Public API through mod.ts files
+
+2. **Template Engine**
+
+   - Core Template interface
+   - Efficient rendering
+   - Type safety
+
+3. **Elements API**
+
+   - HTML elements
+   - Styled components
+   - Factory pattern
+
+4. **JSX Support**
+
+   - Full TypeScript support
+   - Fragment support
+   - Component composition
+
+5. **Layouts System**
+   - Clean layout
+   - TWA support
+   - Custom layouts
+
+## Development Guidelines
+
+1. **Imports/Exports**
+
+   - External imports only from main mod.ts
+   - Internal imports through module mod.ts
+   - Direct imports only within module
+
+2. **Types**
+
+   - Types live with their implementations
+   - Clear interfaces between modules
+   - Strong type safety
+
+3. **Testing**
+   - Unit tests for each module
+   - Integration tests
+   - Example apps
+
+## Future Plans
+
+1. **Core Improvements**
+
+   - [ ] Streaming support
+   - [ ] Better error handling
+   - [ ] Performance optimizations
+
+2. **Elements API**
+
+   - [ ] More base elements
+   - [ ] Better styled components
+   - [ ] Animation support
+
+3. **Layouts**
+
+   - [ ] More built-in layouts
+   - [ ] Layout composition
+   - [ ] Dynamic layouts
+
+4. **Framework**
+   - [ ] Better routing
+   - [ ] Middleware support
+   - [ ] State management
