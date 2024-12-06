@@ -1,7 +1,3 @@
-<div style="display: flex; justify-content: center;">
-  <img src="./logo.svg" alt="DOM API" style="width: 300px; height: auto;" />
-</div>
-
 # DOM API in Reface
 
 Reface's DOM API provides a powerful and flexible way to create web interfaces using various development approaches. This module combines several APIs that can be used separately or combined for the best results.

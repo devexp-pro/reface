@@ -1,3 +1,7 @@
+<div style="display: flex; justify-content: center;">
+  <img src="./_assets/logo.svg" alt="Reface" style="width: 300px; height: auto;" />
+</div>
+
 # Reface Framework
 
 Reface is a lightweight framework for building interactive web applications with server-side rendering and islands architecture.
