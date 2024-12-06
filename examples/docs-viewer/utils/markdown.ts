@@ -1,18 +1,43 @@
-import { marked } from "https://esm.sh/marked@11.1.0";
-import DOMPurify from "https://esm.sh/dompurify@3.0.6";
-import Prism from "https://esm.sh/prismjs@1.29.0";
+import { marked } from "https://esm.sh/marked@9.1.5";
 
-export async function markdownToHtml(markdown: string): Promise<string> {
-  const html = await marked(markdown, {
-    gfm: true,
-    breaks: true,
-    highlight: (code: string, lang: string) => {
-      if (Prism.languages[lang]) {
-        return Prism.highlight(code, Prism.languages[lang], lang);
-      }
-      return code;
-    },
-  });
+// Configure marked
+marked.setOptions({
+  gfm: true,
+  breaks: true,
+});
 
-  return DOMPurify.sanitize(html);
+export interface MarkdownHeading {
+  level: number;
+  text: string;
+  slug: string;
+}
+
+export interface ParsedMarkdown {
+  content: string;
+  headings: MarkdownHeading[];
+}
+
+export function parseMarkdown(markdown: string): ParsedMarkdown {
+  const headings: MarkdownHeading[] = [];
+
+  // Custom renderer to collect headings
+  const renderer = new marked.Renderer();
+  renderer.heading = (text, level) => {
+    const slug = text.toLowerCase().replace(/[^\w]+/g, "-");
+    headings.push({ level, text, slug });
+    return `<h${level} id="${slug}">${text}</h${level}>`;
+  };
+
+  // Add code highlighting
+  renderer.code = (code, language) => {
+    return `<pre><code class="language-${language}">${code}</code></pre>`;
+  };
+
+  // Parse markdown
+  const content = marked(markdown, { renderer });
+
+  return {
+    content,
+    headings,
+  };
 }

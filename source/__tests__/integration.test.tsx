@@ -69,6 +69,19 @@ Deno.test("Styled component children jsx", () => {
   );
 });
 
+Deno.test("Array children", () => {
+  const html = <ul>{["A", "B", "C"].map((item) => <li>{item}</li>)}</ul>;
+
+  compareHTML(
+    render(html),
+    `<ul>
+      <li>A</li>
+      <li>B</li>
+      <li>C</li>
+    </ul>`
+  );
+});
+
 Deno.test("Nested components", () => {
   const Header = component<{ title: string }>(({ title }) => (
     <header class="header">

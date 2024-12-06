@@ -7,6 +7,20 @@ import type {
 import * as elements from "../elements/mod.ts";
 
 /**
+ * Fragment component for JSX
+ */
+export const Fragment = ({ children }: { children: unknown }) => ({
+  tag: "",
+  attributes: "",
+  children: Array.isArray(children) ? children : [children],
+  css: "",
+  isTemplate: true,
+  str: Object.assign([""], { raw: [""] }) as TemplateStringsArray,
+  args: [],
+  rootClass: "",
+});
+
+/**
  * Creates a Template from JSX
  */
 export function createElement(
@@ -15,6 +29,15 @@ export function createElement(
   ...children: ElementChild[]
 ): Template {
   try {
+    // Process children to handle arrays
+    const processedChildren = children.flatMap((child) => {
+      // Handle arrays (e.g. from map)
+      if (Array.isArray(child)) {
+        return child;
+      }
+      return child;
+    });
+
     // Handle component functions
     if (typeof tag === "function") {
       // Handle styled components
@@ -27,19 +50,22 @@ export function createElement(
         if (typeof template === "function") {
           return template(
             Object.assign([""], { raw: [""] }) as TemplateStringsArray,
-            ...children
+            ...processedChildren
           );
         }
         return {
           ...template,
-          children,
+          children: processedChildren,
         };
       }
 
       // Handle regular components
       return tag({
         ...props,
-        children: children.length === 1 ? children[0] : children,
+        children:
+          processedChildren.length === 1
+            ? processedChildren[0]
+            : processedChildren,
       });
     }
 
@@ -54,13 +80,13 @@ export function createElement(
     if (typeof template === "function") {
       return template(
         Object.assign([""], { raw: [""] }) as TemplateStringsArray,
-        ...children
+        ...processedChildren
       );
     }
 
     return {
       ...template,
-      children,
+      children: processedChildren,
     };
   } catch (err) {
     const error = err as Error;

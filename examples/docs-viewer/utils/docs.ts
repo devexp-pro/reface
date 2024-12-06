@@ -1,39 +1,60 @@
 import { walk } from "https://deno.land/std@0.210.0/fs/walk.ts";
-import { basename, extname } from "https://deno.land/std@0.210.0/path/mod.ts";
+import { join } from "https://deno.land/std@0.210.0/path/mod.ts";
+import { parseMarkdown, type ParsedMarkdown } from "./markdown.ts";
 
-export interface DocItem {
+export interface DocPage {
   path: string;
   title: string;
-  order: number;
+  content: ParsedMarkdown;
 }
 
-export async function readDocsTree(root: string): Promise<DocItem[]> {
-  const docs: DocItem[] = [];
+export interface DocSection {
+  title: string;
+  pages: DocPage[];
+}
 
-  for await (const entry of walk(root, { exts: [".md"] })) {
-    if (entry.isFile) {
+export async function loadDocs(docsDir: string): Promise<DocSection[]> {
+  console.log("Loading docs from:", docsDir);
+  const sections: DocSection[] = [];
+
+  try {
+    // Walk through docs directory
+    for await (const entry of walk(docsDir, {
+      includeDirs: false,
+      exts: [".md"],
+      skip: [/_/], // Skip files/folders starting with _
+    })) {
+      console.log("Found file:", entry.path);
+
       const content = await Deno.readTextFile(entry.path);
-      const title =
-        extractTitle(content) || basename(entry.path, extname(entry.path));
-      const order = extractOrder(entry.path);
+      const relativePath = entry.path
+        .replace(docsDir + "/", "")
+        .replace(/\.md$/, "");
+      const [section, ...rest] = relativePath.split("/");
 
-      docs.push({
-        path: entry.path,
+      console.log("Processing:", { relativePath, section, rest });
+
+      // Parse markdown
+      const parsed = parseMarkdown(content);
+      const title = parsed.headings[0]?.text || rest.join("/");
+
+      // Add to sections
+      let sectionObj = sections.find((s) => s.title === section);
+      if (!sectionObj) {
+        sectionObj = { title: section, pages: [] };
+        sections.push(sectionObj);
+      }
+
+      sectionObj.pages.push({
+        path: rest.join("/"),
         title,
-        order,
+        content: parsed,
       });
     }
+
+    return sections;
+  } catch (error) {
+    console.error("Error loading docs:", error);
+    return [];
   }
-
-  return docs.sort((a, b) => a.order - b.order);
-}
-
-function extractTitle(content: string): string | null {
-  const match = content.match(/^#\s+(.+)$/m);
-  return match ? match[1] : null;
-}
-
-function extractOrder(path: string): number {
-  const match = basename(path).match(/^(\d+)-/);
-  return match ? parseInt(match[1], 10) : 999;
 }

@@ -7,6 +7,19 @@ export function render(input: Template | (Template | string)[]): string {
   const styles = new Set<string>();
 
   function renderTemplate(template: Template): string {
+    // Handle Fragment (empty tag)
+    if (template.tag === "") {
+      return template.children
+        .map((child) => {
+          if (child === null || child === undefined) return "";
+          if (typeof child === "object" && "isTemplate" in child) {
+            return renderTemplate(child as Template);
+          }
+          return String(child);
+        })
+        .join("");
+    }
+
     // Collect CSS
     if (template.css) {
       styles.add(template.css);

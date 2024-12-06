@@ -1,10 +1,11 @@
-import { createElement } from "../../source/jsx/mod.ts";
+import { createElement, Fragment } from "../../source/jsx/mod.ts";
 
 import { Hono } from "@hono/hono";
 
 import { Reface } from "../../source/Reface.ts";
 import { clean } from "../../source/layouts/clean.ts";
 import { styled } from "../../source/styled/mod.ts";
+import { loadDocs, type DocSection } from "./utils/docs.ts";
 
 // Styled components
 const Container = styled.div`
@@ -100,9 +101,45 @@ const Layout = styled.div`
   }
 `;
 
-// Components
-const DocsViewer = () => {
-  const content = (
+const TableOfContents = styled.nav`
+  & {
+    position: sticky;
+    top: 2rem;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+  }
+`;
+
+const DocContent = styled.div`
+  & {
+    max-width: 800px;
+  }
+
+  & img {
+    max-width: 100%;
+  }
+`;
+
+interface DocsViewerProps {
+  sections: DocSection[];
+  currentPath?: string;
+}
+
+const DocsViewer = ({ sections, currentPath = "" }: DocsViewerProps) => {
+  console.log("Current path:", currentPath);
+
+  console.log("Sections:", sections[0].pages[0]);
+
+  // Find current page
+  const currentPage = sections
+    .flatMap(s => s.pages.map(p => ({
+      ...p,
+    })))
+    .find(p => p.path === currentPath);
+
+  console.log("Current page:", currentPage);
+
+  return (
     <Container>
       <Header>
         <img src="/_assets/logo.svg" alt="Reface Logo" />
@@ -111,52 +148,110 @@ const DocsViewer = () => {
       
       <Layout>
         <Navigation>
-          <ul>
-            <li><a href="/core">Core Concepts</a></li>
-            <li><a href="/templates">Templates</a></li>
-            <li><a href="/styling">Styling</a></li>
-            <li><a href="/jsx">JSX Support</a></li>
-            <li><a href="/layouts">Layouts</a></li>
-          </ul>
+          {sections.map(section => (
+            <div>
+              <h3>{section.title}</h3>
+              <ul>
+                {section.pages.map(page => {
+                  const fullPath = `${section.title}/${page.path}`;
+                  return (
+                    <li>
+                      <a 
+                        href={`/${fullPath}`}
+                        class={currentPath === fullPath ? "active" : ""}
+                      >
+                        {page.title}
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
         </Navigation>
 
         <Content>
-          <h1>Welcome to Reface</h1>
-          <p>
-            Reface is a modern template engine that combines several powerful approaches:
-            server-side rendering, islands architecture, and type safety.
-          </p>
-
-          <h2>Quick Start</h2>
-          <pre><code>{`
-import { Reface } from "@vseplet/reface";
-
-const app = new Reface({
-  layout: clean({
-    htmx: true,
-    bootstrap: true,
-  }),
-});
-          `}</code></pre>
+          {currentPage ? (
+            <>
+              <DocContent 
+                dangerouslySetInnerHTML={{ __html: currentPage.content.content }} 
+              />
+              <TableOfContents>
+                <h4>On this page</h4>
+                <ul>
+                  {currentPage.content.headings.map(heading => (
+                    <li 
+                      style={`margin-left: ${(heading.level - 1) * 1}rem`}
+                    >
+                      <a href={`#${heading.slug}`}>{heading.text}</a>
+                    </li>
+                  ))}
+                </ul>
+              </TableOfContents>
+            </>
+          ) : (
+            <p>Select a page from the navigation</p>
+          )}
         </Content>
       </Layout>
     </Container>
   );
-
-  return content;
 };
 
-const app = new Hono().route(
-  "/",
-  new Reface({
-    layout: clean({
-      title: "Reface Documentation",
-      description: "Modern Template Engine for Server-Side Applications",
-      favicon: "/_assets/favicon.ico",
-      htmx: true,
-      bootstrap: true,
-    }),
-  }).page("/", DocsViewer).hono(),
+// Load docs at startup
+const sections = await loadDocs("./docs");
+
+if (!sections.length) {
+  console.error("No documentation sections found!");
+}
+
+console.log("Loaded sections:", 
+  sections.map(s => ({
+    title: s.title,
+    pages: s.pages.map(p => ({ title: p.title, path: p.path }))
+  }))
 );
+
+const reface = new Reface({
+  layout: clean({
+    title: "Reface Documentation",
+    description: "Modern Template Engine for Server-Side Applications",
+    favicon: "/_assets/favicon.ico",
+    htmx: true,
+    bootstrap: true,
+    head: `
+      <link rel="stylesheet" href="https://esm.sh/prismjs@1.29.0/themes/prism.css">
+      <script src="https://esm.sh/prismjs@1.29.0/components/prism-core.min.js"></script>
+      <script src="https://esm.sh/prismjs@1.29.0/components/prism-markup.min.js"></script>
+      <script src="https://esm.sh/prismjs@1.29.0/components/prism-typescript.min.js"></script>
+      <script src="https://esm.sh/prismjs@1.29.0/components/prism-javascript.min.js"></script>
+    `,
+  }),
+});
+
+const app = new Hono()
+  // Redirect root to docs
+  .get("/", (c) => c.redirect("/docs"))
+  // Handle docs routes
+  .route("/docs", 
+    reface
+      // Главная страница документации
+      .page("/", () => <DocsViewer sections={sections} />)
+      // Страница раздела
+      .page("/:section", ({ params }) => (
+        <DocsViewer 
+          sections={sections} 
+          currentPath={params.section}
+        />
+      ))
+      // Страница документа
+      .page("/:section/:path", ({ params }) => (
+        <DocsViewer 
+          sections={sections} 
+          currentPath={params.section + "/" + params.path} 
+        />
+      ))
+      .hono()
+  );
 
 Deno.serve(app.fetch);

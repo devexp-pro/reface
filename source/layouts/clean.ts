@@ -4,6 +4,9 @@ export interface CleanLayoutOptions extends LayoutOptions {
   htmx?: boolean;
   bootstrap?: boolean;
   head?: string;
+  title?: string;
+  description?: string;
+  favicon?: string;
 }
 
 export function clean(options: CleanLayoutOptions = {}) {
