@@ -1,121 +1,162 @@
+import { createElement } from "../../source/jsx/mod.ts";
+
 import { Hono } from "@hono/hono";
-import { Reface, clean, component, island, RESPONSE } from "@vseplet/reface";
-import {
-  div,
-  aside,
-  main,
-  nav,
-  a,
-  h1,
-  p,
-  createElement,
-} from "@vseplet/reface/dom";
-import { readDocsTree } from "./utils/docs.ts";
-import type { DocItem } from "./utils/docs.ts";
-import { markdownToHtml } from "./utils/markdown.ts";
 
-// Вместо styled компонентов используем обычные классы
-const Navigation = island<{ loadDoc: { path: string } }, { docs: DocItem[] }>({
-  template: ({ props, rpc }) => (
-    <aside class="sidebar">
-      <nav>
-        {props.docs.map((doc) => (
-          <div class="nav-item">
-            <a
-              class="nav-link"
-              href="#"
-              {...rpc.hx.loadDoc({ path: doc.path })}
-              hx-target="#content"
-            >
-              {doc.title}
-            </a>
-          </div>
-        ))}
-      </nav>
-    </aside>
-  ),
-  rpc: {
-    loadDoc: async ({ args }) => {
-      const content = await Deno.readTextFile(args.path);
-      const html = await markdownToHtml(content);
-      return RESPONSE(<div innerHTML={html}></div>);
-    },
-  },
+import { Reface } from "../../source/Reface.ts";
+import { clean } from "../../source/layouts/clean.ts";
+import { styled } from "../../source/styled/mod.ts";
+
+// Styled components
+const Container = styled.div`
+  & {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+`;
+
+const Header = styled.header`
+  & {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  & img {
+    width: 50px;
+    height: 50px;
+    margin-right: 1rem;
+  }
+
+  & h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #333;
+  }
+`;
+
+const Navigation = styled.nav`
+  & {
+    width: 250px;
+    padding: 1rem;
+    background: #f5f5f5;
+    border-radius: 8px;
+  }
+
+  & ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  & li {
+    margin-bottom: 0.5rem;
+  }
+
+  & a {
+    color: #333;
+    text-decoration: none;
+    &:hover {
+      color: #0066cc;
+    }
+  }
+`;
+
+const Content = styled.main`
+  & {
+    flex: 1;
+    padding: 1rem;
+  }
+
+  & h1, & h2, & h3 {
+    color: #333;
+    margin-top: 0;
+  }
+
+  & p {
+    line-height: 1.6;
+    color: #666;
+  }
+
+  & code {
+    background: #f5f5f5;
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+
+  & pre {
+    background: #f5f5f5;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+  }
+`;
+
+const Layout = styled.div`
+  & {
+    display: flex;
+    gap: 2rem;
+  }
+`;
+
+// Components
+const DocsViewer = () => {
+  const content = (
+    <Container>
+      <Header>
+        <img src="/_assets/logo.svg" alt="Reface Logo" />
+        <h1>Reface Documentation</h1>
+      </Header>
+      
+      <Layout>
+        <Navigation>
+          <ul>
+            <li><a href="/core">Core Concepts</a></li>
+            <li><a href="/templates">Templates</a></li>
+            <li><a href="/styling">Styling</a></li>
+            <li><a href="/jsx">JSX Support</a></li>
+            <li><a href="/layouts">Layouts</a></li>
+          </ul>
+        </Navigation>
+
+        <Content>
+          <h1>Welcome to Reface</h1>
+          <p>
+            Reface is a modern template engine that combines several powerful approaches:
+            server-side rendering, islands architecture, and type safety.
+          </p>
+
+          <h2>Quick Start</h2>
+          <pre><code>{`
+import { Reface } from "@vseplet/reface";
+
+const app = new Reface({
+  layout: clean({
+    htmx: true,
+    bootstrap: true,
+  }),
 });
+          `}</code></pre>
+        </Content>
+      </Layout>
+    </Container>
+  );
 
-// Main page component
-const DocsPage = component<{ docs: DocItem[] }>(({ docs }) => (
-  <div class="container">
-    <Navigation docs={docs} />
-    <main id="content" class="content">
-      <h1>Welcome to Reface Documentation</h1>
-      <p>Select a document from the sidebar to begin.</p>
-    </main>
-  </div>
-));
-
-// Initialize app
-const docs = await readDocsTree("./docs");
+  return content;
+};
 
 const app = new Hono().route(
   "/",
   new Reface({
     layout: clean({
+      title: "Reface Documentation",
+      description: "Modern Template Engine for Server-Side Applications",
+      favicon: "/_assets/favicon.ico",
       htmx: true,
-      jsonEnc: true,
       bootstrap: true,
-      head: `
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/fira_code.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism.css">
-        <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/components/prism-typescript.min.js"></script>
-        <style>
-          .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-          }
-          .sidebar {
-            width: 250px;
-            padding: 1rem;
-            border-right: 1px solid #eee;
-            height: 100vh;
-            position: fixed;
-            overflow-y: auto;
-          }
-          .nav-item {
-            padding: 0.5rem 0;
-          }
-          .nav-link {
-            color: #333;
-            text-decoration: none;
-          }
-          .nav-link:hover {
-            color: #007bff;
-          }
-          .nav-link.active {
-            color: #007bff;
-            font-weight: bold;
-          }
-          .content {
-            margin-left: 270px;
-            padding: 1rem;
-          }
-          pre {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 4px;
-            overflow-x: auto;
-          }
-          code {
-            font-family: 'Fira Code', monospace;
-          }
-        </style>
-      `,
     }),
-  })
-    .page("/", () => DocsPage({ docs }))
-    .hono()
+  }).page("/", DocsViewer).hono(),
 );
 
-Deno.serve(app.fetch); 
+Deno.serve(app.fetch);

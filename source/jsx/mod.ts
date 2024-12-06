@@ -2,9 +2,8 @@ import type {
   ElementChild,
   ElementFactory,
   HTMLAttributes,
+  Template,
 } from "../types/base.ts";
-import type { JSXProps } from "./types.ts";
-import type { Template } from "../types/mod.ts";
 import * as elements from "../elements/mod.ts";
 
 /**
@@ -12,19 +11,32 @@ import * as elements from "../elements/mod.ts";
  */
 export function createElement(
   tag: keyof typeof elements | Function,
-  props: JSXProps | null,
+  props: Record<string, unknown> | null,
   ...children: ElementChild[]
 ): Template {
   try {
-    // Process children
-    const processedChildren = children
-      .flat()
-      .filter(
-        (child) => child !== null && child !== undefined && child !== false
-      );
-
     // Handle component functions
     if (typeof tag === "function") {
+      // Handle styled components
+      if ("className" in tag) {
+        const styledComponent = tag as ElementFactory<HTMLAttributes> & {
+          className: string;
+        };
+        const template = styledComponent(props || {});
+
+        if (typeof template === "function") {
+          return template(
+            Object.assign([""], { raw: [""] }) as TemplateStringsArray,
+            ...children
+          );
+        }
+        return {
+          ...template,
+          children,
+        };
+      }
+
+      // Handle regular components
       return tag({
         ...props,
         children: children.length === 1 ? children[0] : children,
@@ -32,34 +44,24 @@ export function createElement(
     }
 
     // Get element factory
-    const elementFn = elements[tag] as ElementFactory<HTMLAttributes>;
+    const elementFn = elements[tag];
     if (!elementFn) {
       throw new Error(`Unknown element: ${String(tag)}`);
     }
 
     // Create template
-    const processedProps: Record<string, unknown> = {};
-    if (props) {
-      Object.entries(props).forEach(([key, value]) => {
-        if (key === "className") {
-          processedProps.class = value;
-        } else if (key.startsWith("on") && typeof value === "function") {
-          processedProps[key.toLowerCase()] = value();
-        } else {
-          processedProps[key] = value;
-        }
-      });
-    }
-
-    // Create template using element factory
-    const template = elementFn(processedProps as HTMLAttributes);
+    const template = elementFn(props || {});
     if (typeof template === "function") {
       return template(
         Object.assign([""], { raw: [""] }) as TemplateStringsArray,
-        ...processedChildren
+        ...children
       );
     }
-    return template;
+
+    return {
+      ...template,
+      children,
+    };
   } catch (err) {
     const error = err as Error;
     throw new Error(`Error creating element ${String(tag)}: ${error.message}`);

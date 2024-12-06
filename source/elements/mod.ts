@@ -1,16 +1,5 @@
 import { createElementFactory } from "./createElementFactory.ts";
-import type {
-  HTMLAttributes,
-  ButtonAttributes,
-  InputAttributes,
-  AnchorAttributes,
-  ImgAttributes,
-  TableAttributes,
-  FormAttributes,
-  SelectAttributes,
-  OptionAttributes,
-  TextareaAttributes,
-} from "../types/mod.ts";
+import type { HTMLAttributes } from "../types/base.ts";
 
 // Document structure
 export const div = createElementFactory<HTMLAttributes>("div");
@@ -32,36 +21,26 @@ export const h4 = createElementFactory<HTMLAttributes>("h4");
 export const h5 = createElementFactory<HTMLAttributes>("h5");
 export const h6 = createElementFactory<HTMLAttributes>("h6");
 
-// Forms
-export const form = createElementFactory<FormAttributes>("form");
-export const input = createElementFactory<InputAttributes>("input");
-export const button = createElementFactory<ButtonAttributes>("button");
-export const textarea = createElementFactory<TextareaAttributes>("textarea");
-export const select = createElementFactory<SelectAttributes>("select");
-export const option = createElementFactory<OptionAttributes>("option");
-export const label = createElementFactory<HTMLAttributes>("label");
-
-// Links
-export const a = createElementFactory<AnchorAttributes>("a");
+// Text formatting
+export const pre = createElementFactory<HTMLAttributes>("pre");
+export const code = createElementFactory<HTMLAttributes>("code");
+export const strong = createElementFactory<HTMLAttributes>("strong");
+export const em = createElementFactory<HTMLAttributes>("em");
 
 // Lists
 export const ul = createElementFactory<HTMLAttributes>("ul");
 export const ol = createElementFactory<HTMLAttributes>("ol");
 export const li = createElementFactory<HTMLAttributes>("li");
 
-// Tables
-export const table = createElementFactory<TableAttributes>("table");
-export const thead = createElementFactory<TableAttributes>("thead");
-export const tbody = createElementFactory<TableAttributes>("tbody");
-export const tr = createElementFactory<TableAttributes>("tr");
-export const td = createElementFactory<TableAttributes>("td");
-export const th = createElementFactory<TableAttributes>("th");
+// Links and media
+export const a = createElementFactory<HTMLAttributes>("a");
+export const img = createElementFactory<HTMLAttributes>("img");
 
-// Media
-export const img = createElementFactory<ImgAttributes>("img");
-export const video = createElementFactory<HTMLAttributes>("video");
-export const audio = createElementFactory<HTMLAttributes>("audio");
-
-// Void elements
-export const br = createElementFactory<HTMLAttributes>("br");
-export const hr = createElementFactory<HTMLAttributes>("hr");
+// Forms
+export const form = createElementFactory<HTMLAttributes>("form");
+export const input = createElementFactory<HTMLAttributes>("input");
+export const button = createElementFactory<HTMLAttributes>("button");
+export const textarea = createElementFactory<HTMLAttributes>("textarea");
+export const select = createElementFactory<HTMLAttributes>("select");
+export const option = createElementFactory<HTMLAttributes>("option");
+export const label = createElementFactory<HTMLAttributes>("label");

@@ -54,14 +54,7 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
         css: "",
         isTemplate: true,
         str: strings,
-        args: templateValues.map((v) =>
-          v === null || v === undefined
-            ? ""
-            : typeof v === "string" ||
-              (typeof v === "object" && "isTemplate" in v)
-            ? v
-            : String(v)
-        ),
+        args: templateValues,
         rootClass: "",
       });
     },

@@ -1,43 +1,40 @@
-// deno-lint-ignore-file no-unused-vars
-import { layout } from "../helpers/mod.ts";
-import { alpinejs, htmx, hyperscript, jsonEnc } from "$/resources/scripts.ts";
-import { bootstrapIcons } from "$/resources/icons.ts";
-import { bluma, bootstrap } from "$/resources/styles.ts";
+import type { Layout, LayoutOptions } from "../types.ts";
 
-/**
- * TWA is a layout for building TWA (Telegram Web Apps)
- * @param config - Layout configuration
- * @returns Layout function
- */
-export const clean = layout<{
-  hyperscript?: boolean;
-  alpine?: boolean;
-  bootstrap?: boolean;
-  bootstrapIcons?: boolean;
+export interface CleanLayoutOptions extends LayoutOptions {
   htmx?: boolean;
-  jsonEnc?: boolean;
-  bluma?: boolean;
-}>((options) => {
-  return (page: string) => {
-    return `
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          ${options.htmx ? htmx : ""}
-          ${options.alpine ? alpinejs : ""}
-          ${options.bootstrap ? bootstrap : ""}
-          ${options.bootstrapIcons ? bootstrapIcons : ""}
-          ${options.jsonEnc ? jsonEnc : ""}
-          ${options.bluma ? bluma : ""}
-          ${options.hyperscript ? hyperscript : ""}
-          <title>${options.title || "Reface Clean"}</title>
-          ${options.head || ""}
-        </head>
-        <body>
-          ${page}
-        </body>
-      </html>
-    `;
-  };
-});
+  bootstrap?: boolean;
+  head?: string;
+}
+
+export function clean(options: CleanLayoutOptions = {}) {
+  return (content: string) => `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>${options.title || "Reface App"}</title>
+        ${
+          options.description
+            ? `<meta name="description" content="${options.description}">`
+            : ""
+        }
+        ${options.favicon ? `<link rel="icon" href="${options.favicon}">` : ""}
+        ${
+          options.htmx
+            ? '<script src="https://unpkg.com/htmx.org@1.9.6"></script>'
+            : ""
+        }
+        ${
+          options.bootstrap
+            ? '<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">'
+            : ""
+        }
+        ${options.head || ""}
+      </head>
+      <body>
+        ${content}
+      </body>
+    </html>
+  `;
+}

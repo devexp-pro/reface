@@ -49,6 +49,26 @@ Deno.test("Styled component", () => {
   );
 });
 
+Deno.test("Styled component children jsx", () => {
+  const Button = styled.button`
+    & {
+      background: blue;
+      color: white;
+    }
+  `;
+
+  compareHTML(
+    render(<Button class="primary">Click me</Button>),
+    `<button class="c0 primary">Click me</button>
+<style>
+  .c0 {
+    background: blue;
+    color: white;
+  }
+</style>`
+  );
+});
+
 Deno.test("Nested components", () => {
   const Header = component<{ title: string }>(({ title }) => (
     <header class="header">

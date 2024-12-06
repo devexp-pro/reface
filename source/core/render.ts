@@ -7,12 +7,12 @@ export function render(input: Template | (Template | string)[]): string {
   const styles = new Set<string>();
 
   function renderTemplate(template: Template): string {
-    // Collect CSS from current template
+    // Collect CSS
     if (template.css) {
       styles.add(template.css);
     }
 
-    // Process children and collect their CSS
+    // Process children
     const children = template.children
       .map((child) => {
         if (child === null || child === undefined) return "";
@@ -23,10 +23,12 @@ export function render(input: Template | (Template | string)[]): string {
       })
       .join("");
 
-    // Return just the HTML element
-    return `<${template.tag}${
+    // Build HTML
+    const html = `<${template.tag}${
       template.attributes ? ` ${template.attributes}` : ""
     }>${children}</${template.tag}>`;
+
+    return html;
   }
 
   // Handle array input
