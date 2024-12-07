@@ -13,12 +13,7 @@
     "./html": "./reface/html/mod.ts",
     "./elements": "./reface/elements/mod.ts",
     "./jsx": "./reface/jsx/mod.ts",
-    "./layouts": "./reface/layouts/mod.ts",
-    "./helpers": "./reface/helpers/mod.ts",
-    "./resources/scripts": "./reface/resources/scripts.ts",
-    "./resources/styles": "./reface/resources/styles.ts",
-    "./resources/icons": "./reface/resources/icons.ts",
-    "./resources/fonts": "./reface/resources/fonts.ts"
+    "./layouts": "./reface/layouts/mod.ts"
   },
   "imports": {
     "@reface": "./reface/mod.ts",
@@ -27,7 +22,6 @@
     "@reface/elements": "./reface/elements/mod.ts",
     "@reface/jsx": "./reface/jsx/mod.ts",
     "@reface/layouts": "./reface/layouts/mod.ts",
-    "@reface/helpers": "./reface/helpers/mod.ts",
     "@reface/types": "./reface/core/types.ts",
     "@hono/hono": "jsr:@hono/hono@4.5.6",
     "@oak/oak": "jsr:@oak/oak@16.1.0",
