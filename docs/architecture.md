@@ -1,123 +1,301 @@
 # Architecture
 
-Reface is built with a modular architecture that separates concerns into distinct layers. This document outlines the project structure and core concepts.
+## Core Architecture
 
-## Project Structure
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│    Reface       │     │    Islands      │     │    Pages        │
+│                 │────▶│                 │────▶│                 │
+│  (Application)  │     │  (Interactive)  │     │   (Routes)      │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                       │                       │
+        │                       │                       │
+        ▼                       ▼                       ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│      JSX        │     │    Elements     │     │     HTML        │
+│                 │────▶│                 │────▶│                 │
+│    (.tsx)       │     │   (Factory)     │     │   (String)      │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+        │                       │                       │
+        │                       │                       │
+        ▼                       ▼                       ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Templates     │     │     Core        │     │   Security      │
+│                 │────▶│                 │────▶│                 │
+│  (Intermediate) │     │   (Render)      │     │   (Escape)      │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+## Framework Levels
+
+### Framework Level (`/reface`)
+
+- Application setup and configuration
+- Layout and page management
+- RPC and REST handlers for islands
+- Server adapters (Hono, Oak, Express)
+
+### Core Level (`/core`)
+
+- Template engine core
+  - Template interface and types
+  - Template fragments
+  - Render engine
+  - Security features (XSS protection)
+
+### HTML Level (`/html`)
+
+- HTML string manipulation
+  - HTML template tag
+  - Attribute processing
+  - Class name handling
+  - Style processing
+- Type safety features
+
+### Elements Level (`/elements`)
+
+- Component system
+  - HTML elements
+  - SVG elements
+  - Void elements
+- Styled components
+  - CSS-in-JS support
+  - Theme system
+- Security features
+
+### JSX Level (`/jsx`)
+
+- JSX runtime support
+  - createElement function
+  - Fragment component
+  - TypeScript integration
+- Component features
+  - Props validation
+  - Children handling
+  - Event handling
+
+## Module Structure
+
+Each module has a specific responsibility and clear boundaries:
+
+```
+┌─────────────────┐
+│     reface      │  Application framework
+└───────┬─────────┘
+        │
+┌───────▼─────────┐
+│      jsx        │  JSX integration
+└───────┬─────────┘
+        │
+┌───────▼─────────┐
+│    elements     │  Element creation
+└───────┬─────────┘
+        │
+┌───────▼─────────┐
+│      html       │  HTML/CSS string manipulation
+└───────┬─────────┘
+        │
+┌───────▼─────────┐
+│      core       │  Template rendering engine
+└─────────────────┘
+```
+
+### Module Principles
+
+1. **Single Responsibility**
+
+   - One file = one function/type
+   - Clear separation of concerns
+   - Focused module boundaries
+
+2. **Dependencies**
+
+   - Flow from bottom to top
+   - core → html → elements → jsx → reface
+   - No circular dependencies
+
+3. **Exports**
+   - Each module has its own mod.ts
+   - Internal imports through mod.ts
+   - Main mod.ts exports essentials only
+
+Example:
+
+```typescript
+// Correct imports
+import { render } from "../core/mod.ts";
+import { escapeHTML } from "../html/mod.ts";
+
+// Avoid direct imports
+// import { render } from "../core/render.ts"; // ❌
+```
+
+## Overview
+
+Reface is built with a modular architecture that separates concerns into distinct layers:
 
 ```
 source/
-├── reface/         # Framework level
-│   ├── Reface.ts   # Main framework class
-│   ├── types.ts    # Framework types
-│   └── mod.ts      # Public API
+├── core/           # Core rendering engine
+│   ├── render.ts   # HTML rendering
+│   ├── escape.ts   # Security utilities
+│   └── types.ts    # Core types
 │
-├── core/           # Core level - Template engine
-│   ├── Template.ts # Template interface & types
-│   ├── types.ts    # RPC & Island types
-│   ├── render.ts   # Render engine
-│   └── mod.ts      # Public API
+├── elements/       # Element system
+│   ├── factory.ts  # Element creation
+│   ├── styled.ts   # Styled components
+│   └── base.ts     # HTML elements
 │
-├── html/           # HTML level - string manipulation
-│   ├── attributes.ts # HTML attributes
-│   ├── classes.ts   # Class names
-│   ├── styles.ts    # CSS processing
-│   └── mod.ts       # Public API
+├── html/           # HTML processing
+│   ├── escape.ts   # HTML escaping
+│   ├── styles.ts   # CSS processing
+│   └── types.ts    # HTML types
 │
-├── elements/       # Elements level - components
-│   ├── factory.ts   # Element factory
-│   ├── base.ts      # HTML elements
-│   ├── styled.ts    # Styled components
-│   ├── css.ts       # CSS utilities
-│   └── mod.ts       # Public API
-│
-├── jsx/           # JSX level
-│   ├── createElement.ts
-│   ├── Fragment.ts
-│   └── mod.ts
-│
-├── layouts/       # Layouts level
-│   ├── types.ts
-│   ├── clean.ts
-│   ├── twa.ts
-│   └── mod.ts
-│
-└── mod.ts        # Main public API
+└── jsx/           # JSX support
+    ├── runtime.ts  # JSX runtime
+    └── types.ts    # JSX types
 ```
 
 ## Core Concepts
 
-### Modular Architecture
+### Template Engine
 
-Reface is built with modularity in mind. Each module has its own responsibility and clear boundaries:
+The template engine converts templates into HTML strings through several stages:
 
-- **Framework Level** (`reface/`) - High-level framework features
-- **Core Level** (`core/`) - Template engine and rendering
-- **HTML Level** (`html/`) - HTML string manipulation
-- **Elements Level** (`elements/`) - Component system
-- **JSX Level** (`jsx/`) - JSX support
-- **Layouts Level** (`layouts/`) - Layout system
+1. **Template Processing**
 
-### Module Guidelines
+```typescript
+// Template structure
+interface Template {
+  tag: string;
+  attributes: Record<string, unknown>;
+  children: (string | Template)[];
+  css?: string;
+}
 
-Each module follows these principles:
+// Processing example
+const template = {
+  tag: "div",
+  attributes: { class: "container" },
+  children: ["Hello"],
+};
 
-1. **Clear Responsibility**
+render(template); // => <div class="container">Hello</div>
+```
 
-   - Each module has a single, well-defined purpose
-   - Modules communicate through clear interfaces
-   - Dependencies flow downward
+2. **Attribute Processing**
 
-2. **Encapsulation**
+```typescript
+// Attributes are processed and escaped
+const attrs = {
+  class: "btn",
+  disabled: true,
+  "data-id": 123,
+};
 
-   - Internal implementation details are hidden
-   - Public API exposed through `mod.ts` files
-   - Clear separation between public and private features
+processAttributes(attrs);
+// => class="btn" disabled data-id="123"
+```
+
+3. **Content Processing**
+
+```typescript
+// Content is escaped by default
+div()`${userInput}`; // Content is escaped
+
+// Explicit trust
+div()`${html(trustedHTML)}`; // Content is not escaped
+```
+
+### Security
+
+The security system provides several layers of protection:
+
+1. **Automatic Escaping**
+
+```typescript
+// HTML special characters are escaped
+escapeHTML('<script>alert("xss")</script>');
+// => &lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;
+
+// Attributes are escaped
+escapeAttribute('"><script>alert(1)</script>');
+// => &quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;
+```
+
+2. **Type Safety**
+
+```typescript
+// Type-safe attributes
+button({
+  type: "submit", // Only valid button types
+  disabled: true, // Must be boolean
+});
+
+// Invalid attributes caught at compile time
+button({
+  invalid: true, // Error: Property 'invalid' does not exist
+});
+```
+
+### Element System
+
+The element system provides a functional approach to creating HTML:
+
+1. **Element Factory**
+
+```typescript
+// Create element factory
+const div = createElementFactory("div");
+
+// Usage
+div({ class: "container" })`Content`;
+```
+
+2. **Styled Components**
+
+```typescript
+// Create styled component
+const Button = styled.button`
+  & {
+    background: blue;
+  }
+`;
+
+// Usage
+Button({ class: "primary" })`Click me`;
+```
+
+## Performance
+
+1. **String Building**
+
+- Uses string buffers for large templates
+- Minimizes string concatenations
+- Caches processed templates
+
+2. **Memory Management**
+
+- Reuses template objects
+- Minimizes allocations
+- Efficient string handling
+
+## Best Practices
+
+1. **Security**
+
+- Always escape user input
+- Use proper attribute types
+- Follow XSS guidelines
+
+2. **Performance**
+
+- Cache template results
+- Minimize DOM updates
+- Use appropriate patterns
 
 3. **Type Safety**
-   - Strong TypeScript types throughout
-   - Types live with their implementations
-   - Clear interfaces between modules
 
-### Key Features
-
-1. **Template Engine**
-
-   - Efficient HTML rendering
-   - Type-safe templates
-   - Component composition
-
-2. **Elements API**
-
-   - HTML element abstractions
-   - Styled components system
-   - Factory pattern for element creation
-
-3. **JSX Support**
-
-   - Full TypeScript integration
-   - Fragment support
-   - Component composition
-
-4. **Layouts System**
-   - Clean layout
-   - TWA support
-   - Custom layout creation
-
-## Development Guidelines
-
-1. **Imports/Exports**
-
-   - External imports only from main `mod.ts`
-   - Internal imports through module `mod.ts`
-   - Direct imports only within module
-
-2. **Testing**
-
-   - Unit tests for each module
-   - Integration tests
-   - Example applications
-
-3. **Documentation**
-   - Clear API documentation
-   - Usage examples
-   - Architecture overview
+- Use TypeScript strict mode
+- Define proper interfaces
+- Validate input data
