@@ -1,8 +1,4 @@
-<div align="center">
-  <img src="./docs/_assets/logo.svg" alt="Reface" width="300" />
-</div>
-
-# [Reface](https://reface.deno.dev/)
+# [Reface 🎭](https://reface.deno.dev/)
 
 [![JSR](https://jsr.io/badges/@vseplet/reface)](https://jsr.io/@vseplet/reface)
 [![JSR Score](https://jsr.io/badges/@vseplet/reface/score)](https://jsr.io/@vseplet/reface)

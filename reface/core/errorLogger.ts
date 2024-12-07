@@ -3,7 +3,7 @@ import type { ErrorContext } from "./types.ts";
 // Брендинг
 const brand = {
   name: "Reface",
-  emoji: "��",
+  emoji: "🎭",
   version: "0.2.0", // TODO: get version from package.json
 };
 

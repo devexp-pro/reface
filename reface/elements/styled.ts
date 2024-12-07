@@ -1,67 +1,37 @@
-import type { Template } from "../core/types.ts";
-import { attributes } from "../html/mod.ts";
+import type {
+  ElementChild,
+  ElementFactory,
+  HTMLAttributes,
+} from "@reface/core";
 import type { StyledComponent, StyledFactory } from "./styled.types.ts";
-import { createElementFactory } from "./factory.ts";
+import * as elements from "./elements.ts";
+import { generateClassName } from "@reface/html";
 
-function createStyledTag(tag: string): StyledFactory {
+function createStyledTag(
+  elementFactory: ElementFactory<HTMLAttributes>
+): StyledFactory {
   return (strings: TemplateStringsArray, ...values: unknown[]) => {
-    const css = String.raw(strings, ...values);
+    const className = generateClassName();
+    const css = String.raw(strings, ...values)
+      .replace(/&\s*{/g, `.${className} {`)
+      .replace(/&\s*\${/g, `.${className} .`)
+      .replace(/&\s+\./g, `.${className} .`);
 
-    // Создаем базовый элемент
-    const baseElement = createElementFactory(tag);
+    return (props: HTMLAttributes & { children?: ElementChild } = {}) => {
+      const { children, ...restProps } = props;
+      const emptyTemplate = Object.assign([""], {
+        raw: [""],
+      }) as TemplateStringsArray;
 
-    // Создаем функцию-фабрику для styled component
-    function styledElement(props: Record<string, unknown> = {}) {
-      // Получаем функцию для template literals от базового элемента
-      const templateFn = baseElement(props);
+      const baseResult = elementFactory({
+        ...restProps,
+        class: `${className} ${props.class || ""}`.trim(),
+      })(emptyTemplate, children || "");
 
-      // Возвращаем функцию для template literals
-      const elementWithTemplate = function (
-        strings: TemplateStringsArray,
-        ...values: unknown[]
-      ) {
-        // Создаем Template с children
-        return {
-          tag,
-          attributes: attributes(props),
-          css,
-          isTemplate: true,
-          children: values,
-          str: strings,
-          args: values,
-          rootClass: "",
-        };
-      };
-
-      // Копируем все свойства с базового элемента
-      Object.assign(elementWithTemplate, templateFn);
-
-      return elementWithTemplate;
-    }
-
-    // Копируем все свойства с базового элемента
-    Object.assign(styledElement, baseElement);
-
-    // Обновляем свойства для styled component
-    Object.assign(styledElement, {
-      css,
-      isTemplate: true,
-    });
-
-    return styledElement;
-  };
-}
-
-// Создаем функцию для расширения компонентов
-function extendComponent(base: StyledComponent): StyledFactory {
-  return (strings: TemplateStringsArray, ...values: unknown[]) => {
-    const css = String.raw(strings, ...values);
-
-    return (props: Record<string, unknown> = {}) => {
-      const baseResult = base(props);
       return {
         ...baseResult,
-        css: `${baseResult.css || ""}\n${css}`,
+        css,
+        rootClass: className,
       };
     };
   };
@@ -69,15 +39,25 @@ function extendComponent(base: StyledComponent): StyledFactory {
 
 // Создаем базовую функцию styled
 const baseStyled = (component: StyledComponent): StyledFactory => {
-  return extendComponent(component);
+  return (strings: TemplateStringsArray, ...values: unknown[]) => {
+    const css = String.raw(strings, ...values);
+
+    return (props: HTMLAttributes = {}) => {
+      const baseResult = component(props);
+      return {
+        ...baseResult,
+        css: `${baseResult.css || ""}\n${css}`,
+      };
+    };
+  };
 };
 
 // Создаем прокси для тегов
 export const styled = new Proxy(baseStyled, {
   get(target, prop) {
-    if (typeof prop === "string") {
-      return createStyledTag(prop);
+    if (prop in elements) {
+      return createStyledTag(elements[prop as keyof typeof elements]);
     }
-    return target[prop as keyof typeof target];
+    throw new Error(`Tag ${String(prop)} not found`);
   },
 }) as typeof baseStyled & { [key: string]: StyledFactory };

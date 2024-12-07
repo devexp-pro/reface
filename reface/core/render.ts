@@ -29,48 +29,32 @@ function getFunctionSource(fn: Function): string {
   return source;
 }
 
-function validateTemplate(
-  template: Template | TemplateFragment | undefined,
-  componentName?: string
-): void {
-  if (template === undefined) {
-    ErrorContext.setLastError({
-      component: componentName || "Unknown",
-      template: undefined,
-    });
-    throw new RenderError(
-      "Template is undefined (this usually means a component returned undefined)",
-      template,
-      ErrorContext.getContext()
-    );
+function validateTemplate(template: unknown): asserts template is Template {
+  if (template == null) {
+    throw new RenderError("Got null or undefined instead of template");
   }
 
+  // Если получили функцию, вызываем её и проверяем результат
   if (typeof template === "function") {
-    ErrorContext.setLastError({
-      component: componentName || "Unknown",
-      template: {
-        type: "function",
-        name: template.name || "(anonymous)",
-        source: getFunctionSource(template),
-      },
-    });
+    const result = template();
+    if (!result || typeof result !== "object" || !("isTemplate" in result)) {
+      throw new RenderError("Function did not return a valid template", {
+        function: template.toString(),
+        result,
+      });
+    }
+    return;
+  }
+
+  if (typeof template !== "object") {
     throw new RenderError(
-      "Got function instead of template (this usually means a component factory was not called)",
-      undefined,
-      ErrorContext.getContext()
+      `Got ${typeof template} instead of template`,
+      template
     );
   }
 
-  if (!("tag" in template)) {
-    ErrorContext.setLastError({
-      component: componentName || "Unknown",
-      template,
-    });
-    throw new RenderError(
-      "Invalid template structure - missing 'tag' property",
-      template,
-      ErrorContext.getContext()
-    );
+  if (!("isTemplate" in template)) {
+    throw new RenderError("Got object without isTemplate property", template);
   }
 }
 
@@ -94,6 +78,11 @@ export function render(
     return withErrorTracking(
       isTemplateFragment(template) ? "Fragment" : template.tag || "Unknown",
       () => {
+        // Если получили функцию, вызываем её
+        if (typeof template === "function") {
+          return renderTemplate(template());
+        }
+
         validateTemplate(template);
 
         if (isTemplateFragment(template)) {

@@ -84,44 +84,6 @@ export function createElement(
       () => {
         // Handle component functions
         if (typeof tag === "function") {
-          // Handle styled components
-          if ("className" in tag) {
-            const styledComponent = tag as ElementFactory<HTMLAttributes> & {
-              className: string;
-            };
-            const template = styledComponent(processedProps);
-
-            if (!template) {
-              throw new JSXError(
-                `Styled component returned undefined (${componentName})`,
-                componentName,
-                processedProps,
-                children
-              );
-            }
-
-            if (typeof template === "function") {
-              const result = template(
-                Object.assign([""], { raw: [""] }) as TemplateStringsArray,
-                ...processedChildren
-              );
-              if (!result) {
-                throw new JSXError(
-                  `Styled component ${componentName} returned a function instead of a template`,
-                  componentName,
-                  processedProps,
-                  children
-                );
-              }
-              return result as Template;
-            }
-
-            return {
-              ...(template as Template),
-              children: processedChildren,
-            };
-          }
-
           // Handle regular components
           const result = tag({
             ...processedProps,
