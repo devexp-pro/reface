@@ -4,75 +4,86 @@ All notable changes to this project will be documented in this file.
 
 ## 0.2.0 (next)
 
-### Core
+### Framework Level (`/reface`)
 
 - Added `Reface` class for application setup
 - Added support for layouts and pages
 - Added RPC and REST handlers for islands
 - Added server adapters (Hono, Oak, Express)
 
-### DOM API
+### Core Level (`/core`)
 
-#### JSX Support (`/jsx`)
+- Added template engine core
+  - `Template` interface and types
+  - `TemplateFragment` for trusted HTML
+  - Efficient render engine
+  - Type-safe templates
+- Added security features
+  - Automatic HTML escaping
+  - Attribute value escaping
+  - XSS protection
+  - Safe HTML fragments
 
-- `createElement(tag, props, ...children)`: Core JSX runtime function
-- `Fragment`: JSX fragment support
-- Full TypeScript types for HTML elements and attributes
+### HTML Level (`/html`)
 
-#### Styled Components (`/styled`)
+- Added HTML string manipulation
+  - `html` template tag with XSS protection
+  - Attribute processing
+  - Class name handling
+  - Style processing
+- Added type safety features
+  - Strong type checking
+  - Template validation
+  - Attribute validation
 
-- `styled(element)`: Creates styled component from existing element or component
-- `styled.{element}`: Direct element styled components (e.g. `styled.div`)
-- `css`: Template literal tag for CSS
-- `cssVar(name, value?)`: CSS variable helper
+### Elements Level (`/elements`)
 
-#### Elements (`/elements`)
+- Added component system
+  - HTML elements (`div`, `span`, etc.)
+  - SVG elements (`svg`, `path`, etc.)
+  - Void elements (`img`, `input`, etc.)
+- Added styled components
+  - `styled` factory
+  - CSS-in-JS support
+  - Theme system
+- Added security features
+  - XSS protection
+  - Safe HTML fragments
+  - Attribute escaping
 
-- HTML elements: `div()`, `span()`, `button()`, etc.
-- SVG elements: `svg()`, `path()`, `circle()`, etc.
-- Void elements: `img()`, `input()`, `br()`, etc.
-- Full TypeScript types for all HTML attributes
+### JSX Level (`/jsx`)
 
-#### DOM Core (`/dom`)
+- Added JSX support
+  - `createElement` function
+  - `Fragment` component
+  - Full TypeScript integration
+- Added component features
+  - Props validation
+  - Children handling
+  - Event handling
 
-- `render(template)`: Renders template to string
-- `attrs(attributes)`: Processes HTML attributes
-- `classNames(...inputs)`: Class name utility
-- `styles(...inputs)`: Style string utility
+### Layouts Level (`/layouts`)
 
-#### Types (`/dom/types`)
-
-- ARIA attributes
-- Event handlers
-- HTMX attributes
-- Base HTML attributes
-- Style and class types
-
-### Helpers (`/helpers`)
-
-- `generateClassName()`: Unique class name generator
-- `salt()`: Unique identifier generator
-- HTTP method helpers (GET, POST, PUT, etc.)
-- Response helper
+- Added layout system
+  - Clean layout
+  - TWA layout
+  - Custom layout support
+- Added features
+  - Meta tags
+  - Scripts injection
+  - Style handling
 
 ### Documentation
 
-#### API Reference
-
-- `dom.md`: Core DOM API concepts and usage
-- `jsx.md`: JSX syntax and features guide
-- `styled.md`: Styled components documentation
-- `components.md`: Component system overview
-- `layouts.md`: Layout system documentation
-
-### Examples
-
-- Added docs-viewer example
+- Added architecture documentation
+- Added API reference
+  - Core concepts
+  - Component guide
+  - Security guide
+- Added examples
+  - Docs viewer
   - Server-side rendering
   - HTMX integration
-  - Markdown processing
-  - Syntax highlighting
-  - Responsive layout
 
 ## 0.1.0
 
