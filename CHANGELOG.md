@@ -2,14 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-## 0.2.0 (next)
+## 1.0.0 (next)
 
 ### Framework Level (`/reface`)
 
-- Added `Reface` class for application setup
-- Added support for layouts and pages
-- Added RPC and REST handlers for islands
-- Added server adapters (Hono, Oak, Express)
+- Added comprehensive test suite with integration tests
+- Added error handling system with detailed error reporting
+- Added new documentation website
+  - Interactive code examples
+  - Live component previews
+  - Responsive design
+  - Dark/light theme support
+  - Search functionality
 
 ### Core Level (`/core`)
 
@@ -23,6 +27,11 @@ All notable changes to this project will be documented in this file.
   - Attribute value escaping
   - XSS protection
   - Safe HTML fragments
+- Added error context system
+  - Component stack traces
+  - JSX stack traces
+  - Detailed error reporting
+  - Error formatting utilities
 
 ### HTML Level (`/html`)
 
@@ -35,6 +44,11 @@ All notable changes to this project will be documented in this file.
   - Strong type checking
   - Template validation
   - Attribute validation
+- Added utilities
+  - Class name generation
+  - Class name combining
+  - HTML escaping
+  - Attribute escaping
 
 ### Elements Level (`/elements`)
 
@@ -43,13 +57,26 @@ All notable changes to this project will be documented in this file.
   - SVG elements (`svg`, `path`, etc.)
   - Void elements (`img`, `input`, etc.)
 - Added styled components
-  - `styled` factory
+  - `styled` factory with proxy support
   - CSS-in-JS support
   - Theme system
+  - Nested selectors support
+  - Pseudo-class handling
+  - Media query support
 - Added security features
   - XSS protection
   - Safe HTML fragments
   - Attribute escaping
+- Added element factories
+  - Type-safe element creation
+  - Attribute validation
+  - Children processing
+- Added comprehensive element types
+  - Button attributes
+  - Input attributes
+  - Form attributes
+  - Table attributes
+  - Media attributes
 
 ### JSX Level (`/jsx`)
 
@@ -61,17 +88,10 @@ All notable changes to this project will be documented in this file.
   - Props validation
   - Children handling
   - Event handling
-
-### Layouts Level (`/layouts`)
-
-- Added layout system
-  - Clean layout
-  - TWA layout
-  - Custom layout support
-- Added features
-  - Meta tags
-  - Scripts injection
-  - Style handling
+- Added error handling
+  - JSX stack traces
+  - Component stack traces
+  - Detailed error messages
 
 ### Documentation
 
@@ -84,8 +104,36 @@ All notable changes to this project will be documented in this file.
   - Docs viewer
   - Server-side rendering
   - HTMX integration
+- Added new documentation website
+  - Modern design with responsive layout
+  - Interactive code examples with syntax highlighting
+  - Live component previews
+  - Markdown-based documentation
+  - Auto-generated API docs
+  - Full-text search
+  - Table of contents navigation
+  - Mobile-friendly interface
+  - Performance optimized
+  - Live reload during development
+
+### Website
+
+- Added new website with modern design
+  - Landing page with feature overview
+  - Interactive examples
+  - Documentation browser
+  - Component showcase
+  - Installation guide
+  - Quick start tutorial
 
 ## 0.1.0
+
+### Framework Level (`/reface`)
+
+- Added `Reface` class for application setup
+- Added support for layouts and pages
+- Added RPC and REST handlers for islands
+- Added server adapters (Hono, Oak, Express)
 
 #### Template System
 
@@ -98,3 +146,14 @@ All notable changes to this project will be documented in this file.
 - `component<Props>(fn)`: Creates static component
 - `island<RPC, Props>(config)`: Creates interactive component
 - Support for RPC and REST handlers
+
+### Layouts Level (`/layouts`)
+
+- Added layout system
+  - Clean layout
+  - TWA layout
+  - Custom layout support
+- Added features
+  - Meta tags
+  - Scripts injection
+  - Style handling
