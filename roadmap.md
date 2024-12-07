@@ -3,6 +3,7 @@
 - Web
   - Hot reloading
   - Error screen
+- XSS
 
 ## Current Plans
 
