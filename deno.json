@@ -39,7 +39,6 @@
     "pub-dry": "deno publish --dry-run --allow-slow-types",
     "test": "deno test reface/__tests__/",
     "test:watch": "deno test --watch reface/__tests__/",
-    "docs-viewer:dev": "deno run -A --watch docs-viewer/main.tsx",
     "website:dev": "deno run -A --watch website/main.tsx"
   },
   "fmt": {

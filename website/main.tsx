@@ -1,26 +1,61 @@
 import { createElement } from "@reface/jsx";
-import { Hono } from "@hono/hono";
-import { clean, Reface } from "@reface";
-import { Home } from "./pages/Home.tsx";
-import { wrapper } from "./pages/wrapper.tsx";
+import { Reface } from "@reface";
+import { clean } from "@reface/layouts";
+import { Hono } from "https://deno.land/x/hono@v3.11.7/mod.ts";
+import { serveStatic } from "https://deno.land/x/hono@v3.11.7/middleware.ts";
+import { loadDocs } from "./utils/docs.tsx";
+import { DocsViewer } from "./components/DocsViewer.tsx";
+import { Home } from "./components/Home.tsx";
+
+// Загружаем документацию
+const { sections, pages } = await loadDocs(".");
+
+if (!pages.size) {
+  console.error("No documentation found!");
+  console.log("Make sure you have documentation files in ./docs directory");
+  Deno.exit(1);
+}
+
+// Инициализируем приложение
+const reface = new Reface({
+  layout: clean({
+    title: "Reface - Modern Template Engine",
+    description: "Type-safe template engine for HTML with JSX support",
+    favicon: "/assets/logo.png",
+    head: `
+      <link rel="stylesheet" href="/styles/fonts.css">
+      <link rel="icon" type="image/png" href="/assets/logo.png">
+    `,
+  }),
+});
 
 const app = new Hono();
 
-const pages = new Reface({
-  layout: clean({
-    htmx: true,
-    bootstrap: true,
-    bootstrapIcons: true,
-    title: "Reface",
-    head: `
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism.min.css" integrity="sha512-/mZ1FHPkg6EKcxo0fKXF51ak6Cr2ocgDi5ytaTBjsQZIH/RNs6GF6+oId/vPe3eJB836T36nXwVh/WBl/cWT4w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/prism.min.js" integrity="sha512-UOoJElONeUNzQbbKQbjldDf9MwOHqxNz49NNJJ1d90yp+X9edsHyJoAs6O4K19CZGaIdjI5ohK+O2y5lBTW6uQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/components/prism-typescript.min.js" integrity="sha512-Hb168WC7SiCJ1GlGPHBb5ol0ResC6n5wu+5V8FTT5inC5ajLgBSm2hpQBvDq1YG2KqXr7UanlfQqRy6VEb1/kQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    `,
-  }),
-})
-  .page("/", wrapper(Home))
+// Статические файлы
+app.use("/assets/*", serveStatic({ root: "./website/public" }));
+app.use("/styles/*", serveStatic({ root: "./website/public" }));
+
+// Создаем роутеры
+const home = reface.page("/", Home).hono();
+const docs = reface
+  .page("/", () => (
+    <DocsViewer 
+      sections={sections} 
+      pages={pages}
+    />
+  ))
+  .page("/:page", ({ params }) => (
+    <DocsViewer 
+      sections={sections}
+      pages={pages}
+      currentPath={params.page}
+    />
+  ))
   .hono();
 
-app.route("/", pages);
-Deno.serve(app.fetch);
+// Маршрутизация
+app.route("/", home);
+app.route("/docs", docs);
+
+console.log("Server running at http://localhost:8000");
+await Deno.serve(app.fetch);
