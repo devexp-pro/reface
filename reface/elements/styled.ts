@@ -1,5 +1,6 @@
 import type { ElementChild, HTMLAttributes, Template } from "../core/types.ts";
 import { generateClassName } from "../html/classes.ts";
+import { attributes } from "../html/attributes.ts";
 import { createElementFactory } from "./createElementFactory.ts";
 
 // Тип для функции, которая может быть вызвана как template literal
@@ -49,18 +50,23 @@ function createStyledTag(tag: string, css: string): StyledComponent {
     .replace(/&\s*([^{[.])/g, `.${className} $1`);
 
   // Создаем функцию-компонент
-  const styledComponent = function (
-    props: HTMLAttributes | JSXProps = {}
-  ): Template | TemplateLiteralFunction {
+  const styledComponent = function (props: HTMLAttributes | JSXProps = {}) {
     // Если есть children, значит это JSX вызов
     if ("children" in props) {
+      const classNames = [className];
+      if (props.class) classNames.push(props.class);
+
+      const { children, class: _, ...restProps } = props;
+
       return {
         tag,
-        attributes: `class="${className} ${props.class || ""}".trim()`,
-        children: Array.isArray(props.children)
-          ? props.children
-          : props.children !== undefined
-          ? [props.children]
+        attributes: `class="${classNames.join(" ")}" ${attributes(
+          restProps
+        )}`.trim(),
+        children: Array.isArray(children)
+          ? children
+          : children !== undefined
+          ? [children]
           : [],
         css: processedCss,
         isTemplate: true,
@@ -73,9 +79,16 @@ function createStyledTag(tag: string, css: string): StyledComponent {
       strings: TemplateStringsArray,
       ...values: ElementChild[]
     ): Template {
+      const classNames = [className];
+      if (props.class) classNames.push(props.class);
+
+      const { class: _, ...restProps } = props;
+      const attrs = attributes(restProps);
+      const classAttr = `class="${classNames.join(" ")}"`;
+
       return {
         tag,
-        attributes: `class="${className} ${props.class || ""}".trim()`,
+        attributes: attrs ? `${classAttr} ${attrs}` : classAttr,
         children: values,
         css: processedCss,
         isTemplate: true,

@@ -117,10 +117,13 @@ export function render(input: RenderInput): string {
 
         const children = template.children.map(processChild).join("");
 
+        // Формируем атрибуты
+        const attrs = template.attributes ? ` ${template.attributes}` : "";
+
         const isVoid = VOID_ELEMENTS.has(template.tag);
-        return `<${template.tag}${
-          template.attributes ? ` ${template.attributes}` : ""
-        }${isVoid ? " />" : `>${children}</${template.tag}>`}`;
+        return `<${template.tag}${attrs}${
+          isVoid ? " />" : `>${children}</${template.tag}>`
+        }`;
       }
     );
   }
