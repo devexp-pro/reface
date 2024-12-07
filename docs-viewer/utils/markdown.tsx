@@ -1,4 +1,5 @@
-import { createElement, Fragment, type Template } from "../../../source/mod.ts";
+import { createElement, Fragment } from "@reface/jsx";
+import type { Template } from "@reface/types";
 import { marked } from "https://esm.sh/marked@9.1.5";
 import { contentComponents } from "../components/Content.tsx";
 

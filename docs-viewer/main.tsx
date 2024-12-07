@@ -1,5 +1,6 @@
-import { createElement } from "../../source/mod.ts";
-import { Reface, clean } from "../../source/mod.ts";
+import { createElement } from "@reface/jsx";
+import { Reface } from "@reface";
+import { clean } from "@reface/layouts";
 import { Hono } from "@hono/hono";
 import { serveStatic } from "https://deno.land/x/hono@v3.11.7/middleware.ts";
 import { loadDocs } from "./utils/docs.tsx";
@@ -37,8 +38,8 @@ const reface = new Reface({
 
 const app = new Hono()
   // Serve static files
-  .use("/assets/*", serveStatic({ root: "./examples/docs-viewer/public" }))
-  .use("/styles/*", serveStatic({ root: "./examples/docs-viewer/public" }))
+  .use("/assets/*", serveStatic({ root: "./docs-viewer/public" }))
+  .use("/styles/*", serveStatic({ root: "./docs-viewer/public" }))
   // Routes
   .get("/", (c) => c.redirect("/docs"))
   // Live reload WebSocket endpoint

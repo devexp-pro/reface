@@ -1,5 +1,6 @@
-import { createElement, Fragment, type Template } from "../../../source/mod.ts";
-import { styled } from "../../../source/mod.ts";
+import { createElement, Fragment } from "@reface/jsx";
+import type { Template } from "@reface/types";
+import { styled } from "@reface/elements";
 import type { DocSection } from "../utils/docs.tsx";
 
 interface NavigationProps {

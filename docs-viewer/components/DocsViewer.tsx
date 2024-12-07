@@ -1,9 +1,10 @@
-import { createElement, Fragment, type Template } from "../../../source/mod.ts";
+import { createElement, Fragment } from "@reface/jsx";
+import type { Template } from "@reface/types";
+import { styled } from "@reface/elements";
 import { Container, Header, Layout, Logo } from "./Layout.tsx";
 import { Navigation } from "./Navigation.tsx";
 import { Content, DocContent, TableOfContents } from "./Content.tsx";
 import type { DocSection } from "../utils/docs.tsx";
-import { styled } from "../../../source/mod.ts";
 
 interface DocsViewerProps {
   sections: DocSection[];

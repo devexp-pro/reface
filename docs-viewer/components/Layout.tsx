@@ -1,4 +1,4 @@
-import { styled } from "../../../source/mod.ts";
+import { styled } from "@reface/elements";
 
 export const Container = styled.div`
   & {

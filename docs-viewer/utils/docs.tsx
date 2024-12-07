@@ -1,4 +1,4 @@
-import { Fragment, createElement } from "../../../source/mod.ts";
+import { createElement, Fragment } from "@reface/jsx";
 import { walk } from "https://deno.land/std@0.210.0/fs/walk.ts";
 import { parseMarkdown, type ParsedMarkdown } from "./markdown.tsx";
 

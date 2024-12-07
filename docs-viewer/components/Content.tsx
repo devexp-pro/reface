@@ -1,6 +1,5 @@
-import { createElement, Fragment } from "../../../source/mod.ts";
-
-import { styled } from "../../../source/mod.ts";
+import { createElement, Fragment } from "@reface/jsx";
+import { styled } from "@reface/elements";
 
 // Базовые стили для заголовков
 const headingStyles = `
