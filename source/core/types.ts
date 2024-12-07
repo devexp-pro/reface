@@ -44,3 +44,60 @@ export interface Island<R, P> {
   rest?: RestHandlers;
   rpc?: RpcHandlers<R>;
 }
+
+/**
+ * Base template interface
+ */
+export interface Template {
+  tag: string;
+  attributes: string;
+  children: (string | Template)[];
+  css: string;
+  isTemplate: true;
+  str: TemplateStringsArray;
+  args: (string | Template)[];
+  rootClass: string;
+}
+
+/**
+ * HTML Fragment interface
+ */
+export interface TemplateFragment {
+  type: "fragment";
+  content: string;
+}
+
+/**
+ * Base HTML attributes
+ */
+export interface HTMLAttributes {
+  class?: string;
+  id?: string;
+  style?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Type guard for TemplateFragment
+ */
+export function isTemplateFragment(value: unknown): value is TemplateFragment {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "type" in value &&
+    value.type === "fragment" &&
+    "content" in value
+  );
+}
+
+/**
+ * Possible child types in templates
+ */
+export type ElementChild =
+  | string
+  | number
+  | boolean
+  | Template
+  | TemplateFragment
+  | null
+  | undefined;

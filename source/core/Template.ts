@@ -10,6 +10,7 @@ export interface Template {
   str: TemplateStringsArray;
   args: (string | Template)[];
   rootClass: string;
+  trusted?: boolean;
 }
 
 /**

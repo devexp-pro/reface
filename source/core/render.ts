@@ -1,12 +1,21 @@
 import type { Template } from "./Template.ts";
+import type { TemplateFragment } from "../html/types.ts";
+import { isTemplateFragment } from "../html/types.ts";
 
 /**
  * Renders a template to HTML string
  */
-export function render(input: Template | (Template | string)[]): string {
+export function render(
+  input: Template | TemplateFragment | (Template | string)[]
+): string {
   const styles = new Set<string>();
 
-  function renderTemplate(template: Template): string {
+  function renderTemplate(template: Template | TemplateFragment): string {
+    // Handle TemplateFragment
+    if (isTemplateFragment(template)) {
+      return template.content;
+    }
+
     // Handle Fragment (empty tag)
     if (template.tag === "") {
       return template.children

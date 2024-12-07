@@ -3,21 +3,13 @@ import { render } from "./render.ts";
 
 export type {
   Template,
-  ElementChild,
-  ElementFactory,
+  TemplateFragment,
   HTMLAttributes,
-  TemplateGenerator,
-} from "./Template.ts";
-
-export type {
-  PageProps,
-  RpcDefinition,
-  RpcCalls,
-  RpcHandlers,
-  RestHandlers,
-  Island,
+  ElementChild,
 } from "./types.ts";
-
+export { isTemplateFragment } from "./types.ts";
+export { escapeHTML, escapeAttribute } from "./escape.ts";
+export { attributes } from "./attributes.ts";
 export { render } from "./render.ts";
 
 /**
