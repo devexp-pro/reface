@@ -5,6 +5,7 @@ import { Hono } from "https://deno.land/x/hono@v3.11.7/mod.ts";
 import { serveStatic } from "https://deno.land/x/hono@v3.11.7/middleware.ts";
 import { loadDocs } from "./utils/docs.tsx";
 import { DocsViewer } from "./components/DocsViewer.tsx";
+import { Home } from "./components/Home.tsx";
 
 // Загружаем документацию
 const { sections, pages } = await loadDocs(".");
@@ -18,7 +19,7 @@ if (!pages.size) {
 // Инициализируем приложение
 const reface = new Reface({
   layout: clean({
-    title: "Reface Documentation",
+    title: "Reface - Modern Template Engine",
     description: "Type-safe template engine for HTML with JSX support",
     favicon: "/assets/favicon.svg",
     head: `
@@ -34,10 +35,8 @@ const app = new Hono();
 app.use("/assets/*", serveStatic({ root: "./docs-viewer/public" }));
 app.use("/styles/*", serveStatic({ root: "./docs-viewer/public" }));
 
-// Маршруты
-app.get("/", (c) => c.redirect("/docs"));
-
-// Документация
+// Создаем роутеры
+const home = reface.page("/", Home).hono();
 const docs = reface
   .page("/", () => (
     <DocsViewer 
@@ -51,9 +50,12 @@ const docs = reface
       pages={pages}
       currentPath={params.page}
     />
-  ));
+  ))
+  .hono();
 
-app.route("/docs", docs.hono());
+// Маршрутизация
+app.route("/", home);
+app.route("/docs", docs);
 
 console.log("Server running at http://localhost:8000");
 await Deno.serve(app.fetch);
