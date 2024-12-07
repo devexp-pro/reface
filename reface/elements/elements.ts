@@ -1,4 +1,4 @@
-import { createElementFactory } from "./factory.ts";
+import { createElementFactory } from "./createElementFactory.ts";
 import type { HTMLAttributes } from "../core/Template.ts";
 
 // Document Metadata

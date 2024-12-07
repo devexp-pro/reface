@@ -5,52 +5,24 @@ import type {
   Template,
 } from "../core/Template.ts";
 import { attributes } from "../html/attributes.ts";
+import { escapeHTML } from "../html/escape.ts";
+import { isTemplateFragment } from "../html/types.ts";
 
-function createBaseFactory<A extends HTMLAttributes>(
-  tag: string
-): ElementFactory<A> {
-  return function (
-    attributesOrStrings?: A | TemplateStringsArray,
-    ...values: ElementChild[]
-  ):
-    | Template
-    | ((strings: TemplateStringsArray, ...values: ElementChild[]) => Template) {
-    // Handle template literal call
-    if (attributesOrStrings instanceof Array) {
-      return {
-        tag,
-        attributes: "",
-        children: values,
-        css: "",
-        isTemplate: true,
-        str: attributesOrStrings,
-        args: values.map((v) =>
-          v === null || v === undefined
-            ? ""
-            : typeof v === "string" ||
-              (typeof v === "object" && "isTemplate" in v)
-            ? v
-            : String(v)
-        ),
-        rootClass: "",
-      };
+function processElementChildren(values: ElementChild[]): (string | Template)[] {
+  return values.flatMap((value) => {
+    if (value == null || value === false) return [];
+    if (value === true) return [];
+    if (Array.isArray(value)) {
+      return processElementChildren(value);
     }
-
-    // Handle attributes call
-    return (
-      strings: TemplateStringsArray,
-      ...templateValues: ElementChild[]
-    ): Template => ({
-      tag,
-      attributes: attributesOrStrings ? attributes(attributesOrStrings) : "",
-      children: templateValues,
-      css: "",
-      isTemplate: true,
-      str: strings,
-      args: templateValues,
-      rootClass: "",
-    });
-  };
+    if (isTemplateFragment(value)) {
+      return [value.content];
+    }
+    if (typeof value === "object" && "isTemplate" in value) {
+      return [value];
+    }
+    return [escapeHTML(String(value))];
+  });
 }
 
 /**
@@ -59,20 +31,48 @@ function createBaseFactory<A extends HTMLAttributes>(
 export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
   tag: string
 ): ElementFactory<A> {
-  const baseFactory = createBaseFactory<A>(tag);
+  function elementFactory(
+    attributesOrStrings?: A | TemplateStringsArray,
+    ...values: ElementChild[]
+  ):
+    | Template
+    | ((strings: TemplateStringsArray, ...values: ElementChild[]) => Template) {
+    // Если вызвана как template literal
+    if (attributesOrStrings instanceof Array) {
+      return {
+        tag,
+        attributes: "",
+        children: processElementChildren(values),
+        css: "",
+        isTemplate: true,
+        str: attributesOrStrings,
+        args: values,
+        rootClass: "",
+      };
+    }
 
-  return new Proxy(baseFactory, {
-    // Вызов как функции
-    apply(target, thisArg, args) {
-      return target.apply(thisArg, args);
-    },
+    // Если вызвана с атрибутами, возвращаем функцию для template literals
+    return function (
+      strings: TemplateStringsArray,
+      ...templateValues: ElementChild[]
+    ): Template {
+      return {
+        tag,
+        attributes: attributesOrStrings ? attributes(attributesOrStrings) : "",
+        children: processElementChildren(templateValues),
+        css: "",
+        isTemplate: true,
+        str: strings,
+        args: templateValues,
+        rootClass: "",
+      };
+    };
+  }
 
-    // Доступ к свойствам
-    get(target, prop) {
-      if (prop in target) {
-        return target[prop as keyof typeof target];
-      }
-      return undefined;
-    },
-  }) as ElementFactory<A>;
+  return elementFactory as ElementFactory<A>;
 }
+
+export type ElementFunction<P = Record<string, unknown>> = {
+  (props?: P): Template;
+  (strings: TemplateStringsArray, ...values: unknown[]): Template;
+};

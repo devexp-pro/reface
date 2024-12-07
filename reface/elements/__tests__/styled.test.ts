@@ -240,3 +240,27 @@ Deno.test("styled CSS - should handle media queries", () => {
 </style>`
   );
 });
+
+Deno.test("styled with custom element", () => {
+  const CustomEl =
+    styled.custom -
+    element`
+    & {
+      color: blue;
+    }
+  `;
+
+  const result = render(<CustomEl>Custom content</CustomEl>);
+  const match = result.match(/class="(c[a-z0-9]+)"/);
+  const className = match?.[1];
+
+  compareHTML(
+    result,
+    `<custom-element class="${className}">Custom content</custom-element>
+<style>
+  .${className} {
+    color: blue;
+  }
+</style>`
+  );
+});

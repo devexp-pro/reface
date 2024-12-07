@@ -6,6 +6,7 @@ import type {
 import type { StyledComponent, StyledFactory } from "./styled.types.ts";
 import * as elements from "./elements.ts";
 import { generateClassName } from "@reface/html";
+import { createElementFactory } from "./createElementFactory.ts";
 
 function createStyledTag(
   elementFactory: ElementFactory<HTMLAttributes>
@@ -55,9 +56,10 @@ const baseStyled = (component: StyledComponent): StyledFactory => {
 // Создаем прокси для тегов
 export const styled = new Proxy(baseStyled, {
   get(target, prop) {
-    if (prop in elements) {
-      return createStyledTag(elements[prop as keyof typeof elements]);
-    }
-    throw new Error(`Tag ${String(prop)} not found`);
+    return createStyledTag(
+      elements[prop as keyof typeof elements] ||
+        ((props: HTMLAttributes = {}) =>
+          createElementFactory(prop as string)(props))
+    );
   },
 }) as typeof baseStyled & { [key: string]: StyledFactory };

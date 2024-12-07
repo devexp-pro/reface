@@ -59,5 +59,47 @@ export const Logo = styled.div`
   & {
     display: flex;
     align-items: center;
+    gap: 0.75rem;
+  }
+`;
+
+export const LogoIcon = styled.div`
+  & {
+    font-size: 1.25rem;
+    line-height: 1;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border-radius: 0.75rem;
+    color: white;
+    font-weight: 600;
+  }
+`;
+
+export const LogoText = styled.div`
+  & {
+    display: flex;
+    flex-direction: column;
+  }
+`;
+
+export const BrandName = styled.div`
+  & {
+    font-size: 1.25rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+`;
+
+export const BrandTagline = styled.div`
+  & {
+    font-size: 0.875rem;
+    color: #64748b;
   }
 `; 

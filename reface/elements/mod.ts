@@ -1,7 +1,5 @@
-import { createElementFactory } from "./factory.ts";
-import type { HTMLAttributes } from "../core/Template.ts";
-
 export * from "./elements.ts";
+export * from "./createElementFactory.ts";
 
 // Реэкспортируем styled
 export { styled } from "./styled.ts";

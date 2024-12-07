@@ -5,8 +5,9 @@ import type {
   Template,
 } from "../core/Template.ts";
 import * as elements from "../elements/mod.ts";
-import { JSXContext, withJSXStack } from "./context.ts";
-import { ErrorContext, JSXError, withErrorTracking } from "../core/errors.ts";
+import { withJSXStack } from "./context.ts";
+import { JSXError, withErrorTracking } from "../core/errors.ts";
+import { createElementFactory } from "../elements/createElementFactory.ts";
 
 /**
  * Process props including spread
@@ -64,7 +65,7 @@ function processChildren(children: ElementChild[]): ElementChild[] {
  * Creates a Template from JSX
  */
 export function createElement(
-  tag: keyof typeof elements | Function,
+  tag: string | Function,
   props: Record<string, unknown> | null,
   ...children: ElementChild[]
 ): Template {
@@ -105,19 +106,13 @@ export function createElement(
           return result;
         }
 
-        // Get element factory
-        const elementFn = elements[tag];
-        if (!elementFn) {
-          throw new JSXError(
-            `Unknown element: ${componentName}`,
-            componentName,
-            processedProps,
-            children
-          );
-        }
-
         // Create template
-        const template = elementFn(processedProps as HTMLAttributes);
+        const template =
+          tag in elements
+            ? (elements[tag as keyof typeof elements] as ElementFactory)(
+                processedProps as HTMLAttributes
+              )
+            : createElementFactory(tag)(processedProps as HTMLAttributes);
         if (!template) {
           throw new JSXError(
             "Element factory returned undefined",

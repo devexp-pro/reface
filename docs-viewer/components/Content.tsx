@@ -1,8 +1,5 @@
-import { createElement } from "@reface/jsx";
 import { styled } from "@reface/elements";
-import type { Template } from "@reface/core";
 
-// Базовые стили для заголовков как строка
 const headingStyles = `
   color: #0f172a;
   font-weight: 600;
@@ -16,9 +13,6 @@ const H1 = styled.h1`
     ${headingStyles}
     font-size: var(--text-4xl);
     margin-top: 0;
-    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
   }
 `;
 
