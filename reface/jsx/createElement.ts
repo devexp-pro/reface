@@ -3,7 +3,7 @@ import type {
   ElementFactory,
   HTMLAttributes,
   Template,
-} from "../core/Template.ts";
+} from "../core/types.ts";
 import * as elements from "../elements/mod.ts";
 import { withJSXStack } from "./context.ts";
 import { JSXError, withErrorTracking } from "../core/errors.ts";
@@ -109,9 +109,11 @@ export function createElement(
         // Create template
         const template =
           tag in elements
-            ? (elements[tag as keyof typeof elements] as ElementFactory)(
-                processedProps as HTMLAttributes
-              )
+            ? (
+                elements[
+                  tag as keyof typeof elements
+                ] as ElementFactory<HTMLAttributes>
+              )(processedProps as HTMLAttributes)
             : createElementFactory(tag)(processedProps as HTMLAttributes);
         if (!template) {
           throw new JSXError(

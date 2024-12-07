@@ -1,6 +1,5 @@
-import type { Template } from "./Template.ts";
-import type { TemplateFragment } from "../html/types.ts";
-import { isTemplateFragment } from "../html/types.ts";
+import type { Template, TemplateFragment } from "./types.ts";
+import { isTemplateFragment } from "./types.ts";
 import { RenderError, withErrorTracking, ErrorContext } from "./errors.ts";
 // Список void элементов
 const VOID_ELEMENTS = new Set([

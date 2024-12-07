@@ -1,7 +1,7 @@
 import type { ErrorContext as IErrorContext } from "./types.ts";
 import { ErrorContext } from "./ErrorContext.ts";
 import { formatError } from "./errorLogger.ts";
-import type { Template } from "./Template.ts";
+import type { Template } from "./types.ts";
 import type { TemplateFragment } from "../html/types.ts";
 
 // Базовый класс для ошибок Reface

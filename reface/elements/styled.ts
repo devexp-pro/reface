@@ -3,6 +3,7 @@ import type { StyledComponent, StyledFactory } from "./styled.types.ts";
 import * as elements from "./elements.ts";
 import { generateClassName } from "@reface/html";
 import { createElementFactory } from "./createElementFactory.ts";
+import type { ElementFactory } from "../core/types.ts";
 
 // Обновляем типы для поддержки дженериков
 type StyledTagFactory = <Props = HTMLAttributes>(
@@ -47,7 +48,9 @@ const baseStyled = (component: StyledComponent): StyledFactory => {
     const css = String.raw(strings, ...values);
 
     return (props: HTMLAttributes = {}) => {
-      const baseResult = component(props);
+      const baseResult = component(
+        props as HTMLAttributes & { children?: ElementChild }
+      );
       return {
         ...baseResult,
         css: `${baseResult.css || ""}\n${css}`,
@@ -62,7 +65,7 @@ export const styled = new Proxy(baseStyled, {
     return createStyledTag(
       elements[prop as keyof typeof elements] ||
         ((props: HTMLAttributes = {}) =>
-          createElementFactory(prop as string)(props))
+          createElementFactory(prop as string)(props as HTMLAttributes))
     );
   },
 }) as typeof baseStyled & {

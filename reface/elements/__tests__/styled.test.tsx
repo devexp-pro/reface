@@ -1,7 +1,8 @@
-import { styled } from "../styled.ts";
-import { render } from "../../core/render.ts";
-import { compareHTML } from "../../__tests__/utils.ts";
-import { assertEquals } from "https://deno.land/std@0.131.0/testing/asserts.ts";
+import { createElement } from "@reface/jsx";
+import { styled } from "@reface/elements";
+import { render } from "@reface/core";
+import { compareHTML } from "@reface/test-utils";
+import { assertEquals } from "@std/assert";
 
 // Tag based components
 Deno.test("styled.div - should create basic styled div", () => {
@@ -14,10 +15,11 @@ Deno.test("styled.div - should create basic styled div", () => {
   const result = render(StyledDiv({}));
   compareHTML(
     result,
-    `<div></div><style>
-& {
-  color: red;
-}
+    `<div class="c0"></div>
+<style>
+  .c0 {
+    color: red;
+  }
 </style>`
   );
 });
@@ -241,10 +243,9 @@ Deno.test("styled CSS - should handle media queries", () => {
   );
 });
 
+
 Deno.test("styled with custom element", () => {
-  const CustomEl =
-    styled.custom -
-    element`
+  const CustomEl = styled["custom-element"]`
     & {
       color: blue;
     }

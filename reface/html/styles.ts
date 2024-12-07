@@ -1,4 +1,4 @@
-import type { Template } from "../core/Template.ts";
+import type { Template } from "../core/types.ts";
 
 /**
  * Style interpolation types

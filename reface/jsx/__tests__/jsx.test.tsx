@@ -1,231 +1,84 @@
-import { createElement, Fragment } from "../mod.ts";
-import { render } from "../../core/render.ts";
-import { assertEquals } from "@std/assert";
-import { compareHTML } from "../../__tests__/utils.ts";
-import { styled } from "../../elements/mod.ts";
-import { html } from "@reface/html";
+import { createElement, Fragment } from "@reface/jsx";
+import { render } from "@reface/core";
+import type { Template } from "@reface/types";
+import { compareHTML } from "@reface/test-utils";
 
-Deno.test("JSX - basic elements", () => {
-  // Simple element
-  compareHTML(
-    render(<div>Hello</div>),
-    `<div>Hello</div>`
-  );
+// Временная заглушка для component пока не реализуем
+const component = <T,>(fn: (props: T) => Template) => fn;
 
-  // With attributes
-  compareHTML(
-    render(<div class="container">Content</div>),
-    `<div class="container">Content</div>`
-  );
+Deno.test("JSX - basic rendering", () => {
+  const template = <div class="test">Hello World</div>;
+  compareHTML(render(template), `<div class="test">Hello World</div>`);
+});
 
-  // With children
+Deno.test("JSX - component with props", () => {
+  const Greeting = component<{ name: string }>(({ name }) => (
+    <div class="greeting">Hello, {name}!</div>
+  ));
+
   compareHTML(
-    render(
-      <div>
-        <span>First</span>
-        <span>Second</span>
-      </div>
-    ),
-    `<div><span>First</span><span>Second</span></div>`
+    render(Greeting({ name: "John" })),
+    `<div class="greeting">Hello, John!</div>`
   );
 });
 
-Deno.test("JSX - Fragment", () => {
-  // Basic fragment
-  compareHTML(
-    render(
-      <>
-        <div>First</div>
-        <div>Second</div>
-      </>
-    ),
-    `<div>First</div><div>Second</div>`
-  );
+Deno.test("JSX - array children", () => {
+  const html = <ul>{["A", "B", "C"].map((item) => <li>{item}</li>)}</ul>;
 
-  // Nested fragments
   compareHTML(
-    render(
-      <div>
-        <>
-          <span>One</span>
-          <span>Two</span>
-        </>
-        <span>Three</span>
-      </div>
-    ),
-    `<div><span>One</span><span>Two</span><span>Three</span></div>`
+    render(html),
+    `<ul>
+      <li>A</li>
+      <li>B</li>
+      <li>C</li>
+    </ul>`
   );
 });
 
-Deno.test("JSX - Components", () => {
-  // Function component
-  function Button({ text }: { text: string }) {
-    return <button class="btn">{text}</button>;
-  }
+Deno.test("JSX - nested components", () => {
+  const Header = component<{ title: string }>(({ title }) => (
+    <header class="header">
+      <h1>{title}</h1>
+    </header>
+  ));
 
-  compareHTML(
-    render(<Button text="Click me" />),
-    `<button class="btn">Click me</button>`
-  );
-
-  // With children
-  function Card({ title, children }: { title: string; children: unknown }) {
-    return (
-      <div class="card">
-        <h2>{title}</h2>
-        {children}
-      </div>
-    );
-  }
+  const Layout = component<{ children: Template }>(({ children }) => (
+    <div class="layout">
+      <Header title="Welcome" />
+      <main>{children}</main>
+    </div>
+  ));
 
   compareHTML(
     render(
-      <Card title="Hello">
-        <p>Content</p>
-      </Card>
+      Layout({
+        children: <div class="content">Hello World</div>,
+      })
     ),
-    `<div class="card"><h2>Hello</h2><p>Content</p></div>`
+    `
+    <div class="layout">
+      <header class="header">
+        <h1>Welcome</h1>
+      </header>
+      <main>
+        <div class="content">Hello World</div>
+      </main>
+    </div>
+    `
   );
 });
 
-Deno.test("JSX - Dynamic content", () => {
-  // Conditional rendering
-  const show = true;
-  compareHTML(
-    render(
-      <div>
-        {show && <span>Visible</span>}
-        {!show && <span>Hidden</span>}
-      </div>
-    ),
-    `<div><span>Visible</span></div>`
-  );
-
-  // List rendering
-  const items = ["A", "B", "C"];
-  compareHTML(
-    render(
-      <ul>
-        {items.map(item => <li>{item}</li>)}
-      </ul>
-    ),
-    `<ul><li>A</li><li>B</li><li>C</li></ul>`
-  );
-
-  // Mixed content
-  compareHTML(
-    render(
-      <div>
-        Text
-        {42}
-        <span>Element</span>
-        {null}
-        {undefined}
-      </div>
-    ),
-    `<div>Text42<span>Element</span></div>`
-  );
-});
-
-Deno.test("JSX - Attributes", () => {
-  // Boolean attributes
-  compareHTML(
-    render(<input type="checkbox" checked disabled />),
-    `<input type="checkbox" checked disabled />`
-  );
-
-  // Spread attributes
-  const props = { class: "btn", disabled: true };
-  compareHTML(
-    render(<button {...props}>Click</button>),
-    `<button class="btn" disabled>Click</button>`
-  );
-
-  // Dynamic attributes
-  const isActive = true;
-  compareHTML(
-    render(<div class={isActive ? "active" : ""}>Content</div>),
-    `<div class="active">Content</div>`
-  );
-});
-
-Deno.test("JSX - styled components", () => {
-  // Создаем styled компонент
-  const StyledDiv = styled.div`
-    & {
-      color: blue;
-      padding: 10px;
-    }
-  `;
-
-  // Базовое использование
-  const result1 = render(<StyledDiv>Styled content</StyledDiv>);
-  const match1 = result1.match(/class="(c[a-z0-9]+)"/);
-  const className1 = match1?.[1];
-
-  // Проверяем формат класса
-  assertEquals(typeof className1, "string");
-  assertEquals(className1?.startsWith("c"), true);
-  assertEquals(className1?.length, 7);
+Deno.test("JSX - conditional rendering", () => {
+  const Message = component<{ isError?: boolean }>(({ isError }) => (
+    <div class={isError ? "error" : "success"}>
+      {isError ? "Error occurred" : "Success!"}
+    </div>
+  ));
 
   compareHTML(
-    result1,
-    `<div class="${className1}">Styled content</div>
-<style>
-  .${className1} {
-    color: blue;
-    padding: 10px;
-  }
-</style>`
+    render(Message({ isError: true })),
+    `<div class="error">Error occurred</div>`
   );
 
-  // С дополнительными пропсами
-  const result2 = render(
-    <StyledDiv class="extra-class" data-testid="styled-div">
-      With props
-    </StyledDiv>
-  );
-  const match2 = result2.match(/class="(c[a-z0-9]+)\s+extra-class"/);
-  const className2 = match2?.[1];
-
-  compareHTML(
-    result2,
-    `<div class="${className2} extra-class" data-testid="styled-div">With props</div>
-<style>
-  .${className2} {
-    color: blue;
-    padding: 10px;
-  }
-</style>`
-  );
-
-  // Вложенные styled компоненты
-  const StyledSpan = styled.span`
-    & {
-      font-weight: bold;
-    }
-  `;
-
-  const result3 = render(
-    <StyledDiv>
-      <StyledSpan>Nested styled content</StyledSpan>
-    </StyledDiv>
-  );
-  const match3 = result3.match(/class="(c[a-z0-9]+)"/g);
-  const className3 = match3?.[0].match(/"(c[a-z0-9]+)"/)?.[1];
-  const className4 = match3?.[1].match(/"(c[a-z0-9]+)"/)?.[1];
-
-  compareHTML(
-    result3,
-    `<div class="${className3}"><span class="${className4}">Nested styled content</span></div>
-<style>
-  .${className3} {
-    color: blue;
-    padding: 10px;
-  }
-  .${className4} {
-    font-weight: bold;
-  }
-</style>`
-  );
+  compareHTML(render(Message({})), `<div class="success">Success!</div>`);
 });

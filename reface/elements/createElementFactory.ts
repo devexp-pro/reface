@@ -3,7 +3,7 @@ import type {
   ElementFactory,
   HTMLAttributes,
   Template,
-} from "../core/Template.ts";
+} from "../core/types.ts";
 import { attributes } from "../html/attributes.ts";
 import { escapeHTML } from "../html/escape.ts";
 import { isTemplateFragment } from "../html/types.ts";

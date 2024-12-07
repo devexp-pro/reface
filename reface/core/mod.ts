@@ -1,4 +1,4 @@
-import type { Template } from "./Template.ts";
+import type { Template } from "./types.ts";
 import { render } from "./render.ts";
 
 export type {
