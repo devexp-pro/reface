@@ -1,9 +1,11 @@
-import type { ElementFactory, Template } from "../core/types.ts";
+import type { ElementChild, HTMLAttributes, Template } from "@reface/core";
 
 /**
  * Base styled component type
  */
-export type StyledComponent = (props?: Record<string, unknown>) => Template;
+export type StyledComponent = (
+  props: HTMLAttributes & { children?: ElementChild }
+) => Template;
 
 /**
  * Styled factory function type
@@ -11,7 +13,7 @@ export type StyledComponent = (props?: Record<string, unknown>) => Template;
 export type StyledFactory = (
   strings: TemplateStringsArray,
   ...values: unknown[]
-) => ElementFactory<Record<string, unknown>>;
+) => StyledComponent;
 
 /**
  * Styled API interface

@@ -1,12 +1,14 @@
-import type {
-  ElementChild,
-  ElementFactory,
-  HTMLAttributes,
-} from "@reface/core";
+import type { ElementChild, HTMLAttributes, Template } from "@reface/core";
 import type { StyledComponent, StyledFactory } from "./styled.types.ts";
 import * as elements from "./elements.ts";
 import { generateClassName } from "@reface/html";
 import { createElementFactory } from "./createElementFactory.ts";
+
+// Обновляем типы для поддержки дженериков
+type StyledTagFactory = <Props = HTMLAttributes>(
+  strings: TemplateStringsArray,
+  ...values: unknown[]
+) => (props: Props & HTMLAttributes & { children?: ElementChild }) => Template;
 
 function createStyledTag(
   elementFactory: ElementFactory<HTMLAttributes>
@@ -15,8 +17,9 @@ function createStyledTag(
     const className = generateClassName();
     const css = String.raw(strings, ...values)
       .replace(/&\s*{/g, `.${className} {`)
-      .replace(/&\s*\${/g, `.${className} .`)
-      .replace(/&\s+\./g, `.${className} .`);
+      .replace(/&\[(.*?)\]/g, `.${className}[$1]`)
+      .replace(/&\.([\w-]+)/g, `.${className}.$1`)
+      .replace(/&\s*([^{[.])/g, `.${className} $1`);
 
     return (props: HTMLAttributes & { children?: ElementChild } = {}) => {
       const { children, ...restProps } = props;
@@ -62,4 +65,6 @@ export const styled = new Proxy(baseStyled, {
           createElementFactory(prop as string)(props))
     );
   },
-}) as typeof baseStyled & { [key: string]: StyledFactory };
+}) as typeof baseStyled & {
+  [K in keyof typeof elements]: StyledTagFactory;
+};
