@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="./website/public/assets/logo.png" alt="Reface Logo" width="200" />
+</div>
+
 # [Reface 🎭](https://reface.deno.dev/)
 
 [![JSR](https://jsr.io/badges/@vseplet/reface)](https://jsr.io/@vseplet/reface)
@@ -15,7 +19,7 @@ Modern template engine for building server-side applications with islands archit
 - 📱 **TWA Ready** - First-class support for Telegram Web Apps
 
 <div align="center">
-  <img src="./docs/_assets/ex4.gif" alt="Web Terminal Example" width="600" />
+  <img src="./ex4.gif" alt="Web Terminal Example" width="600" />
   <p><em>Simple Web Terminal Example</em></p>
 </div>
 
