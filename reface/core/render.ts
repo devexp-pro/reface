@@ -1,6 +1,19 @@
-import type { Template, TemplateFragment } from "./types.ts";
-import { isTemplateFragment } from "./types.ts";
+import type { Template } from "./types.ts";
+import type { TemplateFragment } from "../html/types.ts";
+import { isTemplateFragment } from "../html/types.ts";
 import { RenderError, withErrorTracking, ErrorContext } from "./errors.ts";
+
+// Тип для входных данных render
+type RenderInput =
+  | Template
+  | TemplateFragment
+  | ((props: any) => Template) // Добавляем поддержку функций
+  | (Template | string)[]
+  | undefined;
+
+// Тип для функции, возвращающей Template
+type TemplateFunction = () => Template;
+
 // Список void элементов
 const VOID_ELEMENTS = new Set([
   "area",
@@ -19,47 +32,47 @@ const VOID_ELEMENTS = new Set([
   "wbr",
 ]);
 
-function getFunctionSource(fn: Function): string {
-  const source = fn.toString();
-  // Если функция слишком длинная, показываем только начало
-  if (source.length > 500) {
-    return source.slice(0, 500) + "...";
-  }
-  return source;
+// Type guard для функции, возвращающей Template
+function isTemplateFunction(value: unknown): value is TemplateFunction {
+  return typeof value === "function";
 }
 
 function validateTemplate(template: unknown): asserts template is Template {
   if (template == null) {
-    throw new RenderError("Got null or undefined instead of template");
+    throw new RenderError("Got null or undefined instead of template", {
+      template,
+      message: "Template is null or undefined",
+    });
   }
 
-  // Если получили функцию, вызываем её и проверяем результат
-  if (typeof template === "function") {
+  if (isTemplateFunction(template)) {
     const result = template();
     if (!result || typeof result !== "object" || !("isTemplate" in result)) {
       throw new RenderError("Function did not return a valid template", {
         function: template.toString(),
         result,
+        message: "Function returned invalid template",
       });
     }
     return;
   }
 
   if (typeof template !== "object") {
-    throw new RenderError(
-      `Got ${typeof template} instead of template`,
-      template
-    );
+    throw new RenderError(`Got ${typeof template} instead of template`, {
+      template,
+      message: `Expected object, got ${typeof template}`,
+    });
   }
 
   if (!("isTemplate" in template)) {
-    throw new RenderError("Got object without isTemplate property", template);
+    throw new RenderError("Got object without isTemplate property", {
+      template,
+      message: "Missing isTemplate property",
+    });
   }
 }
 
-export function render(
-  input: Template | TemplateFragment | (Template | string)[] | undefined
-): string {
+export function render(input: RenderInput): string {
   // Сбрасываем контекст ошибок перед рендером
   ErrorContext.reset();
 
@@ -73,13 +86,19 @@ export function render(
 
   const styles = new Set<string>();
 
-  function renderTemplate(template: Template | TemplateFragment): string {
+  function renderTemplate(
+    template: Template | TemplateFragment | ((props: any) => Template)
+  ): string {
     return withErrorTracking(
-      isTemplateFragment(template) ? "Fragment" : template.tag || "Unknown",
+      isTemplateFragment(template)
+        ? "Fragment"
+        : typeof template === "function"
+        ? "Component"
+        : template.tag || "Unknown",
       () => {
         // Если получили функцию, вызываем её
         if (typeof template === "function") {
-          return renderTemplate(template());
+          return renderTemplate(template({}));
         }
 
         validateTemplate(template);
@@ -89,30 +108,14 @@ export function render(
         }
 
         if (template.tag === "") {
-          return template.children
-            .map((child) => {
-              if (child === null || child === undefined) return "";
-              if (typeof child === "object" && "isTemplate" in child) {
-                return renderTemplate(child as Template);
-              }
-              return String(child);
-            })
-            .join("");
+          return template.children.map(processChild).join("");
         }
 
         if (template.css) {
           styles.add(template.css);
         }
 
-        const children = template.children
-          .map((child) => {
-            if (child === null || child === undefined) return "";
-            if (typeof child === "object" && "isTemplate" in child) {
-              return renderTemplate(child as Template);
-            }
-            return String(child);
-          })
-          .join("");
+        const children = template.children.map(processChild).join("");
 
         const isVoid = VOID_ELEMENTS.has(template.tag);
         return `<${template.tag}${
@@ -120,6 +123,21 @@ export function render(
         }${isVoid ? " />" : `>${children}</${template.tag}>`}`;
       }
     );
+  }
+
+  function processChild(child: Template["children"][number]): string {
+    if (child == null) return "";
+
+    if (typeof child === "object") {
+      if ("isTemplate" in child) {
+        return renderTemplate(child);
+      }
+      if (isTemplateFragment(child)) {
+        return child.content;
+      }
+    }
+
+    return String(child);
   }
 
   const html = Array.isArray(input)

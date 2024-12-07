@@ -10,8 +10,6 @@ export function Fragment({ children }: { children: unknown }): Template {
     children: Array.isArray(children) ? children : [children],
     css: "",
     isTemplate: true,
-    str: Object.assign([""], { raw: [""] }) as TemplateStringsArray,
-    args: [],
     rootClass: "",
   };
 }

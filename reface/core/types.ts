@@ -49,34 +49,78 @@ export interface Island<R, P> {
  * Base template interface
  */
 export interface Template {
+  /** HTML tag name */
   tag: string;
+
+  /** HTML attributes string */
   attributes: string;
-  children: (string | Template)[];
+
+  /** Array of child elements */
+  children: (
+    | string
+    | number
+    | boolean
+    | Template
+    | TemplateFragment
+    | null
+    | undefined
+  )[];
+
+  /** CSS styles associated with the template */
   css: string;
+
+  /** Type guard marker */
   isTemplate: true;
-  str: TemplateStringsArray;
-  args: (string | Template)[];
+
+  /** Root CSS class name for scoped styles */
   rootClass: string;
+
+  /** Flag indicating if HTML content is trusted */
+  trusted?: boolean;
 }
 
 /**
- * HTML Fragment interface
+ * HTML Fragment interface for trusted HTML content
  */
 export interface TemplateFragment {
+  /** Fragment type marker */
   type: "fragment";
+
+  /** Raw HTML content */
   content: string;
 }
 
 /**
- * Base HTML attributes
+ * Base HTML attributes interface
  */
 export interface HTMLAttributes {
+  /** CSS class names */
   class?: string;
-  style?: string;
+
+  /** Element ID */
   id?: string;
-  children?: Template | Template[] | string | string[];
+
+  /** Inline styles */
+  style?: string;
+
+  /** Data attributes */
+  [key: `data-${string}`]: string | number | boolean | undefined;
+
+  /** Allow any other valid HTML attributes */
   [key: string]: unknown;
 }
+
+/**
+ * Possible child types in templates
+ */
+export type ElementChild =
+  | string // Text content
+  | number // Numbers are converted to strings
+  | boolean // Booleans are converted to strings
+  | Template // Nested templates
+  | TemplateFragment // Trusted HTML fragments
+  | null // Ignored
+  | undefined; // Ignored
 
 /**
  * Type guard for TemplateFragment
@@ -92,22 +136,37 @@ export function isTemplateFragment(value: unknown): value is TemplateFragment {
 }
 
 /**
- * Possible child types in templates
+ * Error details for template rendering
  */
-export type ElementChild =
-  | string
-  | number
-  | boolean
-  | Template
-  | TemplateFragment
-  | null
-  | undefined;
+export interface RenderErrorDetails {
+  /** Function source code or description */
+  function?: string;
 
-// Типы для контекста ошибок
-export interface ErrorDetails {
-  component: string;
-  props?: Record<string, unknown>;
+  /** Result of function execution */
+  result?: unknown;
+
+  /** Template or invalid value that вызвало ошибку */
   template?: unknown;
+
+  /** Error message */
+  message?: string;
+
+  /** Stack trace */
+  stack?: string;
+}
+
+/**
+ * Error types
+ */
+export interface ErrorDetails {
+  /** Component name */
+  component: string;
+
+  /** Component props */
+  props?: Record<string, unknown>;
+
+  /** Error details */
+  template?: RenderErrorDetails;
 }
 
 export interface ErrorContext {
@@ -117,42 +176,20 @@ export interface ErrorContext {
 }
 
 /**
- * Base template interface
- */
-export interface Template {
-  tag: string;
-  attributes: string;
-  children: (string | Template)[];
-  css: string;
-  isTemplate: true;
-  str: TemplateStringsArray;
-  args: (string | Template)[];
-  rootClass: string;
-  trusted?: boolean;
-}
-
-/**
- * Base HTML attributes
- */
-export interface HTMLAttributes {
-  class?: string;
-  id?: string;
-  style?: string;
-  [key: `data-${string}`]: string | number | boolean | undefined;
-}
-
-/**
- * Base factory function type
+ * Base factory function type for creating elements
  */
 export type ElementFactory<A> = {
+  /** Create element with attributes */
   (attributes?: A): (
     strings: TemplateStringsArray,
     ...values: ElementChild[]
   ) => Template;
+
+  /** Create element with template literal */
   (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
 };
 
 /**
- * Template generator function
+ * Template generator function type
  */
 export type TemplateGenerator<T> = (props: T) => Template;

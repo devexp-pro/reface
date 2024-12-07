@@ -12,7 +12,7 @@ Deno.test("styled.div - should create basic styled div", () => {
     }
   `;
 
-  const result = render(StyledDiv({}));
+  const result = render(StyledDiv({})``);
   compareHTML(
     result,
     `<div class="c0"></div>
@@ -31,7 +31,7 @@ Deno.test("styled.button - should handle props", () => {
     }
   `;
 
-  const result = render(Button({ class: "primary" }));
+  const result = render(Button({ class: "primary" })``);
   compareHTML(
     result,
     `<button class="primary"></button><style>
@@ -49,7 +49,7 @@ Deno.test("styled.h1 - should handle children", () => {
     }
   `;
 
-  const result = render(Title({ children: ["Hello"] }));
+  const result = render(Title()`Hello`);
   compareHTML(
     result,
     `<h1>Hello</h1><style>
@@ -94,7 +94,7 @@ Deno.test("styled.h1 - should return correct factory", () => {
   assertEquals(typeof Title.css, "string");
 
   // Проверяем что Title можно вызвать как функцию
-  const withProps = Title({ class: "test" });
+  const withProps = Title({ class: "test" })``;
   assertEquals(withProps.tag, "h1");
   assertEquals(withProps.attributes, 'class="test"');
 
@@ -119,7 +119,7 @@ Deno.test("styled(Component) - should extend existing component", () => {
     }
   `;
 
-  const result = render(PrimaryButton({}));
+  const result = render(PrimaryButton({})``);
   compareHTML(
     result,
     `<button></button><style>
@@ -150,7 +150,7 @@ Deno.test(
     `;
 
     const result = render(
-      SearchInput({ type: "search", placeholder: "Search..." })
+      SearchInput({ type: "search", placeholder: "Search..." })``
     );
     compareHTML(
       result,
@@ -177,7 +177,7 @@ Deno.test("styled CSS - should handle pseudo-classes", () => {
     }
   `;
 
-  const result = render(Button({}));
+  const result = render(Button({})``);
   compareHTML(
     result,
     `<button></button><style>
@@ -201,7 +201,7 @@ Deno.test("styled CSS - should handle nested selectors", () => {
     }
   `;
 
-  const result = render(Card({}));
+  const result = render(Card({})``);
   compareHTML(
     result,
     `<div></div><style>
@@ -227,7 +227,7 @@ Deno.test("styled CSS - should handle media queries", () => {
     }
   `;
 
-  const result = render(Container({}));
+  const result = render(Container({})``);
   compareHTML(
     result,
     `<div></div><style>

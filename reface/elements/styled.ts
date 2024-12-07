@@ -1,73 +1,141 @@
-import type { ElementChild, HTMLAttributes, Template } from "@reface/core";
-import type { StyledComponent, StyledFactory } from "./styled.types.ts";
-import * as elements from "./elements.ts";
-import { generateClassName } from "@reface/html";
+import type { ElementChild, HTMLAttributes, Template } from "../core/types.ts";
+import { generateClassName } from "../html/classes.ts";
 import { createElementFactory } from "./createElementFactory.ts";
-import type { ElementFactory } from "../core/types.ts";
 
-// Обновляем типы для поддержки дженериков
-type StyledTagFactory = <Props = HTMLAttributes>(
+// Тип для функции, которая может быть вызвана как template literal
+type TemplateLiteralFunction = (
   strings: TemplateStringsArray,
-  ...values: unknown[]
-) => (props: Props & HTMLAttributes & { children?: ElementChild }) => Template;
+  ...values: ElementChild[]
+) => Template;
 
-function createStyledTag(
-  elementFactory: ElementFactory<HTMLAttributes>
-): StyledFactory {
-  return (strings: TemplateStringsArray, ...values: unknown[]) => {
-    const className = generateClassName();
-    const css = String.raw(strings, ...values)
-      .replace(/&\s*{/g, `.${className} {`)
-      .replace(/&\[(.*?)\]/g, `.${className}[$1]`)
-      .replace(/&\.([\w-]+)/g, `.${className}.$1`)
-      .replace(/&\s*([^{[.])/g, `.${className} $1`);
+// Тип для JSX props
+type JSXProps = HTMLAttributes & { children?: ElementChild };
 
-    return (props: HTMLAttributes & { children?: ElementChild } = {}) => {
-      const { children, ...restProps } = props;
-      const emptyTemplate = Object.assign([""], {
-        raw: [""],
-      }) as TemplateStringsArray;
+// Базовый тип для styled компонента
+interface StyledComponent {
+  // Вызов с props возвращает функцию для template literals
+  (props?: HTMLAttributes): TemplateLiteralFunction;
 
-      const baseResult = elementFactory({
-        ...restProps,
-        class: `${className} ${props.class || ""}`.trim(),
-      })(emptyTemplate, children || "");
+  // JSX сигнатура - теперь соответствует JSX.Element
+  (props: JSXProps): JSX.Element;
 
+  // Метаданные для тестов и отладки
+  tag: string;
+  isTemplate: true;
+  css: string;
+}
+
+// Тип для styled функции
+interface StyledFunction {
+  // Для расширения существующих компонентов
+  (component: StyledComponent): {
+    (strings: TemplateStringsArray, ...values: unknown[]): StyledComponent;
+    (css: string): StyledComponent;
+  };
+
+  // Для HTML элементов
+  [K: string]: (
+    strings: TemplateStringsArray,
+    ...values: unknown[]
+  ) => StyledComponent;
+}
+
+function createStyledTag(tag: string, css: string): StyledComponent {
+  const className = generateClassName();
+  const processedCss = css
+    .replace(/&\s*{/g, `.${className} {`)
+    .replace(/&\[(.*?)\]/g, `.${className}[$1]`)
+    .replace(/&\.([\w-]+)/g, `.${className}.$1`)
+    .replace(/&\s*([^{[.])/g, `.${className} $1`);
+
+  // Создаем функцию-компонент
+  const styledComponent = function (
+    props: HTMLAttributes | JSXProps = {}
+  ): Template | TemplateLiteralFunction {
+    // Если есть children, значит это JSX вызов
+    if ("children" in props) {
       return {
-        ...baseResult,
-        css,
+        tag,
+        attributes: `class="${className} ${props.class || ""}".trim()`,
+        children: Array.isArray(props.children)
+          ? props.children
+          : props.children !== undefined
+          ? [props.children]
+          : [],
+        css: processedCss,
+        isTemplate: true,
+        rootClass: className,
+      };
+    }
+
+    // Иначе возвращаем функцию для template literals
+    return function (
+      strings: TemplateStringsArray,
+      ...values: ElementChild[]
+    ): Template {
+      return {
+        tag,
+        attributes: `class="${className} ${props.class || ""}".trim()`,
+        children: values,
+        css: processedCss,
+        isTemplate: true,
         rootClass: className,
       };
     };
-  };
+  } as StyledComponent;
+
+  // Добавляем метаданные
+  styledComponent.tag = tag;
+  styledComponent.isTemplate = true;
+  styledComponent.css = processedCss;
+
+  return styledComponent;
 }
 
-// Создаем базовую функцию styled
-const baseStyled = (component: StyledComponent): StyledFactory => {
-  return (strings: TemplateStringsArray, ...values: unknown[]) => {
-    const css = String.raw(strings, ...values);
+function processTemplateStrings(
+  strings: TemplateStringsArray | string,
+  values?: unknown[]
+): string {
+  if (typeof strings === "string") return strings;
+  return String.raw({ raw: strings.raw }, ...(values || []));
+}
 
-    return (props: HTMLAttributes = {}) => {
-      const baseResult = component(
-        props as HTMLAttributes & { children?: ElementChild }
-      );
-      return {
-        ...baseResult,
-        css: `${baseResult.css || ""}\n${css}`,
-      };
+export const styled = new Proxy(
+  (component: StyledComponent) => {
+    const styleFunction = (
+      strings: TemplateStringsArray | string,
+      ...values: unknown[]
+    ) => {
+      const css = processTemplateStrings(strings, values);
+
+      const styledComponent = function (props: HTMLAttributes = {}) {
+        return function (
+          strings: TemplateStringsArray,
+          ...values: ElementChild[]
+        ): Template {
+          const baseResult = component(props)(strings, ...values);
+          return {
+            ...baseResult,
+            css: `${baseResult.css}\n${css}`,
+          };
+        };
+      } as StyledComponent;
+
+      // Копируем метаданные
+      styledComponent.tag = component.tag;
+      styledComponent.isTemplate = true;
+      styledComponent.css = css;
+
+      return styledComponent;
     };
-  };
-};
-
-// Создаем прокси для тегов
-export const styled = new Proxy(baseStyled, {
-  get(target, prop) {
-    return createStyledTag(
-      elements[prop as keyof typeof elements] ||
-        ((props: HTMLAttributes = {}) =>
-          createElementFactory(prop as string)(props as HTMLAttributes))
-    );
+    return styleFunction;
   },
-}) as typeof baseStyled & {
-  [K in keyof typeof elements]: StyledTagFactory;
-};
+  {
+    get(target, prop) {
+      return (strings: TemplateStringsArray, ...values: unknown[]) => {
+        const css = processTemplateStrings(strings, values);
+        return createStyledTag(prop as string, css);
+      };
+    },
+  }
+) as StyledFunction;

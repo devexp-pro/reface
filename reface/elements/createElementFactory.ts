@@ -45,8 +45,6 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
         children: processElementChildren(values),
         css: "",
         isTemplate: true,
-        str: attributesOrStrings,
-        args: values,
         rootClass: "",
       };
     }
@@ -62,8 +60,6 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
         children: processElementChildren(templateValues),
         css: "",
         isTemplate: true,
-        str: strings,
-        args: templateValues,
         rootClass: "",
       };
     };

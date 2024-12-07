@@ -3,18 +3,15 @@ import { render } from "@reface/core";
 import type { Template } from "@reface/types";
 import { compareHTML } from "@reface/test-utils";
 
-// Временная заглушка для component пока не реализуем
-const component = <T,>(fn: (props: T) => Template) => fn;
-
 Deno.test("JSX - basic rendering", () => {
   const template = <div class="test">Hello World</div>;
   compareHTML(render(template), `<div class="test">Hello World</div>`);
 });
 
 Deno.test("JSX - component with props", () => {
-  const Greeting = component<{ name: string }>(({ name }) => (
-    <div class="greeting">Hello, {name}!</div>
-  ));
+  function Greeting({ name }: { name: string }) {
+    return <div class="greeting">Hello, {name}!</div>;
+  }
 
   compareHTML(
     render(Greeting({ name: "John" })),
@@ -36,18 +33,22 @@ Deno.test("JSX - array children", () => {
 });
 
 Deno.test("JSX - nested components", () => {
-  const Header = component<{ title: string }>(({ title }) => (
-    <header class="header">
-      <h1>{title}</h1>
-    </header>
-  ));
+  function Header({ title }: { title: string }) {
+    return (
+      <header class="header">
+        <h1>{title}</h1>
+      </header>
+    );
+  }
 
-  const Layout = component<{ children: Template }>(({ children }) => (
-    <div class="layout">
-      <Header title="Welcome" />
-      <main>{children}</main>
-    </div>
-  ));
+  function Layout({ children }: { children: Template | ((props: any) => Template) }) {
+    return (
+      <div class="layout">
+        <Header title="Welcome" />
+        <main>{children}</main>
+      </div>
+    );
+  }
 
   compareHTML(
     render(
@@ -69,11 +70,13 @@ Deno.test("JSX - nested components", () => {
 });
 
 Deno.test("JSX - conditional rendering", () => {
-  const Message = component<{ isError?: boolean }>(({ isError }) => (
-    <div class={isError ? "error" : "success"}>
-      {isError ? "Error occurred" : "Success!"}
-    </div>
-  ));
+  function Message({ isError }: { isError?: boolean }) {
+    return (
+      <div class={isError ? "error" : "success"}>
+        {isError ? "Error occurred" : "Success!"}
+      </div>
+    );
+  }
 
   compareHTML(
     render(Message({ isError: true })),

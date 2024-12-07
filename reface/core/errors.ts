@@ -3,6 +3,7 @@ import { ErrorContext } from "./ErrorContext.ts";
 import { formatError } from "./errorLogger.ts";
 import type { Template } from "./types.ts";
 import type { TemplateFragment } from "../html/types.ts";
+import { RenderErrorDetails } from "./types.ts";
 
 // Базовый класс для ошибок Reface
 export class RefaceError extends Error {
@@ -16,7 +17,7 @@ export class RefaceError extends Error {
 export class RenderError extends RefaceError {
   constructor(
     message: string,
-    public template?: Template | TemplateFragment,
+    public details?: RenderErrorDetails,
     context?: IErrorContext
   ) {
     super(message, context);

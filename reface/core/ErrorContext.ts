@@ -9,10 +9,16 @@ class ErrorContextManager {
 
   // Методы для работы со стеком компонентов
   pushComponent(name: string): void {
+    if (!this.current.componentStack) {
+      this.current.componentStack = [];
+    }
     this.current.componentStack.push(name);
   }
 
   popComponent(): void {
+    if (!this.current.componentStack) {
+      return;
+    }
     this.current.componentStack.pop();
   }
 
@@ -29,7 +35,7 @@ class ErrorContextManager {
   // Получить текущий контекст
   getContext(): IErrorContext {
     return {
-      componentStack: [...this.current.componentStack],
+      componentStack: [...(this.current.componentStack || [])],
       jsxStack: this.current.jsxStack,
       lastError: this.current.lastError,
     };
