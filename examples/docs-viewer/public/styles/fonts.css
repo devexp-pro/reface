@@ -27,4 +27,34 @@
   --leading-normal: 1.5;
   --leading-relaxed: 1.625;
   --leading-loose: 2;
+
+  /* Colors */
+  --color-primary: #2563eb;
+  --color-primary-light: #3b82f6;
+  --color-text: #1e293b;
+  --color-text-light: #64748b;
+  --color-background: #f8fafc;
+  --color-border: rgba(226, 232, 240, 0.8);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }

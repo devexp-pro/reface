@@ -16,6 +16,9 @@ const ContentH1 = styled.h1`
     ${headingStyles}
     font-size: var(--text-4xl);
     margin-top: 0;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 `;
 
@@ -55,15 +58,17 @@ const ContentCode = styled.code`
 
 const ContentPre = styled.pre`
   & {
-    background: #0f172a;
+    background: #1e293b;
     color: #e2e8f0;
-    padding: 1.25rem;
-    border-radius: 0.5rem;
+    padding: 1.5rem;
+    border-radius: 0.75rem;
     overflow-x: auto;
     margin: 1.5rem 0;
     font-family: var(--font-mono);
     font-size: var(--text-sm);
-    line-height: var(--leading-normal);
+    line-height: var(--leading-relaxed);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+                0 2px 4px -2px rgba(0, 0, 0, 0.1);
   }
 
   & ${ContentCode} {
@@ -71,14 +76,44 @@ const ContentPre = styled.pre`
     color: inherit;
     padding: 0;
   }
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
 `;
 
 export const Content = styled.main`
   & {
     flex: 1;
+    min-width: 0;
     max-width: 48rem;
-    margin: 0 auto;
-    font-family: var(--font-sans);
+    padding: 2rem;
+    background: white;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+  }
+
+  @media (max-width: 1024px) {
+    & {
+      max-width: none;
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    & {
+      padding: 1.5rem;
+    }
   }
 `;
 
@@ -90,6 +125,7 @@ export const DocContent = styled.div`
   & img {
     max-width: 100%;
     border-radius: 0.5rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
   }
 `;
 
@@ -191,13 +227,15 @@ const ContentA = styled.a`
 
 export const TableOfContents = styled.nav`
   & {
-    position: fixed;
-    top: 5rem;
-    right: 2rem;
     width: 16rem;
-    max-height: calc(100vh - 7rem);
-    overflow-y: auto;
-    padding: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    height: fit-content;
+    position: sticky;
+    top: 5rem;
+    flex-shrink: 0;
   }
 
   & h4 {
@@ -206,7 +244,7 @@ export const TableOfContents = styled.nav`
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #64748b;
-    margin: 0 0 0.75rem;
+    margin: 0 0 1rem;
   }
 
   & ul {
@@ -219,28 +257,32 @@ export const TableOfContents = styled.nav`
     margin: 0.25rem 0;
   }
 
-  & ${ContentA} {
+  & a {
     display: block;
-    font-size: var(--text-sm);
-    line-height: var(--leading-normal);
+    padding: 0.375rem 0.75rem;
     color: #64748b;
+    text-decoration: none;
+    font-size: var(--text-sm);
+    border-radius: 0.375rem;
+    transition: all 0.15s;
+  }
 
-    &:hover {
-      color: #0f172a;
-      text-decoration: none;
-    }
+  & a:hover {
+    color: #1e293b;
+    background: rgba(226, 232, 240, 0.5);
+  }
 
-    &:focus {
-      color: #0f172a;
-      outline: 2px solid #94a3b8;
-      outline-offset: 2px;
-      border-radius: 2px;
+  @media (max-width: 1024px) {
+    & {
+      width: 100%;
+      position: relative;
+      top: 0;
     }
   }
 
-  @media (max-width: 1280px) {
+  @media (max-width: 768px) {
     & {
-      display: none;
+      padding: 1rem;
     }
   }
 `;

@@ -10,8 +10,23 @@ interface NavigationProps {
 const NavContainer = styled.nav`
   & {
     width: 16rem;
-    padding: 1rem;
-    border-right: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    height: fit-content;
+    position: sticky;
+    top: 5rem;
+    overflow-y: auto;
+    scrollbar-gutter: stable;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 1024px) {
+    & {
+      position: relative;
+      top: 0;
+    }
   }
 `;
 
@@ -33,6 +48,7 @@ const SectionTitle = styled.h3`
     letter-spacing: 0.05em;
     color: #64748b;
     margin: 0 0 0.75rem;
+    padding-left: 0.75rem;
   }
 `;
 
@@ -46,29 +62,33 @@ const NavList = styled.ul`
 
 const NavItem = styled.li`
   & {
-    margin: 0.25rem 0;
+    margin: 0.125rem 0;
   }
 
   & a {
     display: block;
-    padding: 0.25rem 0;
+    padding: 0.5rem 0.75rem;
     color: #64748b;
     text-decoration: none;
     font-size: var(--text-sm);
-    transition: color 0.2s;
+    border-radius: 0.375rem;
+    transition: all 0.15s;
   }
 
   & a:hover {
-    color: #0f172a;
+    color: #1e293b;
+    background: rgba(226, 232, 240, 0.5);
   }
 
   & a.active {
     color: #2563eb;
+    background: rgba(37, 99, 235, 0.1);
     font-weight: 500;
   }
 
   & ul {
-    margin-left: 1rem;
+    margin: 0.25rem 0 0.25rem 1rem;
+    border-left: 1px solid rgba(226, 232, 240, 0.8);
   }
 `;
 
