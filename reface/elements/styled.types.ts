@@ -1,28 +1,44 @@
-import type { ElementFactory, HTMLAttributes } from "../core/Template.ts";
-import type { StyleInterpolation } from "../html/styles.ts";
+import type { ElementFactory, Template } from "../core/types.ts";
 
 /**
- * Styled component interface
+ * Base styled component type
  */
-export interface StyledComponent<T> extends ElementFactory<T> {
-  className: string;
-  displayName?: string;
-}
+export type StyledComponent = (props?: Record<string, unknown>) => Template;
 
 /**
- * Factory for creating styled components
+ * Styled factory function type
  */
-export type StyledFactory<T> = (
+export type StyledFactory = (
   strings: TemplateStringsArray,
-  ...values: StyleInterpolation[]
-) => StyledComponent<T>;
+  ...values: unknown[]
+) => ElementFactory<Record<string, unknown>>;
 
 /**
- * Combined styled API type
+ * Styled API interface
  */
-export interface StyledAPI {
-  <T extends HTMLAttributes>(
-    component: ElementFactory<T> | StyledComponent<T>
-  ): StyledFactory<T>;
-  [key: string]: StyledFactory<any>;
+export interface StyledTags {
+  div: StyledFactory;
+  span: StyledFactory;
+  p: StyledFactory;
+  h1: StyledFactory;
+  h2: StyledFactory;
+  h3: StyledFactory;
+  h4: StyledFactory;
+  h5: StyledFactory;
+  h6: StyledFactory;
+  header: StyledFactory;
+  footer: StyledFactory;
+  nav: StyledFactory;
+  main: StyledFactory;
+  section: StyledFactory;
+  article: StyledFactory;
+  pre: StyledFactory;
+  code: StyledFactory;
+  button: StyledFactory;
+  input: StyledFactory;
+  a: StyledFactory;
+  [key: string]: StyledFactory;
 }
+
+export type StyledAPI = StyledTags &
+  ((component: StyledComponent) => StyledFactory);

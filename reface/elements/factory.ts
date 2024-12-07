@@ -15,64 +15,80 @@ import { escapeHTML } from "../html/escape.ts";
 export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
   tag: string
 ): ElementFactory<A> {
-  const factory = {
-    [tag]: function (
-      attributesOrStrings?: A | TemplateStringsArray,
-      ...values: (
-        | string
-        | number
-        | boolean
-        | Template
-        | TemplateFragment
-        | null
-        | undefined
-      )[]
-    ):
-      | Template
-      | ((
-          strings: TemplateStringsArray,
-          ...values: ElementChild[]
-        ) => Template) {
-      // Handle template literal call
-      if (attributesOrStrings instanceof Array) {
-        return {
-          tag,
-          attributes: "",
-          children: values.map((v) => {
-            if (v === null || v === undefined) return "";
-            if (isTemplateFragment(v)) return v.content;
-            if (typeof v === "object" && "isTemplate" in v) return v;
-            return escapeHTML(String(v));
-          }),
-          css: "",
-          isTemplate: true,
-          str: attributesOrStrings,
-          args: values.map(String),
-          rootClass: "",
-        };
-      }
+  function elementFactory(
+    attributesOrStrings?: A | TemplateStringsArray,
+    ...values: ElementChild[]
+  ):
+    | Template
+    | ((strings: TemplateStringsArray, ...values: ElementChild[]) => Template) {
+    // Если вызвана как template literal
+    if (attributesOrStrings instanceof Array) {
+      // Собираем все части шаблона
+      const children: (string | Template)[] = [];
+      attributesOrStrings.forEach((str, i) => {
+        // Добавляем текст
+        if (str) children.push(escapeHTML(str));
+        // Добавляем значение если есть
+        if (i < values.length) {
+          const value = values[i];
+          if (value === null || value === undefined) return;
+          if (isTemplateFragment(value)) children.push(value.content);
+          else if (typeof value === "object" && "isTemplate" in value)
+            children.push(value);
+          else children.push(escapeHTML(String(value)));
+        }
+      });
 
-      // Handle attributes call
-      return (
-        strings: TemplateStringsArray,
-        ...templateValues: ElementChild[]
-      ): Template => ({
+      return {
+        tag,
+        attributes: "",
+        children,
+        css: "",
+        isTemplate: true,
+        str: attributesOrStrings,
+        args: values.map(String),
+        rootClass: "",
+      };
+    }
+
+    // Если вызвана с атрибутами, возвращаем функцию для template literals
+    return function (
+      strings: TemplateStringsArray,
+      ...templateValues: ElementChild[]
+    ): Template {
+      // Собираем все части шаблона
+      const children: (string | Template)[] = [];
+      strings.forEach((str, i) => {
+        // Добавляем текст
+        if (str) children.push(escapeHTML(str));
+        // Добавляем значение если есть
+        if (i < templateValues.length) {
+          const value = templateValues[i];
+          if (value === null || value === undefined) return;
+          if (isTemplateFragment(value)) children.push(value.content);
+          else if (typeof value === "object" && "isTemplate" in value)
+            children.push(value);
+          else children.push(escapeHTML(String(value)));
+        }
+      });
+
+      return {
         tag,
         attributes: attributesOrStrings ? attributes(attributesOrStrings) : "",
-        children: templateValues.map((v) => {
-          if (v === null || v === undefined) return "";
-          if (isTemplateFragment(v)) return v.content;
-          if (typeof v === "object" && "isTemplate" in v) return v;
-          return escapeHTML(String(v));
-        }),
+        children,
         css: "",
         isTemplate: true,
         str: strings,
         args: templateValues.map(String),
         rootClass: "",
-      });
-    },
-  }[tag];
+      };
+    };
+  }
 
-  return factory as ElementFactory<A>;
+  return elementFactory as ElementFactory<A>;
 }
+
+export type ElementFunction<P = Record<string, unknown>> = {
+  (props?: P): Template;
+  (strings: TemplateStringsArray, ...values: unknown[]): Template;
+};

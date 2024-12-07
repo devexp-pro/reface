@@ -28,4 +28,6 @@
 4. **Framework**
    - [ ] Better routing
    - [ ] Middleware support
-   - [ ] State management
+   - [ ] State managementн
+   - [ ] Integration with Hono
+   - [ ] Integration with Drizzle

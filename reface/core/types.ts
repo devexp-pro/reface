@@ -72,8 +72,9 @@ export interface TemplateFragment {
  */
 export interface HTMLAttributes {
   class?: string;
-  id?: string;
   style?: string;
+  id?: string;
+  children?: Template | Template[] | string | string[];
   [key: string]: unknown;
 }
 

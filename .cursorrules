@@ -54,8 +54,20 @@
 
 ### JSX
 
-- Use JSX for complex components:
+- Always use `.tsx` extension for files containing JSX
+- Always import createElement and Fragment when using JSX:
+
   ```typescript
+  import { createElement, Fragment } from "@reface/jsx";
+  ```
+
+- Use JSX for components:
+
+  ```typescript
+  // Required imports
+  import { createElement, Fragment } from "@reface/jsx";
+  import type { Template } from "@reface/types";
+
   function MyComponent({ title }: Props): Template {
     return (
       <div class="container">
@@ -63,6 +75,57 @@
       </div>
     );
   }
+  ```
+
+- Use Fragment for multiple elements:
+  ```typescript
+  function List(): Template {
+    return (
+      <Fragment>
+        <li>First item</li>
+        <li>Second item</li>
+      </Fragment>
+    );
+  }
+  ```
+
+### Preferred Syntax
+
+- Use JSX for components by default:
+
+  ```tsx
+  // Preferred
+  function Header(): Template {
+    return (
+      <header class="container">
+        <nav>{/* ... */}</nav>
+      </header>
+    );
+  }
+
+  // Instead of template literals
+  const Header = component(
+    () => html`
+      <header class="container">
+        <nav>...</nav>
+      </header>
+    `
+  );
+  ```
+
+- Use styled-components for styling:
+
+  ```tsx
+  // Preferred
+  const StyledHeader = styled.header`
+    & {
+      padding: 1rem;
+      background: white;
+    }
+  `;
+
+  // Instead of inline styles
+  <header style="padding: 1rem; background: white;">
   ```
 
 ## Contributing to Reface
@@ -132,23 +195,48 @@ reface/
 - Place tests in `__tests__` directory
 - Use integration tests for features
 - Test security features thoroughly
-- Use `compareHTML` for HTML comparison:
+- Use compareHTML for HTML comparison:
 
   ```typescript
-  function compareHTML(actual: string, expected: string) {
-    assertEquals(
-      pretty(actual, { ocd: true }),
-      pretty(expected, { ocd: true })
+  import { compareHTML } from "../../__tests__/utils.ts";
+
+  Deno.test("Component - should render correctly", () => {
+    const result = render(Component({}));
+    compareHTML(
+      result,
+      `
+      <div>Expected HTML</div>
+    `
     );
-  }
-
-  Deno.test("Feature - should do something", () => {
-    const template = div`Hello ${user}`;
-    const result = render(template);
-
-    compareHTML(result, "<div>Hello John</div>");
   });
   ```
+
+- Write separate tests for each case:
+
+  ```typescript
+  // Preferred
+  Deno.test("styled.div - should create basic styled div", () => {
+    const StyledDiv = styled.div`
+      & {
+        color: red;
+      }
+    `;
+
+    const result = render(StyledDiv({}));
+    assertEquals(result, '<div style="color: red;"></div>');
+  });
+
+  // Instead of steps
+  Deno.test("styled - tag based components", async (t) => {
+    await t.step("should create basic styled div", () => {
+      // test code
+    });
+  });
+  ```
+
+- Use descriptive test names: "ComponentName - should do something specific"
+- One assertion per test
+- Keep tests focused and isolated
 
 ### Documentation
 

@@ -1,7 +1,8 @@
+import { createElement } from "@reface/jsx";
 import { Hono } from "@hono/hono";
-import { clean, Reface } from "@vseplet/reface";
-import { Home } from "$/pages/Home.ts";
-import { wrapper } from "$/pages/wrapper.ts";
+import { clean, Reface } from "@reface";
+import { Home } from "./pages/Home.tsx";
+import { wrapper } from "./pages/wrapper.tsx";
 
 const app = new Hono();
 

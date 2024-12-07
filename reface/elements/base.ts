@@ -10,12 +10,15 @@ export const section = createElementFactory<HTMLAttributes>("section");
 export const article = createElementFactory<HTMLAttributes>("article");
 export const header = createElementFactory<HTMLAttributes>("header");
 export const nav = createElementFactory<HTMLAttributes>("nav");
+export const footer = createElementFactory<HTMLAttributes>("footer");
 
 // Typography
 export const h1 = createElementFactory<HTMLAttributes>("h1");
 export const h2 = createElementFactory<HTMLAttributes>("h2");
 export const h3 = createElementFactory<HTMLAttributes>("h3");
 export const h4 = createElementFactory<HTMLAttributes>("h4");
+export const h5 = createElementFactory<HTMLAttributes>("h5");
+export const h6 = createElementFactory<HTMLAttributes>("h6");
 
 // Text formatting
 export const pre = createElementFactory<HTMLAttributes>("pre");

@@ -1,103 +1,83 @@
-import type {
-  ElementChild,
-  ElementFactory,
-  HTMLAttributes,
-  Template,
-} from "../core/mod.ts";
-import { generateClassName, processStyles, attributes } from "../html/mod.ts";
-import * as elements from "./base.ts";
+import type { Template } from "../core/types.ts";
+import { attributes } from "../html/mod.ts";
+import type { StyledComponent, StyledFactory } from "./styled.types.ts";
+import { createElementFactory } from "./factory.ts";
 
-/**
- * Creates a styled component
- */
-function createStyled<T extends HTMLAttributes>(
-  elementFactory: ElementFactory<T>
-): StyledFactory<T> {
-  return (strings: TemplateStringsArray, ...values: StyleInterpolation[]) => {
-    const className = generateClassName();
-    const tag = elementFactory.name?.toLowerCase() || "div";
-    const css = processStyles(strings, values, className);
+function createStyledTag(tag: string): StyledFactory {
+  return (strings: TemplateStringsArray, ...values: unknown[]) => {
+    const css = String.raw(strings, ...values);
 
-    const styledComponent = Object.assign(
-      ((props: T = {} as T) => {
-        const mergedProps = {
-          ...props,
-          class: `${className} ${props.class || ""}`.trim(),
+    // Создаем базовый элемент
+    const baseElement = createElementFactory(tag);
+
+    // Создаем функцию-фабрику для styled component
+    function styledElement(props: Record<string, unknown> = {}) {
+      // Получаем функцию для template literals от базового элемента
+      const templateFn = baseElement(props);
+
+      // Возвращаем функцию для template literals
+      const elementWithTemplate = function (
+        strings: TemplateStringsArray,
+        ...values: unknown[]
+      ) {
+        // Создаем Template с children
+        return {
+          tag,
+          attributes: attributes(props),
+          css,
+          isTemplate: true,
+          children: values,
+          str: strings,
+          args: values,
+          rootClass: "",
         };
+      };
 
-        const factory = (
-          strings?: TemplateStringsArray,
-          ...children: ElementChild[]
-        ): Template => {
-          const emptyTemplate = Object.assign([""], {
-            raw: [""],
-          }) as TemplateStringsArray;
+      // Копируем все свойства с базового элемента
+      Object.assign(elementWithTemplate, templateFn);
 
-          if (!strings) {
-            return {
-              tag,
-              attributes: attributes(mergedProps),
-              children: [],
-              css,
-              isTemplate: true,
-              str: emptyTemplate,
-              args: [],
-              rootClass: className,
-            };
-          }
+      return elementWithTemplate;
+    }
 
-          // Get text from strings
-          const text = strings.join("");
-          const allChildren = text ? [text, ...children] : children;
+    // Копируем все свойства с базового элемента
+    Object.assign(styledElement, baseElement);
 
-          const processedChildren = allChildren.map((child) =>
-            child === null || child === undefined
-              ? ""
-              : typeof child === "string" ||
-                (typeof child === "object" && "isTemplate" in child)
-              ? child
-              : String(child)
-          );
+    // Обновляем свойства для styled component
+    Object.assign(styledElement, {
+      css,
+      isTemplate: true,
+    });
 
-          return {
-            tag,
-            attributes: attributes(mergedProps),
-            children: processedChildren,
-            css,
-            isTemplate: true,
-            str: emptyTemplate,
-            args: [],
-            rootClass: className,
-          };
-        };
-
-        return Object.assign(factory, factory());
-      }) as unknown as StyledComponent<T>,
-      {
-        className,
-        displayName: `styled.${tag}`,
-      }
-    );
-
-    return styledComponent;
+    return styledElement;
   };
 }
 
-// Create styled API
-const styledElements = Object.entries(elements).reduce(
-  (acc, [key, element]) => ({
-    ...acc,
-    [key]: createStyled(element),
-  }),
-  {}
-) as StyledAPI;
+// Создаем функцию для расширения компонентов
+function extendComponent(base: StyledComponent): StyledFactory {
+  return (strings: TemplateStringsArray, ...values: unknown[]) => {
+    const css = String.raw(strings, ...values);
 
-// Export combined API
-export const styled = Object.assign(
-  <T extends HTMLAttributes>(
-    component: ElementFactory<T> | StyledComponent<T>
-  ): StyledFactory<T> => createStyled(component),
-  styledElements
-) as StyledAPI;
+    return (props: Record<string, unknown> = {}) => {
+      const baseResult = base(props);
+      return {
+        ...baseResult,
+        css: `${baseResult.css || ""}\n${css}`,
+      };
+    };
+  };
+}
 
-export { css, cssVar, keyframes } from "./css.ts";
+// Создаем базовую функцию styled
+const baseStyled = (component: StyledComponent): StyledFactory => {
+  return extendComponent(component);
+};
+
+// Создаем прокси для тегов
+export const styled = new Proxy(baseStyled, {
+  get(target, prop) {
+    if (typeof prop === "string") {
+      return createStyledTag(prop);
+    }
+    return target[prop as keyof typeof target];
+  },
+}) as typeof baseStyled & { [key: string]: StyledFactory };
