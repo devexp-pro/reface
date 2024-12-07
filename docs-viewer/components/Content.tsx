@@ -70,14 +70,6 @@ const Emphasis = styled.em`
   }
 `;
 
-const Code = styled.code`
-  & {
-    font-family: monospace;
-    background: #f1f5f9;
-    padding: 0.2em 0.4em;
-    border-radius: 0.25em;
-  }
-`;
 
 const Link = styled.a`
   & {
@@ -183,7 +175,6 @@ export const contentComponents = {
   p: Paragraph,
   strong: Strong,
   em: Emphasis,
-  code: Code,
   a: Link,
   img: Image,
   ul: UnorderedList,

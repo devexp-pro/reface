@@ -1,7 +1,8 @@
 import { createElement, Fragment } from "@reface/jsx";
 import type { Template } from "@reface/types";
 import { marked } from "https://esm.sh/marked@9.1.5";
-import { contentComponents as c } from "../components/Content.tsx";
+import { contentComponents as c } from "../components/MarkdownComponents.tsx";
+import { Code } from "../components/Code.tsx";
 
 interface Heading {
   level: number;
@@ -114,9 +115,10 @@ function processToken(token: marked.Token): Template {
 
     case "code":
       return (
-        <c.pre>
-          <c.code>{token.text}</c.code>
-        </c.pre>
+        <Code 
+          content={token.text}
+          language={token.lang || "text"}
+        />
       );
 
     case "blockquote":
@@ -168,7 +170,7 @@ function processToken(token: marked.Token): Template {
   }
 }
 
-// Рекурсивная функция для об��аботки вложенного markdown
+// Рекурсивная функция для обработки вложенного markdown
 function processMarkdownContent(content: string): Template[] {
   const tokens = marked.lexer(content);
   return tokens.map(processToken);

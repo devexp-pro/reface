@@ -1,59 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" version="1.1">
   <defs>
-    <linearGradient id="frontGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#63B3ED" />
-      <stop offset="100%" stop-color="#4299E1" />
-    </linearGradient>
-    
-    <linearGradient id="topGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#90CDF4" />
-      <stop offset="100%" stop-color="#63B3ED" />
-    </linearGradient>
-    
-    <linearGradient id="sideGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#3182CE" />
-      <stop offset="100%" stop-color="#2B6CB0" />
+    <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
     </linearGradient>
   </defs>
-
-  <g transform="translate(16 16) scale(0.25)">
-    <path
-      d="M0 0
-         L50 25
-         L50 75
-         L0 50
-         Z"
-      fill="url(#frontGradient)"
-    />
-    
-    <path
-      d="M0 0
-         L-50 -25
-         L0 -50
-         L50 -25
-         Z"
-      fill="url(#topGradient)"
-    />
-    
-    <path
-      d="M50 25
-         L50 75
-         L0 100
-         L0 50
-         Z"
-      fill="url(#sideGradient)"
-    />
-
-    <path
-      d="M-20 -15
-         L20 5
-         M0 -5
-         L30 10"
-      stroke="white"
-      stroke-width="4"
-      stroke-linecap="round"
-      fill="none"
-    />
-  </g>
+  
+  <rect 
+    x="2" 
+    y="2" 
+    width="28" 
+    height="28" 
+    rx="8"
+    fill="url(#logoGradient)"
+  />
+  
+  <path 
+    d="M13.93 22h-2.21v-3.47h-0.03L9.52 22H7.24l2.85-4.21c-1.61-0.37-2.45-1.59-2.45-3.08v-0.04c0-2.21 1.64-3.43 4.09-3.43h4.38V22h-2.18zm0-8.54h-1.98c-1.12 0-1.71 0.54-1.71 1.37v0.04c0 0.83 0.6 1.37 1.71 1.37h1.98v-2.78z"
+    fill="white"
+  />
 </svg> 

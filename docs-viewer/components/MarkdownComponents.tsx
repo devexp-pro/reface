@@ -1,4 +1,7 @@
+import { createElement } from "../../reface/jsx/createElement.ts";
+
 import { styled } from "@reface/elements";
+import { Code } from "./Code.tsx";
 
 // Базовые стили для заголовков
 const headingStyles = `
@@ -54,37 +57,9 @@ const ContentCode = styled.code`
   }
 `;
 
-const ContentPre = styled.pre`
+const ContentPre = styled.div`
   & {
-    background: #1e293b;
-    color: #e2e8f0;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    overflow-x: auto;
     margin: 1.5rem 0;
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    line-height: var(--leading-relaxed);
-  }
-
-  & ${ContentCode} {
-    background: none;
-    color: inherit;
-    padding: 0;
-  }
-
-  &::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 3px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
   }
 `;
 
