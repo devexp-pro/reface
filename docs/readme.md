@@ -37,12 +37,14 @@ function Greeting({ name }: { name: string }) {
 
 ## Core Concepts
 
-### Elements
+### [Elements](./elements.md)
 
 Functional approach to creating HTML elements:
 
 ```typescript
 import { div, span } from "@reface/elements";
+// or import all elements
+import * from "@reface/elements";
 
 // Empty element
 div()``; // => <div></div>
@@ -54,7 +56,7 @@ div({ class: "container" })``; // => <div class="container"></div>
 div()`Hello`; // => <div>Hello</div>
 ```
 
-### JSX
+### [JSX](./jsx.md)
 
 JSX syntax support:
 
@@ -69,7 +71,7 @@ function Button({ text }: { text: string }) {
 <Button text="Click me" />;
 ```
 
-### Styled Components
+### [Styled Components](./elements@styled.md)
 
 Type-safe CSS-in-JS:
 

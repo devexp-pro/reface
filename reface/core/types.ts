@@ -102,3 +102,16 @@ export type ElementChild =
   | TemplateFragment
   | null
   | undefined;
+
+// Типы для контекста ошибок
+export interface ErrorDetails {
+  component: string;
+  props?: Record<string, unknown>;
+  template?: unknown;
+}
+
+export interface ErrorContext {
+  lastError?: ErrorDetails;
+  jsxStack?: string[];
+  componentStack?: string[];
+}

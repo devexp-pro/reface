@@ -9,6 +9,23 @@ import type { TemplateFragment } from "../html/types.ts";
 import { isTemplateFragment } from "../html/types.ts";
 import { escapeHTML } from "../html/escape.ts";
 
+function processElementChildren(values: ElementChild[]): (string | Template)[] {
+  return values.flatMap((value) => {
+    if (value == null || value === false) return [];
+    if (value === true) return [];
+    if (Array.isArray(value)) {
+      return processElementChildren(value);
+    }
+    if (isTemplateFragment(value)) {
+      return [value.content];
+    }
+    if (typeof value === "object" && "isTemplate" in value) {
+      return [value];
+    }
+    return [escapeHTML(String(value))];
+  });
+}
+
 /**
  * Creates an element factory function for a given tag
  */
@@ -23,30 +40,14 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
     | ((strings: TemplateStringsArray, ...values: ElementChild[]) => Template) {
     // Если вызвана как template literal
     if (attributesOrStrings instanceof Array) {
-      // Собираем все части шаблона
-      const children: (string | Template)[] = [];
-      attributesOrStrings.forEach((str, i) => {
-        // Добавляем текст
-        if (str) children.push(escapeHTML(str));
-        // Добавляем значение если есть
-        if (i < values.length) {
-          const value = values[i];
-          if (value === null || value === undefined) return;
-          if (isTemplateFragment(value)) children.push(value.content);
-          else if (typeof value === "object" && "isTemplate" in value)
-            children.push(value);
-          else children.push(escapeHTML(String(value)));
-        }
-      });
-
       return {
         tag,
         attributes: "",
-        children,
+        children: processElementChildren(values),
         css: "",
         isTemplate: true,
         str: attributesOrStrings,
-        args: values.map(String),
+        args: values,
         rootClass: "",
       };
     }
@@ -56,30 +57,14 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
       strings: TemplateStringsArray,
       ...templateValues: ElementChild[]
     ): Template {
-      // Собираем все части шаблона
-      const children: (string | Template)[] = [];
-      strings.forEach((str, i) => {
-        // Добавляем текст
-        if (str) children.push(escapeHTML(str));
-        // Добавляем значение если есть
-        if (i < templateValues.length) {
-          const value = templateValues[i];
-          if (value === null || value === undefined) return;
-          if (isTemplateFragment(value)) children.push(value.content);
-          else if (typeof value === "object" && "isTemplate" in value)
-            children.push(value);
-          else children.push(escapeHTML(String(value)));
-        }
-      });
-
       return {
         tag,
         attributes: attributesOrStrings ? attributes(attributesOrStrings) : "",
-        children,
+        children: processElementChildren(templateValues),
         css: "",
         isTemplate: true,
         str: strings,
-        args: templateValues.map(String),
+        args: templateValues,
         rootClass: "",
       };
     };

@@ -1,13 +1,14 @@
-import { createElement, Fragment } from "@reface/jsx";
+import { createElement } from "@reface/jsx";
 import type { Template } from "@reface/types";
 import { styled } from "@reface/elements";
 import { Container, Header, Layout, Logo } from "./Layout.tsx";
 import { Navigation } from "./Navigation.tsx";
 import { Content, DocContent, TableOfContents } from "./Content.tsx";
-import type { DocSection } from "../utils/docs.tsx";
+import type { DocSection, DocPage } from "../utils/docs.tsx";
 
 interface DocsViewerProps {
   sections: DocSection[];
+  pages: Map<string, DocPage>;
   currentPath?: string;
 }
 
@@ -28,25 +29,83 @@ const PageTransition = styled.div`
   }
 `;
 
-export function DocsViewer({ sections, currentPath = "" }: DocsViewerProps): Template {
-  const currentPage = sections
-    .flatMap(s => s.pages)
-    .find(p => p.path === currentPath);
+const StyledLogo = styled.div`
+  & {
+    display: flex;
+    align-items: center;
+  }
+`;
+
+const LogoSymbol = styled.div`
+  & {
+    width: 2rem;
+    height: 2rem;
+    background: var(--color-primary);
+    border-radius: 0.5rem;
+  }
+`;
+
+const LogoText = styled.div`
+  & {
+    margin-left: 0.75rem;
+  }
+`;
+
+const BrandText = styled.div`
+  & {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+`;
+
+const SubtitleText = styled.div`
+  & {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+`;
+
+const TocItem = styled.li`
+  & {
+    margin: 0.25rem 0;
+  }
+`;
+
+const TocLink = styled.a`
+  & {
+    color: #64748b;
+    text-decoration: none;
+    
+    &:hover {
+      color: #2563eb;
+    }
+  }
+`;
+
+export function DocsViewer({ sections, pages, currentPath }: DocsViewerProps): Template {
+  const currentPage = currentPath ? pages.get(currentPath) : pages.get("readme");
 
   return (
     <Container>
       <Header>
         <Logo>
-          <div class="logo-symbol"></div>
-          <div class="logo-text">
-            <div class="brand">Reface</div>
-            <div class="subtitle">Documentation</div>
-          </div>
+          <StyledLogo>
+            <LogoSymbol />
+            <LogoText>
+              <BrandText>Reface</BrandText>
+              <SubtitleText>Documentation</SubtitleText>
+            </LogoText>
+          </StyledLogo>
         </Logo>
       </Header>
       
       <Layout>
-        <Navigation sections={sections} currentPath={currentPath} />
+        <Navigation 
+          sections={sections} 
+          currentPath={currentPath} 
+        />
+
         <Content>
           <PageTransition>
             {currentPage ? (
@@ -54,20 +113,19 @@ export function DocsViewer({ sections, currentPath = "" }: DocsViewerProps): Tem
                 {currentPage.content.content}
               </DocContent>
             ) : (
-              <p>Select a page from the navigation</p>
+              <p>Page not found</p>
             )}
           </PageTransition>
         </Content>
-        {currentPage && (
+
+        {currentPage && currentPage.content.headings.length > 0 && (
           <TableOfContents>
             <h4>On this page</h4>
             <ul>
               {currentPage.content.headings.map(heading => (
-                <li 
-                  style={`margin-left: ${(heading.level - 1) * 1}rem`}
-                >
-                  <a href={`#${heading.slug}`}>{heading.text}</a>
-                </li>
+                <TocItem style={`padding-left: ${(heading.level - 1) * 0.75}rem`}>
+                  <TocLink href={`#${heading.slug}`}>{heading.text}</TocLink>
+                </TocItem>
               ))}
             </ul>
           </TableOfContents>

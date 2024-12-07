@@ -5,11 +5,15 @@ import type {
   Template,
 } from "../core/Template.ts";
 import * as elements from "../elements/mod.ts";
+import { JSXContext, withJSXStack } from "./context.ts";
+import { ErrorContext, JSXError, withErrorTracking } from "../core/errors.ts";
 
 /**
  * Process props including spread
  */
-function processProps(props: Record<string, unknown> | null): HTMLAttributes {
+function processProps(
+  props: Record<string, unknown> | null
+): Record<string, unknown> {
   if (!props) return {};
 
   const result: Record<string, unknown> = {};
@@ -27,7 +31,33 @@ function processProps(props: Record<string, unknown> | null): HTMLAttributes {
     result[key] = value;
   }
 
-  return result as HTMLAttributes;
+  return result;
+}
+
+/**
+ * Process children to handle arrays and fragments
+ */
+function processChildren(children: ElementChild[]): ElementChild[] {
+  return children.flatMap((child) => {
+    // Handle null/undefined
+    if (child == null) return [];
+
+    // Handle arrays (e.g. from map)
+    if (Array.isArray(child)) {
+      return processChildren(child);
+    }
+
+    // Handle fragments
+    if (
+      typeof child === "object" &&
+      "isTemplate" in child &&
+      child.tag === ""
+    ) {
+      return child.children;
+    }
+
+    return [child];
+  });
 }
 
 /**
@@ -38,25 +68,102 @@ export function createElement(
   props: Record<string, unknown> | null,
   ...children: ElementChild[]
 ): Template {
-  try {
-    const processedProps = processProps(props);
-    // Process children to handle arrays
-    const processedChildren = children.flatMap((child) => {
-      // Handle arrays (e.g. from map)
-      if (Array.isArray(child)) {
-        return child;
-      }
-      return child;
-    });
+  const componentName = typeof tag === "function" ? tag.name : String(tag);
 
-    // Handle component functions
-    if (typeof tag === "function") {
-      // Handle styled components
-      if ("className" in tag) {
-        const styledComponent = tag as ElementFactory<HTMLAttributes> & {
-          className: string;
-        };
-        const template = styledComponent(processedProps);
+  // Получаем информацию о местоположении из Error.stack
+  const stack = new Error().stack;
+  const location = stack ? parseStackLocation(stack) : {};
+
+  return withJSXStack(componentName, location, () => {
+    // Обрабатываем props и children до withErrorTracking
+    const processedProps = processProps(props);
+    const processedChildren = processChildren(children);
+
+    return withErrorTracking(
+      componentName,
+      () => {
+        // Handle component functions
+        if (typeof tag === "function") {
+          // Handle styled components
+          if ("className" in tag) {
+            const styledComponent = tag as ElementFactory<HTMLAttributes> & {
+              className: string;
+            };
+            const template = styledComponent(processedProps);
+
+            if (!template) {
+              throw new JSXError(
+                `Styled component returned undefined (${componentName})`,
+                componentName,
+                processedProps,
+                children
+              );
+            }
+
+            if (typeof template === "function") {
+              const result = template(
+                Object.assign([""], { raw: [""] }) as TemplateStringsArray,
+                ...processedChildren
+              );
+              if (!result) {
+                throw new JSXError(
+                  `Styled component ${componentName} returned a function instead of a template`,
+                  componentName,
+                  processedProps,
+                  children
+                );
+              }
+              return result as Template;
+            }
+
+            return {
+              ...(template as Template),
+              children: processedChildren,
+            };
+          }
+
+          // Handle regular components
+          const result = tag({
+            ...processedProps,
+            children:
+              processedChildren.length === 1
+                ? processedChildren[0]
+                : processedChildren,
+          });
+
+          if (!result) {
+            throw new JSXError(
+              `Component returned undefined (${componentName})`,
+              componentName,
+              processedProps,
+              children
+            );
+          }
+
+          return result;
+        }
+
+        // Get element factory
+        const elementFn = elements[tag];
+        if (!elementFn) {
+          throw new JSXError(
+            `Unknown element: ${componentName}`,
+            componentName,
+            processedProps,
+            children
+          );
+        }
+
+        // Create template
+        const template = elementFn(processedProps as HTMLAttributes);
+        if (!template) {
+          throw new JSXError(
+            "Element factory returned undefined",
+            componentName,
+            processedProps,
+            children
+          );
+        }
 
         if (typeof template === "function") {
           return template(
@@ -64,43 +171,25 @@ export function createElement(
             ...processedChildren
           );
         }
+
         return {
-          ...template,
+          ...(template as Template),
           children: processedChildren,
         };
-      }
+      },
+      processedProps
+    );
+  });
+}
 
-      // Handle regular components
-      return tag({
-        ...processedProps,
-        children:
-          processedChildren.length === 1
-            ? processedChildren[0]
-            : processedChildren,
-      });
-    }
-
-    // Get element factory
-    const elementFn = elements[tag];
-    if (!elementFn) {
-      throw new Error(`Unknown element: ${String(tag)}`);
-    }
-
-    // Create template
-    const template = elementFn(processedProps);
-    if (typeof template === "function") {
-      return template(
-        Object.assign([""], { raw: [""] }) as TemplateStringsArray,
-        ...processedChildren
-      );
-    }
-
+function parseStackLocation(stack: string) {
+  const match = stack.split("\n")[2]?.match(/at .+\((.+):(\d+):(\d+)\)/);
+  if (match) {
     return {
-      ...template,
-      children: processedChildren,
+      file: match[1],
+      line: parseInt(match[2]),
+      column: parseInt(match[3]),
     };
-  } catch (err) {
-    const error = err as Error;
-    throw new Error(`Error creating element ${String(tag)}: ${error.message}`);
   }
+  return {};
 }

@@ -1,7 +1,7 @@
 import { createElement, Fragment } from "@reface/jsx";
 import type { Template } from "@reface/types";
 import { marked } from "https://esm.sh/marked@9.1.5";
-import { contentComponents } from "../components/Content.tsx";
+import { contentComponents } from "../components/MarkdownComponents.tsx";
 
 interface Heading {
   level: number;

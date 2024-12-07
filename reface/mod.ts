@@ -15,9 +15,6 @@ export {
 // Elements
 export {
   styled,
-  css,
-  cssVar,
-  keyframes,
   // Base elements
   div,
   span,

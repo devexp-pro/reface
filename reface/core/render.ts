@@ -1,66 +1,145 @@
 import type { Template } from "./Template.ts";
 import type { TemplateFragment } from "../html/types.ts";
 import { isTemplateFragment } from "../html/types.ts";
+import { RenderError, withErrorTracking, ErrorContext } from "./errors.ts";
+// Список void элементов
+const VOID_ELEMENTS = new Set([
+  "area",
+  "base",
+  "br",
+  "col",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
+]);
 
-/**
- * Renders a template to HTML string
- */
+function getFunctionSource(fn: Function): string {
+  const source = fn.toString();
+  // Если функция слишком длинная, показываем только начало
+  if (source.length > 500) {
+    return source.slice(0, 500) + "...";
+  }
+  return source;
+}
+
+function validateTemplate(
+  template: Template | TemplateFragment | undefined,
+  componentName?: string
+): void {
+  if (template === undefined) {
+    ErrorContext.setLastError({
+      component: componentName || "Unknown",
+      template: undefined,
+    });
+    throw new RenderError(
+      "Template is undefined (this usually means a component returned undefined)",
+      template,
+      ErrorContext.getContext()
+    );
+  }
+
+  if (typeof template === "function") {
+    ErrorContext.setLastError({
+      component: componentName || "Unknown",
+      template: {
+        type: "function",
+        name: template.name || "(anonymous)",
+        source: getFunctionSource(template),
+      },
+    });
+    throw new RenderError(
+      "Got function instead of template (this usually means a component factory was not called)",
+      undefined,
+      ErrorContext.getContext()
+    );
+  }
+
+  if (!("tag" in template)) {
+    ErrorContext.setLastError({
+      component: componentName || "Unknown",
+      template,
+    });
+    throw new RenderError(
+      "Invalid template structure - missing 'tag' property",
+      template,
+      ErrorContext.getContext()
+    );
+  }
+}
+
 export function render(
-  input: Template | TemplateFragment | (Template | string)[]
+  input: Template | TemplateFragment | (Template | string)[] | undefined
 ): string {
+  // Сбрасываем контекст ошибок перед рендером
+  ErrorContext.reset();
+
+  if (input === undefined) {
+    throw new RenderError(
+      "Cannot render undefined",
+      undefined,
+      ErrorContext.getContext()
+    );
+  }
+
   const styles = new Set<string>();
 
   function renderTemplate(template: Template | TemplateFragment): string {
-    // Handle TemplateFragment
-    if (isTemplateFragment(template)) {
-      return template.content;
-    }
+    return withErrorTracking(
+      isTemplateFragment(template) ? "Fragment" : template.tag || "Unknown",
+      () => {
+        validateTemplate(template);
 
-    // Handle Fragment (empty tag)
-    if (template.tag === "") {
-      return template.children
-        .map((child) => {
-          if (child === null || child === undefined) return "";
-          if (typeof child === "object" && "isTemplate" in child) {
-            return renderTemplate(child as Template);
-          }
-          return String(child);
-        })
-        .join("");
-    }
-
-    // Collect CSS
-    if (template.css) {
-      styles.add(template.css);
-    }
-
-    // Process children
-    const children = template.children
-      .map((child) => {
-        if (child === null || child === undefined) return "";
-        if (typeof child === "object" && "isTemplate" in child) {
-          return renderTemplate(child as Template);
+        if (isTemplateFragment(template)) {
+          return template.content;
         }
-        return String(child);
-      })
-      .join("");
 
-    // Build HTML
-    const html = `<${template.tag}${
-      template.attributes ? ` ${template.attributes}` : ""
-    }>${children}</${template.tag}>`;
+        if (template.tag === "") {
+          return template.children
+            .map((child) => {
+              if (child === null || child === undefined) return "";
+              if (typeof child === "object" && "isTemplate" in child) {
+                return renderTemplate(child as Template);
+              }
+              return String(child);
+            })
+            .join("");
+        }
 
-    return html;
+        if (template.css) {
+          styles.add(template.css);
+        }
+
+        const children = template.children
+          .map((child) => {
+            if (child === null || child === undefined) return "";
+            if (typeof child === "object" && "isTemplate" in child) {
+              return renderTemplate(child as Template);
+            }
+            return String(child);
+          })
+          .join("");
+
+        const isVoid = VOID_ELEMENTS.has(template.tag);
+        return `<${template.tag}${
+          template.attributes ? ` ${template.attributes}` : ""
+        }${isVoid ? " />" : `>${children}</${template.tag}>`}`;
+      }
+    );
   }
 
-  // Handle array input
   const html = Array.isArray(input)
     ? input
         .map((item) => (typeof item === "string" ? item : renderTemplate(item)))
         .join("")
     : renderTemplate(input);
 
-  // Add collected styles at the end
   const collectedStyles = Array.from(styles);
   if (collectedStyles.length > 0) {
     return `${html}\n<style>\n  ${collectedStyles
@@ -70,4 +149,9 @@ export function render(
   }
 
   return html;
+}
+
+// Экспортируем для использования в JSX
+export function setJSXStack(stack?: string[]) {
+  ErrorContext.setJSXStack(stack);
 }
