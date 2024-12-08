@@ -12,12 +12,12 @@ Deno.test("styled.div - should create basic styled div", () => {
     }
   `;
 
-  const result = render(StyledDiv({})``);
+  const component = <StyledDiv></StyledDiv>;
   compareHTML(
-    result,
-    `<div class="c0"></div>
+    render(component),
+    `<div class="${component.rootClass}"></div>
 <style>
-  .c0 {
+  .${component.rootClass} {
     color: red;
   }
 </style>`
@@ -31,13 +31,14 @@ Deno.test("styled.button - should handle props", () => {
     }
   `;
 
-  const result = render(Button({ class: "primary" })``);
+  const component = <Button class="primary"></Button>;
   compareHTML(
-    result,
-    `<button class="primary"></button><style>
-& {
-  background: blue;
-}
+    render(component),
+    `<button class="${component.rootClass} primary"></button>
+<style>
+  .${component.rootClass} {
+    background: blue;
+  }
 </style>`
   );
 });
@@ -49,13 +50,14 @@ Deno.test("styled.h1 - should handle children", () => {
     }
   `;
 
-  const result = render(Title()`Hello`);
+  const component = Title()`Hello`;
   compareHTML(
-    result,
-    `<h1>Hello</h1><style>
-& {
-  font-size: 2em;
-}
+    render(component),
+    `<h1 class="${component.rootClass}">Hello</h1>
+    <style>
+  .${component.rootClass} {
+    font-size: 2em;
+  }
 </style>`
   );
 });
@@ -67,11 +69,12 @@ Deno.test("styled.h1 - should handle template literals", () => {
     }
   `;
 
-  const result = render(Title()`Hello`);
+  const component = Title()`Hello`;
   compareHTML(
-    result,
-    `<h1>Hello</h1><style>
-& {
+    render(component),
+    `<h1 class="${component.rootClass}">Hello</h1>
+    <style>
+  .${component.rootClass} {
   font-size: 2em;
 }
 </style>`
@@ -96,7 +99,7 @@ Deno.test("styled.h1 - should return correct factory", () => {
   // Проверяем что Title можно вызвать как функцию
   const withProps = Title({ class: "test" })``;
   assertEquals(withProps.tag, "h1");
-  assertEquals(withProps.attributes, 'class="test"');
+  assertEquals(withProps.attributes, `class="${withProps.rootClass} test"`);
 
   // Проверяем что Title можно вызвать как template literal
   const withTemplate = Title()`Hello`;
@@ -119,11 +122,12 @@ Deno.test("styled(Component) - should extend existing component", () => {
     }
   `;
 
-  const result = render(PrimaryButton({})``);
+  const component = PrimaryButton({})``;
   compareHTML(
-    result,
-    `<button></button><style>
-& {
+    render(component),
+    `<button class="${component.rootClass}"></button>
+    <style>
+  .${component.rootClass} {
   padding: 1rem;
 }
 & {
@@ -149,13 +153,12 @@ Deno.test(
       }
     `;
 
-    const result = render(
-      SearchInput({ type: "search", placeholder: "Search..." })``
-    );
+    const component = SearchInput({ type: "search", placeholder: "Search..." })``;
     compareHTML(
-      result,
-      `<input type="search" placeholder="Search..."></input><style>
-& {
+      render(component),
+      `<input class="${component.rootClass}" type="search" placeholder="Search..." />
+    <style>
+  .${component.rootClass} {
   border: 1px solid gray;
 }
 & {
@@ -177,16 +180,17 @@ Deno.test("styled CSS - should handle pseudo-classes", () => {
     }
   `;
 
-  const result = render(Button({})``);
+  const component = <Button></Button>;
   compareHTML(
-    result,
-    `<button></button><style>
-& {
-  color: blue;
-}
-&:hover {
-  color: darkblue;
-}
+    render(component),
+    `<button class="${component.rootClass}"></button>
+<style>
+  .${component.rootClass} {
+    color: blue;
+  }
+  .${component.rootClass}:hover {
+    color: darkblue;
+  }
 </style>`
   );
 });
@@ -201,16 +205,17 @@ Deno.test("styled CSS - should handle nested selectors", () => {
     }
   `;
 
-  const result = render(Card({})``);
+  const component = <Card></Card>;
   compareHTML(
-    result,
-    `<div></div><style>
-& {
-  padding: 1rem;
-}
-& h1 {
-  font-size: 2em;
-}
+    render(component),
+    `<div class="${component.rootClass}"></div>
+<style>
+  .${component.rootClass} {
+    padding: 1rem;
+  }
+  .${component.rootClass} h1 {
+    font-size: 2em;
+  }
 </style>`
   );
 });
@@ -227,18 +232,19 @@ Deno.test("styled CSS - should handle media queries", () => {
     }
   `;
 
-  const result = render(Container({})``);
+  const component = <Container></Container>;
   compareHTML(
-    result,
-    `<div></div><style>
-& {
-  width: 100%;
-}
-@media (min-width: 768px) {
-  & {
-    width: 50%;
+    render(component),
+    `<div class="${component.rootClass}"></div>
+<style>
+  .${component.rootClass} {
+    width: 100%;
   }
-}
+  @media (min-width: 768px) {
+    .${component.rootClass} {
+      width: 50%;
+    }
+  }
 </style>`
   );
 });
@@ -251,15 +257,12 @@ Deno.test("styled with custom element", () => {
     }
   `;
 
-  const result = render(<CustomEl>Custom content</CustomEl>);
-  const match = result.match(/class="(c[a-z0-9]+)"/);
-  const className = match?.[1];
-
+  const component = <CustomEl>Custom content</CustomEl>;
   compareHTML(
-    result,
-    `<custom-element class="${className}">Custom content</custom-element>
+    render(component),
+    `<custom-element class="${component.rootClass}">Custom content</custom-element>
 <style>
-  .${className} {
+  .${component.rootClass} {
     color: blue;
   }
 </style>`

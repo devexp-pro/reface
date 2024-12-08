@@ -47,7 +47,8 @@ function createStyledTag(tag: string, css: string): StyledComponent {
     .replace(/&\s*{/g, `.${className} {`)
     .replace(/&\[(.*?)\]/g, `.${className}[$1]`)
     .replace(/&\.([\w-]+)/g, `.${className}.$1`)
-    .replace(/&\s*([^{[.])/g, `.${className} $1`);
+    .replace(/&:([\w-]+)/g, `.${className}:$1`)
+    .replace(/&\s*([^{[.:])/g, `.${className} $1`);
 
   // Создаем функцию-компонент
   const styledComponent = function (props: HTMLAttributes | JSXProps = {}) {
@@ -86,10 +87,17 @@ function createStyledTag(tag: string, css: string): StyledComponent {
       const attrs = attributes(restProps);
       const classAttr = `class="${classNames.join(" ")}"`;
 
+      // Объединяем strings и values �� правильном порядке
+      const children = strings.reduce((acc: ElementChild[], str, i) => {
+        if (str) acc.push(str);
+        if (i < values.length) acc.push(values[i]);
+        return acc;
+      }, []);
+
       return {
         tag,
         attributes: attrs ? `${classAttr} ${attrs}` : classAttr,
-        children: values,
+        children,
         css: processedCss,
         isTemplate: true,
         rootClass: className,
