@@ -129,12 +129,12 @@ Deno.test("styled(Component) - should extend existing component", () => {
     render(component),
     `<button class="${component.rootClass}"></button>
     <style>
-  .${component.rootClass} {
+  .${BaseButton.rootClass} {
   padding: 1rem;
-}
-& {
-  background: blue;
-  color: white;
+  }
+  .${PrimaryButton.rootClass} {
+    background: blue;
+    color: white;
 }
 </style>`
   );
@@ -158,14 +158,14 @@ Deno.test(
     const component = SearchInput({ type: "search", placeholder: "Search..." })``;
     compareHTML(
       render(component),
-      `<input class="${component.rootClass}" type="search" placeholder="Search..." />
+      `<input type="search" placeholder="Search..." class="${component.rootClass}" />
     <style>
-  .${component.rootClass} {
+  .${BaseInput.rootClass} {
   border: 1px solid gray;
-}
-& {
-  padding-left: 2rem;
-}
+  }
+  .${SearchInput.rootClass} {
+    padding-left: 2rem;
+  }
 </style>`
     );
   }

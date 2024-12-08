@@ -1,6 +1,6 @@
 import { createElement, Fragment } from "@reface/jsx";
-import { render } from "@reface/core";
-import type { Template } from "@reface/core";
+import { render } from "@reface/html";
+import type { Template } from "@reface/html";
 import { compareHTML } from "@reface/test-utils";
 import { component } from "@reface/elements";
 

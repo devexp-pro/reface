@@ -1,5 +1,4 @@
-import { render } from "@reface/core";
-import { html } from "@reface/html";
+import { html, render } from "@reface/html";
 import { div } from "@reface/elements";
 import { compareHTML } from "@reface/test-utils";
 
