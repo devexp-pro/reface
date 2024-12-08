@@ -3,10 +3,9 @@ import type {
   HTMLAttributes,
   Template,
   TemplateLiteralFunction,
-  TemplateAttributes,
 } from "../html/types.ts";
 import { processAttributes } from "../html/attributes.ts";
-import { processTemplateChildren } from "../html/templates.ts";
+import { processElementChildren } from "./component.ts";
 
 /**
  * Creates an element factory function for a given tag
@@ -26,7 +25,7 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
       const template: Template = {
         tag,
         attributes: processAttributes({}),
-        children: processTemplateChildren(propsOrStrings, values),
+        children: processElementChildren(propsOrStrings, values),
         isTemplate: true,
         css: "",
         rootClass: "",

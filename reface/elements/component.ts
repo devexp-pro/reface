@@ -5,6 +5,17 @@ import type {
   ElementChild,
   TemplateLiteralFunction,
 } from "../core/types.ts";
+import { html } from "../html/html.ts";
+
+/**
+ * Process template literal children
+ */
+export function processElementChildren(
+  strings: TemplateStringsArray,
+  values: ElementChild[]
+): ElementChild[] {
+  return [html(strings, ...values)];
+}
 
 export function component<T = object>(
   render: (props: T, children: ElementChild[]) => Template
@@ -15,7 +26,7 @@ export function component<T = object>(
   ): TemplateLiteralFunction | Template {
     // Template literal вызов
     if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
-      return render({} as T, processElementChildren(propsOrStrings, values));
+      return render({} as T, [html(propsOrStrings, ...values)]);
     }
 
     // JSX вызов или вызов с пропсами
@@ -56,15 +67,4 @@ export function component<T = object>(
   componentFunction.tag = "div";
 
   return componentFunction;
-}
-
-function processElementChildren(
-  strings: TemplateStringsArray,
-  values: ElementChild[]
-): ElementChild[] {
-  return strings.reduce((acc: ElementChild[], str, i) => {
-    if (str) acc.push(str);
-    if (i < values.length) acc.push(values[i]);
-    return acc;
-  }, []);
 }

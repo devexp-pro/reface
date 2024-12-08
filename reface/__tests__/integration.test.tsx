@@ -1,42 +1,51 @@
 import { createElement, Fragment } from "@reface/jsx";
-import { render } from "@reface/core";
+import { render } from "@reface/html";
 import { styled, component, div } from "@reface/elements";
 import { compareHTML } from "./utils.ts";
 
 // 1. Basic Elements
-Deno.test("Integration - Basic Elements", () => {
-  // JSX
+Deno.test("Integration - Basic Elements - JSX", () => {
   const jsxTemplate = <div class="container">Hello</div>;
   compareHTML(render(jsxTemplate), `<div class="container">Hello</div>`);
+});
 
-  // Template literal without props
+Deno.test("Integration - Basic Elements - Template Literal", () => {
   compareHTML(render(div()`Hello`), `<div>Hello</div>`);
+});
 
-  // Template literal with props
+Deno.test("Integration - Basic Elements - Template Literal with Props", () => {
   const container = div({ class: "container" });
   compareHTML(render(container`Hello`), `<div class="container">Hello</div>`);
-
 });
 
 // 2. Components
-Deno.test("Integration - Components", () => {
+Deno.test("Integration - Components - JSX with children", () => {
   const Greeting = component<{ name: string }>(
     ({ name }, children) => <div class="greeting">Hello, {name}! {children}</div>
   );
 
-  // JSX with children
   compareHTML(
     render(<Greeting name="John">Welcome!</Greeting>),
     `<div class="greeting">Hello, John! Welcome!</div>`
   );
+});
 
-  // Template literal with props
+Deno.test("Integration - Components - Template literal with props", () => {
+  const Greeting = component<{ name: string }>(
+    ({ name }, children) => <div class="greeting">Hello, {name}! {children}</div>
+  );
+
   compareHTML(
     render(Greeting({ name: "John" })`Welcome!`),
     `<div class="greeting">Hello, John! Welcome!</div>`
   );
+});
 
-  // Template literal without children
+Deno.test("Integration - Components - Template literal without children", () => {
+  const Greeting = component<{ name: string }>(
+    ({ name }, children) => <div class="greeting">Hello, {name}! {children}</div>
+  );
+
   compareHTML(
     render(Greeting({ name: "John" })``),
     `<div class="greeting">Hello, John! </div>`
@@ -44,14 +53,13 @@ Deno.test("Integration - Components", () => {
 });
 
 // 3. Styled Components
-Deno.test("Integration - Styled Components", () => {
+Deno.test("Integration - Styled Components - JSX with class", () => {
   const Button = styled.button`
     & {
       color: blue;
     }
   `;
 
-  // JSX with class
   compareHTML(
     render(<Button class="primary">Click me</Button>),
     `<button class="${Button.rootClass} primary">Click me</button>
@@ -61,8 +69,15 @@ Deno.test("Integration - Styled Components", () => {
        }
      </style>`
   );
+});
 
-  // Template literal with props
+Deno.test("Integration - Styled Components - Template literal with props", () => {
+  const Button = styled.button`
+    & {
+      color: blue;
+    }
+  `;
+
   compareHTML(
     render(Button({ class: "primary" })`Click me`),
     `<button class="${Button.rootClass} primary">Click me</button>
@@ -72,8 +87,15 @@ Deno.test("Integration - Styled Components", () => {
        }
      </style>`
   );
+});
 
-  // Template literal without props
+Deno.test("Integration - Styled Components - Template literal without props", () => {
+  const Button = styled.button`
+    & {
+      color: blue;
+    }
+  `;
+
   compareHTML(
     render(Button()`Click me`),
     `<button class="${Button.rootClass}">Click me</button>
@@ -162,7 +184,7 @@ Deno.test("Integration - Extending Styled Components", () => {
     `
     <button class="${PrimaryButton.rootClass} large">Click me</button>
     <style>
-      .${PrimaryButton.rootClass} {
+      .${BaseButton.rootClass} {
         padding: 1rem;
       }
       .${PrimaryButton.rootClass} {
@@ -179,7 +201,7 @@ Deno.test("Integration - Extending Styled Components", () => {
     `
     <button class="${PrimaryButton.rootClass} large">Click me</button>
     <style>
-      .${PrimaryButton.rootClass} {
+      .${BaseButton.rootClass} {
         padding: 1rem;
       }
       .${PrimaryButton.rootClass} {

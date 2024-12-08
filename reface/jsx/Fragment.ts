@@ -1,16 +1,5 @@
-import type { Template } from "../core/types.ts";
-import { processAttributes } from "../html/attributes.ts";
+import type { Template } from "../html/types.ts";
 
-/**
- * Fragment component for JSX
- */
-export function Fragment({ children }: { children: unknown }): Template {
-  return {
-    tag: "",
-    attributes: processAttributes({}),
-    children: Array.isArray(children) ? children : [children],
-    css: "",
-    isTemplate: true,
-    rootClass: "",
-  };
+export function Fragment({ children }: { children?: Template[] }): Template[] {
+  return children || [];
 }

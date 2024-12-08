@@ -24,6 +24,25 @@ const VOID_ELEMENTS = new Set([
   "wbr",
 ]);
 
+function renderChild(child: ElementChild): string {
+  if (child == null || child === false || child === true) return "";
+
+  if (typeof child === "object") {
+    if ("isTemplate" in child) {
+      return render(child);
+    }
+    if (isTemplateFragment(child)) {
+      return child.content;
+    }
+    // Добавляем обработку массивов
+    if (Array.isArray(child)) {
+      return child.map(renderChild).join("");
+    }
+  }
+
+  return String(child);
+}
+
 export function render(input: Template | TemplateFragment): string {
   if (isTemplateFragment(input)) {
     return input.content;
@@ -31,24 +50,8 @@ export function render(input: Template | TemplateFragment): string {
 
   const { tag, attributes: attrs, children, css } = input;
 
-  // Рендерим детей
-  const renderedChildren = children
-    .map((child: ElementChild) => {
-      if (child == null || child === false) return "";
-      if (child === true) return "";
-
-      if (typeof child === "object") {
-        if ("isTemplate" in child) {
-          return render(child);
-        }
-        if (isTemplateFragment(child)) {
-          return child.content;
-        }
-      }
-
-      return String(child);
-    })
-    .join("");
+  // Рендерим детей используя новую функцию
+  const renderedChildren = children.map(renderChild).join("");
 
   // Формируем HTML
   const isVoid = VOID_ELEMENTS.has(tag);

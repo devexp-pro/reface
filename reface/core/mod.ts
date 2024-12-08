@@ -44,3 +44,6 @@ export type {
   RestHandlers,
 } from "./types.ts";
 export type { Island } from "./types.ts";
+
+export { createLogger, configureLogger } from "./logger.ts";
+export type { LogLevel, LoggerConfig } from "./logger.ts";

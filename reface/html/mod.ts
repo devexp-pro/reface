@@ -12,7 +12,7 @@ export type {
 } from "./types.ts";
 
 // Template functions
-export { html, template } from "./templates.ts";
+export { html } from "./html.ts";
 export { render } from "./render.ts";
 
 // Attribute processing
@@ -29,3 +29,5 @@ export { processStyles, createStylesheet } from "./styles.ts";
 
 // Type guards and utilities
 export { isVoidElement, isSelfClosing } from "./utils.ts";
+
+export { isTemplateFragment } from "./types.ts";
