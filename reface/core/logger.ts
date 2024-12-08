@@ -1,25 +1,7 @@
 import { load } from "https://deno.land/std/dotenv/mod.ts";
+import type { LogLevel, LoggerConfig, Logger } from "./types.ts";
 
-/**
- * Debug levels
- */
-export type LogLevel = "debug" | "info" | "warn" | "error";
-
-/**
- * Logger configuration
- */
-export interface LoggerConfig {
-  enabled: boolean;
-  level: LogLevel;
-  prefix?: string;
-}
-
-// Загрузить .env файл
-await load({
-  envPath: "./.env",
-  examplePath: "./.env.example",
-  export: true,
-});
+load({ envPath: ".env", export: true });
 
 /**
  * Style constants
@@ -163,13 +145,6 @@ function formatData(data: unknown, level: LogLevel): string {
   } catch {
     return String(data);
   }
-}
-
-/**
- * Format timestamp
- */
-function formatTimestamp(): string {
-  return STYLES.dim + new Date().toISOString() + STYLES.reset;
 }
 
 /**

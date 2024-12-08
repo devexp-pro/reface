@@ -30,3 +30,25 @@ export const aside = createElementFactory("aside");
 // Re-export styled and component
 export { styled } from "./styled.ts";
 export { component } from "./component.ts";
+
+// Export types
+export type {
+  ElementFactory,
+  ElementFactoryProps,
+  ComponentRenderFunction,
+  ComponentProps,
+} from "./types.ts";
+
+// Export functions
+export { createElementFactory } from "./createElementFactory.ts";
+
+// Style types
+export type {
+  StyledComponent,
+  StyledFactory,
+  StyledComponentOptions,
+  CSSResult,
+} from "./types.ts";
+
+// Style functions
+export { css, cssVar, keyframes } from "./css.ts";

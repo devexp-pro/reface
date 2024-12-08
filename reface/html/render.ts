@@ -1,42 +1,8 @@
-import type {
-  Template,
-  TemplateFragment,
-  ElementChild,
-} from "../html/types.ts";
-import { isTemplateFragment } from "../html/types.ts";
-import { renderAttributes } from "../html/attributes.ts";
-
-// Список void элементов
-const VOID_ELEMENTS = new Set([
-  "area",
-  "base",
-  "br",
-  "col",
-  "embed",
-  "hr",
-  "img",
-  "input",
-  "link",
-  "meta",
-  "param",
-  "source",
-  "track",
-  "wbr",
-]);
-
-// Класс для сбора уникальных стилей
-class StyleCollector {
-  private styles = new Set<string>();
-
-  add(css: string) {
-    this.styles.add(css);
-  }
-
-  toString() {
-    if (this.styles.size === 0) return "";
-    return `<style>\n${Array.from(this.styles).join("\n")}\n</style>`;
-  }
-}
+import type { Template, TemplateFragment, ElementChild } from "./types.ts";
+import { isTemplateFragment } from "./types.ts";
+import { renderAttributes } from "./attributes.ts";
+import { StyleCollector } from "./StyleCollector.ts";
+import { VOID_ELEMENTS } from "./constants.ts";
 
 function renderChild(
   child: ElementChild,

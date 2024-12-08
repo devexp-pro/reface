@@ -25,9 +25,17 @@ export { escapeHTML, escapeAttribute } from "./escape.ts";
 export { generateClassName, combineClassNames } from "./classes.ts";
 
 // Style processing
-export { processStyles, createStylesheet } from "./styles.ts";
+export { processStyles, createStylesheet, processCSS } from "./styles.ts";
 
 // Type guards and utilities
 export { isVoidElement, isSelfClosing } from "./utils.ts";
 
 export { isTemplateFragment } from "./types.ts";
+
+// Style types
+export type { StyleInterpolation, StyleProcessingOptions } from "./types.ts";
+
+export { StyleCollector } from "./StyleCollector.ts";
+
+// Constants
+export { VOID_ELEMENTS, SELF_CLOSING_ELEMENTS } from "./constants.ts";

@@ -10,7 +10,13 @@ export const RESPONSE = (html?: string | Template, status?: number) => ({
 });
 
 // Error types and utilities
-export type { RenderErrorDetails, ErrorContext } from "./types.ts";
+export type {
+  ErrorContext,
+  ErrorContextOptions,
+  ErrorHandler,
+  RenderErrorDetails,
+  ComponentErrorDetails,
+} from "./types.ts";
 export {
   RefaceError,
   RenderError,
@@ -34,5 +40,6 @@ export type {
 } from "./types.ts";
 export type { Island } from "./types.ts";
 
+// Logger types
+export type { LogLevel, LoggerConfig, Logger } from "./types.ts";
 export { createLogger, configureLogger } from "./logger.ts";
-export type { LogLevel, LoggerConfig } from "./logger.ts";

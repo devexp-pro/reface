@@ -1,15 +1,4 @@
-import type { Template } from "./types.ts";
-
-/**
- * Style interpolation types
- */
-export type StyleInterpolation =
-  | string
-  | number
-  | boolean
-  | undefined
-  | null
-  | (() => Template);
+import type { StyleInterpolation } from "./types.ts";
 
 function processSelectors(css: string, className: string): string {
   return (

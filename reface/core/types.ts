@@ -8,20 +8,18 @@ export interface RenderErrorDetails {
   props?: Record<string, unknown>;
   /** Template that caused the error */
   template?: unknown;
-  /** Error message */
+  /** Additional error message */
   message?: string;
-  /** Stack trace */
+  /** Error stack trace */
   stack?: string;
 }
 
 /**
- * Error context for component rendering
+ * Component error details
  */
-export interface ErrorContext {
-  /** Stack of JSX elements */
-  jsxStack: string[];
-  /** Stack of component names */
-  componentStack: string[];
+export interface ComponentErrorDetails {
+  component: string;
+  props?: Record<string, unknown>;
 }
 
 /**
@@ -60,24 +58,49 @@ export interface Island<R, P> {
   rpc?: RpcHandlers<R>;
 }
 
+/**
+ * Debug levels for logging
+ */
 export type LogLevel = "debug" | "info" | "warn" | "error";
 
-export type Logger = {
-  debug(message: string, ...args: unknown[]): void;
-  info(message: string, ...args: unknown[]): void;
-  warn(message: string, ...args: unknown[]): void;
-  error(
-    message: string,
-    error?: Error,
-    context?: Record<string, unknown>
-  ): void;
-};
+/**
+ * Logger configuration
+ */
+export interface LoggerConfig {
+  enabled: boolean;
+  level: LogLevel;
+  prefix?: string;
+}
 
-export type ErrorContext = {
-  component?: string;
-  props?: Record<string, unknown>;
-  children?: unknown[];
-  stack?: string[];
-};
+/**
+ * Logger interface
+ */
+export interface Logger {
+  debug(message: string, data?: unknown): void;
+  info(message: string, data?: unknown): void;
+  warn(message: string, data?: unknown): void;
+  error(message: string, error?: Error, data?: unknown): void;
+}
 
+/**
+ * Error context for component stack
+ */
+export interface ErrorContext {
+  /** Stack of JSX elements */
+  jsxStack: string[];
+  /** Stack of component names */
+  componentStack: string[];
+}
+
+/**
+ * Error context options
+ */
+export interface ErrorContextOptions {
+  jsxStack?: string[];
+  componentStack?: string[];
+}
+
+/**
+ * Error handler function type
+ */
 export type ErrorHandler = (error: Error, context: ErrorContext) => void;

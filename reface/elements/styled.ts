@@ -1,10 +1,12 @@
 import type {
-  ElementChild,
+  StyledComponent,
+  StyledFactory,
+  StyledComponentOptions,
   HTMLAttributes,
+  ElementChild,
   Template,
   TemplateLiteralFunction,
-} from "../html/types.ts";
-import type { StyledComponent, StyledFactory } from "./types.ts";
+} from "./types.ts";
 import { generateClassName } from "../html/classes.ts";
 import { processAttributes } from "../html/attributes.ts";
 import { processCSS } from "../html/styles.ts";

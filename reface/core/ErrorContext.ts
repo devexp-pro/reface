@@ -1,4 +1,4 @@
-import type { ErrorContext } from "./types.ts";
+import type { ErrorContext, ErrorContextOptions } from "./types.ts";
 
 let currentContext: ErrorContext = {
   jsxStack: [],
@@ -10,7 +10,7 @@ let currentContext: ErrorContext = {
  */
 export function withErrorContext<T>(
   fn: () => T,
-  context: Partial<ErrorContext>
+  context: ErrorContextOptions
 ): T {
   const prevContext = currentContext;
   try {

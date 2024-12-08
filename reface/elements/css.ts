@@ -1,5 +1,4 @@
-import type { Template } from "../core/Template.ts";
-import type { StyleInterpolation } from "../html/styles.ts";
+import type { CSSResult, StyleInterpolation } from "./types.ts";
 
 /**
  * CSS template literal tag
@@ -7,7 +6,7 @@ import type { StyleInterpolation } from "../html/styles.ts";
 export const css = (
   strings: TemplateStringsArray,
   ...values: StyleInterpolation[]
-) => ({
+): CSSResult => ({
   isStyle: true,
   str: strings,
   args: values,
@@ -24,7 +23,7 @@ export const cssVar = (name: string) => `var(--${name})`;
 export const keyframes = (
   strings: TemplateStringsArray,
   ...values: StyleInterpolation[]
-) => ({
+): CSSResult => ({
   isStyle: true,
   str: strings,
   args: values,

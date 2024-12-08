@@ -6,25 +6,25 @@ export interface Template {
   attributes: TemplateAttributes;
   children: ElementChild[];
   isTemplate: true;
-  css?: string;
-  rootClass?: string;
+  css: string;
+  rootClass: string;
 }
 
 /**
  * HTML Fragment interface for trusted HTML content
  */
 export interface TemplateFragment {
-  isFragment: true;
-  values: ElementChild[];
+  type: "fragment";
+  content: string;
 }
 
 /**
  * Base HTML attributes interface
  */
 export interface HTMLAttributes {
-  class?: string | string[];
-  style?: string | Record<string, string | number>;
   [key: string]: unknown;
+  class?: string | string[];
+  style?: string | Record<string, string>;
 }
 
 /**
@@ -73,9 +73,9 @@ export function isTemplateFragment(value: unknown): value is TemplateFragment {
   return (
     typeof value === "object" &&
     value !== null &&
-    "isFragment" in value &&
-    value.isFragment === true &&
-    "values" in value
+    "type" in value &&
+    value.type === "fragment" &&
+    "content" in value
   );
 }
 
@@ -93,3 +93,22 @@ export type RenderOptions = {
   collectStyles?: boolean;
   styleCollector?: Set<string>;
 };
+
+/**
+ * Style interpolation types
+ */
+export type StyleInterpolation =
+  | string
+  | number
+  | boolean
+  | undefined
+  | null
+  | (() => Template);
+
+/**
+ * Style processing options
+ */
+export interface StyleProcessingOptions {
+  className: string;
+  prefix?: string;
+}
