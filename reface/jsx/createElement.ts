@@ -34,6 +34,10 @@ export function createElement(
           children: children.length === 1 ? children[0] : children,
         });
 
+        if (result.tag === "html") {
+          return result.children;
+        }
+
         // Проверяем сначала на Template
         if (result instanceof Template) {
           // Если это фрагмент, возвращаем его children напрямую

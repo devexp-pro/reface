@@ -1,5 +1,5 @@
 import { createLogger } from "@reface/core";
-import type { Template, ElementChild } from "./types.ts";
+import type { ElementChild, Template } from "./types.ts";
 import { StyleCollector } from "./StyleCollector.ts";
 import { renderAttributes } from "./attributes.ts";
 import { VOID_ELEMENTS } from "./constants.ts";
@@ -112,7 +112,7 @@ export function render(template: Template): string {
 function renderTemplate(
   template: Template,
   styles: StyleCollector,
-  scripts: ScriptCollector
+  scripts: ScriptCollector,
 ): string {
   logger.debug("Rendering template", { tag: template.tag });
 
@@ -134,6 +134,10 @@ function renderTemplate(
         src: template.scriptFile,
       });
       scripts.addScriptFile(template.scriptFile);
+    }
+
+    if (template.type === "html") {
+      return template.content;
     }
 
     // Process attributes
@@ -178,7 +182,7 @@ function renderTemplate(
       logger.error(
         "Unknown error rendering template",
         new Error(String(error)),
-        { template }
+        { template },
       );
     }
     throw error;

@@ -4,7 +4,9 @@ import type {
   ComponentFunction,
   ElementChild,
   HTMLAttributes,
-} from "./types.ts";
+  TemplateFragment,
+} from "@reface/html";
+import { html } from "@reface/html";
 
 const logger = createLogger("Component");
 
@@ -44,8 +46,14 @@ export function component<T extends object>(
         ) => {
           // Собираем строки и значения в один массив
           const children = strings.reduce((acc: ElementChild[], str, i) => {
-            if (str) acc.push(str);
-            if (i < templateValues.length) acc.push(templateValues[i]);
+            // Добавляем строку как HTML фрагмент
+            if (str) {
+              acc.push(html`${str}` as TemplateFragment);
+            }
+            // Добавляем значение как есть
+            if (i < templateValues.length) {
+              acc.push(templateValues[i]);
+            }
             return acc;
           }, []);
 

@@ -20,7 +20,7 @@ export interface ITemplate {
  * HTML Fragment interface for trusted HTML content
  */
 export interface TemplateFragment {
-  type: "fragment";
+  type: "html";
   content: string;
 }
 

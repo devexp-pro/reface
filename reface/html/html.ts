@@ -13,8 +13,9 @@ export function html(
   // If used as a function for trusted HTML
   if (typeof strings === "string") {
     return {
-      type: "fragment",
+      type: "html",
       content: strings,
+      attributes: {},
     };
   }
 
@@ -24,16 +25,13 @@ export function html(
     const value = values[i];
     if (value === null || value === undefined) {
       result += "";
-    }
-    // Don't escape TemplateFragments
+    } // Don't escape TemplateFragments
     else if (isTemplateFragment(value)) {
       result += value.content;
-    }
-    // Render nested templates
+    } // Render nested templates
     else if (typeof value === "object" && "isTemplate" in value) {
       result += render(value as Template);
-    }
-    // Escape everything else
+    } // Escape everything else
     else {
       result += escapeHTML(String(value));
     }
@@ -41,7 +39,8 @@ export function html(
   }
 
   return {
-    type: "fragment",
+    type: "html",
     content: result,
+    attributes: {},
   };
 }
