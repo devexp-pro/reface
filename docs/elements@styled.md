@@ -1,30 +1,30 @@
 # Styled Components
 
-Styled Components provide a way to create reusable components with encapsulated styles using CSS-in-JS.
+Type-safe CSS-in-JS support for creating styled elements.
 
 ## Basic Usage
 
 ```typescript
 import { styled } from "@reface/elements";
 
-// Create a styled button
+// Create styled button
 const Button = styled.button`
   & {
     background: blue;
     color: white;
     padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
   }
+
   &:hover {
     background: darkblue;
   }
 `;
 
-// Styles are processed by @html/styles
-// and automatically scoped with unique class names
-
 // Usage
-Button()``; // => <button class="c0">...</button>
-Button({ class: "primary" })`Click me`; // => <button class="c0 primary">Click me</button>
+Button()`Click me`; // => <button class="c0">Click me</button>
+Button({ class: "primary" })`Submit`; // => <button class="c0 primary">Submit</button>
 ```
 
 ## Selectors
@@ -36,11 +36,13 @@ const Card = styled.div`
   & {
     padding: 1rem;
     border: 1px solid #eee;
+    border-radius: 4px;
   }
 
   // Child elements
   & .title {
     font-size: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   // Pseudo-classes
@@ -63,15 +65,18 @@ const Container = styled.div`
   & {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 1rem;
   }
 
   // Nested elements
   & h1 {
     font-size: 2rem;
+    margin-bottom: 1rem;
   }
 
   & p {
     line-height: 1.5;
+    margin-bottom: 1rem;
   }
 
   // Deep nesting
@@ -79,72 +84,10 @@ const Container = styled.div`
     & .title {
       color: blue;
     }
+
     & .content {
       color: #666;
     }
-  }
-`;
-```
-
-## Dynamic Styles
-
-### Props
-
-```typescript
-interface ButtonProps {
-  primary?: boolean;
-  size?: "small" | "large";
-}
-
-const Button = styled.button<ButtonProps>`
-  & {
-    background: ${(props) => (props.primary ? "blue" : "gray")};
-    padding: ${(props) =>
-      props.size === "large" ? "1rem 2rem" : "0.5rem 1rem"};
-  }
-`;
-
-// Usage
-Button({ primary: true, size: "large" })`Click me`;
-```
-
-### Theme Support
-
-```typescript
-const ThemeButton = styled.button`
-  & {
-    background: var(--primary-color, blue);
-    color: var(--text-color, white);
-  }
-  &:hover {
-    background: var(--primary-hover, darkblue);
-  }
-`;
-```
-
-## Component Extension
-
-### Extending Styles
-
-```typescript
-const BaseButton = styled.button`
-  & {
-    border: none;
-    padding: 0.5rem 1rem;
-  }
-`;
-
-const PrimaryButton = styled(BaseButton)`
-  & {
-    background: blue;
-    color: white;
-  }
-`;
-
-const SecondaryButton = styled(BaseButton)`
-  & {
-    background: gray;
-    color: white;
   }
 `;
 ```
@@ -164,33 +107,40 @@ const Container = styled.div`
       margin: 0 auto;
     }
   }
+
+  @media (min-width: 1200px) {
+    & {
+      width: 1170px;
+    }
+  }
 `;
 ```
 
-## Type Safety
-
-### Props Types
+## Component Extension
 
 ```typescript
-// Type-safe props
-interface CardProps {
-  variant: "outlined" | "filled";
-  elevation?: number;
-}
-
-const Card = styled.div<CardProps>`
+const BaseButton = styled.button`
   & {
-    border: ${(props) =>
-      props.variant === "outlined" ? "1px solid #eee" : "none"};
-    box-shadow: ${(props) =>
-      props.elevation
-        ? `0 ${props.elevation}px ${props.elevation * 2}px rgba(0,0,0,0.1)`
-        : "none"};
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
   }
 `;
 
-// Usage with type checking
-Card({ variant: "outlined", elevation: 2 })`Content`;
+const PrimaryButton = styled(BaseButton)`
+  & {
+    background: blue;
+    color: white;
+  }
+`;
+
+const SecondaryButton = styled(BaseButton)`
+  & {
+    background: gray;
+    color: white;
+  }
+`;
 ```
 
 ## Best Practices
@@ -198,14 +148,14 @@ Card({ variant: "outlined", elevation: 2 })`Content`;
 1. **Style Organization**
 
    - Keep styles close to components
-   - Use meaningful component names
+   - Use meaningful class names
    - Split complex styles
 
 2. **Performance**
 
    - Reuse styled components
-   - Minimize dynamic styles
    - Use CSS variables for themes
+   - Minimize style calculations
 
 3. **Maintainability**
 
@@ -214,7 +164,6 @@ Card({ variant: "outlined", elevation: 2 })`Content`;
    - Use theme variables
 
 4. **Type Safety**
-   - Define prop interfaces
-   - Use strict TypeScript
+   - Use TypeScript strict mode
    - Validate style values
-     </rewritten_file>
+   - Follow CSS standards

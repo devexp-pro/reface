@@ -1,11 +1,11 @@
-import type { Template } from "@reface/html";
+import { Template } from "@reface/html";
 import type {
   ComponentFunction,
   ElementChild,
   HTMLAttributes,
-  TemplateLiteralFunction,
   StyledComponent,
   StyledFactory,
+  TemplateLiteralFunction,
 } from "./types.ts";
 import { generateClassName, processAttributes, processCSS } from "@reface/html";
 import { createLogger } from "@reface/core";
@@ -17,7 +17,7 @@ const logger = createLogger("Styled");
  */
 function processElementChildren(
   strings: TemplateStringsArray,
-  values: ElementChild[]
+  values: ElementChild[],
 ): ElementChild[] {
   logger.debug("Processing template children", {
     stringsCount: strings.length,
@@ -36,155 +36,44 @@ function processElementChildren(
  */
 function createStyledComponent<P extends HTMLAttributes>(
   tag: string,
-  css: string
+  css: string,
 ): StyledComponent<P> {
-  logger.debug("Creating styled component", { tag });
+  const rootClass = generateClassName();
+  const processedCss = processCSS(css, rootClass);
 
-  const className = generateClassName();
-  logger.debug("Generated class name", { className });
-
-  try {
-    const processedCss = processCSS(css, className);
-    logger.debug("Processed CSS", { processedCss });
-
-    function styledComponent(props: P): TemplateLiteralFunction;
-    function styledComponent(
-      strings: TemplateStringsArray,
-      ...values: ElementChild[]
-    ): Template;
-    function styledComponent(
-      propsOrStrings?: P | TemplateStringsArray,
-      ...values: ElementChild[]
-    ): TemplateLiteralFunction | Template {
-      try {
-        // Template literal call
-        if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
-          logger.debug("Creating template with template literal", {
-            tag,
-            valuesCount: values.length,
-          });
-
-          const strings = propsOrStrings as TemplateStringsArray;
-          return {
-            tag,
-            attributes: processAttributes({ class: [className] }),
-            children: processElementChildren(strings, values),
-            css: processedCss,
-            isTemplate: true as const,
-            rootClass: className,
-          };
-        }
-
-        // Props call
-        const props = (propsOrStrings as P) || ({} as P);
-        logger.debug("Creating template with props", { tag, props });
-
-        // Return template literal function
-        const templateLiteralFn = (
-          strings: TemplateStringsArray,
-          ...templateValues: ElementChild[]
-        ): Template => {
-          try {
-            logger.debug("Executing template literal function", {
-              tag,
-              valuesCount: templateValues.length,
-            });
-
-            const combinedClasses = [
-              className,
-              ...(Array.isArray(props.class)
-                ? props.class
-                : props.class
-                ? [props.class]
-                : []),
-            ];
-
-            const template = {
-              tag,
-              attributes: processAttributes({
-                ...props,
-                class: combinedClasses,
-              } as Record<string, unknown>),
-              children: processElementChildren(strings, templateValues),
-              css: processedCss,
-              isTemplate: true as const,
-              rootClass: className,
-            };
-
-            logger.info("Created styled template", {
-              tag,
-              className,
-              classCount: combinedClasses.length,
-              childrenCount: template.children.length,
-            });
-
-            return template;
-          } catch (error: unknown) {
-            if (error instanceof Error) {
-              logger.error("Failed to create styled template", error, {
-                tag,
-                strings,
-                templateValues,
-              });
-            } else {
-              logger.error(
-                "Unknown error creating styled template",
-                new Error(String(error)),
-                { tag, strings, templateValues }
-              );
-            }
-            throw error;
-          }
-        };
-
-        return Object.assign(templateLiteralFn, {
-          isTemplate: true as const,
-          tag,
-          css: processedCss,
-          rootClass: className,
-        });
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          logger.error("Styled component error", error, {
-            tag,
-            propsOrStrings,
-            values,
-          });
-        } else {
-          logger.error(
-            "Unknown styled component error",
-            new Error(String(error)),
-            { tag, propsOrStrings, values }
-          );
-        }
-        throw error;
-      }
+  function styledFactory(
+    propsOrStrings?: P | TemplateStringsArray,
+    ...values: ElementChild[]
+  ): Template {
+    // Template literal call
+    if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
+      const strings = propsOrStrings as TemplateStringsArray;
+      return new Template({
+        tag,
+        attributes: { class: rootClass },
+        children: [],
+        css: processedCss,
+        rootClass,
+      }).templateLiteral(strings, ...values);
     }
 
-    styledComponent.isTemplate = true as const;
-    styledComponent.tag = tag;
-    styledComponent.css = processedCss;
-    styledComponent.rootClass = className;
-
-    logger.info("Created styled component", {
+    // Props call
+    const props = (propsOrStrings || {}) as P;
+    return new Template({
       tag,
-      className,
-      cssLength: processedCss.length,
+      attributes: { ...processAttributes(props), class: rootClass },
+      children: [],
+      css: processedCss,
+      rootClass,
     });
-
-    return styledComponent;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error("Failed to create styled component", error, { tag, css });
-    } else {
-      logger.error(
-        "Unknown error creating styled component",
-        new Error(String(error)),
-        { tag, css }
-      );
-    }
-    throw error;
   }
+
+  styledFactory.isTemplate = true as const;
+  styledFactory.tag = tag;
+  styledFactory.css = processedCss;
+  styledFactory.rootClass = rootClass;
+
+  return styledFactory as StyledComponent<P>;
 }
 
 /**
@@ -192,7 +81,7 @@ function createStyledComponent<P extends HTMLAttributes>(
  */
 function processTemplateStrings(
   strings: TemplateStringsArray | string,
-  values?: unknown[]
+  values?: unknown[],
 ): string {
   logger.debug("Processing template strings", {
     isTemplateStrings: Array.isArray(strings),
@@ -224,7 +113,7 @@ export const styled = new Proxy(
 
         return createStyledComponent(
           component.tag,
-          `${originalCss}\n${newCss}`
+          `${originalCss}\n${newCss}`,
         );
       } catch (error: unknown) {
         if (error instanceof Error) {
@@ -237,7 +126,7 @@ export const styled = new Proxy(
           logger.error(
             "Unknown error extending component",
             new Error(String(error)),
-            { tag: component.tag, strings, values }
+            { tag: component.tag, strings, values },
           );
         }
         throw error;
@@ -263,12 +152,12 @@ export const styled = new Proxy(
             logger.error(
               "Unknown error creating new styled component",
               new Error(String(error)),
-              { tag: String(prop), strings, values }
+              { tag: String(prop), strings, values },
             );
           }
           throw error;
         }
       };
     },
-  }
+  },
 );

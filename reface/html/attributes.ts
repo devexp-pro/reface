@@ -79,7 +79,7 @@ export function processAttributes(
 /**
  * Convert attributes to string for HTML
  */
-export function renderAttributes(attrs: TemplateAttributes): string {
+export function renderAttributes(attrs: TemplateAttributes = {}): string {
   logger.debug("Rendering attributes", {
     count: Object.keys(attrs).length,
   });

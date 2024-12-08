@@ -1,32 +1,30 @@
 # JSX Support
 
-Reface provides first-class JSX support with full TypeScript integration.
+JSX integration for creating templates with TypeScript support.
 
 ## Basic Usage
 
 ```typescript
-import { createElement, Fragment } from "@reface/jsx";
-import type { Template } from "@reface/html";
+import { createElement } from "@reface/jsx";
 
-// Simple component
-function Greeting({ name }: { name: string }): Template {
-  return <div>Hello, {name}!</div>;
-}
+// Simple element
+const element = <div>Hello World</div>;
+
+// With attributes
+const container = (
+  <div class="container" id="root">
+    Content
+  </div>
+);
 
 // With children
-function Card({ title, children }: { title: string; children: Template }) {
-  return (
-    <div class="card">
-      <h2>{title}</h2>
-      {children}
-    </div>
-  );
-}
-
-// Usage
-<Card title="Welcome">
-  <Greeting name="World" />
-</Card>;
+const page = (
+  <div>
+    <header>Header</header>
+    <main>Content</main>
+    <footer>Footer</footer>
+  </div>
+);
 ```
 
 ## Components
@@ -35,41 +33,47 @@ function Card({ title, children }: { title: string; children: Template }) {
 
 ```typescript
 // Basic component
-function Button({ text }: { text: string }): Template {
+function Button({ text }: { text: string }) {
   return <button class="btn">{text}</button>;
 }
 
+// Usage
+const button = <Button text="Click me" />;
+
 // With children
-function Layout({ children }: { children: Template }) {
-  return (
-    <div class="layout">
-      <nav>Navigation</nav>
-      <main>{children}</main>
-      <footer>Footer</footer>
-    </div>
-  );
+function Container({ children }: { children: Template }) {
+  return <div class="container">{children}</div>;
 }
+
+// Usage
+const container = (
+  <Container>
+    <h1>Title</h1>
+    <p>Content</p>
+  </Container>
+);
 ```
 
 ### Fragments
 
 ```typescript
 // Multiple elements without wrapper
-function List(): Template {
+function List() {
   return (
     <>
-      <li>First item</li>
-      <li>Second item</li>
+      <li>First</li>
+      <li>Second</li>
     </>
   );
 }
 
-// Conditional groups
-function Content({ isLoggedIn }: { isLoggedIn: boolean }): Template {
+// Usage in components
+function Page() {
   return (
     <>
-      {isLoggedIn && <UserProfile />}
-      <MainContent />
+      <Header />
+      <Main />
+      <Footer />
     </>
   );
 }
@@ -80,16 +84,11 @@ function Content({ isLoggedIn }: { isLoggedIn: boolean }): Template {
 ### HTML Attributes
 
 ```typescript
-// Global attributes
+// Standard attributes
 <div id="main" class="container" title="Main content" hidden={true} />;
 
-// Element-specific
-<button type="submit" disabled={true} form="login-form">
-  Submit
-</button>;
-
 // Data attributes
-<div data-id="123" data-testid="container" data-user-role="admin" />;
+<div data-id="123" data-testid="container" />;
 
 // ARIA attributes
 <button role="tab" aria-selected={true} aria-controls="panel-1">
@@ -100,7 +99,7 @@ function Content({ isLoggedIn }: { isLoggedIn: boolean }): Template {
 ### Dynamic Attributes
 
 ```typescript
-// Conditional classes
+// Conditional class
 <div class={isActive ? "active" : ""}>Content</div>;
 
 // Spread attributes
@@ -108,36 +107,33 @@ const props = { class: "btn", disabled: true };
 <button {...props}>Click me</button>;
 ```
 
-## Children
+## Scripts
 
-### Dynamic Content
+### Adding Scripts
 
 ```typescript
-// Conditional rendering
-function Toggle({ on }: { on: boolean }) {
-  return <div>{on ? <OnState /> : <OffState />}</div>;
-}
-
-// List rendering
-function List({ items }: { items: string[] }) {
+// Inline scripts
+function Counter() {
   return (
-    <ul>
-      {items.map((item) => (
-        <li>{item}</li>
-      ))}
-    </ul>
+    <div
+      script={`
+      function increment() {
+        const count = document.getElementById('count');
+        count.textContent = Number(count.textContent) + 1;
+      }
+    `}
+    >
+      <span id="count">0</span>
+      <button onclick="increment()">+</button>
+    </div>
   );
 }
 
-// Mixed content
-function Content() {
+// External scripts
+function App() {
   return (
-    <div>
-      Some text
-      {42}
-      <span>More text</span>
-      {null}
-      {undefined}
+    <div scriptFile="/app.js">
+      <button onclick="init()">Initialize</button>
     </div>
   );
 }
@@ -149,63 +145,47 @@ function Content() {
 
 ```typescript
 // Props interface
-interface CardProps {
-  title: string;
-  subtitle?: string;
-  children: Template;
+interface ButtonProps {
+  text: string;
+  disabled?: boolean;
+  onClick?: () => void;
 }
 
 // Typed component
-function Card({ title, subtitle, children }: CardProps): Template {
+function Button({ text, disabled, onClick }: ButtonProps) {
   return (
-    <div class="card">
-      <h2>{title}</h2>
-      {subtitle && <h3>{subtitle}</h3>}
-      {children}
-    </div>
+    <button class="btn" disabled={disabled} onclick={onClick}>
+      {text}
+    </button>
   );
 }
-```
 
-### Runtime Types
-
-```typescript
-// Template type
-interface Template {
-  tag: string;
-  attributes: Record<string, unknown>;
-  children: (string | Template)[];
-  css?: string;
-}
-
-// JSX.Element maps to Template
-declare namespace JSX {
-  interface Element extends Template {}
-}
+// Usage with type checking
+const button = <Button text="Click me" disabled={true} />;
 ```
 
 ## Best Practices
 
 1. **Component Design**
 
-   - Single responsibility
-   - Clear props interface
-   - Meaningful names
+   - Keep components small and focused
+   - Use meaningful component names
+   - Follow single responsibility principle
 
 2. **Type Safety**
 
-   - Use TypeScript strict mode
-   - Define prop types
-   - Validate children
+   - Define prop interfaces
+   - Use strict TypeScript settings
+   - Validate component props
 
 3. **Performance**
 
-   - Minimize props
-   - Reuse components
-   - Avoid deep nesting
+   - Minimize component nesting
+   - Reuse components when possible
+   - Keep render functions pure
 
-4. **Patterns**
-   - Composition over inheritance
-   - Small, focused components
-   - Clear component boundaries
+4. **Maintainability**
+   - Document complex components
+   - Use consistent naming
+   - Follow project structure
      </rewritten_file>

@@ -37,23 +37,23 @@ export type StyleInterpolation = string | number | CSSResult;
 /**
  * Element function interface
  */
-export type ElementFunction<A = HTMLAttributes> = {
+export interface ElementFunction<A = HTMLAttributes>
+  extends TemplateLiteralFunction {
   (props: A): TemplateLiteralFunction;
-  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
-  isTemplate: true;
-  tag: string;
-};
+  (strings: TemplateStringsArray, ...values: ElementChild[]): ITemplate;
+}
 
 /**
  * Component function interface
  */
-export type ComponentFunction<P = HTMLAttributes> = {
-  (props: P): TemplateLiteralFunction;
+export interface ComponentFunction<P = HTMLAttributes> {
+  (props: P): Template;
   (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
   isTemplate: true;
   tag: string;
   css?: string;
-};
+  rootClass?: string;
+}
 
 /**
  * Styled component interface
@@ -66,18 +66,21 @@ export type StyledComponent<P = HTMLAttributes> = ComponentFunction<P> & {
 /**
  * Styled factory type
  */
-export type StyledFactory = {
-  <P = HTMLAttributes>(
-    strings: TemplateStringsArray | string,
-    ...values: unknown[]
-  ): StyledComponent<P>;
-} & {
-  [K in keyof JSX.IntrinsicElements]: StyledFactory;
-} & {
-  <P = HTMLAttributes>(
-    component: ComponentFunction<P> | StyledComponent<P>
-  ): StyledFactory;
-};
+export type StyledFactory =
+  & {
+    <P = HTMLAttributes>(
+      strings: TemplateStringsArray | string,
+      ...values: unknown[]
+    ): StyledComponent<P>;
+  }
+  & {
+    [K in keyof JSX.IntrinsicElements]: StyledFactory;
+  }
+  & {
+    <P = HTMLAttributes>(
+      component: ComponentFunction<P> | StyledComponent<P>,
+    ): StyledFactory;
+  };
 
 /**
  * CSS result interface

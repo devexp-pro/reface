@@ -13,7 +13,8 @@
     "./html": "./reface/html/mod.ts",
     "./elements": "./reface/elements/mod.ts",
     "./jsx": "./reface/jsx/mod.ts",
-    "./layouts": "./reface/layouts/mod.ts"
+    "./layouts": "./reface/layouts/mod.ts",
+    "./devtools": "./reface/devtools/mod.ts"
   },
   "imports": {
     "@reface": "./reface/mod.ts",
@@ -21,6 +22,7 @@
     "@reface/html": "./reface/html/mod.ts",
     "@reface/elements": "./reface/elements/mod.ts",
     "@reface/jsx": "./reface/jsx/mod.ts",
+    "@reface/devtools": "./reface/devtools/mod.ts",
     "@reface/layouts": "./reface/layouts/mod.ts",
     "@reface/types": "./reface/core/types.ts",
     "@reface/test-utils": "./reface/__tests__/utils.ts",

@@ -1,15 +1,18 @@
 // Core functionality
 export { component } from "./component.ts";
-export { createElementFactory } from "./createElementFactory.ts";
 export { styled } from "./styled.ts";
+export { js } from "./js.ts";
+export { css, cssVar, keyframes } from "./css.ts";
 
 // HTML Elements
 export * from "./elements.ts";
 
 // Types
 export type {
-  ElementFunction,
   ComponentFunction,
-  StyledComponent,
+  CSSResult,
+  ElementFunction,
   HTMLAttributes,
+  StyledComponent,
+  StyleInterpolation,
 } from "./types.ts";

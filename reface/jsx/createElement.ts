@@ -1,6 +1,8 @@
 import { createLogger } from "@reface/core";
-import type { Template, ElementChild } from "@reface/html";
-import { processAttributes } from "@reface/html";
+import type { ElementChild } from "@reface/html";
+import { processAttributes, Template } from "@reface/html";
+import type { ComponentFunction } from "../elements/types.ts";
+import { processJSXChildren } from "./children.ts";
 
 const logger = createLogger("JSX");
 
@@ -8,9 +10,9 @@ const logger = createLogger("JSX");
  * Create element from JSX
  */
 export function createElement(
-  tag: string | Function,
+  tag: string | ComponentFunction,
   props: Record<string, unknown> | null,
-  ...children: unknown[]
+  ...children: ElementChild[]
 ): Template {
   try {
     logger.debug("Creating element", {
@@ -27,10 +29,16 @@ export function createElement(
       });
 
       try {
-        return tag({
+        const result = tag({
           ...props,
           children: children.length === 1 ? children[0] : children,
         });
+
+        if (result instanceof Template) {
+          return result;
+        }
+
+        throw new Error("Component must return Template");
       } catch (error: unknown) {
         if (error instanceof Error) {
           logger.error("Function component failed", error, {
@@ -42,7 +50,7 @@ export function createElement(
           logger.error(
             "Unknown error in function component",
             new Error(String(error)),
-            { name: tag.name || "Anonymous", props, children }
+            { name: tag.name || "Anonymous", props, children },
           );
         }
         throw error;
@@ -50,41 +58,11 @@ export function createElement(
     }
 
     // Handle regular elements
-    const processedProps = processAttributes(props || {});
-
-    // Process children to ensure they match ElementChild type
-    const processedChildren = children.map((child): ElementChild => {
-      if (child == null) return "";
-      if (
-        typeof child === "string" ||
-        typeof child === "number" ||
-        typeof child === "boolean"
-      ) {
-        return String(child);
-      }
-      if (typeof child === "object" && "isTemplate" in child) {
-        return child as Template;
-      }
-      logger.warn("Invalid child type, converting to string", { child });
-      return String(child);
-    });
-
-    const template: Template = {
+    return new Template({
       tag,
-      attributes: processedProps,
-      children: processedChildren,
-      isTemplate: true as const,
-      css: "",
-      rootClass: "",
-    };
-
-    logger.info("Created element", {
-      tag,
-      attributesCount: Object.keys(processedProps).length,
-      childrenCount: processedChildren.length,
+      attributes: processAttributes(props || {}),
+      children: processJSXChildren(children),
     });
-
-    return template;
   } catch (error: unknown) {
     if (error instanceof Error) {
       logger.error("Failed to create element", error, { tag, props, children });

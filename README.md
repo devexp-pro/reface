@@ -8,15 +8,17 @@
 [![JSR Score](https://jsr.io/badges/@vseplet/reface/score)](https://jsr.io/@vseplet/reface)
 [![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/gT4gvVwqb8)
 
-Modern template engine for building server-side applications with islands architecture.
+Легкий и типизированный шаблонизатор для создания HTML с поддержкой компонентов, стилей и скриптов.
 
-## Features
+## Основные возможности
 
-- 🚀 **Zero Build Step** - No bundling, no transpiling, just run
-- 🏝️ **Islands Architecture** - Interactive components with server-side rendering
-- 💅 **Modern Styling** - CSS-in-JS with theme support
-- 🔒 **Type Safe** - Full TypeScript support
-- 📱 **TWA Ready** - First-class support for Telegram Web Apps
+- Template literals для создания HTML
+- Компонентный подход
+- Встроенная поддержка стилей
+- Встроенная поддержка скриптов
+- Полная типизация TypeScript
+- Нет зависимостей
+- Поддержка SSR
 
 <div align="center">
   <img src="./ex4.gif" alt="Web Terminal Example" width="600" />

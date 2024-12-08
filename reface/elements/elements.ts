@@ -1,130 +1,129 @@
-import { createElementFactory } from "./createElementFactory.ts";
-import type { HTMLAttributes } from "./types.ts";
+import { Template } from "@reface/html";
 
 // Document Metadata
-export const head = createElementFactory<HTMLAttributes>("head");
-export const title = createElementFactory<HTMLAttributes>("title");
-export const base = createElementFactory<HTMLAttributes>("base");
-export const link = createElementFactory<HTMLAttributes>("link");
-export const meta = createElementFactory<HTMLAttributes>("meta");
-export const style = createElementFactory<HTMLAttributes>("style");
+export const head = Template.createTemplateFunction("head");
+export const title = Template.createTemplateFunction("title");
+export const base = Template.createTemplateFunction("base");
+export const link = Template.createTemplateFunction("link");
+export const meta = Template.createTemplateFunction("meta");
+export const style = Template.createTemplateFunction("style");
 
 // Content Sectioning
-export const header = createElementFactory<HTMLAttributes>("header");
-export const nav = createElementFactory<HTMLAttributes>("nav");
-export const main = createElementFactory<HTMLAttributes>("main");
-export const article = createElementFactory<HTMLAttributes>("article");
-export const section = createElementFactory<HTMLAttributes>("section");
-export const aside = createElementFactory<HTMLAttributes>("aside");
-export const footer = createElementFactory<HTMLAttributes>("footer");
-export const address = createElementFactory<HTMLAttributes>("address");
-export const h1 = createElementFactory<HTMLAttributes>("h1");
-export const h2 = createElementFactory<HTMLAttributes>("h2");
-export const h3 = createElementFactory<HTMLAttributes>("h3");
-export const h4 = createElementFactory<HTMLAttributes>("h4");
-export const h5 = createElementFactory<HTMLAttributes>("h5");
-export const h6 = createElementFactory<HTMLAttributes>("h6");
+export const header = Template.createTemplateFunction("header");
+export const nav = Template.createTemplateFunction("nav");
+export const main = Template.createTemplateFunction("main");
+export const article = Template.createTemplateFunction("article");
+export const section = Template.createTemplateFunction("section");
+export const aside = Template.createTemplateFunction("aside");
+export const footer = Template.createTemplateFunction("footer");
+export const address = Template.createTemplateFunction("address");
+export const h1 = Template.createTemplateFunction("h1");
+export const h2 = Template.createTemplateFunction("h2");
+export const h3 = Template.createTemplateFunction("h3");
+export const h4 = Template.createTemplateFunction("h4");
+export const h5 = Template.createTemplateFunction("h5");
+export const h6 = Template.createTemplateFunction("h6");
 
 // Text Content
-export const div = createElementFactory<HTMLAttributes>("div");
-export const p = createElementFactory<HTMLAttributes>("p");
-export const hr = createElementFactory<HTMLAttributes>("hr");
-export const pre = createElementFactory<HTMLAttributes>("pre");
-export const blockquote = createElementFactory<HTMLAttributes>("blockquote");
-export const ol = createElementFactory<HTMLAttributes>("ol");
-export const ul = createElementFactory<HTMLAttributes>("ul");
-export const li = createElementFactory<HTMLAttributes>("li");
-export const dl = createElementFactory<HTMLAttributes>("dl");
-export const dt = createElementFactory<HTMLAttributes>("dt");
-export const dd = createElementFactory<HTMLAttributes>("dd");
-export const figure = createElementFactory<HTMLAttributes>("figure");
-export const figcaption = createElementFactory<HTMLAttributes>("figcaption");
+export const div = Template.createTemplateFunction("div");
+export const p = Template.createTemplateFunction("p");
+export const hr = Template.createTemplateFunction("hr");
+export const pre = Template.createTemplateFunction("pre");
+export const blockquote = Template.createTemplateFunction("blockquote");
+export const ol = Template.createTemplateFunction("ol");
+export const ul = Template.createTemplateFunction("ul");
+export const li = Template.createTemplateFunction("li");
+export const dl = Template.createTemplateFunction("dl");
+export const dt = Template.createTemplateFunction("dt");
+export const dd = Template.createTemplateFunction("dd");
+export const figure = Template.createTemplateFunction("figure");
+export const figcaption = Template.createTemplateFunction("figcaption");
 
 // Inline Text Semantics
-export const a = createElementFactory<HTMLAttributes>("a");
-export const em = createElementFactory<HTMLAttributes>("em");
-export const strong = createElementFactory<HTMLAttributes>("strong");
-export const small = createElementFactory<HTMLAttributes>("small");
-export const s = createElementFactory<HTMLAttributes>("s");
-export const cite = createElementFactory<HTMLAttributes>("cite");
-export const q = createElementFactory<HTMLAttributes>("q");
-export const dfn = createElementFactory<HTMLAttributes>("dfn");
-export const abbr = createElementFactory<HTMLAttributes>("abbr");
-export const ruby = createElementFactory<HTMLAttributes>("ruby");
-export const rt = createElementFactory<HTMLAttributes>("rt");
-export const rp = createElementFactory<HTMLAttributes>("rp");
-export const data = createElementFactory<HTMLAttributes>("data");
-export const time = createElementFactory<HTMLAttributes>("time");
-export const code = createElementFactory<HTMLAttributes>("code");
-export const var_ = createElementFactory<HTMLAttributes>("var");
-export const samp = createElementFactory<HTMLAttributes>("samp");
-export const kbd = createElementFactory<HTMLAttributes>("kbd");
-export const sub = createElementFactory<HTMLAttributes>("sub");
-export const sup = createElementFactory<HTMLAttributes>("sup");
-export const i = createElementFactory<HTMLAttributes>("i");
-export const b = createElementFactory<HTMLAttributes>("b");
-export const u = createElementFactory<HTMLAttributes>("u");
-export const mark = createElementFactory<HTMLAttributes>("mark");
-export const bdi = createElementFactory<HTMLAttributes>("bdi");
-export const bdo = createElementFactory<HTMLAttributes>("bdo");
-export const span = createElementFactory<HTMLAttributes>("span");
-export const br = createElementFactory<HTMLAttributes>("br");
-export const wbr = createElementFactory<HTMLAttributes>("wbr");
+export const a = Template.createTemplateFunction("a");
+export const em = Template.createTemplateFunction("em");
+export const strong = Template.createTemplateFunction("strong");
+export const small = Template.createTemplateFunction("small");
+export const s = Template.createTemplateFunction("s");
+export const cite = Template.createTemplateFunction("cite");
+export const q = Template.createTemplateFunction("q");
+export const dfn = Template.createTemplateFunction("dfn");
+export const abbr = Template.createTemplateFunction("abbr");
+export const ruby = Template.createTemplateFunction("ruby");
+export const rt = Template.createTemplateFunction("rt");
+export const rp = Template.createTemplateFunction("rp");
+export const data = Template.createTemplateFunction("data");
+export const time = Template.createTemplateFunction("time");
+export const code = Template.createTemplateFunction("code");
+export const var_ = Template.createTemplateFunction("var");
+export const samp = Template.createTemplateFunction("samp");
+export const kbd = Template.createTemplateFunction("kbd");
+export const sub = Template.createTemplateFunction("sub");
+export const sup = Template.createTemplateFunction("sup");
+export const i = Template.createTemplateFunction("i");
+export const b = Template.createTemplateFunction("b");
+export const u = Template.createTemplateFunction("u");
+export const mark = Template.createTemplateFunction("mark");
+export const bdi = Template.createTemplateFunction("bdi");
+export const bdo = Template.createTemplateFunction("bdo");
+export const span = Template.createTemplateFunction("span");
+export const br = Template.createTemplateFunction("br");
+export const wbr = Template.createTemplateFunction("wbr");
 
 // Image and Multimedia
-export const img = createElementFactory<HTMLAttributes>("img");
-export const audio = createElementFactory<HTMLAttributes>("audio");
-export const video = createElementFactory<HTMLAttributes>("video");
-export const track = createElementFactory<HTMLAttributes>("track");
-export const map = createElementFactory<HTMLAttributes>("map");
-export const area = createElementFactory<HTMLAttributes>("area");
+export const img = Template.createTemplateFunction("img");
+export const audio = Template.createTemplateFunction("audio");
+export const video = Template.createTemplateFunction("video");
+export const track = Template.createTemplateFunction("track");
+export const map = Template.createTemplateFunction("map");
+export const area = Template.createTemplateFunction("area");
 
 // Embedded Content
-export const iframe = createElementFactory<HTMLAttributes>("iframe");
-export const embed = createElementFactory<HTMLAttributes>("embed");
-export const object = createElementFactory<HTMLAttributes>("object");
-export const param = createElementFactory<HTMLAttributes>("param");
-export const picture = createElementFactory<HTMLAttributes>("picture");
-export const source = createElementFactory<HTMLAttributes>("source");
+export const iframe = Template.createTemplateFunction("iframe");
+export const embed = Template.createTemplateFunction("embed");
+export const object = Template.createTemplateFunction("object");
+export const param = Template.createTemplateFunction("param");
+export const picture = Template.createTemplateFunction("picture");
+export const source = Template.createTemplateFunction("source");
 
 // Scripting
-export const canvas = createElementFactory<HTMLAttributes>("canvas");
-export const noscript = createElementFactory<HTMLAttributes>("noscript");
-export const script = createElementFactory<HTMLAttributes>("script");
+export const canvas = Template.createTemplateFunction("canvas");
+export const noscript = Template.createTemplateFunction("noscript");
+export const script = Template.createTemplateFunction("script");
 
 // Table Content
-export const table = createElementFactory<HTMLAttributes>("table");
-export const caption = createElementFactory<HTMLAttributes>("caption");
-export const colgroup = createElementFactory<HTMLAttributes>("colgroup");
-export const col = createElementFactory<HTMLAttributes>("col");
-export const tbody = createElementFactory<HTMLAttributes>("tbody");
-export const thead = createElementFactory<HTMLAttributes>("thead");
-export const tfoot = createElementFactory<HTMLAttributes>("tfoot");
-export const tr = createElementFactory<HTMLAttributes>("tr");
-export const td = createElementFactory<HTMLAttributes>("td");
-export const th = createElementFactory<HTMLAttributes>("th");
+export const table = Template.createTemplateFunction("table");
+export const caption = Template.createTemplateFunction("caption");
+export const colgroup = Template.createTemplateFunction("colgroup");
+export const col = Template.createTemplateFunction("col");
+export const tbody = Template.createTemplateFunction("tbody");
+export const thead = Template.createTemplateFunction("thead");
+export const tfoot = Template.createTemplateFunction("tfoot");
+export const tr = Template.createTemplateFunction("tr");
+export const td = Template.createTemplateFunction("td");
+export const th = Template.createTemplateFunction("th");
 
 // Forms
-export const form = createElementFactory<HTMLAttributes>("form");
-export const label = createElementFactory<HTMLAttributes>("label");
-export const input = createElementFactory<HTMLAttributes>("input");
-export const button = createElementFactory<HTMLAttributes>("button");
-export const select = createElementFactory<HTMLAttributes>("select");
-export const datalist = createElementFactory<HTMLAttributes>("datalist");
-export const optgroup = createElementFactory<HTMLAttributes>("optgroup");
-export const option = createElementFactory<HTMLAttributes>("option");
-export const textarea = createElementFactory<HTMLAttributes>("textarea");
-export const output = createElementFactory<HTMLAttributes>("output");
-export const progress = createElementFactory<HTMLAttributes>("progress");
-export const meter = createElementFactory<HTMLAttributes>("meter");
-export const fieldset = createElementFactory<HTMLAttributes>("fieldset");
-export const legend = createElementFactory<HTMLAttributes>("legend");
+export const form = Template.createTemplateFunction("form");
+export const label = Template.createTemplateFunction("label");
+export const input = Template.createTemplateFunction("input");
+export const button = Template.createTemplateFunction("button");
+export const select = Template.createTemplateFunction("select");
+export const datalist = Template.createTemplateFunction("datalist");
+export const optgroup = Template.createTemplateFunction("optgroup");
+export const option = Template.createTemplateFunction("option");
+export const textarea = Template.createTemplateFunction("textarea");
+export const output = Template.createTemplateFunction("output");
+export const progress = Template.createTemplateFunction("progress");
+export const meter = Template.createTemplateFunction("meter");
+export const fieldset = Template.createTemplateFunction("fieldset");
+export const legend = Template.createTemplateFunction("legend");
 
 // Interactive Elements
-export const details = createElementFactory<HTMLAttributes>("details");
-export const summary = createElementFactory<HTMLAttributes>("summary");
-export const dialog = createElementFactory<HTMLAttributes>("dialog");
+export const details = Template.createTemplateFunction("details");
+export const summary = Template.createTemplateFunction("summary");
+export const dialog = Template.createTemplateFunction("dialog");
 
 // Web Components
-export const slot = createElementFactory<HTMLAttributes>("slot");
-export const template = createElementFactory<HTMLAttributes>("template");
+export const slot = Template.createTemplateFunction("slot");
+export const template = Template.createTemplateFunction("template");

@@ -1,53 +1,70 @@
 # HTML Module
 
-The HTML module is the core template engine that handles all HTML-related operations with built-in security features.
+The HTML module is responsible for template processing and HTML generation.
 
-## HTML Templates
+## Template Engine
 
-### Template Engine
+### Basic Usage
 
 ```typescript
-// Core template interface
+import { html, render } from "@reface/html";
+
+// Basic template
+const template = html`<div>Hello</div>`;
+render(template); // => <div>Hello</div>
+
+// With interpolation
+const name = "World";
+const greeting = html`<div>Hello, ${name}!</div>`;
+render(greeting); // => <div>Hello, World!</div>
+```
+
+### Template Structure
+
+```typescript
 interface Template {
   tag: string;
   attributes: TemplateAttributes;
   children: ElementChild[];
   css?: string;
-  rootClass?: string;
+  script?: string;
+  scriptFile?: string;
   isTemplate: true;
 }
 
-// Render template to HTML
+// Example
 const template = {
   tag: "div",
-  attributes: processAttributes({ class: ["container"] }),
+  attributes: { class: "container" },
   children: ["Hello"],
   isTemplate: true,
 };
-
-render(template); // => <div class="container">Hello</div>
 ```
 
-### Basic Usage
+## Security
+
+### HTML Escaping
 
 ```typescript
-import { html } from "@reface/html";
-
-// Safe by default - content is escaped
+// Content is escaped by default
 const userInput = "<script>alert('xss')</script>";
 html`<div>${userInput}</div>`;
 // => <div>&lt;script&gt;alert('xss')&lt;/script&gt;</div>
 
-// Explicit trust for safe HTML
-const trustedHTML = "<span>Safe content</span>";
-html`<div>${html(trustedHTML)}</div>`;
-// => <div><span>Safe content</span></div>
+// Attributes are always escaped
+html`<div data-value="${userInput}">Content</div>`;
+// => <div data-value="&lt;script&gt;...">Content</div>
 ```
 
-### Template Fragments
+### Safe HTML
 
 ```typescript
-// Create reusable fragments
+// Explicitly mark content as safe
+const trustedHTML = "<b>Bold</b>";
+html`<div>${html(trustedHTML)}</div>`;
+// => <div><b>Bold</b></div>
+
+// Template fragments are safe
 const header = html`<header>Site Header</header>`;
 const footer = html`<footer>Site Footer</footer>`;
 
@@ -59,143 +76,69 @@ const page = html`
 `;
 ```
 
-## Attribute Processing
+## Styles
 
-### Basic Attributes
-
-```typescript
-import { attributes } from "@reface/html";
-
-// Process attribute object
-const attrs = {
-  class: "btn primary",
-  disabled: true,
-  "data-id": 123,
-};
-
-attributes(attrs);
-// => class="btn primary" disabled data-id="123"
-
-// Boolean attributes
-attributes({ hidden: true }); // => hidden
-attributes({ hidden: false }); // => ""
-```
-
-### Data Attributes
+### CSS Processing
 
 ```typescript
-const dataAttrs = {
-  "data-id": "user-123",
-  "data-role": "admin",
-  "data-permissions": JSON.stringify(["read", "write"]),
-};
-
-attributes(dataAttrs);
-// => data-id="user-123" data-role="admin" data-permissions="[\"read\",\"write\"]"
-```
-
-## Style Processing
-
-### Basic Styles
-
-```typescript
-import { processStyles } from "@reface/html";
-
-// Process CSS string
-const css = processStyles`
-  & {
+// Add styles to template
+const template = html`<div class="${className}">Content</div>`;
+template.css = `
+  .${className} {
     color: blue;
-    background: white;
-  }
-  &:hover {
-    background: lightblue;
-  }
-`, "c1");
-
-// => .c1 { color: blue; background: white; }
-// => .c1:hover { background: lightblue; }
-```
-
-### Class Names
-
-```typescript
-import { classNames, generateClassName } from "@reface/html";
-
-// Combine class names
-classNames("btn", "primary", isActive && "active");
-// => "btn primary active"
-
-// Generate unique class
-const className = generateClassName(); // => "c1234ab"
-```
-
-## Security
-
-### HTML Escaping
-
-```typescript
-import { escapeHTML } from "@reface/html";
-
-// Escape HTML special characters
-escapeHTML('<div class="test">');
-// => &lt;div class=&quot;test&quot;&gt;
-
-// Escape attribute values
-escapeAttribute('"><script>alert(1)</script>');
-// => &quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;
-```
-
-### Safe HTML
-
-```typescript
-// Content is escaped by default
-html`<div>${userContent}</div>`;
-
-// Explicitly mark content as safe
-const trusted = "<b>Bold</b>";
-html`<div>${html(trusted)}</div>`;
-
-// Nested templates are processed safely
-const nested = html`
-  <div>${html`<span>${escapeHTML(user.name)}</span>`}</div>
-`;
-```
-
-## Type Safety
-
-### Template Types
-
-```typescript
-// Template fragment type
-interface TemplateFragment {
-  type: "fragment";
-  content: string;
-}
-
-// Type guard
-function isTemplateFragment(value: unknown): value is TemplateFragment {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "type" in value &&
-    value.type === "fragment"
-  );
-}
-```
-
-### Style Types
-
-```typescript
-// Style interpolation types
-type StyleInterpolation = string | number | boolean | undefined | null;
-
-// Process styles with type checking
-processStyles`
-  & {
-    width: ${100}px;
-    display: ${true ? "block" : "none"};
   }
 `;
+
+// Styles are collected and deduplicated
+render(template);
+// => <div class="c1">Content</div>
+//    <style>.c1 { color: blue; }</style>
+```
+
+## Scripts
+
+### Script Handling
+
+```typescript
+// Inline scripts
+const template = html`
+  <div>
+    <button onclick="handleClick()">Click me</button>
+  </div>
+`;
+template.script = `
+  function handleClick() {
+    console.log('Clicked!');
+  }
+`;
+
+// External scripts
+const template = html`
+  <div>
+    <button onclick="init()">Initialize</button>
+  </div>
+`;
+template.scriptFile = "/scripts/init.js";
+```
+
+## Performance
+
+### Optimization
+
+```typescript
+// Reuse template fragments
+const header = html`<header>Header</header>`;
+const footer = html`<footer>Footer</footer>`;
+
+// Multiple usage
+const page1 = html`${header}
+  <main>Page 1</main>
+  ${footer}`;
+const page2 = html`${header}
+  <main>Page 2</main>
+  ${footer}`;
+
+// Styles and scripts are deduplicated automatically
 ```
 
 ## Best Practices
@@ -212,7 +155,13 @@ processStyles`
    - Cache processed styles
    - Minimize string operations
 
-3. **Type Safety**
+3. **Maintainability**
+
+   - Keep templates small
+   - Use meaningful class names
+   - Document complex templates
+
+4. **Type Safety**
    - Use TypeScript strict mode
-   - Check template types
-   - Validate attribute values
+   - Define proper interfaces
+   - Validate template structure

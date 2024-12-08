@@ -3,6 +3,8 @@ import type { Template, ElementChild } from "./types.ts";
 import { StyleCollector } from "./StyleCollector.ts";
 import { renderAttributes } from "./attributes.ts";
 import { VOID_ELEMENTS } from "./constants.ts";
+import { updateDevTools } from "@reface/devtools";
+import { ScriptCollector } from "./ScriptCollector.ts";
 
 const logger = createLogger("HTML:Render");
 
@@ -62,7 +64,13 @@ export function render(template: Template): string {
 
   try {
     const styles = new StyleCollector();
-    let result = renderTemplate(template, styles);
+    const scripts = new ScriptCollector();
+    let result = renderTemplate(template, styles, scripts);
+
+    // Обновляем DevTools если мы в браузере
+    if (typeof window !== "undefined") {
+      updateDevTools(template);
+    }
 
     // Add collected styles
     const styleTag = styles.toString();
@@ -71,9 +79,17 @@ export function render(template: Template): string {
       result += styleTag;
     }
 
+    // Add collected scripts
+    const scriptTags = scripts.toString();
+    if (scriptTags) {
+      logger.debug("Adding script tags", { scriptTags });
+      result += scriptTags;
+    }
+
     logger.info("Render complete", {
       templateTag: template.tag,
       hasStyles: Boolean(styleTag),
+      hasScripts: Boolean(scriptTags),
       childrenCount: template.children?.length,
     });
 
@@ -93,7 +109,11 @@ export function render(template: Template): string {
 /**
  * Render single template
  */
-function renderTemplate(template: Template, styles: StyleCollector): string {
+function renderTemplate(
+  template: Template,
+  styles: StyleCollector,
+  scripts: ScriptCollector
+): string {
   logger.debug("Rendering template", { tag: template.tag });
 
   try {
@@ -101,6 +121,19 @@ function renderTemplate(template: Template, styles: StyleCollector): string {
     if (template.css) {
       logger.debug("Adding CSS to collector", { css: template.css });
       styles.add(template.css);
+    }
+
+    // Add scripts if present
+    if (template.script) {
+      logger.debug("Adding script to collector", { script: template.script });
+      scripts.addScript(template.script);
+    }
+
+    if (template.scriptFile) {
+      logger.debug("Adding script file to collector", {
+        src: template.scriptFile,
+      });
+      scripts.addScriptFile(template.scriptFile);
     }
 
     // Process attributes
@@ -119,6 +152,13 @@ function renderTemplate(template: Template, styles: StyleCollector): string {
       children = template.children
         .map((child) => renderChild(child, styles))
         .join("");
+    }
+
+    // Добавляем уникальный идентификатор для DOM элементов
+    if (!template.isComponent) {
+      const id = generateId();
+      template.attributes["data-reface-id"] = id;
+      (template as any).key = id; // для Fiber
     }
 
     const result = `<${template.tag}${attrs}>${children}</${template.tag}>`;
@@ -143,4 +183,10 @@ function renderTemplate(template: Template, styles: StyleCollector): string {
     }
     throw error;
   }
+}
+
+// Генерируем уникальные ID
+let idCounter = 0;
+function generateId(): string {
+  return `reface-${idCounter++}`;
 }

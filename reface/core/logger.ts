@@ -1,14 +1,22 @@
-import { load } from "https://deno.land/std@0.190.0/dotenv/mod.ts";
+import { loadSync } from "https://deno.land/std@0.190.0/dotenv/mod.ts";
+import { join } from "https://deno.land/std@0.190.0/path/mod.ts";
+
 import type {
-  LoggerConfig,
-  Logger,
-  LoggerStyle,
   FormattedStack,
+  Logger,
+  LoggerConfig,
+  LoggerStyle,
+  LogLevel,
   RenderErrorDetails,
 } from "./types.ts";
 import { LOG_LEVELS, LOGGER_STYLES } from "./constants.ts";
 
-load({ envPath: ".env", export: true });
+const LOG_LEVEL_PRIORITIES: Record<LogLevel, number> = {
+  debug: 0,
+  info: 1,
+  warn: 2,
+  error: 3,
+};
 
 /**
  * Контекст ошибок для отслеживания стека компонентов
@@ -20,27 +28,53 @@ let currentContext = {
 
 const config: LoggerConfig = {
   enabled: true,
-  level: LOG_LEVELS.INFO,
+  level: LOG_LEVELS.WARN,
 };
 
-const LEVEL_STYLES: Record<string, LoggerStyle> = {
-  [LOG_LEVELS.DEBUG]: {
-    badge: `${LOGGER_STYLES.dim}●${LOGGER_STYLES.reset}`,
+// Загружаем .env файл если он есть (но не перезаписываем существующие переменные)
+loadSync({
+  envPath: join(Deno.cwd(), ".env"),
+  export: true,
+  allowEmptyValues: true,
+});
+
+// Инициализируем конфигурацию сразу
+try {
+  const envLogLevel = Deno.env
+    .get("REFACE_LOG_LEVEL")
+    ?.toLowerCase() as LogLevel;
+  if (envLogLevel && envLogLevel in LOG_LEVEL_PRIORITIES) {
+    config.level = envLogLevel;
+  }
+} catch (error) {
+  console.warn("Failed to read REFACE_LOG_LEVEL from env", error);
+}
+
+const LEVEL_STYLES: Record<LogLevel, LoggerStyle> = {
+  debug: {
+    badge: `${LOGGER_STYLES.dim}[D]${LOGGER_STYLES.reset}`,
     text: LOGGER_STYLES.dim,
   },
-  [LOG_LEVELS.INFO]: {
-    badge: `${LOGGER_STYLES.blue}●${LOGGER_STYLES.reset}`,
+  info: {
+    badge: `${LOGGER_STYLES.blue}[I]${LOGGER_STYLES.reset}`,
     text: LOGGER_STYLES.reset,
   },
-  [LOG_LEVELS.WARN]: {
-    badge: `${LOGGER_STYLES.yellow}●${LOGGER_STYLES.reset}`,
+  warn: {
+    badge: `${LOGGER_STYLES.yellow}[W]${LOGGER_STYLES.reset}`,
     text: LOGGER_STYLES.yellow,
   },
-  [LOG_LEVELS.ERROR]: {
-    badge: `${LOGGER_STYLES.red}●${LOGGER_STYLES.reset}`,
+  error: {
+    badge: `${LOGGER_STYLES.red}[E]${LOGGER_STYLES.reset}`,
     text: LOGGER_STYLES.red,
   },
 };
+
+function shouldLog(messageLevel: LogLevel): boolean {
+  if (!config.enabled) return false;
+  return (
+    LOG_LEVEL_PRIORITIES[messageLevel] >= LOG_LEVEL_PRIORITIES[config.level]
+  );
+}
 
 /**
  * Получить текущий контекст ошибки
@@ -54,7 +88,7 @@ export function getErrorContext() {
  */
 export function withErrorContext<T>(
   fn: () => T,
-  context: Partial<typeof currentContext>
+  context: Partial<typeof currentContext>,
 ): T {
   const prevContext = currentContext;
   try {
@@ -94,7 +128,7 @@ function formatErrorStack(stack: string): string[] {
  */
 function formatFullStack(
   error: Error,
-  componentStack?: string[]
+  componentStack?: string[],
 ): FormattedStack {
   const result: FormattedStack = {};
 
@@ -151,21 +185,22 @@ function formatError(error: Error & { details?: RenderErrorDetails }): string {
 
 function formatLogMessage(
   prefix: string,
+  level: LogLevel,
   message: string,
   style: LoggerStyle,
   data?: unknown,
-  error?: Error
+  error?: Error,
 ): string {
   const parts = [
     style.badge,
-    prefix,
+    `[${prefix}]`,
     `${style.text}${message}${LOGGER_STYLES.reset}`,
   ];
 
   if (error) {
     const stack = formatFullStack(error);
     parts.push(
-      `\n${LOGGER_STYLES.red}Error: ${error.message}${LOGGER_STYLES.reset}`
+      `\n${LOGGER_STYLES.red}Error: ${error.message}${LOGGER_STYLES.reset}`,
     );
     if (stack.errorStack?.length) {
       parts.push("\nStack trace:");
@@ -180,44 +215,119 @@ function formatLogMessage(
   return parts.join(" ");
 }
 
+// Создаем базовый логгер для внутреннего использования
+function createInternalLogger(): Logger {
+  return {
+    debug(message: string, data?: unknown) {
+      if (shouldLog("debug")) {
+        console.debug(
+          formatLogMessage(
+            "Logger",
+            "debug",
+            message,
+            LEVEL_STYLES.debug,
+            data,
+          ),
+        );
+      }
+    },
+    info(message: string, data?: unknown) {
+      if (shouldLog("info")) {
+        console.info(
+          formatLogMessage("Logger", "info", message, LEVEL_STYLES.info, data),
+        );
+      }
+    },
+    warn(message: string, data?: unknown) {
+      if (shouldLog("warn")) {
+        console.warn(
+          formatLogMessage("Logger", "warn", message, LEVEL_STYLES.warn, data),
+        );
+      }
+    },
+    error(message: string, error?: Error, data?: unknown) {
+      if (shouldLog("error")) {
+        console.error(
+          formatLogMessage(
+            "Logger",
+            "error",
+            message,
+            LEVEL_STYLES.error,
+            data,
+            error,
+          ),
+        );
+      }
+    },
+  };
+}
+
+const REFACE_VERSION = "0.1.0";
+const REFACE_EMOJIS = ["🔄", "⚡️", "🚀", "✨", "💫"];
+const getRandomEmoji = () =>
+  REFACE_EMOJIS[Math.floor(Math.random() * REFACE_EMOJIS.length)];
+
+const REFACE_STYLES = {
+  bg: "\x1b[44m", // синий фон
+  bold: "\x1b[1m", // жирный текст
+  reset: "\x1b[0m", // сброс стилей
+  dim: "\x1b[2m", // серый текст
+};
+
+const internalLogger = createInternalLogger();
+
+// Логируем состояние один раз при импорте
+console.info(
+  `${REFACE_STYLES.bg} ${getRandomEmoji()} ${REFACE_STYLES.bold}Reface${REFACE_STYLES.dim} v${REFACE_VERSION} ${getRandomEmoji()} (${config.level}) ${REFACE_STYLES.reset}`,
+);
+
 export function createLogger(prefix: string): Logger {
   return {
     debug(message: string, data?: unknown) {
-      if (!config.enabled || config.level !== LOG_LEVELS.DEBUG) return;
-      console.debug(
-        formatLogMessage(prefix, message, LEVEL_STYLES[LOG_LEVELS.DEBUG], data)
-      );
+      if (shouldLog("debug")) {
+        console.debug(
+          formatLogMessage(prefix, "debug", message, LEVEL_STYLES.debug, data),
+        );
+      }
     },
-
     info(message: string, data?: unknown) {
-      if (!config.enabled) return;
-      console.info(
-        formatLogMessage(prefix, message, LEVEL_STYLES[LOG_LEVELS.INFO], data)
-      );
+      if (shouldLog("info")) {
+        console.info(
+          formatLogMessage(prefix, "info", message, LEVEL_STYLES.info, data),
+        );
+      }
     },
-
     warn(message: string, data?: unknown) {
-      if (!config.enabled) return;
-      console.warn(
-        formatLogMessage(prefix, message, LEVEL_STYLES[LOG_LEVELS.WARN], data)
-      );
+      if (shouldLog("warn")) {
+        console.warn(
+          formatLogMessage(prefix, "warn", message, LEVEL_STYLES.warn, data),
+        );
+      }
     },
-
     error(message: string, error?: Error, data?: unknown) {
-      if (!config.enabled) return;
-      console.error(
-        formatLogMessage(
-          prefix,
-          message,
-          LEVEL_STYLES[LOG_LEVELS.ERROR],
-          data,
-          error
-        )
-      );
+      if (shouldLog("error")) {
+        console.error(
+          formatLogMessage(
+            prefix,
+            "error",
+            message,
+            LEVEL_STYLES.error,
+            data,
+            error,
+          ),
+        );
+      }
     },
   };
 }
 
 export function configureLogger(options: Partial<LoggerConfig>) {
+  const prevLevel = config.level;
   Object.assign(config, options);
+
+  if (prevLevel !== config.level || prevLevel !== options.level) {
+    console.info(
+      `${REFACE_STYLES.bg} ${getRandomEmoji()} ${REFACE_STYLES.bold}Reface${REFACE_STYLES.dim} log level: ${prevLevel} → ${config.level} ${getRandomEmoji()} ${REFACE_STYLES.reset}`,
+    );
+  }
 }

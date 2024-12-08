@@ -5,13 +5,15 @@ const logger = createLogger("HTML:Types");
 /**
  * Base template interface
  */
-export interface Template {
+export interface ITemplate {
   tag: string;
   attributes: TemplateAttributes;
   children: ElementChild[];
   isTemplate: true;
-  css: string;
-  rootClass: string;
+  css?: string;
+  rootClass?: string;
+  script?: string;
+  scriptFile?: string;
 }
 
 /**
@@ -38,7 +40,7 @@ export type ElementChild =
   | string
   | number
   | boolean
-  | Template
+  | ITemplate
   | TemplateFragment
   | null
   | undefined;
@@ -46,18 +48,19 @@ export type ElementChild =
 /**
  * Function that accepts template literals and returns Template
  */
-export type TemplateLiteralFunction = {
-  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+export interface TemplateLiteralFunction {
+  (props?: Record<string, unknown>): TemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChild[]): ITemplate;
   isTemplate: true;
   tag: string;
-};
+}
 
 /**
  * Base component function type
  */
 export type ComponentFunction<P = HTMLAttributes> = {
-  (props?: P): Template | TemplateLiteralFunction;
-  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+  (props?: P): ITemplate | TemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChild[]): ITemplate;
   isTemplate: true;
   tag: string;
 };
@@ -65,10 +68,11 @@ export type ComponentFunction<P = HTMLAttributes> = {
 /**
  * Simple component function type (only JSX)
  */
-export type SimpleComponentFunction<P = HTMLAttributes> = ((
-  props: P
-) => Template) &
-  Pick<Template, "isTemplate" | "tag">;
+export type SimpleComponentFunction<P = HTMLAttributes> =
+  & ((
+    props: P,
+  ) => ITemplate)
+  & Pick<ITemplate, "isTemplate" | "tag">;
 
 /**
  * Check if value is TemplateFragment
@@ -88,8 +92,8 @@ export function isTemplateFragment(value: unknown): value is TemplateFragment {
  */
 export type StyledComponentFunction<P = HTMLAttributes> = {
   (props?: P): TemplateLiteralFunction;
-  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
-} & Pick<Template, "isTemplate" | "tag" | "css" | "rootClass">;
+  (strings: TemplateStringsArray, ...values: ElementChild[]): ITemplate;
+} & Pick<ITemplate, "isTemplate" | "tag" | "css" | "rootClass">;
 
 export type TemplateAttributes = Record<string, unknown>;
 
@@ -107,7 +111,7 @@ export type StyleInterpolation =
   | boolean
   | undefined
   | null
-  | (() => Template);
+  | (() => ITemplate);
 
 /**
  * Style processing options

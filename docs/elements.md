@@ -7,38 +7,55 @@ The Elements module provides a functional approach to creating HTML elements wit
 ```typescript
 import { div, span } from "@reface/elements";
 
-// Empty element
-div()``; // => <div></div>
+// Basic element
+div()`Content`; // => <div>Content</div>
 
 // With attributes
-div({ class: "container" })``; // => <div class="container"></div>
+div({ class: "container" })`Content`; // => <div class="container">Content</div>
 
-// With text content
-div()`Hello world`; // => <div>Hello world</div>
-
-// With nested elements
+// Nested elements
 div()`
-  ${span()`First`}
-  ${span()`Second`}
+  ${span`First`}
+  ${span`Second`}
 `; // => <div><span>First</span><span>Second</span></div>
 ```
 
-## Element Factory
+## Components
 
-### Creating Elements
+### Creating Components
 
 ```typescript
-// Basic element
-const container = div({ class: "container" });
-const button = button({ type: "submit" });
+import { component } from "@reface/elements";
 
-// Usage
-container`
-  ${button`Submit`}
-`;
+// Basic component
+const Button = component(() => div({ class: "btn" })`Click me`);
 
-// Direct usage
-div({ id: "root" })`Content`;
+// With scripts
+const Counter = component(
+  () => div`
+    <span id="count">0</span>
+    <button onclick="increment()">+</button>
+  `,
+  {
+    script: js`
+      function increment() {
+        const count = document.getElementById('count');
+        count.textContent = Number(count.textContent) + 1;
+      }
+    `,
+  }
+);
+
+// With external scripts
+const ExternalCounter = component(
+  () => div`
+    <span id="count">0</span>
+    <button onclick="increment()">+</button>
+  `,
+  {
+    scriptFile: "/counter.js",
+  }
+);
 ```
 
 ### HTML Attributes
@@ -63,7 +80,6 @@ button({
 div({
   "data-id": "123",
   "data-testid": "container",
-  "data-user-role": "admin",
 })`Content`;
 
 // ARIA attributes
@@ -81,10 +97,6 @@ button({
 ```typescript
 // Simple text
 p()`Hello world`;
-
-// Interpolation
-const name = "World";
-p()`Hello, ${name}!`;
 
 // Numbers and other primitives
 div()`Count: ${42}`;
@@ -112,25 +124,6 @@ div({ class: "card" })`
 `;
 ```
 
-### Dynamic Content
-
-```typescript
-// Conditional rendering
-div()`
-  ${condition ? span()`True` : span()`False`}
-`;
-
-// List rendering
-ul()`
-  ${items.map((item) => li()`${item}`)}
-`;
-
-// Fragments
-div()`
-  ${[span()`First`, span()`Second`, span()`Third`]}
-`;
-```
-
 ## Type Safety
 
 ### HTML Attributes
@@ -140,7 +133,6 @@ div()`
 button({
   type: "submit", // Only valid button types
   disabled: true, // Must be boolean
-  "aria-pressed": true, // Valid ARIA attribute
 })`Submit`;
 
 // Invalid attributes caught at compile time
@@ -153,40 +145,6 @@ input({
   type: "email", // Only valid input types
   required: true,
   pattern: "[^@]+@[^@]+\\.[^@]+",
-})``;
-```
-
-### Content Types
-
-```typescript
-// Type-safe children
-type ElementChild = string | number | boolean | Template | null | undefined;
-
-// Valid children
-div()`
-  ${42} // number
-  ${true} // boolean
-  ${span()`Text`} // Template
-  ${null} // ignored
-  ${undefined} // ignored
-`;
-```
-
-## Security
-
-### XSS Prevention
-
-```typescript
-// Safe by default
-div()`${userInput}`; // Content is escaped
-
-// Explicit trust
-import { html } from "@reface/html";
-div()`${html(trustedHTML)}`; // Content is not escaped
-
-// Attributes are always escaped
-div({
-  "data-value": userInput, // Automatically escaped
 })``;
 ```
 
