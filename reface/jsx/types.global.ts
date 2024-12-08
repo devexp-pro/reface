@@ -7,6 +7,12 @@ import type {
   ElementChild,
 } from "../html/types.ts";
 
+// Тип для Fragment компонента
+export type FragmentComponent = {
+  ({ children }: { children?: ElementChild[] }): ElementChild[];
+  isFragment: true;
+};
+
 // JSX элемент - это всегда Template
 type JSXElement = Template;
 
@@ -23,17 +29,16 @@ type ComponentProps<P = object> = P & JSXAttributes;
 
 declare global {
   namespace JSX {
-    // JSX всегда возвращает Template
     type Element = Template;
 
-    // Тип для компонентов, которые можно использовать в JSX
+    // Обновленный тип для компонентов
     type ElementType<P = any> =
-      | keyof JSXIntrinsicElements
+      | keyof IntrinsicElements
       | ComponentFunction<P>
       | SimpleComponentFunction<P>
-      | StyledComponentFunction<P>;
+      | StyledComponentFunction<P>
+      | FragmentComponent;
 
-    // Встроенные HTML элементы
     interface IntrinsicElements {
       [elemName: string]: JSXAttributes;
     }

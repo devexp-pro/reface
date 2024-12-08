@@ -1,102 +1,52 @@
-import type { HTMLAttributes } from "../types/base.ts";
+import type {
+  HTMLAttributes,
+  ElementChild,
+  Template,
+  TemplateLiteralFunction,
+} from "../html/types.ts";
 
-// Button attributes
-export interface ButtonAttributes extends HTMLAttributes {
-  type?: "button" | "submit" | "reset";
-  disabled?: boolean;
-  form?: string;
-  name?: string;
-}
+export type ElementFactoryProps<A> = A & {
+  children?: ElementChild | ElementChild[];
+};
 
-// Input attributes
-export interface InputAttributes extends HTMLAttributes {
-  type?:
-    | "text"
-    | "password"
-    | "email"
-    | "number"
-    | "checkbox"
-    | "radio"
-    | "file"
-    | "date"
-    | "time"
-    | "datetime-local"
-    | "month"
-    | "week"
-    | "tel"
-    | "url"
-    | "search"
-    | "color"
-    | "range";
-  value?: string | number;
-  placeholder?: string;
-  required?: boolean;
-  readonly?: boolean;
-  disabled?: boolean;
-  min?: number | string;
-  max?: number | string;
-  step?: number | string;
-  pattern?: string;
-  name?: string;
-}
+export type ElementFunction<A = HTMLAttributes> = {
+  (props: ElementFactoryProps<A>): TemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+  isTemplate: true;
+  tag: string;
+};
 
-// Anchor attributes
-export interface AnchorAttributes extends HTMLAttributes {
-  href?: string;
-  target?: "_blank" | "_self" | "_parent" | "_top";
-  rel?: string;
-  download?: string;
-}
+export type StyledComponent<P = HTMLAttributes> = {
+  (props: P & { class?: string | string[] }): TemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+  isTemplate: true;
+  tag: string;
+  css: string;
+  rootClass: string;
+};
 
-// Image attributes
-export interface ImgAttributes extends HTMLAttributes {
-  src: string;
-  alt: string;
-  width?: number | string;
-  height?: number | string;
-  loading?: "eager" | "lazy";
-}
+export type StyledFactory = {
+  <P = HTMLAttributes>(
+    strings: TemplateStringsArray | string,
+    ...values: unknown[]
+  ): StyledComponent<P>;
+} & {
+  [K in keyof JSX.IntrinsicElements]: StyledFactory;
+} & {
+  <P = HTMLAttributes>(
+    component: ElementFunction<P> | StyledComponent<P>
+  ): StyledFactory;
+};
 
-// Table attributes
-export interface TableAttributes extends HTMLAttributes {
-  border?: number;
-  cellPadding?: number | string;
-  cellSpacing?: number | string;
-}
+export type ElementFactory = <A extends HTMLAttributes = HTMLAttributes>(
+  tag: string
+) => ElementFunction<A>;
 
-// Form attributes
-export interface FormAttributes extends HTMLAttributes {
-  action?: string;
-  method?: "get" | "post";
-  enctype?: string;
-  target?: string;
-  noValidate?: boolean;
-}
+export type ComponentProps<T> = T & {
+  children?: ElementChild | ElementChild[];
+};
 
-// Select attributes
-export interface SelectAttributes extends HTMLAttributes {
-  multiple?: boolean;
-  size?: number;
-  required?: boolean;
-  disabled?: boolean;
-  name?: string;
-}
-
-// Option attributes
-export interface OptionAttributes extends HTMLAttributes {
-  value: string;
-  selected?: boolean;
-  disabled?: boolean;
-  label?: string;
-}
-
-// Textarea attributes
-export interface TextareaAttributes extends HTMLAttributes {
-  rows?: number;
-  cols?: number;
-  wrap?: "soft" | "hard";
-  readonly?: boolean;
-  required?: boolean;
-  placeholder?: string;
-  name?: string;
-}
+export type ComponentRenderFunction<T> = (
+  props: T,
+  children: ElementChild[]
+) => Template;

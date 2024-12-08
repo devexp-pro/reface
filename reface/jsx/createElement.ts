@@ -1,3 +1,5 @@
+import type { JSXElementProps } from "./types.ts";
+
 import type {
   Template,
   ElementChild,
@@ -15,13 +17,10 @@ import { Fragment } from "./Fragment.ts";
 
 const logger = createLogger("JSX");
 
-/**
- * Create element from JSX
- */
 export function createElement(
   type: string | ComponentFunction,
-  props: Record<string, unknown> | null,
-  ...children: unknown[]
+  props: JSXElementProps,
+  ...children: ElementChild[]
 ): Template {
   logger.debug("JSX Input", { type, props, children });
 

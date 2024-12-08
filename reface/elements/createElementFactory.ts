@@ -1,3 +1,5 @@
+import type { ElementFunction, ElementFactoryProps } from "./types.ts";
+
 import type {
   ElementChild,
   HTMLAttributes,
@@ -18,8 +20,10 @@ const logger = createLogger("HTML");
 export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
   tag: string
 ): {
-  (props?: A): TemplateLiteralFunction;
+  (props: ElementFactoryProps<A>): TemplateLiteralFunction;
   (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+  isTemplate: true;
+  tag: string;
 } {
   function elementFactory(
     propsOrStrings?: A | TemplateStringsArray,
@@ -49,7 +53,7 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
       props,
     });
 
-    // Возвращаем функцию для template literals
+    // В��звращаем функцию для template literals
     const templateLiteralFn = (
       strings: TemplateStringsArray,
       ...templateValues: ElementChild[]
@@ -80,7 +84,6 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
 
   return elementFactory;
 }
-
 function processChildren(
   strings: TemplateStringsArray,
   values: ElementChild[]
@@ -103,8 +106,3 @@ function processChildren(
     return acc;
   }, []);
 }
-
-export type ElementFunction<P = Record<string, unknown>> = {
-  (props?: P): Template;
-  (strings: TemplateStringsArray, ...values: unknown[]): Template;
-};

@@ -11,10 +11,11 @@ import { html } from "../html/html.ts";
  * Process template literal children
  */
 export function processElementChildren(
-  strings: TemplateStringsArray,
+  strings: TemplateStringsArray | undefined,
   values: ElementChild[]
 ): ElementChild[] {
-  return [html(strings, ...values)];
+  if (!strings) return values;
+  return [html(strings as TemplateStringsArray, ...values)];
 }
 
 export function component<T = object>(

@@ -59,3 +59,25 @@ export interface Island<R, P> {
   rest?: RestHandlers;
   rpc?: RpcHandlers<R>;
 }
+
+export type LogLevel = "debug" | "info" | "warn" | "error";
+
+export type Logger = {
+  debug(message: string, ...args: unknown[]): void;
+  info(message: string, ...args: unknown[]): void;
+  warn(message: string, ...args: unknown[]): void;
+  error(
+    message: string,
+    error?: Error,
+    context?: Record<string, unknown>
+  ): void;
+};
+
+export type ErrorContext = {
+  component?: string;
+  props?: Record<string, unknown>;
+  children?: unknown[];
+  stack?: string[];
+};
+
+export type ErrorHandler = (error: Error, context: ErrorContext) => void;

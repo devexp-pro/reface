@@ -5,27 +5,17 @@ export interface Template {
   tag: string;
   attributes: TemplateAttributes;
   children: ElementChild[];
+  isTemplate: true;
   css?: string;
   rootClass?: string;
-  isTemplate: true;
-}
-
-/**
- * Template attributes interface
- */
-export interface TemplateAttributes {
-  class?: string[];
-  id?: string;
-  style?: string | Record<string, string>;
-  [key: string]: unknown;
 }
 
 /**
  * HTML Fragment interface for trusted HTML content
  */
 export interface TemplateFragment {
-  type: "fragment";
-  content: string;
+  isFragment: true;
+  values: ElementChild[];
 }
 
 /**
@@ -33,10 +23,7 @@ export interface TemplateFragment {
  */
 export interface HTMLAttributes {
   class?: string | string[];
-  id?: string;
-  style?: string | Record<string, string>;
-  children?: ElementChild | ElementChild[];
-  [key: `data-${string}`]: string | number | boolean | undefined;
+  style?: string | Record<string, string | number>;
   [key: string]: unknown;
 }
 
@@ -57,15 +44,19 @@ export type ElementChild =
  */
 export type TemplateLiteralFunction = {
   (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
-} & Pick<Template, "isTemplate" | "tag" | "css" | "rootClass">;
+  isTemplate: true;
+  tag: string;
+};
 
 /**
  * Base component function type
  */
 export type ComponentFunction<P = HTMLAttributes> = {
-  (props?: P): TemplateLiteralFunction;
+  (props?: P): Template | TemplateLiteralFunction;
   (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
-} & Pick<Template, "isTemplate" | "tag" | "css" | "rootClass">;
+  isTemplate: true;
+  tag: string;
+};
 
 /**
  * Simple component function type (only JSX)
@@ -82,9 +73,9 @@ export function isTemplateFragment(value: unknown): value is TemplateFragment {
   return (
     typeof value === "object" &&
     value !== null &&
-    "type" in value &&
-    value.type === "fragment" &&
-    "content" in value
+    "isFragment" in value &&
+    value.isFragment === true &&
+    "values" in value
   );
 }
 
@@ -95,3 +86,10 @@ export type StyledComponentFunction<P = HTMLAttributes> = {
   (props?: P): TemplateLiteralFunction;
   (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
 } & Pick<Template, "isTemplate" | "tag" | "css" | "rootClass">;
+
+export type TemplateAttributes = Record<string, unknown>;
+
+export type RenderOptions = {
+  collectStyles?: boolean;
+  styleCollector?: Set<string>;
+};
