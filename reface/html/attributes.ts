@@ -11,7 +11,7 @@ const logger = createLogger("HTML:Attributes");
  * Convert props to TemplateAttributes
  */
 export function processAttributes(
-  props: Record<string, unknown>
+  props: Record<string, unknown>,
 ): TemplateAttributes {
   logger.debug("Processing attributes", {
     count: Object.keys(props).length,
@@ -21,36 +21,21 @@ export function processAttributes(
     const result: TemplateAttributes = {};
 
     for (const [key, value] of Object.entries(props)) {
-      // Skip undefined/null/false
       if (value === undefined || value === null || value === false) {
-        logger.debug(`Skipping attribute "${key}"`, { value });
         continue;
       }
 
       if (key === "class") {
-        // Convert class to array
         const classes = Array.isArray(value)
           ? value
           : String(value).split(/\s+/).filter(Boolean);
-
-        logger.debug("Processing class attribute", {
-          input: value,
-          processed: classes,
-        });
-
         result.class = classes;
       } else if (key === "style" && typeof value === "object") {
-        // Handle style object
-        logger.debug("Processing style object", { value });
         result.style = value as Record<string, string>;
       } else if (value === true) {
-        // Boolean attributes
-        logger.debug(`Processing boolean attribute "${key}"`);
         result[key] = key;
       } else {
-        // Regular values
-        logger.debug(`Processing attribute "${key}"`, { value });
-        result[key] = String(value);
+        result[key] = value;
       }
     }
 
@@ -69,7 +54,7 @@ export function processAttributes(
       logger.error(
         "Unknown error processing attributes",
         new Error(String(error)),
-        { props }
+        { props },
       );
     }
     throw error;
@@ -143,7 +128,7 @@ export function renderAttributes(attrs: TemplateAttributes = {}): string {
       logger.error(
         "Unknown error rendering attributes",
         new Error(String(error)),
-        { attrs }
+        { attrs },
       );
     }
     throw error;

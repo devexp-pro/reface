@@ -5,31 +5,11 @@ import type {
   HTMLAttributes,
   StyledComponent,
   StyledFactory,
-  TemplateLiteralFunction,
 } from "./types.ts";
 import { generateClassName, processAttributes, processCSS } from "@reface/html";
 import { createLogger } from "@reface/core";
 
 const logger = createLogger("Styled");
-
-/**
- * Process template literal children
- */
-function processElementChildren(
-  strings: TemplateStringsArray,
-  values: ElementChild[],
-): ElementChild[] {
-  logger.debug("Processing template children", {
-    stringsCount: strings.length,
-    valuesCount: values.length,
-  });
-
-  return strings.reduce((acc: ElementChild[], str, i) => {
-    if (str) acc.push(str);
-    if (i < values.length) acc.push(values[i]);
-    return acc;
-  }, []);
-}
 
 /**
  * Create styled component
@@ -41,55 +21,77 @@ function createStyledComponent<P extends HTMLAttributes>(
   const rootClass = generateClassName();
   const processedCss = processCSS(css, rootClass);
 
-  function styledFactory(
+  // Создаем базовую функцию через Template
+  const fn = Template.createTemplateFunction(tag);
+
+  function styledFn(
     propsOrStrings?: P | TemplateStringsArray,
     ...values: ElementChild[]
-  ): Template {
-    // Template literal call
+  ): Template | TemplateLiteralFunction {
+    // Template literal call: StyledDiv`Hello`
     if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
-      const strings = propsOrStrings as TemplateStringsArray;
       return new Template({
         tag,
-        attributes: { class: rootClass },
-        children: [],
+        attributes: { class: [rootClass] },
+        children: fn(propsOrStrings, ...values).children,
         css: processedCss,
         rootClass,
-      }).templateLiteral(strings, ...values);
+      });
     }
 
-    // Props call
-    const props = (propsOrStrings || {}) as P;
-    return new Template({
+    // Props call: StyledDiv({ props })
+    const props = propsOrStrings || {} as P;
+    const { children: propsChildren, ...restProps } = props;
+
+    // Обрабатываем атрибуты без children
+    const attributes = processAttributes(restProps);
+
+    // Добавляем rootClass к существующим классам
+    attributes.class = Array.isArray(attributes.class)
+      ? [rootClass, ...attributes.class]
+      : [rootClass];
+
+    // Если есть children, возвращаем Template
+    if (propsChildren) {
+      return new Template({
+        tag,
+        attributes,
+        children: Array.isArray(propsChildren)
+          ? propsChildren
+          : [propsChildren],
+        css: processedCss,
+        rootClass,
+      });
+    }
+
+    // Иначе возвращаем функцию для template literals
+    const templateFn = (
+      strings: TemplateStringsArray,
+      ...templateValues: ElementChild[]
+    ) => {
+      return new Template({
+        tag,
+        attributes,
+        children: fn(strings, ...templateValues).children,
+        css: processedCss,
+        rootClass,
+      });
+    };
+
+    return Object.assign(templateFn, {
+      isTemplate: true as const,
       tag,
-      attributes: { ...processAttributes(props), class: rootClass },
-      children: [],
       css: processedCss,
       rootClass,
     });
   }
 
-  styledFactory.isTemplate = true as const;
-  styledFactory.tag = tag;
-  styledFactory.css = processedCss;
-  styledFactory.rootClass = rootClass;
-
-  return styledFactory as StyledComponent<P>;
-}
-
-/**
- * Process template strings
- */
-function processTemplateStrings(
-  strings: TemplateStringsArray | string,
-  values?: unknown[],
-): string {
-  logger.debug("Processing template strings", {
-    isTemplateStrings: Array.isArray(strings),
-    valuesCount: values?.length,
+  return Object.assign(styledFn, {
+    isTemplate: true as const,
+    tag,
+    css: processedCss,
+    rootClass,
   });
-
-  if (typeof strings === "string") return strings;
-  return String.raw({ raw: strings.raw }, ...(values || []));
 }
 
 /**
@@ -104,8 +106,11 @@ export const styled = new Proxy(
 
     return (strings: TemplateStringsArray | string, ...values: unknown[]) => {
       try {
-        const newCss = processTemplateStrings(strings, values);
+        const newCss = typeof strings === "string"
+          ? strings
+          : String.raw({ raw: strings.raw }, ...(values || []));
         const originalCss = component.css || "";
+
         logger.debug("Combining CSS", {
           originalLength: originalCss.length,
           newLength: newCss.length,
@@ -139,7 +144,9 @@ export const styled = new Proxy(
 
       return (strings: TemplateStringsArray, ...values: unknown[]) => {
         try {
-          const css = processTemplateStrings(strings, values);
+          const css = typeof strings === "string"
+            ? strings
+            : String.raw({ raw: strings.raw }, ...(values || []));
           return createStyledComponent(prop as string, css);
         } catch (error: unknown) {
           if (error instanceof Error) {

@@ -1,4 +1,4 @@
-import type { Template, ElementChild, HTMLAttributes } from "@reface/html";
+import type { ElementChild, HTMLAttributes, Template } from "@reface/html";
 
 /**
  * Fragment props interface
@@ -11,8 +11,9 @@ export interface FragmentProps {
  * Fragment component type
  */
 export interface FragmentComponent {
-  (props: FragmentProps): ElementChild[];
+  (props: FragmentProps): Template;
   isFragment: true;
+  tag: string;
 }
 
 /**

@@ -1,60 +1,52 @@
 import { createLogger } from "@reface/core";
-import type { Template, ElementChild } from "@reface/html";
+import type { ElementChild } from "@reface/html";
+import { Template } from "@reface/html";
 
 const logger = createLogger("JSX:Children");
 
 /**
  * Process JSX children
  */
-export function processJSXChildren(children: unknown[]): ElementChild[] {
-  logger.debug("Processing JSX children", { count: children.length });
+export function processJSXChildren(children: ElementChild[]): ElementChild[] {
+  logger.debug("Processing JSX children", {
+    count: children.length,
+  });
 
   try {
-    const processed = children.reduce<ElementChild[]>((acc, child) => {
-      // Handle null/undefined/boolean
-      if (child == null || typeof child === "boolean") {
-        logger.debug("Skipping null/undefined/boolean child", { child });
-        return acc;
-      }
+    const result: ElementChild[] = [];
 
-      // Handle arrays (flatten)
+    for (const child of children) {
       if (Array.isArray(child)) {
-        logger.debug("Processing array child", { length: child.length });
-        acc.push(...processJSXChildren(child));
-        return acc;
-      }
-
-      // Handle templates
-      if (typeof child === "object" && "isTemplate" in child) {
-        logger.debug("Processing template child", {
-          tag: (child as Template).tag,
+        logger.debug("Processing array child", {
+          length: child.length,
         });
-        acc.push(child as Template);
-        return acc;
+        result.push(...processJSXChildren(child));
+      } else if (child && typeof child === "object") {
+        if ("isTemplate" in child || "type" in child) {
+          logger.debug("Processing template child", {
+            tag: (child as Template).tag,
+          });
+          result.push(child);
+        } else {
+          logger.debug("Processing object child", {
+            type: typeof child,
+          });
+          result.push(String(child));
+        }
+      } else if (child != null) {
+        logger.debug("Processing primitive child", {
+          type: typeof child,
+        });
+        result.push(String(child));
       }
-
-      // Handle primitives
-      if (typeof child === "string" || typeof child === "number") {
-        logger.debug("Processing primitive child", { type: typeof child });
-        acc.push(String(child));
-        return acc;
-      }
-
-      // Handle unknown types
-      logger.warn("Converting unknown child type to string", {
-        child,
-        type: typeof child,
-      });
-      acc.push(String(child));
-      return acc;
-    }, []);
+    }
 
     logger.info("Processed JSX children", {
       inputCount: children.length,
-      outputCount: processed.length,
+      outputCount: result.length,
     });
 
-    return processed;
+    return result;
   } catch (error: unknown) {
     if (error instanceof Error) {
       logger.error("Failed to process JSX children", error, { children });
@@ -62,7 +54,7 @@ export function processJSXChildren(children: unknown[]): ElementChild[] {
       logger.error(
         "Unknown error processing JSX children",
         new Error(String(error)),
-        { children }
+        { children },
       );
     }
     throw error;
@@ -109,7 +101,7 @@ export function processJSXChild(child: unknown): ElementChild {
       logger.error(
         "Unknown error processing JSX child",
         new Error(String(error)),
-        { child }
+        { child },
       );
     }
     throw error;

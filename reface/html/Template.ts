@@ -5,14 +5,26 @@ import type {
   TemplateLiteralFunction,
 } from "./types.ts";
 import { processAttributes } from "./attributes.ts";
+import { escapeHTML } from "./escape.ts";
 
 function processElementChildren(
   strings: TemplateStringsArray,
   values: ElementChild[],
 ): ElementChild[] {
   return strings.reduce((acc: ElementChild[], str, i) => {
-    if (str) acc.push(str);
-    if (i < values.length) acc.push(values[i]);
+    if (str) acc.push(escapeHTML(str));
+
+    if (i < values.length) {
+      const value = values[i];
+      if (
+        value && typeof value === "object" &&
+        ("isTemplate" in value || "type" in value)
+      ) {
+        acc.push(value);
+      } else {
+        acc.push(escapeHTML(String(value)));
+      }
+    }
     return acc;
   }, []);
 }
@@ -45,6 +57,11 @@ export class Template implements ITemplate {
     scriptFile?: string;
   }) {
     this.tag = tag;
+    if (attributes.class) {
+      attributes.class = Array.isArray(attributes.class)
+        ? attributes.class
+        : attributes.class.split(/\s+/).filter(Boolean);
+    }
     this.attributes = attributes;
     this.children = children;
     this.css = css;
@@ -54,13 +71,14 @@ export class Template implements ITemplate {
   }
 
   addClass(className: string): Template {
-    const newAttributes = {
-      ...this.attributes,
-      class: this.attributes.class
-        ? `${this.attributes.class} ${className}`
-        : className,
-    };
-    return new Template({ ...this, attributes: newAttributes });
+    const currentClasses = this.attributes.class || [];
+    return new Template({
+      ...this,
+      attributes: {
+        ...this.attributes,
+        class: [...currentClasses, className],
+      },
+    });
   }
 
   setAttribute(name: string, value: unknown): Template {
@@ -93,8 +111,19 @@ export class Template implements ITemplate {
     ...values: ElementChild[]
   ): Template {
     const children = strings.reduce((acc: ElementChild[], str, i) => {
-      if (str) acc.push(str);
-      if (i < values.length) acc.push(values[i]);
+      if (str) acc.push(escapeHTML(str));
+
+      if (i < values.length) {
+        const value = values[i];
+        if (
+          value && typeof value === "object" &&
+          ("isTemplate" in value || "type" in value)
+        ) {
+          acc.push(value);
+        } else {
+          acc.push(escapeHTML(String(value)));
+        }
+      }
       return acc;
     }, []);
 

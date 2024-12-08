@@ -13,7 +13,7 @@ export function createElement(
   tag: string | ComponentFunction,
   props: Record<string, unknown> | null,
   ...children: ElementChild[]
-): Template {
+): Template | ElementChild[] {
   try {
     logger.debug("Creating element", {
       tag,
@@ -34,11 +34,21 @@ export function createElement(
           children: children.length === 1 ? children[0] : children,
         });
 
+        // Проверяем сначала на Template
         if (result instanceof Template) {
+          // Если это фрагмент, возвращаем его children напрямую
+          if (result.tag === "fragment") {
+            return result.children;
+          }
           return result;
         }
 
-        throw new Error("Component must return Template");
+        // Если это массив (результат Fragment), возвращаем его
+        if (Array.isArray(result)) {
+          return result;
+        }
+
+        throw new Error("Component must return Template or ElementChild[]");
       } catch (error: unknown) {
         if (error instanceof Error) {
           logger.error("Function component failed", error, {
