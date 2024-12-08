@@ -1,4 +1,4 @@
-import type { Template } from "../core/types.ts";
+import type { Template } from "./types.ts";
 
 /**
  * Style interpolation types
@@ -43,4 +43,23 @@ export function processStyles(
   css = processSelectors(css, className);
 
   return css;
+}
+
+/**
+ * Create stylesheet from CSS string
+ */
+export function createStylesheet(css: string): string {
+  return `<style>\n${css}\n</style>`;
+}
+
+/**
+ * Process CSS template with class name
+ */
+export function processCSS(css: string, className: string): string {
+  return css
+    .replace(/&\s*{/g, `.${className} {`)
+    .replace(/&\[(.*?)\]/g, `.${className}[$1]`)
+    .replace(/&\.([\w-]+)/g, `.${className}.$1`)
+    .replace(/&:([\w-]+)/g, `.${className}:$1`)
+    .replace(/&\s*([^{[.:])/g, `.${className} $1`);
 }

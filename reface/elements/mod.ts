@@ -1,5 +1,5 @@
 import { createElementFactory } from "./createElementFactory.ts";
-import type { HTMLAttributes } from "../core/types.ts";
+import type { HTMLAttributes } from "../html/types.ts";
 
 // HTML Elements
 export const div = createElementFactory("div");

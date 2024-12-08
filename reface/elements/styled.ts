@@ -3,19 +3,11 @@ import type {
   HTMLAttributes,
   Template,
   TemplateLiteralFunction,
-} from "../core/types.ts";
+} from "../html/types.ts";
 import type { StyledComponent, StyledFactory } from "./styled.types.ts";
 import { generateClassName } from "../html/classes.ts";
 import { processAttributes } from "../html/attributes.ts";
-
-function processCss(css: string, className: string): string {
-  return css
-    .replace(/&\s*{/g, `.${className} {`)
-    .replace(/&\[(.*?)\]/g, `.${className}[$1]`)
-    .replace(/&\.([\w-]+)/g, `.${className}.$1`)
-    .replace(/&:([\w-]+)/g, `.${className}:$1`)
-    .replace(/&\s*([^{[.:])/g, `.${className} $1`);
-}
+import { processCSS } from "../html/styles.ts";
 
 function processElementChildren(
   strings: TemplateStringsArray,
@@ -33,7 +25,7 @@ function createStyledComponent<P extends HTMLAttributes>(
   css: string
 ): StyledComponent<P> {
   const className = generateClassName();
-  const processedCss = processCss(css, className);
+  const processedCss = processCSS(css, className);
 
   function templateLiteralCall(
     strings: TemplateStringsArray,
@@ -55,7 +47,10 @@ function createStyledComponent<P extends HTMLAttributes>(
   ): TemplateLiteralFunction | Template {
     // Template literal вызов
     if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
-      return templateLiteralCall(propsOrStrings, values);
+      return templateLiteralCall(
+        propsOrStrings as TemplateStringsArray,
+        values
+      );
     }
 
     // JSX вызов или вызов с пропсами
@@ -66,7 +61,7 @@ function createStyledComponent<P extends HTMLAttributes>(
       const templateLiteralFn = (
         strings: TemplateStringsArray,
         ...templateValues: ElementChild[]
-      ) => ({
+      ): Template => ({
         tag,
         attributes: processAttributes({
           ...props,

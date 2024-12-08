@@ -1,4 +1,8 @@
-import type { Template, TemplateFragment } from "./types.ts";
+import type {
+  Template,
+  TemplateFragment,
+  ElementChild,
+} from "../html/types.ts";
 import { isTemplateFragment } from "../html/types.ts";
 import { renderAttributes } from "../html/attributes.ts";
 
@@ -29,7 +33,7 @@ export function render(input: Template | TemplateFragment): string {
 
   // Рендерим детей
   const renderedChildren = children
-    .map((child) => {
+    .map((child: ElementChild) => {
       if (child == null || child === false) return "";
       if (child === true) return "";
 

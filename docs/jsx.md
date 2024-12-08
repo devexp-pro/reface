@@ -6,7 +6,7 @@ Reface provides first-class JSX support with full TypeScript integration.
 
 ```typescript
 import { createElement, Fragment } from "@reface/jsx";
-import type { Template } from "@reface/types";
+import type { Template } from "@reface/html";
 
 // Simple component
 function Greeting({ name }: { name: string }): Template {

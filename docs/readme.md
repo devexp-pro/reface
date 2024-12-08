@@ -6,10 +6,10 @@ Reface is a type-safe template engine for HTML with JSX support.
 
 ```bash
 # Using npm
-npm install @reface/core @reface/elements
+npm install @reface/html @reface/elements
 
 # Using Deno
-import { Reface } from "@reface/core";
+import { html } from "@reface/html";
 ```
 
 ## Quick Start
@@ -36,6 +36,20 @@ function Greeting({ name }: { name: string }) {
 ```
 
 ## Core Concepts
+
+### [HTML](./html.md)
+
+Core template engine:
+
+```typescript
+import { html, render } from "@reface/html";
+
+// Safe by default
+const template = html`<div>${userInput}</div>`;
+
+// Render to string
+render(template);
+```
 
 ### [Elements](./elements.md)
 

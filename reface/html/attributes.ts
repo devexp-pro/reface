@@ -1,5 +1,5 @@
 import { escapeAttribute } from "./escape.ts";
-import type { HTMLAttributes, TemplateAttributes } from "../core/types.ts";
+import type { HTMLAttributes, TemplateAttributes } from "./types.ts";
 
 /**
  * Convert props to TemplateAttributes

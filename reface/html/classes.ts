@@ -8,8 +8,6 @@ export function generateClassName(): string {
 /**
  * Combine multiple class names
  */
-export function classNames(
-  ...classes: (string | undefined | null | false)[]
-): string {
+export function combineClassNames(...classes: (string | undefined)[]): string {
   return classes.filter(Boolean).join(" ");
 }

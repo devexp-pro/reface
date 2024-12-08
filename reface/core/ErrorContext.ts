@@ -1,55 +1,43 @@
-import type { ErrorDetails, ErrorContext as IErrorContext } from "./types.ts";
+import type { ErrorContext } from "./types.ts";
 
-class ErrorContextManager {
-  private current: IErrorContext = {
-    componentStack: [],
-    jsxStack: undefined,
-    lastError: undefined,
-  };
+let currentContext: ErrorContext = {
+  jsxStack: [],
+  componentStack: [],
+};
 
-  // Методы для работы со стеком компонентов
-  pushComponent(name: string): void {
-    if (!this.current.componentStack) {
-      this.current.componentStack = [];
-    }
-    this.current.componentStack.push(name);
-  }
-
-  popComponent(): void {
-    if (!this.current.componentStack) {
-      return;
-    }
-    this.current.componentStack.pop();
-  }
-
-  // Методы для работы с JSX стеком
-  setJSXStack(stack?: string[]): void {
-    this.current.jsxStack = stack;
-  }
-
-  // Методы для работы с последней ошибкой
-  setLastError(error: ErrorDetails): void {
-    this.current.lastError = error;
-  }
-
-  // Получить текущий контекст
-  getContext(): IErrorContext {
-    return {
-      componentStack: [...(this.current.componentStack || [])],
-      jsxStack: this.current.jsxStack,
-      lastError: this.current.lastError,
-    };
-  }
-
-  // Сбросить контекст
-  reset(): void {
-    this.current = {
-      componentStack: [],
-      jsxStack: undefined,
-      lastError: undefined,
-    };
+/**
+ * Run function with error context
+ */
+export function withErrorContext<T>(
+  fn: () => T,
+  context: Partial<ErrorContext>
+): T {
+  const prevContext = currentContext;
+  try {
+    currentContext = { ...currentContext, ...context };
+    return fn();
+  } finally {
+    currentContext = prevContext;
   }
 }
 
-// Экспортируем единственный экземпляр
-export const ErrorContext = new ErrorContextManager();
+/**
+ * Get current error context
+ */
+export function getErrorContext(): ErrorContext {
+  return { ...currentContext };
+}
+
+/**
+ * Push component to stack
+ */
+export function pushComponent(name: string): void {
+  currentContext.componentStack = [...currentContext.componentStack, name];
+}
+
+/**
+ * Pop component from stack
+ */
+export function popComponent(): void {
+  currentContext.componentStack = currentContext.componentStack.slice(0, -1);
+}

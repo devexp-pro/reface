@@ -5,7 +5,7 @@ import type {
   HTMLAttributes,
   Template,
   ElementChild,
-} from "../core/types.ts";
+} from "../html/types.ts";
 
 // JSX элемент - это всегда Template
 type JSXElement = Template;

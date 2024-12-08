@@ -4,8 +4,9 @@ import type {
   Template,
   TemplateLiteralFunction,
   TemplateAttributes,
-} from "../core/types.ts";
+} from "../html/types.ts";
 import { processAttributes } from "../html/attributes.ts";
+import { processTemplateChildren } from "../html/templates.ts";
 
 /**
  * Creates an element factory function for a given tag
@@ -22,13 +23,15 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
   ): TemplateLiteralFunction | Template {
     // Template literal вызов
     if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
-      return {
+      const template: Template = {
         tag,
         attributes: processAttributes({}),
-        children: processChildren(propsOrStrings, values),
+        children: processTemplateChildren(propsOrStrings, values),
         isTemplate: true,
-        tag,
+        css: "",
+        rootClass: "",
       };
+      return template;
     }
 
     // Вызов с пропсами или без
@@ -43,7 +46,8 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
       attributes: processAttributes(props),
       children: processChildren(strings, templateValues),
       isTemplate: true,
-      tag,
+      css: "",
+      rootClass: "",
     });
 
     return Object.assign(templateLiteralFn, {

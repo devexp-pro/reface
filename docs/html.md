@@ -1,8 +1,32 @@
 # HTML Module
 
-The HTML module provides low-level utilities for HTML string manipulation with built-in security features.
+The HTML module is the core template engine that handles all HTML-related operations with built-in security features.
 
 ## HTML Templates
+
+### Template Engine
+
+```typescript
+// Core template interface
+interface Template {
+  tag: string;
+  attributes: TemplateAttributes;
+  children: ElementChild[];
+  css?: string;
+  rootClass?: string;
+  isTemplate: true;
+}
+
+// Render template to HTML
+const template = {
+  tag: "div",
+  attributes: processAttributes({ class: ["container"] }),
+  children: ["Hello"],
+  isTemplate: true,
+};
+
+render(template); // => <div class="container">Hello</div>
+```
 
 ### Basic Usage
 

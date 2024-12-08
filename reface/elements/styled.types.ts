@@ -3,7 +3,7 @@ import type {
   HTMLAttributes,
   TemplateLiteralFunction,
   StyledComponentFunction,
-} from "../core/types.ts";
+} from "../html/types.ts";
 
 /**
  * Base styled component type

@@ -19,6 +19,9 @@ const Button = styled.button`
   }
 `;
 
+// Styles are processed by @html/styles
+// and automatically scoped with unique class names
+
 // Usage
 Button()``; // => <button class="c0">...</button>
 Button({ class: "primary" })`Click me`; // => <button class="c0 primary">Click me</button>

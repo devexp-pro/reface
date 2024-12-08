@@ -37,20 +37,24 @@
 
 ### Core Level (`/core`)
 
-- Template engine core
-  - Template interface and types
-  - Template fragments
-  - Render engine
-  - Security features (XSS protection)
+- Error handling system
+  - Error types and classes
+  - Error context management
+  - Error logging
+- RPC and Islands types
 
 ### HTML Level (`/html`)
 
 - HTML string manipulation
+  - Template engine core
+  - Template interface and types
+  - Template fragments
+  - Render engine
   - HTML template tag
   - Attribute processing
   - Class name handling
   - Style processing
-- Type safety features
+- Security features (XSS protection)
 
 ### Elements Level (`/elements`)
 
@@ -88,15 +92,15 @@ Each module has a specific responsibility and clear boundaries:
 └───────┬─────────┘
         │
 ┌───────▼─────────┐
-│    elements     │  Element creation
+│    elements     ���  Element creation
 └───────┬─────────┘
         │
 ┌───────▼─────────┐
-│      html       │  HTML/CSS string manipulation
+│      html       │  Template engine & HTML processing
 └───────┬─────────┘
         │
 ┌───────▼─────────┐
-│      core       │  Template rendering engine
+│      core       │  Error handling & RPC
 └─────────────────┘
 ```
 

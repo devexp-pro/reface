@@ -2,35 +2,11 @@ import type {
   Template,
   ElementChild,
   TemplateLiteralFunction,
-} from "../core/types.ts";
-import { attributes } from "../html/attributes.ts";
+} from "../html/types.ts";
+import { processAttributes } from "../html/attributes.ts";
 import { escapeHTML } from "../html/escape.ts";
 import { isTemplateFragment } from "../html/types.ts";
-
-function processChildren(children: unknown[]): ElementChild[] {
-  return children.flatMap((child): ElementChild[] => {
-    if (child == null || child === false) return [];
-    if (child === true) return [];
-
-    // Обработка массивов
-    if (Array.isArray(child)) {
-      return processChildren(child);
-    }
-
-    // Обработка фрагментов
-    if (isTemplateFragment(child)) {
-      return [child];
-    }
-
-    // Обработка шаблонов
-    if (typeof child === "object" && "isTemplate" in child) {
-      return [child as Template];
-    }
-
-    // Преобразование примитивов в строки
-    return [escapeHTML(String(child))];
-  });
-}
+import { processJSXChildren } from "../html/templates.ts";
 
 export function createElement(
   type: string | ((props: any) => Template | TemplateLiteralFunction),
@@ -39,7 +15,7 @@ export function createElement(
 ): Template {
   // Если type это функция (компонент), вызываем её
   if (typeof type === "function") {
-    const result = type({ ...props }, processChildren(children));
+    const result = type({ ...props, children: processJSXChildren(children) });
 
     // Проверяем что результат это Template или TemplateLiteralFunction
     if (!result || !("isTemplate" in result)) {
@@ -59,8 +35,8 @@ export function createElement(
   // Создаем элемент
   return {
     tag: type,
-    attributes: props ? attributes(props) : "",
-    children: processChildren(children),
+    attributes: processAttributes(props || {}),
+    children: processJSXChildren(children),
     isTemplate: true,
     css: "",
     rootClass: "",
