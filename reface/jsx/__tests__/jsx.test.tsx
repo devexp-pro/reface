@@ -1,7 +1,8 @@
 import { createElement, Fragment } from "@reface/jsx";
 import { render } from "@reface/core";
-import type { Template } from "@reface/types";
+import type { Template } from "@reface/core";
 import { compareHTML } from "@reface/test-utils";
+import { component } from "@reface/elements";
 
 Deno.test("JSX - basic rendering", () => {
   const template = <div class="test">Hello World</div>;
@@ -9,13 +10,21 @@ Deno.test("JSX - basic rendering", () => {
 });
 
 Deno.test("JSX - component with props", () => {
-  function Greeting({ name }: { name: string }) {
-    return <div class="greeting">Hello, {name}!</div>;
-  }
 
+  const Greeting = component<{ name: string }>(
+    ({ name }, children) => <div class="greeting">Hello, {name}! {children}</div>
+  );
+
+  // JSX использование
   compareHTML(
-    render(Greeting({ name: "John" })),
-    `<div class="greeting">Hello, John!</div>`
+    render(<Greeting name="John">Welcome!</Greeting>),
+    `<div class="greeting">Hello, John! Welcome!</div>`
+  );
+
+  // Template literal использование
+  compareHTML(
+    render(Greeting({ name: "John" })`Welcome!`),
+    `<div class="greeting">Hello, John! Welcome!</div>`
   );
 });
 
@@ -33,28 +42,40 @@ Deno.test("JSX - array children", () => {
 });
 
 Deno.test("JSX - nested components", () => {
-  function Header({ title }: { title: string }) {
-    return (
-      <header class="header">
-        <h1>{title}</h1>
-      </header>
-    );
+  interface HeaderProps {
+    title: string;
   }
 
-  function Layout({ children }: { children: Template | ((props: any) => Template) }) {
-    return (
-      <div class="layout">
-        <Header title="Welcome" />
-        <main>{children}</main>
-      </div>
-    );
+  const Header = component<HeaderProps>(
+    function Header({ title }) {
+      return (
+        <header class="header">
+          <h1>{title}</h1>
+        </header>
+      );
+    }
+  );
+
+  interface LayoutProps {
+    title?: string;
   }
+
+  const Layout = component<LayoutProps>(
+    function Layout({ title = "Default" }, children) {
+      return (
+        <div class="layout">
+          <Header title={title} />
+          <main>{children}</main>
+        </div>
+      );
+    }
+  );
 
   compareHTML(
     render(
-      Layout({
-        children: <div class="content">Hello World</div>,
-      })
+      <Layout title="Welcome">
+        <div class="content">Hello World</div>
+      </Layout>
     ),
     `
     <div class="layout">
@@ -70,18 +91,23 @@ Deno.test("JSX - nested components", () => {
 });
 
 Deno.test("JSX - conditional rendering", () => {
-  function Message({ isError }: { isError?: boolean }) {
+  function Message({ isError }: { isError?: boolean }): Template {
     return (
       <div class={isError ? "error" : "success"}>
         {isError ? "Error occurred" : "Success!"}
       </div>
     );
   }
+  Message.isTemplate = true;
+  Message.tag = "div";
 
   compareHTML(
-    render(Message({ isError: true })),
+    render(<Message isError />),
     `<div class="error">Error occurred</div>`
   );
 
-  compareHTML(render(Message({})), `<div class="success">Success!</div>`);
+  compareHTML(
+    render(<Message />),
+    `<div class="success">Success!</div>`
+  );
 });

@@ -1,114 +1,121 @@
-import type { ElementChild, HTMLAttributes, Template } from "../core/types.ts";
+import type {
+  ElementChild,
+  HTMLAttributes,
+  Template,
+  ComponentFunction,
+  TemplateLiteralFunction,
+} from "../core/types.ts";
+import type { StyledComponent, StyledFactory } from "./styled.types.ts";
 import { generateClassName } from "../html/classes.ts";
 import { attributes } from "../html/attributes.ts";
-import { createElementFactory } from "./createElementFactory.ts";
 
-// Тип для функции, которая может быть вызвана как template literal
-type TemplateLiteralFunction = (
-  strings: TemplateStringsArray,
-  ...values: ElementChild[]
-) => Template;
-
-// Тип для JSX props
-type JSXProps = HTMLAttributes & { children?: ElementChild };
-
-// Базовый тип для styled компонента
-interface StyledComponent {
-  // Вызов с props возвращает функцию для template literals
-  (props?: HTMLAttributes): TemplateLiteralFunction;
-
-  // JSX сигнатура - теперь соответствует JSX.Element
-  (props: JSXProps): JSX.Element;
-
-  // Метаданные для тестов и отладки
-  tag: string;
-  isTemplate: true;
-  css: string;
-}
-
-// Тип для styled функции
-interface StyledFunction {
-  // Для расширения существующих компонентов
-  (component: StyledComponent): {
-    (strings: TemplateStringsArray, ...values: unknown[]): StyledComponent;
-    (css: string): StyledComponent;
-  };
-
-  // Для HTML элементов
-  [K: string]: (
-    strings: TemplateStringsArray,
-    ...values: unknown[]
-  ) => StyledComponent;
-}
-
-function createStyledTag(tag: string, css: string): StyledComponent {
-  const className = generateClassName();
-  const processedCss = css
+function processCss(css: string, className: string): string {
+  return css
     .replace(/&\s*{/g, `.${className} {`)
     .replace(/&\[(.*?)\]/g, `.${className}[$1]`)
     .replace(/&\.([\w-]+)/g, `.${className}.$1`)
     .replace(/&:([\w-]+)/g, `.${className}:$1`)
     .replace(/&\s*([^{[.:])/g, `.${className} $1`);
+}
 
-  // Создаем функцию-компонент
-  const styledComponent = function (props: HTMLAttributes | JSXProps = {}) {
-    // Если есть children, значит это JSX вызов
-    if ("children" in props) {
-      const classNames = [className];
-      if (props.class) classNames.push(props.class);
+function processElementChildren(
+  strings: TemplateStringsArray,
+  values: ElementChild[]
+): ElementChild[] {
+  return strings.reduce((acc: ElementChild[], str, i) => {
+    if (str) acc.push(str);
+    if (i < values.length) acc.push(values[i]);
+    return acc;
+  }, []);
+}
 
-      const { children, class: _, ...restProps } = props;
+function createAttributes(
+  className: string,
+  customClass?: string,
+  props: Record<string, unknown> = {}
+): string {
+  const classNames = [className];
+  if (customClass) classNames.push(customClass);
 
-      return {
-        tag,
-        attributes: `class="${classNames.join(" ")}" ${attributes(
-          restProps
-        )}`.trim(),
-        children: Array.isArray(children)
-          ? children
-          : children !== undefined
-          ? [children]
-          : [],
-        css: processedCss,
-        isTemplate: true,
-        rootClass: className,
-      };
+  const classAttr = `class="${classNames.join(" ")}"`;
+  const otherAttrs = Object.keys(props).length ? attributes(props) : "";
+
+  return `${classAttr}${otherAttrs ? " " + otherAttrs : ""}`.trim();
+}
+
+function createStyledComponent<P extends HTMLAttributes>(
+  tag: string,
+  css: string
+): StyledComponent<P> {
+  const className = generateClassName();
+  const processedCss = processCss(css, className);
+
+  function templateLiteralCall(
+    strings: TemplateStringsArray,
+    ...values: ElementChild[]
+  ): Template {
+    return {
+      tag,
+      attributes: createAttributes(className),
+      children: processElementChildren(strings, values),
+      css: processedCss,
+      isTemplate: true,
+      rootClass: className,
+    };
+  }
+
+  function styledComponent(
+    propsOrStrings?: P | TemplateStringsArray,
+    ...values: ElementChild[]
+  ): TemplateLiteralFunction | Template {
+    // Template literal вызов
+    if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
+      return templateLiteralCall(propsOrStrings, values);
     }
 
-    // Иначе возвращаем функцию для template literals
-    return function (
-      strings: TemplateStringsArray,
-      ...values: ElementChild[]
-    ): Template {
-      const classNames = [className];
-      if (props.class) classNames.push(props.class);
+    // JSX вызов или вызов с пропсами
+    const props = propsOrStrings || ({} as P);
 
-      const { class: _, ...restProps } = props;
-      const attrs = attributes(restProps);
-      const classAttr = `class="${classNames.join(" ")}"`;
-
-      // Объединяем strings и values �� правильном порядке
-      const children = strings.reduce((acc: ElementChild[], str, i) => {
-        if (str) acc.push(str);
-        if (i < values.length) acc.push(values[i]);
-        return acc;
-      }, []);
-
-      return {
+    // Если нет дополнительных значений, возвращаем TemplateLiteralFunction
+    if (values.length === 0) {
+      const templateLiteralFn = (
+        strings: TemplateStringsArray,
+        ...templateValues: ElementChild[]
+      ) => ({
         tag,
-        attributes: attrs ? `${classAttr} ${attrs}` : classAttr,
-        children,
+        attributes: createAttributes(className, props.class, props),
+        children: processElementChildren(strings, templateValues),
         css: processedCss,
         isTemplate: true,
         rootClass: className,
-      };
-    };
-  } as StyledComponent;
+      });
 
-  // Добавляем метаданные
+      return Object.assign(templateLiteralFn, {
+        isTemplate: true as const,
+        tag,
+        css: processedCss,
+        rootClass: className,
+      });
+    }
+
+    return {
+      tag,
+      attributes: createAttributes(className, props.class, props),
+      children: Array.isArray(props.children)
+        ? props.children
+        : props.children
+        ? [props.children]
+        : [],
+      css: processedCss,
+      isTemplate: true,
+      rootClass: className,
+    };
+  }
+
+  styledComponent.isTemplate = true as const;
   styledComponent.tag = tag;
-  styledComponent.isTemplate = true;
   styledComponent.css = processedCss;
+  styledComponent.rootClass = className;
 
   return styledComponent;
 }
@@ -122,41 +129,19 @@ function processTemplateStrings(
 }
 
 export const styled = new Proxy(
-  (component: StyledComponent) => {
-    const styleFunction = (
-      strings: TemplateStringsArray | string,
-      ...values: unknown[]
-    ) => {
-      const css = processTemplateStrings(strings, values);
-
-      const styledComponent = function (props: HTMLAttributes = {}) {
-        return function (
-          strings: TemplateStringsArray,
-          ...values: ElementChild[]
-        ): Template {
-          const baseResult = component(props)(strings, ...values);
-          return {
-            ...baseResult,
-            css: `${baseResult.css}\n${css}`,
-          };
-        };
-      } as StyledComponent;
-
-      // Копируем метаданные
-      styledComponent.tag = component.tag;
-      styledComponent.isTemplate = true;
-      styledComponent.css = css;
-
-      return styledComponent;
+  ((component: ComponentFunction) => {
+    return (strings: TemplateStringsArray | string, ...values: unknown[]) => {
+      const newCss = processTemplateStrings(strings, values);
+      const originalCss = component.css || "";
+      return createStyledComponent(component.tag, `${originalCss}\n${newCss}`);
     };
-    return styleFunction;
-  },
+  }) as unknown as StyledFactory,
   {
     get(target, prop) {
       return (strings: TemplateStringsArray, ...values: unknown[]) => {
         const css = processTemplateStrings(strings, values);
-        return createStyledTag(prop as string, css);
+        return createStyledComponent(prop as string, css);
       };
     },
   }
-) as StyledFunction;
+);

@@ -1,46 +1,42 @@
-import type { ElementChild, HTMLAttributes, Template } from "@reface/core";
+import type {
+  ComponentFunction,
+  HTMLAttributes,
+  TemplateLiteralFunction,
+  StyledComponentFunction,
+} from "../core/types.ts";
 
 /**
  * Base styled component type
  */
-export type StyledComponent = (
-  props: HTMLAttributes & { children?: ElementChild }
-) => Template;
+export type StyledComponent<P = HTMLAttributes> = StyledComponentFunction<P> & {
+  css: string;
+  rootClass: string;
+};
 
 /**
  * Styled factory function type
  */
-export type StyledFactory = (
-  strings: TemplateStringsArray,
-  ...values: unknown[]
-) => StyledComponent;
+export type StyledFactory = {
+  <P = HTMLAttributes>(
+    strings: TemplateStringsArray,
+    ...values: unknown[]
+  ): StyledComponent<P>;
+  (css: string): StyledComponent<HTMLAttributes>;
+} & {
+  [K in keyof JSX.IntrinsicElements]: StyledFactory;
+} & {
+  <P = HTMLAttributes>(
+    component: ComponentFunction<P> | StyledComponent<P>
+  ): StyledFactory;
+};
 
 /**
  * Styled API interface
  */
-export interface StyledTags {
-  div: StyledFactory;
-  span: StyledFactory;
-  p: StyledFactory;
-  h1: StyledFactory;
-  h2: StyledFactory;
-  h3: StyledFactory;
-  h4: StyledFactory;
-  h5: StyledFactory;
-  h6: StyledFactory;
-  header: StyledFactory;
-  footer: StyledFactory;
-  nav: StyledFactory;
-  main: StyledFactory;
-  section: StyledFactory;
-  article: StyledFactory;
-  pre: StyledFactory;
-  code: StyledFactory;
-  button: StyledFactory;
-  input: StyledFactory;
-  a: StyledFactory;
-  [key: string]: StyledFactory;
-}
-
-export type StyledAPI = StyledTags &
-  ((component: StyledComponent) => StyledFactory);
+export type StyledAPI = {
+  [K in keyof JSX.IntrinsicElements]: StyledFactory;
+} & {
+  <P = HTMLAttributes>(
+    component: StyledComponentFunction<P> | StyledComponent<P>
+  ): StyledFactory;
+};

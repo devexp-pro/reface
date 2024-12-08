@@ -48,35 +48,9 @@ export interface Island<R, P> {
 /**
  * Base template interface
  */
-export interface Template {
-  /** HTML tag name */
-  tag: string;
-
-  /** HTML attributes string */
+export interface Template extends ComponentBase {
   attributes: string;
-
-  /** Array of child elements */
-  children: (
-    | string
-    | number
-    | boolean
-    | Template
-    | TemplateFragment
-    | null
-    | undefined
-  )[];
-
-  /** CSS styles associated with the template */
-  css: string;
-
-  /** Type guard marker */
-  isTemplate: true;
-
-  /** Root CSS class name for scoped styles */
-  rootClass: string;
-
-  /** Flag indicating if HTML content is trusted */
-  trusted?: boolean;
+  children: ElementChild[];
 }
 
 /**
@@ -103,6 +77,9 @@ export interface HTMLAttributes {
   /** Inline styles */
   style?: string;
 
+  /** Children elements */
+  children?: ElementChild | ElementChild[];
+
   /** Data attributes */
   [key: `data-${string}`]: string | number | boolean | undefined;
 
@@ -114,13 +91,13 @@ export interface HTMLAttributes {
  * Possible child types in templates
  */
 export type ElementChild =
-  | string // Text content
-  | number // Numbers are converted to strings
-  | boolean // Booleans are converted to strings
-  | Template // Nested templates
-  | TemplateFragment // Trusted HTML fragments
-  | null // Ignored
-  | undefined; // Ignored
+  | string
+  | number
+  | boolean
+  | Template
+  | TemplateFragment
+  | null
+  | undefined;
 
 /**
  * Type guard for TemplateFragment
@@ -193,3 +170,44 @@ export type ElementFactory<A> = {
  * Template generator function type
  */
 export type TemplateGenerator<T> = (props: T) => Template;
+
+/**
+ * Function that accepts template literals and returns Template
+ */
+export type TemplateLiteralFunction = {
+  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+} & ComponentBase;
+
+/**
+ * Base component function type
+ */
+export type ComponentFunction<P = HTMLAttributes> = {
+  (props?: P): TemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+} & ComponentBase;
+
+/**
+ * Base template interface
+ */
+export interface ComponentBase {
+  isTemplate: true;
+  tag: string;
+  css?: string;
+  rootClass?: string;
+}
+
+/**
+ * Simple component function type (only JSX)
+ */
+export type SimpleComponentFunction<P = HTMLAttributes> = ((
+  props: P & HTMLAttributes
+) => Template) &
+  ComponentBase;
+
+/**
+ * Styled component function type
+ */
+export type StyledComponentFunction<P = HTMLAttributes> = {
+  (props?: P): TemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+} & ComponentBase;

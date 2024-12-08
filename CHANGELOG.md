@@ -4,6 +4,77 @@ All notable changes to this project will be documented in this file.
 
 ## 1.0.0 (next)
 
+### Release Notes
+
+Reface 1.0.0 introduces a unified template system with three powerful ways to create templates:
+
+1. JSX Components:
+
+```tsx
+// Type-safe components with props
+const Greeting = component<{ name: string }>(({ name }, children) => (
+  <div class="greeting">
+    Hello, {name}! {children}
+  </div>
+));
+
+// Usage in JSX
+<Greeting name="John">Welcome!</Greeting>;
+```
+
+2. Template Literals:
+
+```tsx
+// Basic elements
+const container = div({ class: "container" });
+container`Hello World`;
+
+// Components with props
+const greeting = Greeting({ name: "John" });
+greeting`Welcome!`;
+
+// Styled components
+const button = Button({ class: "primary" });
+button`Click me`;
+```
+
+3. Styled Components:
+
+```tsx
+const Button = styled.button`
+  & {
+    color: blue;
+    padding: 1rem;
+  }
+  &:hover {
+    background: darkblue;
+  }
+`;
+
+// Use in JSX
+<Button class="primary">Click me</Button>;
+
+// Use with template literals
+Button({ class: "primary" })`Click me`;
+
+// Extend existing components
+const PrimaryButton = styled(Button)`
+  & {
+    background: blue;
+    color: white;
+  }
+`;
+```
+
+Key Features:
+
+- Full TypeScript support with type inference
+- Mix and match all approaches freely
+- Secure by default with automatic HTML escaping
+- Efficient rendering with minimal overhead
+- Comprehensive component lifecycle
+- Rich styling system with CSS-in-JS
+
 ### Framework Level (`/reface`)
 
 - Added comprehensive test suite with integration tests

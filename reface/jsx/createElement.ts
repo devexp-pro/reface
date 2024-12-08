@@ -1,10 +1,14 @@
-import type { Template, HTMLAttributes } from "../core/types.ts";
+import type {
+  Template,
+  ElementChild,
+  TemplateLiteralFunction,
+} from "../core/types.ts";
 import { attributes } from "../html/attributes.ts";
 import { escapeHTML } from "../html/escape.ts";
 import { isTemplateFragment } from "../html/types.ts";
 
-function processChildren(children: unknown[]): (string | Template)[] {
-  return children.flatMap((child): (string | Template)[] => {
+function processChildren(children: unknown[]): ElementChild[] {
+  return children.flatMap((child): ElementChild[] => {
     if (child == null || child === false) return [];
     if (child === true) return [];
 
@@ -15,7 +19,7 @@ function processChildren(children: unknown[]): (string | Template)[] {
 
     // Обработка фрагментов
     if (isTemplateFragment(child)) {
-      return [child.content];
+      return [child];
     }
 
     // Обработка шаблонов
@@ -29,24 +33,36 @@ function processChildren(children: unknown[]): (string | Template)[] {
 }
 
 export function createElement(
-  tag: string | ((props: any) => Template),
-  props: HTMLAttributes | null,
+  type: string | ((props: any) => Template | TemplateLiteralFunction),
+  props: Record<string, unknown> | null,
   ...children: unknown[]
 ): Template {
-  // Если tag это функция (компонент)
-  if (typeof tag === "function") {
-    return tag({ ...props, children });
+  // Если type это функция (компонент), вызываем её
+  if (typeof type === "function") {
+    const result = type({ ...props }, processChildren(children));
+
+    // Проверяем что результат это Template или TemplateLiteralFunction
+    if (!result || !("isTemplate" in result)) {
+      throw new Error(
+        "Component must return a Template or TemplateLiteralFunction"
+      );
+    }
+
+    // Если это TemplateLiteralFunction, вызываем её без аргументов
+    if (typeof result === "function") {
+      return result`` as Template;
+    }
+
+    return result as Template;
   }
 
-  // Обработка children
-  const processedChildren = processChildren(children);
-
+  // Создаем элемент
   return {
-    tag,
+    tag: type,
     attributes: props ? attributes(props) : "",
-    children: processedChildren,
-    css: "",
+    children: processChildren(children),
     isTemplate: true,
+    css: "",
     rootClass: "",
   };
 }

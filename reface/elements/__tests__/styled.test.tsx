@@ -268,3 +268,18 @@ Deno.test("styled with custom element", () => {
 </style>`
   );
 });
+
+// Тест для вызова без аргументов
+Deno.test("styled component - should handle empty call for template literals", () => {
+  const Title = styled.h1`
+    & {
+      font-size: 2em;
+    }
+  `;
+
+  // Оба варианта должны работать одинаково
+  const withEmptyCall = Title()`Hello`;
+  const withEmptyProps = Title({})`Hello`;
+
+  assertEquals(withEmptyCall, withEmptyProps);
+});

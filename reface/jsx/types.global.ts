@@ -1,41 +1,50 @@
-import type { HTMLAttributes, Template } from "../core/types.ts";
+import type {
+  ComponentFunction,
+  SimpleComponentFunction,
+  StyledComponentFunction,
+  HTMLAttributes,
+  Template,
+  ElementChild,
+} from "../core/types.ts";
+
+// JSX элемент - это всегда Template
+type JSXElement = Template;
+
+// Тип для children в JSX
+type JSXElementChild = ElementChild;
+
+// Расширяем HTMLAttributes для JSX
+interface JSXAttributes extends HTMLAttributes {
+  children?: JSXElementChild | JSXElementChild[];
+}
+
+// Тип для пропсов компонента
+type ComponentProps<P = object> = P & JSXAttributes;
 
 declare global {
   namespace JSX {
-    // Элемент может быть либо Template, либо функцией, возвращающей Template
-    type Element = Template | ((props: any) => Template);
+    // JSX всегда возвращает Template
+    type Element = Template;
 
-    // Поддержка функциональных компонентов
-    interface ElementClass {
-      render(): Template;
-    }
+    // Тип для компонентов, которые можно использовать в JSX
+    type ElementType<P = any> =
+      | keyof JSXIntrinsicElements
+      | ComponentFunction<P>
+      | SimpleComponentFunction<P>
+      | StyledComponentFunction<P>;
 
-    // Атрибуты для всех элементов
-    interface IntrinsicAttributes {
-      children?: unknown;
-    }
-
-    // Базовые HTML элементы
+    // Встроенные HTML элементы
     interface IntrinsicElements {
-      div: HTMLAttributes;
-      span: HTMLAttributes;
-      button: HTMLAttributes & {
-        type?: "button" | "submit" | "reset";
-        disabled?: boolean;
-      };
-      input: HTMLAttributes & {
-        type?: "text" | "password" | "email" | "number" | "checkbox" | "radio";
-        value?: string | number;
-        checked?: boolean;
-      };
-      [elemName: string]: HTMLAttributes;
-    }
-
-    // Определяем имя свойства для children
-    interface ElementChildrenAttribute {
-      children: {};
+      [elemName: string]: JSXAttributes;
     }
   }
 }
 
-export {};
+export type {
+  ComponentFunction,
+  SimpleComponentFunction,
+  JSXAttributes,
+  JSXElement,
+  JSXElementChild,
+  ComponentProps,
+};
