@@ -3,31 +3,37 @@ import type { CSSResult, StyleInterpolation } from "./types.ts";
 /**
  * CSS template literal tag
  */
-export const css = (
+export function css(
   strings: TemplateStringsArray,
   ...values: StyleInterpolation[]
-): CSSResult => ({
-  isStyle: true,
-  str: strings,
-  args: values,
-});
+): CSSResult {
+  return {
+    isStyle: true,
+    str: strings,
+    args: values,
+  };
+}
 
 /**
  * CSS variable helper
  */
-export const cssVar = (name: string) => `var(--${name})`;
+export function cssVar(name: string): string {
+  return `var(--${name})`;
+}
 
 /**
  * CSS keyframes helper
  */
-export const keyframes = (
+export function keyframes(
   strings: TemplateStringsArray,
   ...values: StyleInterpolation[]
-): CSSResult => ({
-  isStyle: true,
-  str: strings,
-  args: values,
-  isKeyframes: true,
-});
+): CSSResult {
+  return {
+    isStyle: true,
+    str: strings,
+    args: values,
+    isKeyframes: true,
+  };
+}
 
 // ... other CSS utilities ...

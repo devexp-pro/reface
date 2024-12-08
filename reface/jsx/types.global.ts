@@ -1,55 +1,34 @@
-import type {
-  ComponentFunction,
-  SimpleComponentFunction,
-  StyledComponentFunction,
-  HTMLAttributes,
-  Template,
-  ElementChild,
-} from "../html/types.ts";
+import type { Template, ElementChild, HTMLAttributes } from "@reface/html";
+import type { ComponentFunction, FragmentComponent } from "./types.ts";
 
-// Тип для Fragment компонента
-export type FragmentComponent = {
-  ({ children }: { children?: ElementChild[] }): ElementChild[];
-  isFragment: true;
-};
-
-// JSX элемент - это всегда Template
+// JSX element is always Template
 type JSXElement = Template;
 
-// Тип для children в JSX
+// Type for children in JSX
 type JSXElementChild = ElementChild;
 
-// Расширяем HTMLAttributes для JSX
+// Extend HTMLAttributes for JSX
 interface JSXAttributes extends HTMLAttributes {
   children?: JSXElementChild | JSXElementChild[];
 }
 
-// Тип для пропсов компонента
+// Type for component props
 type ComponentProps<P = object> = P & JSXAttributes;
 
 declare global {
   namespace JSX {
-    type Element = Template;
+    // Element type
+    interface Element extends Template {}
 
-    // Обновленный тип для компонентов
+    // Component types
     type ElementType<P = any> =
-      | keyof IntrinsicElements
+      | keyof JSX.IntrinsicElements
       | ComponentFunction<P>
-      | SimpleComponentFunction<P>
-      | StyledComponentFunction<P>
       | FragmentComponent;
 
-    interface IntrinsicElements {
-      [elemName: string]: JSXAttributes;
-    }
+    // Intrinsic elements
+    interface IntrinsicElements extends Record<string, JSXAttributes> {}
   }
 }
 
-export type {
-  ComponentFunction,
-  SimpleComponentFunction,
-  JSXAttributes,
-  JSXElement,
-  JSXElementChild,
-  ComponentProps,
-};
+export type { JSXAttributes, JSXElement, JSXElementChild, ComponentProps };

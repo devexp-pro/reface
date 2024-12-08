@@ -1,41 +1,18 @@
-// Core types
+// Core types and interfaces
 export type {
   Template,
-  TemplateFragment,
-  TemplateAttributes,
-  HTMLAttributes,
   ElementChild,
-  TemplateLiteralFunction,
-  ComponentFunction,
-  SimpleComponentFunction,
-  StyledComponentFunction,
+  HTMLAttributes,
+  TemplateFragment,
 } from "./types.ts";
 
-// Template functions
+// Core functionality
 export { html } from "./html.ts";
 export { render } from "./render.ts";
+export { processAttributes } from "./attributes.ts";
+export { escapeHTML } from "./escape.ts";
 
-// Attribute processing
-export { processAttributes, renderAttributes } from "./attributes.ts";
-
-// HTML escaping
-export { escapeHTML, escapeAttribute } from "./escape.ts";
-
-// Class name utilities
-export { generateClassName, combineClassNames } from "./classes.ts";
-
-// Style processing
-export { processStyles, createStylesheet, processCSS } from "./styles.ts";
-
-// Type guards and utilities
-export { isVoidElement, isSelfClosing } from "./utils.ts";
-
+// Utilities
+export { generateClassName } from "./classes.ts";
+export { processCSS } from "./styles.ts";
 export { isTemplateFragment } from "./types.ts";
-
-// Style types
-export type { StyleInterpolation, StyleProcessingOptions } from "./types.ts";
-
-export { StyleCollector } from "./StyleCollector.ts";
-
-// Constants
-export { VOID_ELEMENTS, SELF_CLOSING_ELEMENTS } from "./constants.ts";

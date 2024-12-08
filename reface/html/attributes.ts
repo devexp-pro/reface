@@ -1,5 +1,11 @@
-import { escapeAttribute } from "./escape.ts";
+import { createLogger } from "@reface/core";
+
 import type { HTMLAttributes, TemplateAttributes } from "./types.ts";
+import { HTML_ENTITIES } from "./constants.ts";
+import { escapeAttribute } from "./escape.ts";
+import { processHTMLAttributes } from "./utils.ts";
+
+const logger = createLogger("HTML");
 
 /**
  * Convert props to TemplateAttributes
@@ -10,22 +16,22 @@ export function processAttributes(
   const result: TemplateAttributes = {};
 
   for (const [key, value] of Object.entries(props)) {
-    // Пропускаем undefined/null/false
+    // Skip undefined/null/false
     if (value === undefined || value === null || value === false) continue;
 
     if (key === "class") {
-      // Преобразуем class в массив
+      // Convert class to array
       result.class = Array.isArray(value)
         ? value
         : String(value).split(/\s+/).filter(Boolean);
     } else if (key === "style" && typeof value === "object") {
-      // Обработка style как объекта
+      // Handle style object
       result.style = value as Record<string, string>;
     } else if (value === true) {
-      // Boolean атрибуты
+      // Boolean attributes
       result[key] = key;
     } else {
-      // Обычные значения
+      // Regular values
       result[key] = String(value);
     }
   }

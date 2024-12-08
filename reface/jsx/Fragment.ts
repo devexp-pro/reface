@@ -1,5 +1,11 @@
-import type { Template } from "../html/types.ts";
+import type { ElementChild } from "@reface/html";
+import type { FragmentProps } from "./types.ts";
 
-export function Fragment({ children }: { children?: Template[] }): Template[] {
+/**
+ * JSX Fragment component
+ */
+export function Fragment({ children }: FragmentProps): ElementChild[] {
   return children || [];
 }
+
+Fragment.isFragment = true as const;

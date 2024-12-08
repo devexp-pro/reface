@@ -1,5 +1,5 @@
 import { createElementFactory } from "./createElementFactory.ts";
-import type { HTMLAttributes } from "../core/types.ts";
+import type { HTMLAttributes } from "./types.ts";
 
 // Document Metadata
 export const head = createElementFactory<HTMLAttributes>("head");

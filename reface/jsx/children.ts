@@ -1,39 +1,40 @@
-import type { ElementChild } from "../html/types.ts";
-import { isTemplateFragment } from "../html/types.ts";
-import { escapeHTML } from "../html/escape.ts";
+import { createLogger } from "@reface/core";
+import {
+  isTemplateFragment,
+  escapeHTML,
+  type ElementChild,
+} from "@reface/html";
+
+import { getComponentType } from "./utils.ts";
+
+const logger = createLogger("JSX:Children");
 
 /**
  * Process JSX children
  */
 export function processJSXChildren(children: unknown[]): ElementChild[] {
   return children.flatMap((child): ElementChild[] => {
-    // Пропускаем null, undefined, false
-    if (child == null || child === false) return [];
-    // Пропускаем true
-    if (child === true) return [];
+    if (child == null || child === false || child === true) return [];
 
-    // Обработка фрагментов
     if (isTemplateFragment(child)) {
       return [child];
     }
 
-    // Обработка массивов (рекурсивно)
     if (Array.isArray(child)) {
       return processJSXChildren(child);
     }
 
-    // Обработка шаблонов
-    if (typeof child === "object" && "isTemplate" in child) {
-      return [child as Template];
+    const componentType = getComponentType(child);
+
+    if (componentType === "FUNCTION") {
+      logger.debug("Processing component child", child);
+      return [(child as Function)`` as ElementChild];
     }
 
-    // Обработка функций (компонентов)
-    if (typeof child === "function" && "isTemplate" in child) {
-      logger.debug("Component", child);
-      return [child`` as Template];
+    if (typeof child === "object" && child !== null && "isTemplate" in child) {
+      return [child as ElementChild];
     }
 
-    // Обработка примитивов
     if (
       typeof child === "string" ||
       typeof child === "number" ||
@@ -42,7 +43,6 @@ export function processJSXChildren(children: unknown[]): ElementChild[] {
       return [escapeHTML(String(child))];
     }
 
-    // Возвращаем пустой массив для неизвестных типов
     return [];
   });
 }

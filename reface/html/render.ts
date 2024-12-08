@@ -1,76 +1,82 @@
 import type { Template, TemplateFragment, ElementChild } from "./types.ts";
+import { VOID_ELEMENTS } from "./constants.ts";
 import { isTemplateFragment } from "./types.ts";
 import { renderAttributes } from "./attributes.ts";
 import { StyleCollector } from "./StyleCollector.ts";
-import { VOID_ELEMENTS } from "./constants.ts";
 
+/**
+ * Render child element
+ */
 function renderChild(
   child: ElementChild,
   styleCollector: StyleCollector
 ): string {
   if (child == null || child === false || child === true) return "";
 
-  // Обрабатываем массивы
+  // Handle arrays
   if (Array.isArray(child)) {
     return child.map((c) => renderChild(c, styleCollector)).join("");
   }
 
-  if (typeof child === "object") {
-    // Обрабатываем Template
+  if (typeof child === "object" && child !== null) {
+    // Handle Template
     if ("isTemplate" in child) {
-      return render(child, styleCollector);
+      return render(child as Template, styleCollector);
     }
-    // Обрабатываем TemplateFragment
+    // Handle TemplateFragment
     if (isTemplateFragment(child)) {
       return child.content;
     }
-    // Обрабатываем фрагменты из JSX
+    // Handle JSX fragments
     if ("type" in child && child.type === "fragment") {
-      return child.content;
+      return (child as TemplateFragment).content;
     }
   }
 
   return String(child);
 }
 
+/**
+ * Render template to HTML string
+ */
 export function render(
   input: Template | TemplateFragment | ElementChild[],
   styleCollector?: StyleCollector
 ): string {
-  // Создаем коллектор стилей только для корневого вызова
+  // Create style collector only for root call
   const isRoot = !styleCollector;
   styleCollector = styleCollector || new StyleCollector();
 
-  // Обрабатываем массивы (для Fragment)
+  // Handle arrays (for Fragment)
   if (Array.isArray(input)) {
     return input.map((child) => renderChild(child, styleCollector)).join("");
   }
 
-  // Обрабатываем TemplateFragment
+  // Handle TemplateFragment
   if (isTemplateFragment(input)) {
     return input.content;
   }
 
-  const { tag, attributes: attrs, children, css } = input;
+  const { tag, attributes: attrs = {}, children = [], css } = input;
 
-  // Добавляем CSS в коллектор если он есть
+  // Add CSS to collector if present
   if (css) {
     styleCollector.add(css);
   }
 
-  // Рендерим детей, разворачивая массивы
+  // Render children, flattening arrays
   const renderedChildren = children
     .flatMap((child) => (Array.isArray(child) ? child : [child]))
     .map((child) => renderChild(child, styleCollector))
     .join("");
 
-  // Формируем HTML
+  // Build HTML
   const isVoid = VOID_ELEMENTS.has(tag);
   const html = `<${tag}${renderAttributes(attrs)}${
     isVoid ? " />" : `>${renderedChildren}</${tag}>`
   }`;
 
-  // Добавляем собранные стили только в корневом рендере
+  // Add collected styles only in root render
   if (isRoot) {
     return `${html}\n${styleCollector}`;
   }

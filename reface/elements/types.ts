@@ -1,69 +1,70 @@
-import type {
-  HTMLAttributes,
-  ElementChild,
-  Template,
-  TemplateLiteralFunction,
-} from "../html/types.ts";
+import type { Template } from "@reface/html";
 
 /**
- * Element factory function
+ * HTML attributes interface
  */
-export type ElementFactory = <A extends HTMLAttributes = HTMLAttributes>(
-  tag: string
-) => ElementFunction<A>;
-
-/**
- * Element factory props
- */
-export type ElementFactoryProps<A> = A & {
-  children?: ElementChild | ElementChild[];
-};
-
-/**
- * Component render function
- */
-export type ComponentRenderFunction<T> = (
-  props: T,
-  children: ElementChild[]
-) => Template;
-
-/**
- * Component props
- */
-export type ComponentProps<T> = T & {
-  children?: ElementChild | ElementChild[];
-};
-
-export type ElementFunction<A = HTMLAttributes> = {
-  (props: ElementFactoryProps<A>): TemplateLiteralFunction;
-  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
-  isTemplate: true;
-  tag: string;
-};
-
-/**
- * Styled component options
- */
-export interface StyledComponentOptions {
-  tag: string;
-  css: string;
-  className: string;
+export interface HTMLAttributes {
+  class?: string | string[];
+  style?: string | Record<string, string | number>;
+  [key: string]: unknown;
 }
 
 /**
- * Styled component function
+ * Element child types
  */
-export type StyledComponent<P = HTMLAttributes> = {
-  (props: P & { class?: string | string[] }): TemplateLiteralFunction;
+export type ElementChild =
+  | string
+  | number
+  | boolean
+  | Template
+  | null
+  | undefined;
+
+/**
+ * Template literal function
+ */
+export interface TemplateLiteralFunction {
   (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
   isTemplate: true;
   tag: string;
+}
+
+/**
+ * Style interpolation types
+ */
+export type StyleInterpolation = string | number | CSSResult;
+
+/**
+ * Element function interface
+ */
+export type ElementFunction<A = HTMLAttributes> = {
+  (props: A): TemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+  isTemplate: true;
+  tag: string;
+};
+
+/**
+ * Component function interface
+ */
+export type ComponentFunction<P = HTMLAttributes> = {
+  (props: P): TemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
+  isTemplate: true;
+  tag: string;
+  css?: string;
+};
+
+/**
+ * Styled component interface
+ */
+export type StyledComponent<P = HTMLAttributes> = ComponentFunction<P> & {
   css: string;
   rootClass: string;
 };
 
 /**
- * Styled factory function
+ * Styled factory type
  */
 export type StyledFactory = {
   <P = HTMLAttributes>(
@@ -74,12 +75,12 @@ export type StyledFactory = {
   [K in keyof JSX.IntrinsicElements]: StyledFactory;
 } & {
   <P = HTMLAttributes>(
-    component: ElementFunction<P> | StyledComponent<P>
+    component: ComponentFunction<P> | StyledComponent<P>
   ): StyledFactory;
 };
 
 /**
- * CSS template literal result
+ * CSS result interface
  */
 export interface CSSResult {
   isStyle: true;

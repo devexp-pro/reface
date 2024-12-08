@@ -1,26 +1,57 @@
-import type { Template, ElementChild } from "../html/types.ts";
+import type { Template, ElementChild, HTMLAttributes } from "@reface/html";
 
-export type FragmentProps = {
+/**
+ * Fragment props interface
+ */
+export interface FragmentProps {
   children?: ElementChild[];
-};
+}
 
-export type FragmentComponent = {
+/**
+ * Fragment component type
+ */
+export interface FragmentComponent {
   (props: FragmentProps): ElementChild[];
   isFragment: true;
-};
+}
 
-export type JSXElementProps = {
+/**
+ * Component function interface
+ */
+export interface ComponentFunction<P = HTMLAttributes> {
+  (props: P): Template;
+  isTemplate?: true;
+  tag?: string;
+  css?: string;
+  rootClass?: string;
+}
+
+/**
+ * JSX element props interface
+ */
+export interface JSXElementProps {
   children?: ElementChild | ElementChild[];
   [key: string]: unknown;
-};
+}
 
-export type JSXRenderContext = {
+/**
+ * Component types
+ */
+export type ComponentType = "FUNCTION" | "CLASS" | "FRAGMENT" | "ELEMENT";
+
+/**
+ * JSX render context
+ */
+export interface JSXRenderContext {
   components: Set<string>;
   currentComponent?: string;
-};
+}
 
-export type JSXErrorContext = {
+/**
+ * JSX error context
+ */
+export interface JSXErrorContext {
   component?: string;
   props?: Record<string, unknown>;
   children?: ElementChild[];
-};
+}

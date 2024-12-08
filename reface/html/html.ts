@@ -1,5 +1,5 @@
-import { escapeHTML } from "./escape.ts";
 import type { Template, TemplateFragment } from "./types.ts";
+import { escapeHTML } from "./escape.ts";
 import { isTemplateFragment } from "./types.ts";
 import { render } from "./render.ts";
 
@@ -22,14 +22,19 @@ export function html(
   let result = strings[0];
   for (let i = 0; i < values.length; i++) {
     const value = values[i];
+    if (value === null || value === undefined) {
+      result += "";
+    }
     // Don't escape TemplateFragments
-    if (isTemplateFragment(value)) {
+    else if (isTemplateFragment(value)) {
       result += value.content;
-    } else if (typeof child === "object" && "isTemplate" in child) {
-      // Render nested templates
+    }
+    // Render nested templates
+    else if (typeof value === "object" && "isTemplate" in value) {
       result += render(value as Template);
-    } else {
-      // Escape everything else
+    }
+    // Escape everything else
+    else {
       result += escapeHTML(String(value));
     }
     result += strings[i + 1];

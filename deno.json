@@ -37,14 +37,11 @@
     "ex6": "deno run --allow-all --watch=./examples/ex6.ts ./examples/ex6.ts",
     "pub-dry": "deno publish --dry-run --allow-slow-types",
     "test": "deno test -A",
-    "test:watch": "deno test -A --watch",
-    "test:core": "deno test -A reface/core/__tests__/",
-    "test:html": "deno test -A reface/html/__tests__/",
-    "test:elements": "deno test -A reface/elements/__tests__/",
-    "test:jsx": "deno test -A reface/jsx/__tests__/",
+    "test:watch": "deno test -A --watch --no-check reface/",
     "test:coverage": "deno test -A --coverage=coverage && deno coverage coverage",
     "test:ci": "deno test -A --coverage=coverage --junit-path=junit.xml",
-    "website:dev": "deno run -A --watch website/main.tsx"
+    "website:dev": "deno run -A --watch website/main.tsx",
+    "check": "deno check reface/"
   },
   "fmt": {
     "exclude": [

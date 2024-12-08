@@ -1,16 +1,13 @@
-import type { ElementFunction } from "./types.ts";
-
+import type { Template } from "@reface/html";
 import type {
+  ElementFunction,
   ElementChild,
   HTMLAttributes,
-  Template,
   TemplateLiteralFunction,
-} from "../html/types.ts";
-import { processAttributes } from "../html/attributes.ts";
+} from "./types.ts";
+import { processAttributes } from "@reface/html";
 import { processElementChildren } from "./component.ts";
-import { createLogger } from "../core/logger.ts";
-import { escapeHTML } from "../html/escape.ts";
-import { isTemplateFragment } from "../html/types.ts";
+import { createLogger } from "@reface/core";
 
 const logger = createLogger("HTML");
 
@@ -20,35 +17,40 @@ const logger = createLogger("HTML");
 export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
   tag: string
 ): ElementFunction<A> {
+  function elementFactory(props: A): TemplateLiteralFunction;
+  function elementFactory(
+    strings: TemplateStringsArray,
+    ...values: ElementChild[]
+  ): Template;
   function elementFactory(
     propsOrStrings?: A | TemplateStringsArray,
     ...values: ElementChild[]
   ): TemplateLiteralFunction | Template {
-    // Template literal вызов
+    // Template literal call
     if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
       logger.debug(`Creating template for tag "${tag}" with template literal`, {
         strings: propsOrStrings,
         values,
       });
 
-      const template: Template = {
+      const strings = propsOrStrings as TemplateStringsArray;
+      return {
         tag,
         attributes: processAttributes({}),
-        children: processElementChildren(propsOrStrings, values),
+        children: processElementChildren(strings, values),
         isTemplate: true,
         css: "",
         rootClass: "",
       };
-      return template;
     }
 
-    // Вызов с пропсами или без
-    const props = propsOrStrings || ({} as A);
+    // Props call
+    const props = (propsOrStrings as A) || ({} as A);
     logger.debug(`Creating template literal function for tag "${tag}"`, {
       props,
     });
 
-    // Взвращаем функцию для template literals
+    // Return template literal function
     const templateLiteralFn = (
       strings: TemplateStringsArray,
       ...templateValues: ElementChild[]
@@ -60,8 +62,8 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
 
       return {
         tag,
-        attributes: processAttributes(props),
-        children: processChildren(strings, templateValues),
+        attributes: processAttributes(props as Record<string, unknown>),
+        children: processElementChildren(strings, templateValues),
         isTemplate: true,
         css: "",
         rootClass: "",
@@ -78,26 +80,4 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
   elementFactory.tag = tag;
 
   return elementFactory;
-}
-function processChildren(
-  strings: TemplateStringsArray,
-  values: ElementChild[]
-): ElementChild[] {
-  logger.debug("Processing children", { strings, values });
-  return strings.reduce((acc: ElementChild[], str, i) => {
-    if (str) acc.push(str);
-    if (i < values.length) {
-      const value = values[i];
-      // Проверяем является ли значение шаблоном или фрагментом
-      if (
-        (typeof value === "object" && "isTemplate" in value) ||
-        isTemplateFragment(value)
-      ) {
-        acc.push(value);
-      } else {
-        acc.push(escapeHTML(String(value)));
-      }
-    }
-    return acc;
-  }, []);
 }

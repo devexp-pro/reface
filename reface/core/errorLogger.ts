@@ -1,5 +1,6 @@
 import type { RenderErrorDetails, ErrorContext } from "./types.ts";
 import { getErrorContext } from "./ErrorContext.ts";
+import { formatErrorStack, formatComponentStack } from "./utils.ts";
 
 /**
  * Format error details for logging
@@ -16,17 +17,13 @@ export function formatError(
   // Component stack
   if (context.componentStack.length) {
     lines.push("\nComponent stack:");
-    context.componentStack.forEach((component: string, i: number) => {
-      lines.push(`  ${" ".repeat(i * 2)}${component}`);
-    });
+    lines.push(formatComponentStack(context.componentStack));
   }
 
-  // JSX stack
-  if (context.jsxStack.length) {
-    lines.push("\nJSX stack:");
-    context.jsxStack.forEach((jsx: string, i: number) => {
-      lines.push(`  ${" ".repeat(i * 2)}${jsx}`);
-    });
+  // Stack trace
+  if (error.stack) {
+    lines.push("\nStack trace:");
+    lines.push(...formatErrorStack(error.stack));
   }
 
   // Error details
