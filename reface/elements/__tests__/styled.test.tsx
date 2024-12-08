@@ -1,6 +1,6 @@
 import { createElement } from "@reface/jsx";
 import { styled } from "@reface/elements";
-import { render } from "@reface/core";
+import { render } from "@reface/html";
 import { compareHTML } from "@reface/test-utils";
 import { assertEquals } from "@std/assert";
 
@@ -99,7 +99,9 @@ Deno.test("styled.h1 - should return correct factory", () => {
   // Проверяем что Title можно вызвать как функцию
   const withProps = Title({ class: "test" })``;
   assertEquals(withProps.tag, "h1");
-  assertEquals(withProps.attributes, `class="${withProps.rootClass} test"`);
+  assertEquals(withProps.attributes, {
+    class: [`${withProps.rootClass}`, "test"],
+  });
 
   // Проверяем что Title можно вызвать как template literal
   const withTemplate = Title()`Hello`;

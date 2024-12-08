@@ -1,5 +1,5 @@
 import { div, span } from "../mod.ts";
-import { render } from "../../core/render.ts";
+import { render } from "@reface/html";
 import { assertEquals } from "@std/assert";
 import { compareHTML } from "../../__tests__/utils.ts";
 

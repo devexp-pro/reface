@@ -4,7 +4,7 @@ import type {
   Template,
   ElementChild,
   TemplateLiteralFunction,
-} from "../core/types.ts";
+} from "@reface/html";
 import { html } from "../html/html.ts";
 
 /**

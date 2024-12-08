@@ -1,16 +1,5 @@
-import type { Template } from "./types.ts";
-import { render } from "./render.ts";
-
-export type {
-  Template,
-  TemplateFragment,
-  HTMLAttributes,
-  ElementChild,
-} from "./types.ts";
-export { isTemplateFragment } from "./types.ts";
-export { escapeHTML, escapeAttribute } from "./escape.ts";
-export { attributes } from "./attributes.ts";
-export { render } from "./render.ts";
+import type { Template } from "@reface/html";
+import { render } from "@reface/html";
 
 /**
  * Response helper for RPC calls
