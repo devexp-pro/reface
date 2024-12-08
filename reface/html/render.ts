@@ -24,34 +24,64 @@ const VOID_ELEMENTS = new Set([
   "wbr",
 ]);
 
-function renderChild(child: ElementChild): string {
+// Класс для сбора уникальных стилей
+class StyleCollector {
+  private styles = new Set<string>();
+
+  add(css: string) {
+    this.styles.add(css);
+  }
+
+  toString() {
+    if (this.styles.size === 0) return "";
+    return `<style>\n${Array.from(this.styles).join("\n")}\n</style>`;
+  }
+}
+
+function renderChild(
+  child: ElementChild,
+  styleCollector: StyleCollector
+): string {
   if (child == null || child === false || child === true) return "";
 
   if (typeof child === "object") {
     if ("isTemplate" in child) {
-      return render(child);
+      return render(child, styleCollector);
     }
     if (isTemplateFragment(child)) {
       return child.content;
     }
-    // Добавляем обработку массивов
     if (Array.isArray(child)) {
-      return child.map(renderChild).join("");
+      return child.map((c) => renderChild(c, styleCollector)).join("");
     }
   }
 
   return String(child);
 }
 
-export function render(input: Template | TemplateFragment): string {
+export function render(
+  input: Template | TemplateFragment,
+  styleCollector?: StyleCollector
+): string {
+  // Создаем коллектор стилей только для корневого вызова
+  const isRoot = !styleCollector;
+  styleCollector = styleCollector || new StyleCollector();
+
   if (isTemplateFragment(input)) {
     return input.content;
   }
 
   const { tag, attributes: attrs, children, css } = input;
 
-  // Рендерим детей используя новую функцию
-  const renderedChildren = children.map(renderChild).join("");
+  // Добавляем CSS в коллектор если он есть
+  if (css) {
+    styleCollector.add(css);
+  }
+
+  // Рендерим детей
+  const renderedChildren = children
+    .map((child) => renderChild(child, styleCollector))
+    .join("");
 
   // Формируем HTML
   const isVoid = VOID_ELEMENTS.has(tag);
@@ -59,9 +89,9 @@ export function render(input: Template | TemplateFragment): string {
     isVoid ? " />" : `>${renderedChildren}</${tag}>`
   }`;
 
-  // Добавляем CSS если есть
-  if (css) {
-    return `${html}\n<style>\n${css}\n</style>`;
+  // Добавляем собранные стили только в корневом рендере
+  if (isRoot) {
+    return `${html}\n${styleCollector}`;
   }
 
   return html;
