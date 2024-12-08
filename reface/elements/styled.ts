@@ -2,12 +2,11 @@ import type {
   ElementChild,
   HTMLAttributes,
   Template,
-  ComponentFunction,
   TemplateLiteralFunction,
 } from "../core/types.ts";
 import type { StyledComponent, StyledFactory } from "./styled.types.ts";
 import { generateClassName } from "../html/classes.ts";
-import { attributes } from "../html/attributes.ts";
+import { processAttributes } from "../html/attributes.ts";
 
 function processCss(css: string, className: string): string {
   return css
@@ -29,20 +28,6 @@ function processElementChildren(
   }, []);
 }
 
-function createAttributes(
-  className: string,
-  customClass?: string,
-  props: Record<string, unknown> = {}
-): string {
-  const classNames = [className];
-  if (customClass) classNames.push(customClass);
-
-  const classAttr = `class="${classNames.join(" ")}"`;
-  const otherAttrs = Object.keys(props).length ? attributes(props) : "";
-
-  return `${classAttr}${otherAttrs ? " " + otherAttrs : ""}`.trim();
-}
-
 function createStyledComponent<P extends HTMLAttributes>(
   tag: string,
   css: string
@@ -56,7 +41,7 @@ function createStyledComponent<P extends HTMLAttributes>(
   ): Template {
     return {
       tag,
-      attributes: createAttributes(className),
+      attributes: processAttributes({ class: [className] }),
       children: processElementChildren(strings, values),
       css: processedCss,
       isTemplate: true,
@@ -83,7 +68,17 @@ function createStyledComponent<P extends HTMLAttributes>(
         ...templateValues: ElementChild[]
       ) => ({
         tag,
-        attributes: createAttributes(className, props.class, props),
+        attributes: processAttributes({
+          ...props,
+          class: [
+            className,
+            ...(Array.isArray(props.class)
+              ? props.class
+              : props.class
+              ? [props.class]
+              : []),
+          ],
+        }),
         children: processElementChildren(strings, templateValues),
         css: processedCss,
         isTemplate: true,
@@ -100,12 +95,18 @@ function createStyledComponent<P extends HTMLAttributes>(
 
     return {
       tag,
-      attributes: createAttributes(className, props.class, props),
-      children: Array.isArray(props.children)
-        ? props.children
-        : props.children
-        ? [props.children]
-        : [],
+      attributes: processAttributes({
+        ...props,
+        class: [
+          className,
+          ...(Array.isArray(props.class)
+            ? props.class
+            : props.class
+            ? [props.class]
+            : []),
+        ],
+      }),
+      children: values,
       css: processedCss,
       isTemplate: true,
       rootClass: className,

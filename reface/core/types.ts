@@ -46,10 +46,30 @@ export interface Island<R, P> {
 }
 
 /**
+ * Base component interface
+ */
+export interface ComponentBase {
+  isTemplate: true;
+  tag: string;
+  css?: string;
+  rootClass?: string;
+}
+
+/**
+ * Template attributes interface
+ */
+export interface TemplateAttributes {
+  class?: string[];
+  id?: string;
+  style?: string | Record<string, string>;
+  [key: string]: unknown;
+}
+
+/**
  * Base template interface
  */
 export interface Template extends ComponentBase {
-  attributes: string;
+  attributes: TemplateAttributes;
   children: ElementChild[];
 }
 
@@ -57,10 +77,7 @@ export interface Template extends ComponentBase {
  * HTML Fragment interface for trusted HTML content
  */
 export interface TemplateFragment {
-  /** Fragment type marker */
   type: "fragment";
-
-  /** Raw HTML content */
   content: string;
 }
 
@@ -68,22 +85,11 @@ export interface TemplateFragment {
  * Base HTML attributes interface
  */
 export interface HTMLAttributes {
-  /** CSS class names */
-  class?: string;
-
-  /** Element ID */
+  class?: string | string[];
   id?: string;
-
-  /** Inline styles */
-  style?: string;
-
-  /** Children elements */
+  style?: string | Record<string, string>;
   children?: ElementChild | ElementChild[];
-
-  /** Data attributes */
   [key: `data-${string}`]: string | number | boolean | undefined;
-
-  /** Allow any other valid HTML attributes */
   [key: string]: unknown;
 }
 
@@ -98,78 +104,6 @@ export type ElementChild =
   | TemplateFragment
   | null
   | undefined;
-
-/**
- * Type guard for TemplateFragment
- */
-export function isTemplateFragment(value: unknown): value is TemplateFragment {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "type" in value &&
-    value.type === "fragment" &&
-    "content" in value
-  );
-}
-
-/**
- * Error details for template rendering
- */
-export interface RenderErrorDetails {
-  /** Function source code or description */
-  function?: string;
-
-  /** Result of function execution */
-  result?: unknown;
-
-  /** Template or invalid value that вызвало ошибку */
-  template?: unknown;
-
-  /** Error message */
-  message?: string;
-
-  /** Stack trace */
-  stack?: string;
-}
-
-/**
- * Error types
- */
-export interface ErrorDetails {
-  /** Component name */
-  component: string;
-
-  /** Component props */
-  props?: Record<string, unknown>;
-
-  /** Error details */
-  template?: RenderErrorDetails;
-}
-
-export interface ErrorContext {
-  lastError?: ErrorDetails;
-  jsxStack?: string[];
-  componentStack?: string[];
-}
-
-/**
- * Base factory function type for creating elements
- */
-export type ElementFactory<A> = {
-  /** Create element with attributes */
-  (attributes?: A): (
-    strings: TemplateStringsArray,
-    ...values: ElementChild[]
-  ) => Template;
-
-  /** Create element with template literal */
-  (strings: TemplateStringsArray, ...values: ElementChild[]): Template;
-};
-
-/**
- * Template generator function type
- */
-export type TemplateGenerator<T> = (props: T) => Template;
 
 /**
  * Function that accepts template literals and returns Template
@@ -187,20 +121,10 @@ export type ComponentFunction<P = HTMLAttributes> = {
 } & ComponentBase;
 
 /**
- * Base template interface
- */
-export interface ComponentBase {
-  isTemplate: true;
-  tag: string;
-  css?: string;
-  rootClass?: string;
-}
-
-/**
  * Simple component function type (only JSX)
  */
 export type SimpleComponentFunction<P = HTMLAttributes> = ((
-  props: P & HTMLAttributes
+  props: P
 ) => Template) &
   ComponentBase;
 

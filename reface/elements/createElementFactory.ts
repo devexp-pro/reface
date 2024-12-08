@@ -1,30 +1,11 @@
 import type {
   ElementChild,
-  ElementFactory,
   HTMLAttributes,
   Template,
   TemplateLiteralFunction,
+  TemplateAttributes,
 } from "../core/types.ts";
-import { attributes } from "../html/attributes.ts";
-import { escapeHTML } from "../html/escape.ts";
-import { isTemplateFragment } from "../html/types.ts";
-
-function processElementChildren(values: ElementChild[]): (string | Template)[] {
-  return values.flatMap((value) => {
-    if (value == null || value === false) return [];
-    if (value === true) return [];
-    if (Array.isArray(value)) {
-      return processElementChildren(value);
-    }
-    if (isTemplateFragment(value)) {
-      return [value.content];
-    }
-    if (typeof value === "object" && "isTemplate" in value) {
-      return [value];
-    }
-    return [escapeHTML(String(value))];
-  });
-}
+import { processAttributes } from "../html/attributes.ts";
 
 /**
  * Creates an element factory function for a given tag
@@ -43,7 +24,7 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
     if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
       return {
         tag,
-        attributes: "",
+        attributes: processAttributes({}),
         children: processChildren(propsOrStrings, values),
         isTemplate: true,
         tag,
@@ -59,7 +40,7 @@ export function createElementFactory<A extends HTMLAttributes = HTMLAttributes>(
       ...templateValues: ElementChild[]
     ): Template => ({
       tag,
-      attributes: attributes(props),
+      attributes: processAttributes(props),
       children: processChildren(strings, templateValues),
       isTemplate: true,
       tag,
