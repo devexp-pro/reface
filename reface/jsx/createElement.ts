@@ -1,73 +1,100 @@
 import { createLogger } from "@reface/core";
-import { withErrorContext, pushComponent, popComponent } from "@reface/core";
-import { Template, ElementChild, processAttributes } from "@reface/html";
-
-import { getComponentType, processJSXProps } from "./utils.ts";
-import { COMPONENT_TYPES } from "./constants.ts";
-import { processJSXChildren } from "./children.ts";
-import type { ComponentFunction } from "./types.ts";
+import type { Template, ElementChild } from "@reface/html";
+import { processAttributes } from "@reface/html";
 
 const logger = createLogger("JSX");
 
 /**
- * Create JSX element
+ * Create element from JSX
  */
 export function createElement(
-  type: string | ComponentFunction,
+  tag: string | Function,
   props: Record<string, unknown> | null,
-  ...children: ElementChild[]
+  ...children: unknown[]
 ): Template {
-  logger.debug("JSX Input", { type, props, children });
+  try {
+    logger.debug("Creating element", {
+      tag,
+      props,
+      childrenCount: children.length,
+    });
 
-  return withErrorContext(
-    () => {
-      const componentType = getComponentType(type);
-      const processedProps = props ? processJSXProps(props) : {};
+    // Handle function components
+    if (typeof tag === "function") {
+      logger.debug("Creating function component", {
+        name: tag.name || "Anonymous",
+        props,
+      });
 
-      // Fragment handling
-      if (componentType === "FRAGMENT") {
-        const fragmentChildren = processJSXChildren(children);
-        return {
-          tag: "div",
-          attributes: {},
-          children: fragmentChildren,
-          isTemplate: true,
-          css: "",
-          rootClass: "",
-        };
-      }
-
-      // Component handling
-      if (componentType === "FUNCTION") {
-        const componentName = (type as Function).name || "AnonymousComponent";
-        logger.debug(`Rendering component: ${componentName}`, {
-          props: processedProps,
-          children,
-          type,
+      try {
+        return tag({
+          ...props,
+          children: children.length === 1 ? children[0] : children,
         });
-
-        try {
-          pushComponent(componentName);
-          const component = type as ComponentFunction;
-          return component({
-            ...processedProps,
-            children: children.length === 1 ? children[0] : children,
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          logger.error("Function component failed", error, {
+            name: tag.name || "Anonymous",
+            props,
+            children,
           });
-        } finally {
-          popComponent();
+        } else {
+          logger.error(
+            "Unknown error in function component",
+            new Error(String(error)),
+            { name: tag.name || "Anonymous", props, children }
+          );
         }
+        throw error;
       }
+    }
 
-      // Element handling
-      return {
-        tag: type as string,
-        attributes: processAttributes(processedProps),
-        children: processJSXChildren(children),
-        isTemplate: true,
-        css: "",
-        rootClass: "",
-      };
-    },
-    { jsxStack: [] }
-  );
+    // Handle regular elements
+    const processedProps = processAttributes(props || {});
+
+    // Process children to ensure they match ElementChild type
+    const processedChildren = children.map((child): ElementChild => {
+      if (child == null) return "";
+      if (
+        typeof child === "string" ||
+        typeof child === "number" ||
+        typeof child === "boolean"
+      ) {
+        return String(child);
+      }
+      if (typeof child === "object" && "isTemplate" in child) {
+        return child as Template;
+      }
+      logger.warn("Invalid child type, converting to string", { child });
+      return String(child);
+    });
+
+    const template: Template = {
+      tag,
+      attributes: processedProps,
+      children: processedChildren,
+      isTemplate: true as const,
+      css: "",
+      rootClass: "",
+    };
+
+    logger.info("Created element", {
+      tag,
+      attributesCount: Object.keys(processedProps).length,
+      childrenCount: processedChildren.length,
+    });
+
+    return template;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error("Failed to create element", error, { tag, props, children });
+    } else {
+      logger.error("Unknown error creating element", new Error(String(error)), {
+        tag,
+        props,
+        children,
+      });
+    }
+    throw error;
+  }
 }

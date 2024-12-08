@@ -3,7 +3,6 @@ export * from "./utils.ts";
 export * from "./types.ts";
 export * from "./errors.ts";
 export * from "./logger.ts";
-export * from "./ErrorContext.ts";
 
 // FIXME
 import type { Template } from "@reface/html";

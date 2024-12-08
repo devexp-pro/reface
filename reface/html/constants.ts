@@ -19,19 +19,6 @@ export const VOID_ELEMENTS = new Set([
 ]);
 
 /**
- * HTML self-closing elements
- */
-export const SELF_CLOSING_ELEMENTS = new Set([
-  ...VOID_ELEMENTS,
-  "path",
-  "circle",
-  "rect",
-  "line",
-  "polyline",
-  "polygon",
-]);
-
-/**
  * HTML entities for escaping
  */
 export const HTML_ENTITIES = {
@@ -40,13 +27,4 @@ export const HTML_ENTITIES = {
   ">": "&gt;",
   '"': "&quot;",
   "'": "&#39;",
-} as const;
-
-/**
- * Default render options
- */
-export const DEFAULT_RENDER_OPTIONS = {
-  collectStyles: true,
-  escapeHTML: true,
-  prettyPrint: false,
 } as const;

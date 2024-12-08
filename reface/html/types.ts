@@ -1,3 +1,7 @@
+import { createLogger } from "@reface/core";
+
+const logger = createLogger("HTML:Types");
+
 /**
  * Base template interface
  */
@@ -67,16 +71,16 @@ export type SimpleComponentFunction<P = HTMLAttributes> = ((
   Pick<Template, "isTemplate" | "tag">;
 
 /**
- * Type guard for TemplateFragment
+ * Check if value is TemplateFragment
  */
 export function isTemplateFragment(value: unknown): value is TemplateFragment {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    "type" in value &&
-    value.type === "fragment" &&
-    "content" in value
-  );
+  const is = typeof value === "object" && value !== null && "content" in value;
+  logger.debug("Checking if value is template fragment", {
+    is,
+    type: typeof value,
+    hasContent: value && typeof value === "object" && "content" in value,
+  });
+  return is;
 }
 
 /**
