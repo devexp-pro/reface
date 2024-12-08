@@ -1,7 +1,7 @@
 import type { RenderErrorDetails, ComponentErrorDetails } from "./types.ts";
 
 /**
- * Base error class for Reface
+ * Базовый класс ошибок Reface
  */
 export class RefaceError extends Error {
   constructor(message: string) {
@@ -11,7 +11,7 @@ export class RefaceError extends Error {
 }
 
 /**
- * Error thrown during template rendering
+ * Ошибка рендеринга шаблона
  */
 export class RenderError extends RefaceError {
   constructor(message: string, public details: RenderErrorDetails) {
@@ -21,7 +21,7 @@ export class RenderError extends RefaceError {
 }
 
 /**
- * Error thrown during component initialization
+ * Ошибка инициализации компонента
  */
 export class ComponentError extends RefaceError {
   constructor(message: string, details: ComponentErrorDetails) {
@@ -36,7 +36,7 @@ export class ComponentError extends RefaceError {
 }
 
 /**
- * Error thrown during template validation
+ * Ошибка валидации шаблона
  */
 export class ValidationError extends RefaceError {
   constructor(message: string, public template: unknown) {

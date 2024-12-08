@@ -1,4 +1,4 @@
-import { ERROR_TYPES } from "./constants.ts";
+import type { FormattedStack } from "./types.ts";
 
 /**
  * Format error stack for logging
@@ -13,25 +13,37 @@ export function formatErrorStack(stack: string): string[] {
 /**
  * Format component stack for logging
  */
-export function formatComponentStack(stack: string): string {
-  return stack
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .join("\n");
+export function formatComponentStack(stack: string[] | string): string[] {
+  if (Array.isArray(stack)) {
+    return stack;
+  }
+  return formatErrorStack(stack);
 }
 
 /**
- * Get error type name
+ * Format full stack
  */
-export function getErrorTypeName(type: keyof typeof ERROR_TYPES): string {
-  return ERROR_TYPES[type];
+export function formatFullStack(
+  error: Error,
+  componentStack?: string[]
+): FormattedStack {
+  const result: FormattedStack = {};
+
+  if (componentStack?.length) {
+    result.componentStack = componentStack;
+  }
+
+  if (error.stack) {
+    result.errorStack = formatErrorStack(error.stack);
+  }
+
+  return result;
 }
 
 /**
  * Format data for logging
  */
-export function formatData(data: unknown, level: string): string {
+export function formatData(data: unknown, compact = false): string {
   if (!data) return "";
-  return `\n${JSON.stringify(data, null, 2)}`;
+  return compact ? JSON.stringify(data) : `\n${JSON.stringify(data, null, 2)}`;
 }

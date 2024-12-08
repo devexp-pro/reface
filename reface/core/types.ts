@@ -83,24 +83,15 @@ export interface Logger {
 }
 
 /**
- * Error context for component stack
+ * Форматированный стек для логирования
  */
-export interface ErrorContext {
-  /** Stack of JSX elements */
-  jsxStack: string[];
-  /** Stack of component names */
-  componentStack: string[];
-}
-
-/**
- * Error context options
- */
-export interface ErrorContextOptions {
-  jsxStack?: string[];
+export interface FormattedStack {
   componentStack?: string[];
+  errorStack?: string[];
+  jsxStack?: string[];
 }
 
-/**
- * Error handler function type
- */
-export type ErrorHandler = (error: Error, context: ErrorContext) => void;
+export interface LoggerStyle {
+  badge: string;
+  text: string;
+}
