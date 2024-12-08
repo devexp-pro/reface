@@ -44,15 +44,23 @@ function renderChild(
 ): string {
   if (child == null || child === false || child === true) return "";
 
+  // Обрабатываем массивы
+  if (Array.isArray(child)) {
+    return child.map((c) => renderChild(c, styleCollector)).join("");
+  }
+
   if (typeof child === "object") {
+    // Обрабатываем Template
     if ("isTemplate" in child) {
       return render(child, styleCollector);
     }
+    // Обрабатываем TemplateFragment
     if (isTemplateFragment(child)) {
       return child.content;
     }
-    if (Array.isArray(child)) {
-      return child.map((c) => renderChild(c, styleCollector)).join("");
+    // Обрабатываем фрагменты из JSX
+    if ("type" in child && child.type === "fragment") {
+      return child.content;
     }
   }
 
@@ -60,13 +68,19 @@ function renderChild(
 }
 
 export function render(
-  input: Template | TemplateFragment,
+  input: Template | TemplateFragment | ElementChild[],
   styleCollector?: StyleCollector
 ): string {
   // Создаем коллектор стилей только для корневого вызова
   const isRoot = !styleCollector;
   styleCollector = styleCollector || new StyleCollector();
 
+  // Обрабатываем массивы (для Fragment)
+  if (Array.isArray(input)) {
+    return input.map((child) => renderChild(child, styleCollector)).join("");
+  }
+
+  // Обрабатываем TemplateFragment
   if (isTemplateFragment(input)) {
     return input.content;
   }
@@ -78,8 +92,9 @@ export function render(
     styleCollector.add(css);
   }
 
-  // Рендерим детей
+  // Рендерим детей, разворачивая массивы
   const renderedChildren = children
+    .flatMap((child) => (Array.isArray(child) ? child : [child]))
     .map((child) => renderChild(child, styleCollector))
     .join("");
 

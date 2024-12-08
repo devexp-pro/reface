@@ -12,14 +12,14 @@ export function processJSXChildren(children: unknown[]): ElementChild[] {
     // Пропускаем true
     if (child === true) return [];
 
-    // Обработка массивов (рекурсивно)
-    if (Array.isArray(child)) {
-      return processJSXChildren(child);
-    }
-
     // Обработка фрагментов
     if (isTemplateFragment(child)) {
       return [child];
+    }
+
+    // Обработка массивов (рекурсивно)
+    if (Array.isArray(child)) {
+      return processJSXChildren(child);
     }
 
     // Обработка шаблонов
@@ -29,6 +29,7 @@ export function processJSXChildren(children: unknown[]): ElementChild[] {
 
     // Обработка функций (компонентов)
     if (typeof child === "function" && "isTemplate" in child) {
+      logger.debug("Component", child);
       return [child`` as Template];
     }
 

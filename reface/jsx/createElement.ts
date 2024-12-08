@@ -19,13 +19,37 @@ const logger = createLogger("JSX");
 
 export function createElement(
   type: string | ComponentFunction,
-  props: JSXElementProps,
+  props: Record<string, unknown> | null,
   ...children: ElementChild[]
 ): Template {
   logger.debug("JSX Input", { type, props, children });
 
   return withErrorContext(() => {
-    // Если type это функция (компонент)
+    // Обработка children, разворачиваем массивы и фрагменты
+    const processedChildren = children.flatMap((child) => {
+      // Если это массив, разворачиваем его рекурсивно
+      if (Array.isArray(child)) {
+        return child.flatMap((c) => {
+          // Если это фрагмент внутри массива
+          if (typeof c === "object" && c && "type" === "fragment") {
+            return c.content;
+          }
+          return c;
+        });
+      }
+      // Если это фрагмент
+      if (typeof child === "object" && child && "type" === "fragment") {
+        return child.content;
+      }
+      return child;
+    });
+
+    // Fragment
+    if (type === Fragment) {
+      return processedChildren;
+    }
+
+    // Компонент
     if (typeof type === "function") {
       const componentName = type.name || "AnonymousComponent";
       logger.debug(`Rendering component: ${componentName}`, {
@@ -37,22 +61,8 @@ export function createElement(
       try {
         pushComponent(componentName);
 
-        const processedChildren = processJSXChildren(children);
-        logger.debug("Processed children", processedChildren);
+        const result = type(props || {}, processedChildren);
 
-        // Специальная обработка для Fragment
-        if (type === Fragment) {
-          return processedChildren;
-        }
-
-        const result = type(
-          {
-            ...props,
-          },
-          processedChildren
-        );
-
-        // Если это TemplateLiteralFunction
         if (typeof result === "function") {
           logger.debug(
             "Component returned template literal function",
@@ -74,18 +84,15 @@ export function createElement(
       }
     }
 
-    // Создаем элемент
-    const element = {
+    // HTML элемент
+    return {
       tag: type,
       attributes: processAttributes(props || {}),
-      children: processJSXChildren(children),
+      children: processedChildren,
       isTemplate: true,
       css: "",
       rootClass: "",
     };
-
-    logger.debug("Created element", element);
-    return element;
   }, "jsxStack");
 }
 

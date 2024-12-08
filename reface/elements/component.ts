@@ -34,13 +34,14 @@ export function component<T = object>(
     const props = propsOrStrings || ({} as T & HTMLAttributes);
     const { children: propsChildren, ...restProps } = props;
 
-    // Если нет дополнительных значений, возвращаем TemplateLiteralFunction для template literals
     if (values.length === 0) {
       const templateLiteralFn = (
         strings: TemplateStringsArray,
         ...templateValues: ElementChild[]
-      ) =>
-        render(restProps as T, processElementChildren(strings, templateValues));
+      ) => {
+        const templateChildren = html(strings, ...templateValues);
+        return render(restProps as T, [templateChildren]);
+      };
 
       return Object.assign(templateLiteralFn, {
         isTemplate: true as const,
