@@ -16,7 +16,7 @@ function createStyledComponent(tag: string) {
     const rootClass = `styled-${Math.random().toString(36).slice(2)}`;
 
     const StyledComponent = component<{ class?: string }>(
-      function StyledComponent(props, children) {
+      function StyledComponent(props = {}, children) {
         logger.debug("Rendering styled component", {
           tag,
           props,
