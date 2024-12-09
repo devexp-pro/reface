@@ -22,7 +22,7 @@ function createStyledComponent(
   logger.debug("Creating styled component", { tag: tagName, css });
 
   const StyledComponent = component<{ class?: string }>(
-    function StyledComponent(props, children) {
+    function StyledComponent(props = {}, children) {
       logger.debug("Rendering styled component", {
         tag: tagName,
         props,

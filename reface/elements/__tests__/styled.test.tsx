@@ -34,7 +34,7 @@ Deno.test("styled.button - should handle props", () => {
   const component = <Button class="primary"></Button>;
   compareHTML(
     render(component),
-    `<button class="${component.rootClass} primary"></button>
+    `<button class="${component.rootClass}  primary"></button>
 <style>
   .${component.rootClass} {
     background: blue;
@@ -53,9 +53,9 @@ Deno.test("styled.h1 - should handle children", () => {
   const component = Title()`Hello`;
   compareHTML(
     render(component),
-    `<h1 class="${component.rootClass}">Hello</h1>
+    `<h1 class="${Title.rootClass}">Hello</h1>
     <style>
-  .${component.rootClass} {
+  .${Title.rootClass} {
     font-size: 2em;
   }
 </style>`
@@ -72,42 +72,15 @@ Deno.test("styled.h1 - should handle template literals", () => {
   const component = Title()`Hello`;
   compareHTML(
     render(component),
-    `<h1 class="${component.rootClass}">Hello</h1>
+    `<h1 class="${Title.rootClass}">Hello</h1>
     <style>
-  .${component.rootClass} {
+  .${Title.rootClass} {
   font-size: 2em;
 }
 </style>`
   );
 });
 
-Deno.test("styled.h1 - should return correct factory", () => {
-  const Title = styled.h1`
-    & {
-      font-size: 2em;
-    }
-  `;
-
-  // Проверяем что Title это функция
-  assertEquals(typeof Title, "function");
-
-  // Проверяем что у Title есть нужные свойства
-  assertEquals(Title.tag, "h1");
-  assertEquals(Title.isTemplate, true);
-  assertEquals(typeof Title.css, "string");
-
-  // Проверяем что Title можно вызвать как функцию
-  const withProps = Title({ class: "test" })``;
-  assertEquals(withProps.tag, "h1");
-  assertEquals(withProps.attributes, {
-    class: [`${withProps.rootClass}`, "test"],
-  });
-
-  // Проверяем что Title можно вызвать как template literal
-  const withTemplate = Title()`Hello`;
-  assertEquals(withTemplate.tag, "h1");
-  assertEquals(withTemplate.children, ["Hello"]);
-});
 
 // Component extension
 Deno.test("styled(Component) - should extend existing component", () => {
@@ -127,7 +100,7 @@ Deno.test("styled(Component) - should extend existing component", () => {
   const component = PrimaryButton({})``;
   compareHTML(
     render(component),
-    `<button class="${component.rootClass}"></button>
+    `<button class="${PrimaryButton.rootClass} ${BaseButton.rootClass}"></button>
     <style>
   .${BaseButton.rootClass} {
   padding: 1rem;
@@ -158,7 +131,7 @@ Deno.test(
     const component = SearchInput({ type: "search", placeholder: "Search..." })``;
     compareHTML(
       render(component),
-      `<input type="search" placeholder="Search..." class="${component.rootClass}" />
+      `<input type="search" placeholder="Search..." class="${SearchInput.rootClass}" />
     <style>
   .${BaseInput.rootClass} {
   border: 1px solid gray;

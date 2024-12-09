@@ -16,7 +16,7 @@ export interface IHTMLAttributes {
  * Base template interface
  */
 export interface ITemplate {
-  toHtml(): string;
+  toHtml(context: RenderContext): string;
 }
 
 /**
@@ -34,12 +34,9 @@ export type ElementChildType =
   | string
   | number
   | boolean
+  | ITemplate
   | null
   | undefined
-  | Template
-  | TemplateHtml
-  | TemplateFragment
-  | TemplateText
   | ElementChildType[];
 
 /**

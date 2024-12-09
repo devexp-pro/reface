@@ -2,10 +2,11 @@ import { createLogger } from "@reface/core";
 import type { ElementChildType } from "./types.ts";
 import type { RenderContext } from "./render.ts";
 import { escapeHTML } from "./escape.ts";
+import type { ITemplate } from "./types.ts";
 
 const logger = createLogger("HTML:Html");
 
-export class TemplateHtml {
+export class TemplateHtml implements ITemplate {
   constructor(public readonly children: ElementChildType[]) {
     logger.debug("Creating HTML template", { childrenCount: children.length });
   }

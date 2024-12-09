@@ -48,19 +48,19 @@ Deno.test(
   "HTML Security - should handle nested templates with mixed content",
   () => {
     const userContent = "<b>bold</b>";
-    const trusted = "<i>italic</i>";
+    const trusted = html`<i>italic</i>`;
+
+    compareHTML(render(trusted), "<i>italic</i>");
 
     const template = html`
       <div>
         <p>${userContent}</p>
-        <p>${html`${trusted}`}</p>
+        <p>${trusted}</p>
       </div>
     `;
 
-    const result = render(template);
-
     compareHTML(
-      result,
+      render(template),
       `<div>
       <p>&lt;b&gt;bold&lt;/b&gt;</p>
       <p><i>italic</i></p>

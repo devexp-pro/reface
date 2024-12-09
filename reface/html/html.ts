@@ -39,7 +39,9 @@ export function html(
         if (value != null) {
           if (Array.isArray(value)) {
             result.push(...value);
-          } else if (value instanceof Template) {
+          } else if (
+            value instanceof Template || value instanceof TemplateHtml
+          ) {
             result.push(value);
           } else {
             // Динамические значения не доверенные
