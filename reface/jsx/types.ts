@@ -20,7 +20,7 @@ export interface FragmentComponent {
  * Component function interface
  */
 export interface ComponentFunction<P = HTMLAttributes> {
-  (props: P): Template;
+  (props: P): Template<P>;
   isTemplate?: true;
   tag?: string;
   css?: string;

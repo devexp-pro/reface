@@ -3,12 +3,21 @@ import { createLogger } from "@reface/core";
 const logger = createLogger("HTML:Types");
 
 /**
+ * Base HTML attributes interface
+ */
+export interface IHTMLAttributes {
+  [key: string]: unknown;
+  class?: string | string[];
+  style?: string | Record<string, string>;
+}
+
+/**
  * Base template interface
  */
 export interface ITemplate {
   tag: string;
-  attributes: TemplateAttributes;
-  children: ElementChild[];
+  attributes: IHTMLAttributes;
+  children: ElementChildType[];
   isTemplate: true;
   css?: string;
   rootClass?: string;
@@ -19,38 +28,29 @@ export interface ITemplate {
 /**
  * HTML Fragment interface for trusted HTML content
  */
-export interface TemplateFragment {
+export interface ITemplateFragment {
   type: "html";
   content: string;
 }
 
 /**
- * Base HTML attributes interface
- */
-export interface HTMLAttributes {
-  [key: string]: unknown;
-  class?: string | string[];
-  style?: string | Record<string, string>;
-}
-
-/**
  * Possible child types in templates
  */
-export type ElementChild =
+export type ElementChildType =
   | string
   | number
   | boolean
   | ITemplate
-  | TemplateFragment
+  | ITemplateFragment
   | null
   | undefined;
 
 /**
  * Function that accepts template literals and returns Template
  */
-export interface TemplateLiteralFunction {
-  (props?: Record<string, unknown>): TemplateLiteralFunction;
-  (strings: TemplateStringsArray, ...values: ElementChild[]): ITemplate;
+export interface ITemplateLiteralFunction {
+  (props?: Record<string, unknown>): ITemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChildType[]): ITemplate;
   isTemplate: true;
   tag: string;
 }
@@ -58,46 +58,33 @@ export interface TemplateLiteralFunction {
 /**
  * Base component function type
  */
-export type ComponentFunction<P = HTMLAttributes> = {
-  (props?: P): ITemplate | TemplateLiteralFunction;
-  (strings: TemplateStringsArray, ...values: ElementChild[]): ITemplate;
+export interface IComponentFunction<P = IHTMLAttributes> {
+  (props?: P): ITemplate | ITemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChildType[]): ITemplate;
   isTemplate: true;
   tag: string;
-};
+}
 
 /**
  * Simple component function type (only JSX)
  */
-export type SimpleComponentFunction<P = HTMLAttributes> =
-  & ((
-    props: P,
-  ) => ITemplate)
+export type SimpleComponentFunctionType<P = IHTMLAttributes> =
+  & ((props: P) => ITemplate)
   & Pick<ITemplate, "isTemplate" | "tag">;
-
-/**
- * Check if value is TemplateFragment
- */
-export function isTemplateFragment(value: unknown): value is TemplateFragment {
-  const is = typeof value === "object" && value !== null && "content" in value;
-  logger.debug("Checking if value is template fragment", {
-    is,
-    type: typeof value,
-    hasContent: value && typeof value === "object" && "content" in value,
-  });
-  return is;
-}
 
 /**
  * Styled component function type
  */
-export type StyledComponentFunction<P = HTMLAttributes> = {
-  (props?: P): TemplateLiteralFunction;
-  (strings: TemplateStringsArray, ...values: ElementChild[]): ITemplate;
-} & Pick<ITemplate, "isTemplate" | "tag" | "css" | "rootClass">;
+export interface IStyledComponentFunction<P = IHTMLAttributes> {
+  (props?: P): ITemplateLiteralFunction;
+  (strings: TemplateStringsArray, ...values: ElementChildType[]): ITemplate;
+  isTemplate: true;
+  tag: string;
+  css: string;
+  rootClass: string;
+}
 
-export type TemplateAttributes = Record<string, unknown>;
-
-export type RenderOptions = {
+export type RenderOptionsType = {
   collectStyles?: boolean;
   styleCollector?: Set<string>;
 };
@@ -105,7 +92,7 @@ export type RenderOptions = {
 /**
  * Style interpolation types
  */
-export type StyleInterpolation =
+export type StyleInterpolationType =
   | string
   | number
   | boolean
@@ -116,7 +103,20 @@ export type StyleInterpolation =
 /**
  * Style processing options
  */
-export interface StyleProcessingOptions {
+export interface IStyleProcessingOptions {
   className: string;
   prefix?: string;
+}
+
+/**
+ * Check if value is TemplateFragment
+ */
+export function isTemplateFragment(value: unknown): value is ITemplateFragment {
+  const is = typeof value === "object" && value !== null && "content" in value;
+  logger.debug("Checking if value is template fragment", {
+    is,
+    type: typeof value,
+    hasContent: value && typeof value === "object" && "content" in value,
+  });
+  return is;
 }

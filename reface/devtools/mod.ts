@@ -5,7 +5,7 @@ import { inspector } from "./inspector.ts";
 const logger = createLogger("DevTools");
 
 // Расширяем интерфейс Template для компонентов
-interface ComponentTemplate extends Template {
+interface ComponentTemplate extends Template<HTMLAttributes> {
   componentName?: string;
   originalProps?: Record<string, unknown>;
   isComponent?: boolean;
@@ -71,7 +71,7 @@ const defaultConfig: DevToolsConfig = {
  */
 function createFiberNode(
   template: ComponentTemplate,
-  parent?: FiberNode
+  parent?: FiberNode,
 ): FiberNode {
   logger.debug("Creating fiber node", {
     tag: template.tag,
@@ -137,7 +137,7 @@ function createFiberNode(
  */
 function createFiberTree(
   template: ComponentTemplate,
-  parent?: FiberNode
+  parent?: FiberNode,
 ): FiberNode {
   logger.debug("Creating fiber tree", {
     template,
@@ -248,7 +248,7 @@ export function updateDevTools(template: ComponentTemplate) {
       highlightElement: (fiber: FiberNode) => {
         // Подсветка через DOM
         const element = document.querySelector(
-          `[data-reface-id="${fiber.key}"]`
+          `[data-reface-id="${fiber.key}"]`,
         );
         if (element) {
           inspector.highlightElement(element);

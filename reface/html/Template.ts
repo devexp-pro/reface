@@ -1,78 +1,36 @@
-import type {
-  ElementChild,
-  ITemplate,
-  TemplateAttributes,
-  TemplateLiteralFunction,
-} from "./types.ts";
+import { createLogger } from "@reface/core";
+import type { ElementChildType, IHTMLAttributes } from "./types.ts";
+import { TemplateBase } from "./TemplateBase.ts";
 import { processAttributes } from "./attributes.ts";
 import { escapeHTML } from "./escape.ts";
 
-function processElementChildren(
-  strings: TemplateStringsArray,
-  values: ElementChild[],
-): ElementChild[] {
-  return strings.reduce((acc: ElementChild[], str, i) => {
-    if (str) acc.push(escapeHTML(str));
+const logger = createLogger("HTML:Template");
 
-    if (i < values.length) {
-      const value = values[i];
-      if (
-        value && typeof value === "object" &&
-        ("isTemplate" in value || "type" in value)
-      ) {
-        acc.push(value);
-      } else {
-        acc.push(escapeHTML(String(value)));
-      }
-    }
-    return acc;
-  }, []);
-}
-
-export class Template implements ITemplate {
-  readonly isTemplate = true as const;
-  readonly tag: string;
-  readonly attributes: TemplateAttributes;
-  readonly children: ElementChild[];
-  readonly css: string;
-  readonly rootClass: string;
-  readonly script?: string;
-  readonly scriptFile?: string;
-
-  constructor({
-    tag,
-    attributes = {},
-    children = [],
-    css = "",
-    rootClass = "",
-    script,
-    scriptFile,
-  }: {
+/**
+ * Main template class for DOM elements
+ */
+export class Template<P extends IHTMLAttributes = IHTMLAttributes>
+  extends TemplateBase<P> {
+  constructor(options: {
     tag: string;
-    attributes?: TemplateAttributes;
-    children?: ElementChild[];
+    attributes?: P;
+    children?: ElementChildType[];
     css?: string;
     rootClass?: string;
     script?: string;
     scriptFile?: string;
   }) {
-    this.tag = tag;
-    if (attributes.class) {
-      attributes.class = Array.isArray(attributes.class)
-        ? attributes.class
-        : attributes.class.split(/\s+/).filter(Boolean);
+    if (options.attributes?.class) {
+      options.attributes.class = Array.isArray(options.attributes.class)
+        ? options.attributes.class
+        : options.attributes.class.split(/\s+/).filter(Boolean);
     }
-    this.attributes = attributes;
-    this.children = children;
-    this.css = css;
-    this.rootClass = rootClass;
-    this.script = script;
-    this.scriptFile = scriptFile;
+    super(options);
   }
 
-  addClass(className: string): Template {
+  addClass(className: string): Template<P> {
     const currentClasses = this.attributes.class || [];
-    return new Template({
+    return new Template<P>({
       ...this,
       attributes: {
         ...this.attributes,
@@ -81,26 +39,26 @@ export class Template implements ITemplate {
     });
   }
 
-  setAttribute(name: string, value: unknown): Template {
-    return new Template({
+  setAttribute(name: keyof P, value: P[keyof P]): Template<P> {
+    return new Template<P>({
       ...this,
       attributes: { ...this.attributes, [name]: value },
     });
   }
 
-  appendChild(child: ElementChild): Template {
-    return new Template({
+  appendChild(child: ElementChildType): Template<P> {
+    return new Template<P>({
       ...this,
       children: [...this.children, child],
     });
   }
 
-  setChildren(children: ElementChild[]): Template {
-    return new Template({ ...this, children });
+  setChildren(children: ElementChildType[]): Template<P> {
+    return new Template<P>({ ...this, children });
   }
 
-  addCss(css: string): Template {
-    return new Template({
+  addCss(css: string): Template<P> {
+    return new Template<P>({
       ...this,
       css: this.css ? `${this.css}\n${css}` : css,
     });
@@ -108,17 +66,14 @@ export class Template implements ITemplate {
 
   templateLiteral(
     strings: TemplateStringsArray,
-    ...values: ElementChild[]
-  ): Template {
-    const children = strings.reduce((acc: ElementChild[], str, i) => {
+    ...values: ElementChildType[]
+  ): Template<P> {
+    const children = strings.reduce((acc: ElementChildType[], str, i) => {
       if (str) acc.push(escapeHTML(str));
 
       if (i < values.length) {
         const value = values[i];
-        if (
-          value && typeof value === "object" &&
-          ("isTemplate" in value || "type" in value)
-        ) {
+        if (value instanceof TemplateBase) {
           acc.push(value);
         } else {
           acc.push(escapeHTML(String(value)));
@@ -127,24 +82,21 @@ export class Template implements ITemplate {
       return acc;
     }, []);
 
-    return new Template({
-      tag: this.tag,
-      attributes: this.attributes,
+    return new Template<P>({
+      ...this,
       children,
-      css: this.css,
-      rootClass: this.rootClass,
-      script: this.script,
-      scriptFile: this.scriptFile,
     });
   }
 
   /**
-   * Создает новый шаблон на основе существующего с дополнительными свойствами
+   * Create template from partial data
    */
-  static from(template: Partial<ITemplate>): Template {
-    return new Template({
+  static from<T extends IHTMLAttributes>(
+    template: Partial<ITemplateBase<T>>,
+  ): Template<T> {
+    return new Template<T>({
       tag: template.tag || "div",
-      attributes: template.attributes || {},
+      attributes: template.attributes || {} as T,
       children: template.children || [],
       css: template.css || "",
       rootClass: template.rootClass || "",
@@ -154,72 +106,52 @@ export class Template implements ITemplate {
   }
 
   /**
-   * Создает функцию-шаблон с поддержкой template literals
+   * Create component with typed props
    */
-  static createTemplateFunction(tag: string): TemplateLiteralFunction {
-    function templateFn(
-      propsOrStrings?: Record<string, unknown> | TemplateStringsArray,
-      ...values: ElementChild[]
-    ): ITemplate | TemplateLiteralFunction {
-      // Создаем базовый шаблон
-      const template = new Template({
-        tag,
-        attributes: {},
-        children: [],
-      });
-
-      // Template literal call: div`Hello`
-      if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
-        const strings = propsOrStrings as TemplateStringsArray;
-        return template.templateLiteral(strings, ...values);
-      }
-
-      // Props call: div({class: 'test'})
-      const withProps = new Template({
-        ...template,
-        attributes: propsOrStrings
-          ? processAttributes(propsOrStrings as Record<string, unknown>)
-          : {},
-      });
-
-      // Создаем функцию для поддержки template literals
-      const fn = (
-        strings: TemplateStringsArray,
-        ...templateValues: ElementChild[]
-      ) => {
-        return withProps.templateLiteral(strings, ...templateValues);
-      };
-
-      // Добавляем свойства для поддержки template literals
-      return Object.assign(fn, {
-        isTemplate: true as const,
-        tag,
-      });
-    }
-
-    // Добавляем свойства для поддержки template literals
-    return Object.assign(templateFn, {
-      isTemplate: true as const,
-      tag,
-      // Добавляем поддержку прямого вызова template literals
-      templateLiteral: (
-        strings: TemplateStringsArray,
-        ...values: ElementChild[]
-      ) => {
-        return new Template({
-          tag,
-          attributes: {},
-          children: processElementChildren(strings, values),
+  static createComponent<T extends IHTMLAttributes>(
+    name: string,
+    defaultProps?: Partial<T>,
+  ) {
+    return Object.assign(
+      (props?: T) => {
+        return new Template<T>({
+          tag: name,
+          attributes: { ...defaultProps, ...props } as T,
         });
       },
-    });
+      {
+        isTemplate: true as const,
+        tag: name,
+      },
+    );
   }
-}
 
-// Добавляем поддержку вызова как template literal function
-export interface Template {
-  templateLiteral: (
-    strings: TemplateStringsArray,
-    ...values: ElementChild[]
-  ) => Template;
+  /**
+   * Create template function with template literals support
+   */
+  static createTemplateFunction(tag: string) {
+    return Object.assign(
+      <T extends IHTMLAttributes>(
+        propsOrStrings?: T | TemplateStringsArray,
+        ...values: ElementChildType[]
+      ) => {
+        const template = new Template<T>({ tag });
+
+        if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
+          return template.templateLiteral(propsOrStrings, ...values);
+        }
+
+        return new Template<T>({
+          ...template,
+          attributes: propsOrStrings
+            ? processAttributes(propsOrStrings as Record<string, unknown>) as T
+            : {} as T,
+        });
+      },
+      {
+        tag,
+        isTemplate: true as const,
+      },
+    );
+  }
 }

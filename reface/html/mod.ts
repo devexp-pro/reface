@@ -1,5 +1,8 @@
 // Core functionality
+export { TemplateBase } from "./TemplateBase.ts";
 export { Template } from "./Template.ts";
+export { TemplateFragment } from "./TemplateFragment.ts";
+export { TemplateHtml } from "./TemplateHtml.ts";
 export { html } from "./html.ts";
 export { render } from "./render.ts";
 export { processAttributes, renderAttributes } from "./attributes.ts";
@@ -9,14 +12,13 @@ export { createStylesheet, processCSS } from "./styles.ts";
 
 // Types
 export type {
-  ElementChild,
-  HTMLAttributes,
+  ElementChildType,
+  IHTMLAttributes as HTMLAttributes,
+  IStyleProcessingOptions as StyleProcessingOptions,
   ITemplate,
-  RenderOptions,
-  StyleProcessingOptions,
-  TemplateAttributes,
-  TemplateFragment,
-  TemplateLiteralFunction,
+  ITemplateFragment as TemplateFragment,
+  ITemplateLiteralFunction as TemplateLiteralFunction,
+  RenderOptionsType as RenderOptions,
 } from "./types.ts";
 
 // Type guards

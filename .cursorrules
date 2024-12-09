@@ -1,0 +1,88 @@
+# Naming Conventions
+
+## Interfaces
+
+- Prefix "I"
+- Example: ITemplate, IHTMLAttributes
+
+## Types
+
+- Suffix "Type"
+- Example: ElementChildType, RenderOptionsType
+
+## Classes
+
+- PascalCase
+- Example: Template, TemplateHtml
+
+## Functions & Variables
+
+- camelCase
+- Example: createElement, templateInstance
+
+## Constants
+
+- UPPER_SNAKE_CASE
+- Example: HTML_ENTITIES
+
+# Module Structure
+
+## File Organization
+
+- mod.ts - Public API of module
+- types.ts - Types & Interfaces (types only this file)
+- constants.ts - Constants
+- utils.ts - Utilities and helpers
+- **tests**/\*.test.ts - Tests for module
+
+## Import Rules
+
+### Import Order (separated by newline)
+
+1. External imports
+   Example: import { useState } from "react"
+
+2. Reface imports (@reface/\*)
+   Example: import { render } from "@reface/html"
+
+3. Internal imports (relative paths)
+   Example: import { Template } from "./Template.ts"
+
+### Path Style
+
+- Internal imports use relative paths
+  Example: import { Template } from "./Template.ts"
+
+- External imports use @reface alias
+  Example: import { render } from "@reface/html"
+
+- Core imports from @reface/core
+  Example: import { createLogger } from "@reface/core"
+
+# Test Rules
+
+## Test File Organization
+
+- Place tests in **tests** directory
+- Name test files \*.test.ts
+- Group related tests in subdirectories
+
+## Test Imports
+
+- Import from module root (@reface/\*)
+  Example: import { html, Template } from "@reface/html"
+
+- Avoid relative imports for testing module code
+  Bad: import { html } from "../html.ts"
+  Good: import { html } from "@reface/html"
+
+- Use relative imports only for test utilities
+  Example: import { compareHTML } from "./utils.ts"
+
+## Test Structure
+
+- Use async/await with t.step for subtests
+- Group related test cases together
+- Use descriptive test names
+- Follow "should" naming convention
+  Example: "should escape unsafe content"

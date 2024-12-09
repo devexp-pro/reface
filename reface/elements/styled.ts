@@ -21,8 +21,7 @@ function createStyledComponent<P extends HTMLAttributes>(
   const rootClass = generateClassName();
   const processedCss = processCSS(css, rootClass);
 
-  // Создаем базовую функцию через Template
-  const fn = Template.createTemplateFunction(tag);
+  const fn = Template.createTemplateFunction<P>(tag);
 
   function styledFn(
     propsOrStrings?: P | TemplateStringsArray,

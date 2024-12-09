@@ -14,7 +14,7 @@ const logger = createLogger("Component");
  * Create component function
  */
 export function component<T extends object>(
-  render: (props: T, children: ElementChild[]) => Template,
+  render: (props: T, children: ElementChild[]) => Template<T & HTMLAttributes>,
 ): ComponentFunction<T & HTMLAttributes> {
   logger.debug("Creating component", { renderFn: render.name || "Anonymous" });
 

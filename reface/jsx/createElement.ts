@@ -13,7 +13,7 @@ export function createElement(
   tag: string | ComponentFunction,
   props: Record<string, unknown> | null,
   ...children: ElementChild[]
-): Template | ElementChild[] {
+): Template<HTMLAttributes> | TemplateFragment {
   try {
     logger.debug("Creating element", {
       tag,
@@ -34,8 +34,8 @@ export function createElement(
           children: children.length === 1 ? children[0] : children,
         });
 
-        if (result.tag === "html") {
-          return result.children;
+        if (result.tag === "html" || result.tag === "fragment") {
+          return new TemplateFragment(result.children);
         }
 
         // Проверяем сначала на Template

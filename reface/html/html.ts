@@ -1,46 +1,17 @@
-import type { Template, TemplateFragment } from "./types.ts";
-import { escapeHTML } from "./escape.ts";
-import { isTemplateFragment } from "./types.ts";
-import { render } from "./render.ts";
+import { TemplateHtml } from "./TemplateHtml.ts";
 
 /**
- * Creates a trusted HTML fragment
+ * Creates a trusted HTML template
  */
 export function html(
   strings: TemplateStringsArray | string,
   ...values: unknown[]
-): TemplateFragment {
+): TemplateHtml {
   // If used as a function for trusted HTML
   if (typeof strings === "string") {
-    return {
-      type: "html",
-      content: strings,
-      attributes: {},
-    };
+    return new TemplateHtml(strings);
   }
 
-  // Process interpolated values
-  let result = strings[0];
-  for (let i = 0; i < values.length; i++) {
-    const value = values[i];
-    if (value === null || value === undefined) {
-      result += "";
-    } // Don't escape TemplateFragments
-    else if (isTemplateFragment(value)) {
-      result += value.content;
-    } // Render nested templates
-    else if (typeof value === "object" && "isTemplate" in value) {
-      result += render(value as Template);
-    } // Escape everything else
-    else {
-      result += escapeHTML(String(value));
-    }
-    result += strings[i + 1];
-  }
-
-  return {
-    type: "html",
-    content: result,
-    attributes: {},
-  };
+  // Process template literal
+  return TemplateHtml.fromTemplateLiteral(strings, values);
 }
