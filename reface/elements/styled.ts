@@ -21,18 +21,25 @@ function createStyledComponent<P extends HTMLAttributes>(
   const rootClass = generateClassName();
   const processedCss = processCSS(css, rootClass);
 
-  const fn = Template.createTemplateFunction<P>(tag);
+  const fn = Template.createTemplateFunction(tag);
 
   function styledFn(
     propsOrStrings?: P | TemplateStringsArray,
     ...values: ElementChild[]
-  ): Template | TemplateLiteralFunction {
+  ): Template {
     // Template literal call: StyledDiv`Hello`
     if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
+      // Собираем строки и значения в один массив
+      const children = propsOrStrings.reduce((acc: ElementChild[], str, i) => {
+        if (str) acc.push(str);
+        if (i < values.length) acc.push(values[i]);
+        return acc;
+      }, []);
+
       return new Template({
         tag,
         attributes: { class: [rootClass] },
-        children: fn(propsOrStrings, ...values).children,
+        children,
         css: processedCss,
         rootClass,
       });
@@ -68,10 +75,17 @@ function createStyledComponent<P extends HTMLAttributes>(
       strings: TemplateStringsArray,
       ...templateValues: ElementChild[]
     ) => {
+      // Собираем строки и значения в один массив
+      const children = strings.reduce((acc: ElementChild[], str, i) => {
+        if (str) acc.push(str);
+        if (i < templateValues.length) acc.push(templateValues[i]);
+        return acc;
+      }, []);
+
       return new Template({
         tag,
         attributes,
-        children: fn(strings, ...templateValues).children,
+        children,
         css: processedCss,
         rootClass,
       });

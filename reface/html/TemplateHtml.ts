@@ -2,6 +2,7 @@ import { createLogger } from "@reface/core";
 import { TemplateBase } from "./TemplateBase.ts";
 import { escapeHTML } from "./escape.ts";
 import { Template } from "./Template.ts";
+import { render } from "./render.ts";
 
 const logger = createLogger("HTML:Html");
 
@@ -41,7 +42,7 @@ export class TemplateHtml extends TemplateBase {
         } else if (value instanceof TemplateHtml) {
           result += value.children[0];
         } else if (value instanceof Template) {
-          result += value.toString();
+          result += render(value);
         } else {
           result += escapeHTML(String(value));
         }
