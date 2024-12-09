@@ -2,6 +2,8 @@ import { createLogger } from "@reface/core";
 import type { ElementChildType } from "./types.ts";
 import { render } from "./render.ts";
 import { Template } from "./Template.ts";
+import { TemplateBase } from "./TemplateBase.ts";
+import { TemplateText } from "./TemplateText.ts";
 
 const logger = createLogger("Fragment");
 
@@ -43,5 +45,46 @@ export class TemplateFragment {
    */
   getChildren(): ElementChildType[] {
     return this.children;
+  }
+
+  [Symbol.for("Deno.customInspect")](indent = "") {
+    if (!this.children.length) return "<></> // [TemplateFragment]";
+
+    const childIndent = `${indent}  `;
+    const children = this.children
+      .map((child) => {
+        if (child === null || child === undefined) return "";
+        if (typeof child === "string") {
+          return child.length > 40
+            ? `${childIndent}"${child.slice(0, 40)}..."`
+            : `${childIndent}"${child}"`;
+        }
+        if (child instanceof TemplateBase) {
+          return `${childIndent}${
+            child[Symbol.for("Deno.customInspect")](childIndent)
+          }`;
+        }
+        if (child instanceof TemplateText) {
+          return `${childIndent}${child[Symbol.for("Deno.customInspect")]()}`;
+        }
+        return `${childIndent}${child}`;
+      })
+      .filter(Boolean)
+      .join("\n");
+
+    return `<>\n${children}\n${indent}</> // [TemplateFragment]`;
+  }
+
+  [Symbol.for("nodejs.util.inspect.custom")]() {
+    return this[Symbol.for("Deno.customInspect")]();
+  }
+
+  toJSON() {
+    return {
+      type: "TemplateFragment",
+      children: this.children.map((child) =>
+        typeof child === "string" ? `"${child}"` : child
+      ),
+    };
   }
 }

@@ -73,4 +73,25 @@ export class TemplateHtml extends TemplateBase {
   static isHtml(value: unknown): value is TemplateHtml {
     return value instanceof TemplateHtml;
   }
+
+  [Symbol.for("Deno.customInspect")]() {
+    const content = this.children[0] as string;
+    const preview = content.length > 50
+      ? `${content.slice(0, 50)}...`
+      : content;
+    return `<html dangerouslySetInnerHTML="${preview}" /> // [TemplateHtml]`;
+  }
+
+  [Symbol.for("nodejs.util.inspect.custom")]() {
+    return this[Symbol.for("Deno.customInspect")]();
+  }
+
+  toJSON() {
+    return {
+      type: "TemplateHtml",
+      content: this.children[0],
+      ...(this.css ? { css: "..." } : {}),
+      ...(this.script ? { script: "..." } : {}),
+    };
+  }
 }

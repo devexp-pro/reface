@@ -1,6 +1,7 @@
 import type { ElementChildType, IHTMLAttributes } from "./types.ts";
 import type { ITemplateBase } from "./ITemplateBase.ts";
-
+import { TemplateText } from "./TemplateText.ts";
+import { formatTemplate } from "./utils/format.ts";
 /**
  * Base template class
  */
@@ -42,5 +43,32 @@ export abstract class TemplateBase<P extends IHTMLAttributes = IHTMLAttributes>
 
   toString(): string {
     return this.children.join("");
+  }
+
+  private formatForInspect() {
+    return {
+      type: this.constructor.name,
+      tag: this.tag,
+      attributes: this.attributes,
+      children: this.children.map((child) =>
+        child instanceof TemplateText ? `"${child.getContent()}"` : child
+      ),
+      ...(this.css ? { css: "..." } : {}),
+      ...(this.rootClass ? { rootClass: this.rootClass } : {}),
+      ...(this.script ? { script: "..." } : {}),
+      ...(this.scriptFile ? { scriptFile: this.scriptFile } : {}),
+    };
+  }
+
+  [Symbol.for("Deno.customInspect")](): string {
+    return formatTemplate(this);
+  }
+
+  [Symbol.for("nodejs.util.inspect.custom")](): string {
+    return formatTemplate(this);
+  }
+
+  toJSON() {
+    return this.formatForInspect();
   }
 }

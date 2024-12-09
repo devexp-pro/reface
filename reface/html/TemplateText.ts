@@ -39,4 +39,23 @@ export class TemplateText {
     }
     return new TemplateText(String(value));
   }
+
+  [Symbol.for("Deno.customInspect")]() {
+    const preview = this.content.length > 30
+      ? `${this.content.slice(0, 30)}...`
+      : this.content;
+    return `"${preview}" // [TemplateText]`;
+  }
+
+  [Symbol.for("nodejs.util.inspect.custom")]() {
+    return this[Symbol.for("Deno.customInspect")]();
+  }
+
+  toJSON() {
+    return {
+      type: "TemplateText",
+      content: this.content,
+      escapedContent: this.escapedContent,
+    };
+  }
 }

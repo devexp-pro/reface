@@ -177,6 +177,7 @@ Deno.test("Integration - Extending Styled Components", () => {
       color: white;
     }
   `;
+  console.log(<PrimaryButton class="large">Click me</PrimaryButton>);
 
   // JSX usage
   compareHTML(
