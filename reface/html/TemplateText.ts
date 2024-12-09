@@ -1,14 +1,12 @@
 import { createLogger } from "@reface/core";
 import { escapeHTML } from "./escape.ts";
-import type { ElementChildType } from "./types.ts";
-import { ITemplate } from "./types.ts";
+import type { RenderContext } from "./render.ts";
 
 const logger = createLogger("HTML:Text");
 
-/**
- * Text template for safe text content
- */
-export class TemplateText implements ITemplate {
+export class TemplateText {
+  private escaped: string | null = null;
+
   constructor(
     public readonly content: string,
     public readonly trusted: boolean = false,
@@ -16,14 +14,17 @@ export class TemplateText implements ITemplate {
     logger.debug("Creating text node", { length: content.length });
   }
 
-  toHtml(): string {
-    return this.trusted ? this.content : escapeHTML(this.content);
+  toHtml(_context: RenderContext): string {
+    if (this.trusted) {
+      return this.content;
+    }
+    if (this.escaped === null) {
+      this.escaped = escapeHTML(this.content);
+    }
+    return this.escaped;
   }
 
-  static from(value: ElementChildType): TemplateText {
-    if (value == null) {
-      return new TemplateText("");
-    }
+  static from(value: unknown): TemplateText {
     return new TemplateText(String(value));
   }
 }

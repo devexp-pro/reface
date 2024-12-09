@@ -30,15 +30,28 @@ export function createElement(
       name: type.name,
       props,
     });
-    return type(props, children);
+    const result = type(props, children);
+    if (!(result instanceof Template)) {
+      logger.error("Function component must return a Template instance");
+      throw new Error("Function component must return a Template instance");
+    }
+    return result;
   }
 
   // Если это обычный HTML элемент
-  return new Template({
+  const template = new Template({
     tag: type,
     attributes: props || {},
     children: children.flatMap((child) =>
       Array.isArray(child) ? child : [child]
     ),
   });
+
+  logger.debug("Created HTML element", {
+    tag: type,
+    props,
+    childrenCount: children.length,
+  });
+
+  return template;
 }

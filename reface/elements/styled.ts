@@ -1,100 +1,61 @@
-import { TemplateComponent } from "@reface/html";
-import type {
-  ComponentFunction,
-  ElementChild,
-  HTMLAttributes,
-  StyledComponent,
-  StyledFactory,
-} from "./types.ts";
-import { generateClassName, processAttributes, processCSS } from "@reface/html";
 import { createLogger } from "@reface/core";
+import type { ElementChildType } from "@reface/html";
+import { TemplateComponent } from "@reface/html";
+import { component } from "./component.ts";
 
 const logger = createLogger("Styled");
 
-/**
- * Create styled component
- */
-function createStyledComponent<P extends HTMLAttributes>(
-  tag: string,
-  css: string,
-): StyledComponent<P> {
-  const rootClass = generateClassName();
-  const processedCss = processCSS(css, rootClass);
+function createStyledComponent(tag: string) {
+  return function (strings: TemplateStringsArray, ...values: any[]) {
+    const css = strings.reduce((acc, str, i) => {
+      return acc + str + (values[i] || "");
+    }, "");
 
-  return new TemplateComponent(tag, { class: rootClass }, processedCss);
-}
+    logger.debug("Creating styled component", { tag, css });
 
-/**
- * Styled components factory
- */
-export const styled = new Proxy(
-  ((component: ComponentFunction) => {
-    logger.debug("Extending component with styles", {
-      tag: component.tag,
-      hasExistingCss: Boolean(component.css),
-    });
+    const rootClass = `styled-${Math.random().toString(36).slice(2)}`;
 
-    return (strings: TemplateStringsArray | string, ...values: unknown[]) => {
-      try {
-        const newCss = typeof strings === "string"
-          ? strings
-          : String.raw({ raw: strings.raw }, ...(values || []));
-        const originalCss = component.css || "";
-
-        logger.debug("Combining CSS", {
-          originalLength: originalCss.length,
-          newLength: newCss.length,
+    const StyledComponent = component<{ class?: string }>(
+      function StyledComponent(props, children) {
+        logger.debug("Rendering styled component", {
+          tag,
+          props,
+          rootClass,
+          childrenCount: children?.length,
         });
 
-        return createStyledComponent(
-          component.tag,
-          `${originalCss}\n${newCss}`,
-        );
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          logger.error("Failed to extend component", error, {
-            tag: component.tag,
-            strings,
-            values,
-          });
-        } else {
-          logger.error(
-            "Unknown error extending component",
-            new Error(String(error)),
-            { tag: component.tag, strings, values },
-          );
-        }
-        throw error;
-      }
-    };
-  }) as StyledFactory,
-  {
-    get(target, prop) {
-      logger.debug("Creating new styled component", { tag: String(prop) });
+        const className = props.class
+          ? `${rootClass} ${props.class}`
+          : rootClass;
 
-      return (strings: TemplateStringsArray, ...values: unknown[]) => {
-        try {
-          const css = typeof strings === "string"
-            ? strings
-            : String.raw({ raw: strings.raw }, ...(values || []));
-          return createStyledComponent(prop as string, css);
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            logger.error("Failed to create new styled component", error, {
-              tag: String(prop),
-              strings,
-              values,
-            });
-          } else {
-            logger.error(
-              "Unknown error creating new styled component",
-              new Error(String(error)),
-              { tag: String(prop), strings, values },
-            );
-          }
-          throw error;
-        }
-      };
-    },
-  },
-);
+        const templateComponent = new TemplateComponent(
+          tag,
+          {
+            ...props,
+            class: className,
+          },
+          css,
+          rootClass,
+        );
+
+        return templateComponent.template(children);
+      },
+    );
+
+    // Добавляем rootClass как статическое свойство
+    Object.defineProperty(StyledComponent, "rootClass", {
+      value: rootClass,
+      writable: false,
+      configurable: false,
+    });
+
+    return StyledComponent;
+  };
+}
+
+// Создаем и экспортируем styled как прокси
+export const styled = new Proxy({}, {
+  get: (_, tag: string) => createStyledComponent(tag),
+}) as {
+  [K: string]: ReturnType<typeof createStyledComponent>;
+};

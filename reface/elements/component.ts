@@ -12,9 +12,24 @@ export function component<P extends object = {}>(
 ) {
   logger.debug("Creating component", { renderFn: renderFn.name });
 
-  return function (props: P) {
-    logger.debug("Component called with props", { props });
+  const componentFn = function (props: P, jsxChildren?: ElementChildType[]) {
+    logger.debug("Component called", {
+      props,
+      hasJsxChildren: !!jsxChildren,
+      childrenCount: jsxChildren?.length,
+    });
 
+    // JSX вызов (с children)
+    if (jsxChildren) {
+      const result = renderFn(props, jsxChildren);
+      logger.debug("JSX render result", {
+        type: result?.constructor?.name,
+        hasToHtml: result && typeof result === "object" && "toHtml" in result,
+      });
+      return result;
+    }
+
+    // Template literal вызов
     return function (strings: TemplateStringsArray, ...values: any[]) {
       const children = strings.map((str, i) => {
         const text = new TemplateText(str);
@@ -47,4 +62,6 @@ export function component<P extends object = {}>(
       return result;
     };
   };
+
+  return componentFn;
 }
