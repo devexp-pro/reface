@@ -158,8 +158,12 @@ function renderTemplate(
     }
 
     // Render children
-    const children = template.children
-      .map((child) => renderChild(child, styles))
+    const children = (Array.isArray(template.children)
+      ? template.children
+      : [template.children])
+      .map((child) =>
+        renderChild(child, styles)
+      )
       .join("");
 
     return `<${template.tag}${attrs}>${children}</${template.tag}>`;

@@ -10,26 +10,25 @@ const logger = createLogger("Component");
  * Create component with props
  */
 export function component<P extends Record<string, unknown>>(
-  renderFn: (props: P, children?: ElementChildType[]) => Template,
+  renderFn: (props: P, children: ElementChildType[]) => Template,
 ) {
   logger.debug("Creating component", {
     renderFn: renderFn.name || "Anonymous",
   });
 
-  const componentFn = (props: P) => {
-    logger.debug("Component called", { props });
+  function componentFn(props: P, children?: ElementChildType[]) {
+    logger.debug("Component called", {
+      props,
+      childrenCount: children?.length,
+    });
 
-    // Если есть children в props, это JSX вызов
-    if ("children" in props) {
-      const { children, ...restProps } = props;
-      return renderFn(
-        restProps as P,
-        Array.isArray(children) ? children : [children],
-      );
+    // Если есть children, это JSX вызов
+    if (children) {
+      return renderFn(props, children);
     }
 
-    // Создаем функцию для template literals
-    function templateLiteral(
+    // Иначе возвращаем функцию для template literals
+    return function templateLiteral(
       strings: TemplateStringsArray,
       ...values: ElementChildType[]
     ): Template {
@@ -38,19 +37,22 @@ export function component<P extends Record<string, unknown>>(
         valuesCount: values.length,
       });
 
-      // Собираем массив элементов
       const result: ElementChildType[] = [];
 
       for (let i = 0; i < strings.length; i++) {
         if (strings[i]) {
-          result.push(strings[i]);
+          result.push(new TemplateText(strings[i]));
         }
 
         if (i < values.length) {
           const value = values[i];
           if (value != null) {
             if (Array.isArray(value)) {
-              result.push(...value);
+              result.push(
+                ...value.map((v) =>
+                  v instanceof Template ? v : new TemplateText(String(v))
+                ),
+              );
             } else if (value instanceof Template) {
               result.push(value);
             } else {
@@ -60,18 +62,9 @@ export function component<P extends Record<string, unknown>>(
         }
       }
 
-      // Создаем фрагмент с собранными элементами
-      const fragment = new TemplateFragment(result);
-
-      // Передаем фрагмент как children в renderFn
-      return renderFn(props, [fragment]);
-    }
-
-    // Возвращаем функцию с поддержкой template literals
-    return Object.assign(templateLiteral, {
-      isTemplate: true as const,
-    });
-  };
+      return renderFn(props, result);
+    };
+  }
 
   return Object.assign(componentFn, {
     isTemplate: true as const,
