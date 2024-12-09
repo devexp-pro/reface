@@ -1,28 +1,30 @@
 import { Template } from "./Template.ts";
 import type { ElementChildType } from "./types.ts";
-import type { RenderContext } from "./render.ts";
 
-export function createTemplateFunction(
-  tag: string,
-  attributes: Record<string, unknown> = {},
-  css?: string,
-  rootClass?: string,
-) {
-  return function (
-    strings: TemplateStringsArray,
-    ...values: ElementChildType[]
-  ): Template {
-    const children = strings.map((str, i) => {
-      const value = i < values.length ? values[i] : "";
-      return `${str}${value}`;
-    });
+export function createTemplateFunction(tag: string) {
+  return (
+    attributes: Record<string, unknown> = {},
+    css?: string,
+    rootClass?: string,
+  ) => {
+    return (
+      strings: TemplateStringsArray,
+      ...values: ElementChildType[]
+    ): Template => {
+      const children = strings.map((str, i) => {
+        if (i < values.length) {
+          return [str, values[i]];
+        }
+        return [str];
+      }).flat();
 
-    return new Template({
-      tag,
-      attributes,
-      children,
-      css,
-      rootClass,
-    });
+      return new Template({
+        tag,
+        attributes,
+        children,
+        css,
+        rootClass,
+      });
+    };
   };
 }
