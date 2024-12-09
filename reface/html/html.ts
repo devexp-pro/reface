@@ -1,8 +1,8 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "./types.ts";
 import { Template } from "./Template.ts";
-import { TemplateHtml } from "./TemplateHtml.ts";
 import { TemplateText } from "./TemplateText.ts";
+import { TemplateHtml } from "./TemplateHtml.ts";
 
 const logger = createLogger("HTML:Html");
 
@@ -19,9 +19,9 @@ export function html(
   });
 
   try {
-    // Если передана просто строка - считаем её безопасным HTML
+    // Если передана просто строка - создаем доверенный TemplateText
     if (typeof strings === "string") {
-      return new TemplateHtml(strings);
+      return new TemplateHtml([new TemplateText(strings, true)]);
     }
 
     // Для template literal создаем массив из статического HTML и значений
@@ -30,7 +30,8 @@ export function html(
     // Чередуем статический HTML и значения
     for (let i = 0; i < strings.length; i++) {
       if (strings[i]) {
-        result.push(strings[i]);
+        // Статический HTML из template literal всегда доверенный
+        result.push(new TemplateText(strings[i], true));
       }
 
       if (i < values.length) {
@@ -38,13 +39,10 @@ export function html(
         if (value != null) {
           if (Array.isArray(value)) {
             result.push(...value);
-          } else if (
-            value instanceof Template ||
-            value instanceof TemplateHtml
-          ) {
+          } else if (value instanceof Template) {
             result.push(value);
           } else {
-            // Только динамические значения оборачиваем в TemplateText
+            // Динамические значения не доверенные
             result.push(new TemplateText(String(value)));
           }
         }

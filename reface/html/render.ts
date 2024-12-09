@@ -1,84 +1,43 @@
 import { createLogger } from "@reface/core";
-import type { ElementChild } from "./types.ts";
-import { StyleCollector } from "./StyleCollector.ts";
-import { renderAttributes } from "./attributes.ts";
-import { VOID_ELEMENTS } from "./constants.ts";
-import { ScriptCollector } from "./ScriptCollector.ts";
+import type { ElementChildType } from "./types.ts";
 import { Template } from "./Template.ts";
+import { TemplateText } from "./TemplateText.ts";
 import { TemplateHtml } from "./TemplateHtml.ts";
 import { TemplateFragment } from "./TemplateFragment.ts";
-import { TemplateText } from "./TemplateText.ts";
 import { escapeHTML } from "./escape.ts";
+import { StyleCollector } from "./StyleCollector.ts";
+import { ScriptCollector } from "./ScriptCollector.ts";
+import { renderAttributes } from "./attributes.ts";
+import { VOID_ELEMENTS } from "./constants.ts";
 
 const logger = createLogger("HTML:Render");
 
-/**
- * Render child element
- */
-function renderChild(child: ElementChild, styles: StyleCollector): string {
+function renderChild(child: ElementChildType, styles: Set<string>): string {
   logger.debug("Rendering child", { type: typeof child });
 
-  try {
-    if (child == null || child === false || child === true) {
-      logger.debug("Skipping empty child");
-      return "";
-    }
-
-    // Handle arrays
-    if (Array.isArray(child)) {
-      logger.debug("Processing array child", { length: child.length });
-      return child.map((c) => renderChild(c, styles)).join("");
-    }
-
-    if (typeof child === "object" && child !== null) {
-      // Handle TemplateText
-      if (child instanceof TemplateText) {
-        logger.debug("Processing text node", {
-          length: child.getContent().length,
-        });
-        return escapeHTML(child.getContent());
-      }
-
-      // Handle TemplateFragment
-      if (child instanceof TemplateFragment) {
-        logger.debug("Processing fragment", {
-          childrenCount: child.getChildren().length,
-        });
-        return child.getChildren()
-          .map((c) => renderChild(c, styles))
-          .join("");
-      }
-
-      // Handle Template
-      if (child instanceof Template) {
-        logger.debug("Processing template", { tag: child.tag });
-        return renderTemplate(child, styles, new ScriptCollector());
-      }
-
-      // Handle TemplateHtml
-      if (child instanceof TemplateHtml) {
-        logger.debug("Processing HTML template", {
-          childrenCount: child.children.length,
-        });
-        return child.children
-          .map((c) => renderChild(c, styles))
-          .join("");
-      }
-    }
-
-    // Строки считаем безопасным HTML
-    logger.debug("Processing string child", { value: String(child) });
-    return String(child);
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error("Failed to render child", error, { child });
-    } else {
-      logger.error("Unknown error rendering child", new Error(String(error)), {
-        child,
-      });
-    }
-    throw error;
+  if (child instanceof Template) {
+    return renderTemplate(child, styles);
   }
+
+  if (child instanceof TemplateHtml) {
+    logger.debug("Processing HTML template", {
+      childrenCount: child.children.length,
+    });
+    // TemplateHtml всегда доверенный
+    return child.children.map((c) => renderChild(c, styles)).join("");
+  }
+
+  if (child instanceof TemplateText) {
+    logger.debug("Processing text node", { length: child.content.length });
+    return child.trusted ? child.content : escapeHTML(child.content);
+  }
+
+  if (child == null) {
+    logger.debug("Skipping empty child");
+    return "";
+  }
+
+  return escapeHTML(String(child));
 }
 
 /**
@@ -129,8 +88,8 @@ export function render(
  */
 function renderTemplate(
   template: Template,
-  styles: StyleCollector,
-  scripts: ScriptCollector,
+  styles?: StyleCollector,
+  scripts?: ScriptCollector,
 ): string {
   logger.debug("Rendering template", { tag: template.tag });
 

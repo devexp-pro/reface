@@ -4,6 +4,7 @@ import { TemplateBase } from "./TemplateBase.ts";
 import { processAttributes } from "./attributes.ts";
 import { TemplateText } from "./TemplateText.ts";
 import { TemplateFragment } from "./TemplateFragment.ts";
+import { TemplateHtml } from "./TemplateHtml.ts";
 
 const logger = createLogger("HTML:Template");
 
@@ -210,7 +211,8 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
                 result.push(...value);
               } else if (
                 value instanceof Template ||
-                value instanceof TemplateFragment
+                value instanceof TemplateFragment ||
+                value instanceof TemplateHtml
               ) {
                 result.push(value);
               } else {
