@@ -1,20 +1,20 @@
 import { assertEquals } from "@std/assert";
 
-import { html, TemplateHtml } from "@reface/html";
+import { html, render, TemplateHtml } from "@reface/html";
 import { span } from "@reface/elements";
 import { compareHTML } from "@reface/test-utils";
 
 Deno.test("html should create TemplateHtml from string", () => {
   const template = html`<div>Hello</div>`;
   assertEquals(template instanceof TemplateHtml, true);
-  assertEquals(template.toString(), "<div>Hello</div>");
+  compareHTML(render(template), "<div>Hello</div>");
 });
 
 Deno.test("html should escape unsafe content", () => {
   const unsafe = "<script>alert('xss')</script>";
   const template = html`${unsafe}`;
   assertEquals(
-    template.toString(),
+    render(template),
     "&lt;script&gt;alert(&#39;xss&#39;)&lt;/script&gt;",
   );
 });
@@ -28,8 +28,8 @@ Deno.test("html should allow nested html templates", () => {
       ${content}
     </div>
   `;
-  assertEquals(
-    template.toString().trim(),
+  compareHTML(
+    render(template),
     `<div>
       <h1>Title</h1>
       <p>Content</p>
@@ -40,19 +40,19 @@ Deno.test("html should allow nested html templates", () => {
 Deno.test("html should allow nested elements", () => {
   const el = span()`Hello`;
   const template = html`<div>${el}</div>`;
-  assertEquals(template.toString(), "<div><span>Hello</span></div>");
+  compareHTML(render(template), "<div><span>Hello</span></div>");
 });
 
 Deno.test("html should handle null/undefined values", () => {
   const template = html`<div>${null}${undefined}</div>`;
-  assertEquals(template.toString(), "<div></div>");
+  compareHTML(render(template), "<div></div>");
 });
 
 Deno.test("html should handle primitive values", () => {
   const number = 42;
   const boolean = true;
   const template = html`<div>${number} ${boolean}</div>`;
-  assertEquals(template.toString(), "<div>42 true</div>");
+  compareHTML(render(template), "<div>42 true</div>");
 });
 
 Deno.test("html should handle complex interpolation", () => {
@@ -63,7 +63,7 @@ Deno.test("html should handle complex interpolation", () => {
     </ul>
   `;
   compareHTML(
-    list.toString(),
+    render(list),
     `<ul>
       <li>One</li>
       <li>Two</li>
@@ -74,7 +74,7 @@ Deno.test("html should handle complex interpolation", () => {
 Deno.test("html should handle trusted HTML strings", () => {
   const trusted = "<b>Bold</b>";
   const template = html(trusted);
-  assertEquals(template.toString(), "<b>Bold</b>");
+  compareHTML(render(template), "<b>Bold</b>");
 });
 
 Deno.test("html should handle mixed content", () => {
@@ -86,8 +86,8 @@ Deno.test("html should handle mixed content", () => {
       <p>${safe}</p>
     </div>
   `;
-  assertEquals(
-    template.toString().trim(),
+  compareHTML(
+    render(template),
     "<div>\n      <p>&lt;b&gt;bold&lt;/b&gt;</p>\n      <p><i>italic</i></p>\n    </div>",
   );
 });

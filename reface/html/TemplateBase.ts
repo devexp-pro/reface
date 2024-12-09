@@ -41,18 +41,14 @@ export abstract class TemplateBase<P extends IHTMLAttributes = IHTMLAttributes>
     this.scriptFile = scriptFile;
   }
 
-  toString(): string {
-    return this.children.join("");
-  }
+  abstract toString(): string;
 
   private formatForInspect() {
     return {
       type: this.constructor.name,
       tag: this.tag,
       attributes: this.attributes,
-      children: this.children.map((child) =>
-        child instanceof TemplateText ? `"${child.getContent()}"` : child
-      ),
+      children: this.children,
       ...(this.css ? { css: "..." } : {}),
       ...(this.rootClass ? { rootClass: this.rootClass } : {}),
       ...(this.script ? { script: "..." } : {}),

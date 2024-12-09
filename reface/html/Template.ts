@@ -22,13 +22,7 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
   }) {
     super({
       ...options,
-      children: options.children?.map((child) => {
-        // Если это примитив, оборачиваем в TemplateText
-        if (child == null || typeof child !== "object") {
-          return TemplateText.from(child);
-        }
-        return child;
-      }),
+      children: options.children || [],
     });
 
     logger.debug("Creating template", {
@@ -61,10 +55,7 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
   }
 
   appendChild(child: ElementChildType): Template<T> {
-    logger.debug("Appending child", {
-      type: typeof child,
-      isTemplate: child instanceof TemplateBase,
-    });
+    logger.debug("Appending child", { type: typeof child });
     return new Template<T>({
       ...this,
       children: [...this.children, child],
@@ -95,18 +86,8 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
 
     try {
       const children = strings.reduce((acc: ElementChildType[], str, i) => {
-        // Создаем TemplateText для строковой части
-        if (str) acc.push(new TemplateText(str));
-
-        if (i < values.length) {
-          const value = values[i];
-          if (value instanceof TemplateBase) {
-            acc.push(value);
-          } else {
-            // Оборачиваем значение в TemplateText
-            acc.push(TemplateText.from(value));
-          }
-        }
+        if (str) acc.push(str);
+        if (i < values.length) acc.push(values[i]);
         return acc;
       }, []);
 

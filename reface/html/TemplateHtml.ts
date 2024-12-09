@@ -1,28 +1,27 @@
 import { createLogger } from "@reface/core";
 import { TemplateBase } from "./TemplateBase.ts";
 import { Template } from "./Template.ts";
-import { render } from "./render.ts";
-import { TemplateText } from "./TemplateText.ts";
+import type { ElementChildType } from "./types.ts";
 
 const logger = createLogger("HTML:Html");
 
 /**
- * HTML template for raw HTML content
+ * HTML template для создания из строковых литералов
  */
 export class TemplateHtml extends TemplateBase {
-  constructor(content: string) {
+  constructor(content: ElementChildType | ElementChildType[]) {
     super({
       tag: "html",
-      children: [content],
+      children: Array.isArray(content) ? content : [content],
     });
   }
 
-  override toString(): string {
+  toString(): string {
     return this.children[0] as string;
   }
 
   /**
-   * Create from template literal
+   * Создать из template literal
    */
   static fromTemplateLiteral(
     strings: TemplateStringsArray,
@@ -37,16 +36,15 @@ export class TemplateHtml extends TemplateBase {
       let result = strings[0];
       for (let i = 0; i < values.length; i++) {
         const value = values[i];
+
         if (value === null || value === undefined) {
           result += "";
-        } else if (value instanceof TemplateHtml) {
-          result += value.toString();
-        } else if (value instanceof Template) {
-          result += render(value);
+        } else if (Array.isArray(value)) {
+          result += value.map(String).join("");
         } else {
-          const text = new TemplateText(String(value));
-          result += text.toString();
+          result += String(value);
         }
+
         result += strings[i + 1];
       }
 
@@ -68,31 +66,7 @@ export class TemplateHtml extends TemplateBase {
     }
   }
 
-  /**
-   * Check if value is TemplateHtml
-   */
   static isHtml(value: unknown): value is TemplateHtml {
     return value instanceof TemplateHtml;
-  }
-
-  [Symbol.for("Deno.customInspect")]() {
-    const content = this.children[0] as string;
-    const preview = content.length > 50
-      ? `${content.slice(0, 50)}...`
-      : content;
-    return `<html dangerouslySetInnerHTML="${preview}" /> // [TemplateHtml]`;
-  }
-
-  [Symbol.for("nodejs.util.inspect.custom")]() {
-    return this[Symbol.for("Deno.customInspect")]();
-  }
-
-  toJSON() {
-    return {
-      type: "TemplateHtml",
-      content: this.children[0],
-      ...(this.css ? { css: "..." } : {}),
-      ...(this.script ? { script: "..." } : {}),
-    };
   }
 }

@@ -1,14 +1,10 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "./types.ts";
-import { render } from "./render.ts";
-import { Template } from "./Template.ts";
-import { TemplateBase } from "./TemplateBase.ts";
-import { TemplateText } from "./TemplateText.ts";
 
 const logger = createLogger("Fragment");
 
 /**
- * Fragment template
+ * Fragment template - группирует элементы без создания родительского элемента
  */
 export class TemplateFragment {
   constructor(public readonly children: ElementChildType[]) {
@@ -16,37 +12,13 @@ export class TemplateFragment {
   }
 
   /**
-   * Render fragment to string
-   */
-  toString(): string {
-    logger.debug("Rendering fragment", { childrenCount: this.children.length });
-    return this.children.map((child) => {
-      if (child == null) {
-        return "";
-      }
-
-      // Если это Template, используем render
-      if (child instanceof Template) {
-        return render(child);
-      }
-
-      // Если это объект с toString методом
-      if (typeof child === "object" && "toString" in child) {
-        return child.toString();
-      }
-
-      // Для примитивов
-      return String(child);
-    }).join("");
-  }
-
-  /**
-   * Get fragment children
+   * Получить дочерние элементы
    */
   getChildren(): ElementChildType[] {
     return this.children;
   }
 
+  // Для отладки
   [Symbol.for("Deno.customInspect")](indent = "") {
     if (!this.children.length) return "<></> // [TemplateFragment]";
 
@@ -58,14 +30,6 @@ export class TemplateFragment {
           return child.length > 40
             ? `${childIndent}"${child.slice(0, 40)}..."`
             : `${childIndent}"${child}"`;
-        }
-        if (child instanceof TemplateBase) {
-          return `${childIndent}${
-            child[Symbol.for("Deno.customInspect")](childIndent)
-          }`;
-        }
-        if (child instanceof TemplateText) {
-          return `${childIndent}${child[Symbol.for("Deno.customInspect")]()}`;
         }
         return `${childIndent}${child}`;
       })
@@ -82,9 +46,7 @@ export class TemplateFragment {
   toJSON() {
     return {
       type: "TemplateFragment",
-      children: this.children.map((child) =>
-        typeof child === "string" ? `"${child}"` : child
-      ),
+      children: this.children,
     };
   }
 }

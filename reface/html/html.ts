@@ -1,14 +1,13 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "./types.ts";
 import { Template } from "./Template.ts";
-import { TemplateText } from "./TemplateText.ts";
 import { TemplateHtml } from "./TemplateHtml.ts";
-import { render } from "./render.ts";
+import { TemplateText } from "./TemplateText.ts";
 
 const logger = createLogger("HTML:Html");
 
 /**
- * Creates a HTML template
+ * Creates a HTML template from template literal or string
  */
 export function html(
   strings: TemplateStringsArray | string,
@@ -20,29 +19,36 @@ export function html(
   });
 
   try {
-    // Если передана просто строка (не template literal)
+    // Если передана просто строка - считаем её безопасным HTML
     if (typeof strings === "string") {
       return new TemplateHtml(strings);
     }
 
-    // Обработка template literal
-    let result = strings[0];
-    for (let i = 0; i < values.length; i++) {
-      const value = values[i];
+    // Для template literal создаем массив из статического HTML и значений
+    const result: ElementChildType[] = [];
 
-      if (value === null || value === undefined) {
-        result += "";
-      } else if (value instanceof Template) {
-        // Template и TemplateHtml считаются безопасными
-        result += render(value);
-      } else if (value instanceof TemplateHtml) {
-        result += value.toString();
-      } else {
-        // Все остальные значения (строки, числа и т.д.) экранируются
-        result += new TemplateText(String(value)).toString();
+    // Чередуем статический HTML и значения
+    for (let i = 0; i < strings.length; i++) {
+      if (strings[i]) {
+        result.push(strings[i]);
       }
 
-      result += strings[i + 1];
+      if (i < values.length) {
+        const value = values[i];
+        if (value != null) {
+          if (Array.isArray(value)) {
+            result.push(...value);
+          } else if (
+            value instanceof Template ||
+            value instanceof TemplateHtml
+          ) {
+            result.push(value);
+          } else {
+            // Только динамические значения оборачиваем в TemplateText
+            result.push(new TemplateText(String(value)));
+          }
+        }
+      }
     }
 
     return new TemplateHtml(result);
