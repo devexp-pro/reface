@@ -4,6 +4,7 @@ export { Template } from "./Template.ts";
 export { TemplateFragment } from "./TemplateFragment.ts";
 export { TemplateText } from "./TemplateText.ts";
 export { TemplateHtml } from "./TemplateHtml.ts";
+export { TemplateComponent } from "./TemplateComponent.ts";
 export { html } from "./html.ts";
 export { render } from "./render.ts";
 export { processAttributes, renderAttributes } from "./attributes.ts";

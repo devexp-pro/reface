@@ -8,7 +8,7 @@ import { TemplateHtml } from "./TemplateHtml.ts";
 import { ITemplate } from "./types.ts";
 import { renderAttributes } from "./attributes.ts";
 import { VOID_ELEMENTS } from "./constants.ts";
-import { escapeHTML } from "./utils.ts";
+import { escapeHTML } from "./escape.ts";
 
 const logger = createLogger("HTML:Template");
 
@@ -16,6 +16,14 @@ const logger = createLogger("HTML:Template");
  * HTML template class
  */
 export class Template implements ITemplate {
+  private readonly children: ElementChildType[];
+  private readonly tag: string;
+  private readonly attributes: IHTMLAttributes;
+  private readonly css?: string;
+  private readonly rootClass?: string;
+  private readonly script?: string;
+  private readonly scriptFile?: string;
+
   constructor(options: {
     tag: string;
     attributes?: IHTMLAttributes;
@@ -25,17 +33,20 @@ export class Template implements ITemplate {
     script?: string;
     scriptFile?: string;
   }) {
-    super({
-      ...options,
-      children: options.children || [],
-    });
+    this.tag = options.tag;
+    this.attributes = options.attributes || {};
+    this.children = options.children || [];
+    this.css = options.css;
+    this.rootClass = options.rootClass;
+    this.script = options.script;
+    this.scriptFile = options.scriptFile;
 
     logger.debug("Creating template", {
-      tag: options.tag,
-      hasAttributes: Boolean(options.attributes),
-      childrenCount: options.children?.length,
-      hasCss: Boolean(options.css),
-      hasRootClass: Boolean(options.rootClass),
+      tag: this.tag,
+      hasAttributes: Boolean(this.attributes),
+      childrenCount: this.children.length,
+      hasCss: Boolean(this.css),
+      hasRootClass: Boolean(this.rootClass),
     });
   }
 
@@ -252,15 +263,23 @@ export class Template implements ITemplate {
   toHtml(): string {
     const attrs = renderAttributes(this.attributes);
 
-    // Для void elements
     if (VOID_ELEMENTS.has(this.tag)) {
       return `<${this.tag}${attrs}/>`;
     }
 
-    // Рендерим children
-    const children = this.children.map((child) =>
-      "toHtml" in child ? child.toHtml() : escapeHTML(String(child))
-    ).join("");
+    const children = this.children.map((child) => {
+      if (typeof child === "object" && child !== null && "toHtml" in child) {
+        return child.toHtml();
+      }
+
+      if (typeof child === "string") {
+        return escapeHTML(child);
+      }
+      if (child instanceof TemplateText) {
+        return child.toHtml();
+      }
+      return escapeHTML(String(child));
+    }).join("");
 
     return `<${this.tag}${attrs}>${children}</${this.tag}>`;
   }

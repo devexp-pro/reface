@@ -1,21 +1,35 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "./types.ts";
 import { ITemplate } from "./types.ts";
+import { escapeHTML } from "./escape.ts";
+import { TemplateText } from "./TemplateText.ts";
 
-const logger = createLogger("Fragment");
+const logger = createLogger("HTML:Fragment");
 
 /**
  * Fragment template - группирует элементы без создания родительского элемента
  */
 export class TemplateFragment implements ITemplate {
-  constructor(private readonly children: ElementChildType[]) {
+  private readonly children: ElementChildType[];
+
+  constructor(children: ElementChildType[] = []) {
+    this.children = children;
     logger.debug("Creating fragment", { childrenCount: children.length });
   }
 
   toHtml(): string {
-    return this.children.map((child) =>
-      "toHtml" in child ? child.toHtml() : escapeHTML(String(child))
-    ).join("");
+    return this.children.map((child) => {
+      if (typeof child === "object" && child !== null && "toHtml" in child) {
+        return child.toHtml();
+      }
+      if (typeof child === "string") {
+        return escapeHTML(child);
+      }
+      if (child instanceof TemplateText) {
+        return child.toHtml();
+      }
+      return escapeHTML(String(child));
+    }).join("");
   }
 
   // Для отладки

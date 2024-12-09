@@ -1,72 +1,50 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "@reface/html";
-import { Template } from "@reface/html";
-import { TemplateFragment } from "@reface/html";
-import { TemplateText } from "@reface/html";
+import { Template, TemplateComponent, TemplateText } from "@reface/html";
 
 const logger = createLogger("Component");
 
 /**
  * Create component with props
  */
-export function component<P extends Record<string, unknown>>(
-  renderFn: (props: P, children: ElementChildType[]) => Template,
+export function component<P extends object = {}>(
+  renderFn: (props: P, children: ElementChildType[]) => ElementChildType,
 ) {
-  logger.debug("Creating component", {
-    renderFn: renderFn.name || "Anonymous",
-  });
+  logger.debug("Creating component", { renderFn: renderFn.name });
 
-  function componentFn(props: P, children?: ElementChildType[]) {
-    logger.debug("Component called", {
-      props,
-      childrenCount: children?.length,
-    });
+  return function (props: P) {
+    logger.debug("Component called with props", { props });
 
-    // Если есть children, это JSX вызов
-    if (children) {
-      return renderFn(props, children);
-    }
-
-    // Иначе возвращаем функцию для template literals
-    return function templateLiteral(
-      strings: TemplateStringsArray,
-      ...values: ElementChildType[]
-    ): Template {
-      logger.debug("Template literal called", {
-        stringsCount: strings.length,
-        valuesCount: values.length,
-      });
-
-      const result: ElementChildType[] = [];
-
-      for (let i = 0; i < strings.length; i++) {
-        if (strings[i]) {
-          result.push(new TemplateText(strings[i]));
-        }
-
+    return function (strings: TemplateStringsArray, ...values: any[]) {
+      const children = strings.map((str, i) => {
+        const text = new TemplateText(str);
         if (i < values.length) {
           const value = values[i];
-          if (value != null) {
-            if (Array.isArray(value)) {
-              result.push(
-                ...value.map((v) =>
-                  v instanceof Template ? v : new TemplateText(String(v))
-                ),
-              );
-            } else if (value instanceof Template) {
-              result.push(value);
-            } else {
-              result.push(new TemplateText(String(value)));
-            }
+          if (value instanceof TemplateText) {
+            return value;
           }
+          return new TemplateText(String(value));
         }
+        return text;
+      }).filter((child) => child.content !== "");
+
+      logger.debug("Rendering component with children", {
+        children,
+        childrenContent: children.map((c) => c.content),
+      });
+
+      const result = renderFn(props, children);
+      logger.debug("RenderFn result type", {
+        type: result?.constructor?.name,
+        hasToHtml: result && typeof result === "object" && "toHtml" in result,
+      });
+
+      if (!(result instanceof Template)) {
+        logger.error("RenderFn must return Template instance");
+        throw new Error("RenderFn must return Template instance");
       }
 
-      return renderFn(props, result);
+      return result;
     };
-  }
-
-  return Object.assign(componentFn, {
-    isTemplate: true as const,
-  });
+  };
 }

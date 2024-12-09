@@ -1,4 +1,4 @@
-import { Template } from "@reface/html";
+import { TemplateComponent } from "@reface/html";
 import type {
   ComponentFunction,
   ElementChild,
@@ -8,7 +8,6 @@ import type {
 } from "./types.ts";
 import { generateClassName, processAttributes, processCSS } from "@reface/html";
 import { createLogger } from "@reface/core";
-import { TemplateText } from "@reface/html";
 
 const logger = createLogger("Styled");
 
@@ -22,80 +21,7 @@ function createStyledComponent<P extends HTMLAttributes>(
   const rootClass = generateClassName();
   const processedCss = processCSS(css, rootClass);
 
-  // Создаем основную функцию компонента
-  function componentFn(props?: P, children?: ElementChild[]) {
-    logger.debug("Component called with props", {
-      props,
-      hasChildren: Boolean(children),
-    });
-
-    const attributes = processAttributes(props || {});
-    attributes.class = Array.isArray(attributes.class)
-      ? [rootClass, ...attributes.class]
-      : [rootClass];
-
-    // Если переданы children, создаем Template сразу
-    if (children) {
-      return new Template({
-        tag,
-        attributes,
-        children,
-        css: processedCss,
-        rootClass,
-      });
-    }
-
-    // Возвращаем функцию для template literals
-    return (
-      strings: TemplateStringsArray,
-      ...values: ElementChild[]
-    ): Template => {
-      logger.debug("Template literal called", {
-        stringsCount: strings.length,
-        valuesCount: values.length,
-      });
-
-      const result: ElementChild[] = [];
-
-      for (let i = 0; i < strings.length; i++) {
-        if (strings[i]) {
-          result.push(strings[i]);
-        }
-
-        if (i < values.length) {
-          const value = values[i];
-          if (value != null) {
-            if (Array.isArray(value)) {
-              result.push(
-                ...value.map((v) =>
-                  v instanceof Template ? v : new TemplateText(String(v))
-                ),
-              );
-            } else if (value instanceof Template) {
-              result.push(value);
-            } else {
-              result.push(new TemplateText(String(value)));
-            }
-          }
-        }
-      }
-
-      return new Template({
-        tag,
-        attributes,
-        children: result,
-        css: processedCss,
-        rootClass,
-      });
-    };
-  }
-
-  return Object.assign(componentFn, {
-    isTemplate: true as const,
-    tag,
-    css: processedCss,
-    rootClass,
-  });
+  return new TemplateComponent(tag, { class: rootClass }, processedCss);
 }
 
 /**

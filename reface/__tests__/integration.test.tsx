@@ -224,6 +224,10 @@ Deno.test("Integration - Fragments and Lists", () => {
     )
   );
 
+  console.log(Deno.inspect(<ul>
+    <List items={["One", "Two"]} />
+  </ul>));
+
   // Using in JSX
   compareHTML(
     render(
