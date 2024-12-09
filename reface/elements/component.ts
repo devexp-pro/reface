@@ -1,7 +1,8 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "@reface/html";
 import { Template } from "@reface/html";
-import { html } from "@reface/html";
+import { TemplateFragment } from "@reface/html";
+import { TemplateText } from "@reface/html";
 
 const logger = createLogger("Component");
 
@@ -37,11 +38,33 @@ export function component<P extends Record<string, unknown>>(
         valuesCount: values.length,
       });
 
-      // Используем html для создания Template
-      const template = html(strings, ...values);
+      // Собираем массив элементов
+      const result: ElementChildType[] = [];
 
-      // Передаем Template как children
-      return renderFn(props, [template]);
+      for (let i = 0; i < strings.length; i++) {
+        if (strings[i]) {
+          result.push(strings[i]);
+        }
+
+        if (i < values.length) {
+          const value = values[i];
+          if (value != null) {
+            if (Array.isArray(value)) {
+              result.push(...value);
+            } else if (value instanceof Template) {
+              result.push(value);
+            } else {
+              result.push(new TemplateText(String(value)));
+            }
+          }
+        }
+      }
+
+      // Создаем фрагмент с собранными элементами
+      const fragment = new TemplateFragment(result);
+
+      // Передаем фрагмент как children в renderFn
+      return renderFn(props, [fragment]);
     }
 
     // Возвращаем функцию с поддержкой template literals

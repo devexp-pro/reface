@@ -2,6 +2,7 @@
 export { TemplateBase } from "./TemplateBase.ts";
 export { Template } from "./Template.ts";
 export { TemplateFragment } from "./TemplateFragment.ts";
+export { TemplateText } from "./TemplateText.ts";
 export { TemplateHtml } from "./TemplateHtml.ts";
 export { html } from "./html.ts";
 export { render } from "./render.ts";

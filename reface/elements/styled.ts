@@ -8,6 +8,7 @@ import type {
 } from "./types.ts";
 import { generateClassName, processAttributes, processCSS } from "@reface/html";
 import { createLogger } from "@reface/core";
+import { TemplateText } from "@reface/html";
 
 const logger = createLogger("Styled");
 
@@ -21,67 +22,20 @@ function createStyledComponent<P extends HTMLAttributes>(
   const rootClass = generateClassName();
   const processedCss = processCSS(css, rootClass);
 
-  const fn = Template.createTemplateFunction(tag);
+  // Создаем основную функцию компонента
+  function componentFn(props?: P, children?: ElementChild[]) {
+    logger.debug("Component called with props", {
+      props,
+      hasChildren: Boolean(children),
+    });
 
-  function styledFn(
-    propsOrStrings?: P | TemplateStringsArray,
-    ...values: ElementChild[]
-  ): Template {
-    // Template literal call: StyledDiv`Hello`
-    if (Array.isArray(propsOrStrings) && "raw" in propsOrStrings) {
-      // Собираем строки и значения в один массив
-      const children = propsOrStrings.reduce((acc: ElementChild[], str, i) => {
-        if (str) acc.push(str);
-        if (i < values.length) acc.push(values[i]);
-        return acc;
-      }, []);
-
-      return new Template({
-        tag,
-        attributes: { class: [rootClass] },
-        children,
-        css: processedCss,
-        rootClass,
-      });
-    }
-
-    // Props call: StyledDiv({ props })
-    const props = propsOrStrings || {} as P;
-    const { children: propsChildren, ...restProps } = props;
-
-    // Обрабатываем атрибуты без children
-    const attributes = processAttributes(restProps);
-
-    // Добавляем rootClass к существующим классам
+    const attributes = processAttributes(props || {});
     attributes.class = Array.isArray(attributes.class)
       ? [rootClass, ...attributes.class]
       : [rootClass];
 
-    // Если есть children, возвращаем Template
-    if (propsChildren) {
-      return new Template({
-        tag,
-        attributes,
-        children: Array.isArray(propsChildren)
-          ? propsChildren
-          : [propsChildren],
-        css: processedCss,
-        rootClass,
-      });
-    }
-
-    // Иначе возвращаем функцию для template literals
-    const templateFn = (
-      strings: TemplateStringsArray,
-      ...templateValues: ElementChild[]
-    ) => {
-      // Собираем строки и значения в один массив
-      const children = strings.reduce((acc: ElementChild[], str, i) => {
-        if (str) acc.push(str);
-        if (i < templateValues.length) acc.push(templateValues[i]);
-        return acc;
-      }, []);
-
+    // Если переданы children, создаем Template сразу
+    if (children) {
       return new Template({
         tag,
         attributes,
@@ -89,17 +43,54 @@ function createStyledComponent<P extends HTMLAttributes>(
         css: processedCss,
         rootClass,
       });
-    };
+    }
 
-    return Object.assign(templateFn, {
-      isTemplate: true as const,
-      tag,
-      css: processedCss,
-      rootClass,
-    });
+    // Возвращаем функцию для template literals
+    return (
+      strings: TemplateStringsArray,
+      ...values: ElementChild[]
+    ): Template => {
+      logger.debug("Template literal called", {
+        stringsCount: strings.length,
+        valuesCount: values.length,
+      });
+
+      const result: ElementChild[] = [];
+
+      for (let i = 0; i < strings.length; i++) {
+        if (strings[i]) {
+          result.push(strings[i]);
+        }
+
+        if (i < values.length) {
+          const value = values[i];
+          if (value != null) {
+            if (Array.isArray(value)) {
+              result.push(
+                ...value.map((v) =>
+                  v instanceof Template ? v : new TemplateText(String(v))
+                ),
+              );
+            } else if (value instanceof Template) {
+              result.push(value);
+            } else {
+              result.push(new TemplateText(String(value)));
+            }
+          }
+        }
+      }
+
+      return new Template({
+        tag,
+        attributes,
+        children: result,
+        css: processedCss,
+        rootClass,
+      });
+    };
   }
 
-  return Object.assign(styledFn, {
+  return Object.assign(componentFn, {
     isTemplate: true as const,
     tag,
     css: processedCss,

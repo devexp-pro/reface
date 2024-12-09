@@ -2,8 +2,8 @@ import { createLogger } from "@reface/core";
 import type { ElementChildType } from "@reface/html";
 import { processAttributes, Template } from "@reface/html";
 import type { ComponentFunction } from "../elements/types.ts";
-import { processJSXChildren } from "./children.ts";
 import { TemplateFragment } from "@reface/html";
+import { TemplateText } from "@reface/html";
 
 const logger = createLogger("JSX");
 
@@ -29,58 +29,15 @@ export function createElement(
         props,
       });
 
-      try {
-        const result = tag({
-          ...props,
-          children: children.length === 1 ? children[0] : children,
-        });
-
-        // Если это фрагмент, возвращаем его
-        if (result instanceof TemplateFragment) {
-          return result;
-        }
-
-        // Если это Template с тегом fragment, преобразуем в TemplateFragment
-        if (result instanceof Template && result.tag === "fragment") {
-          return new TemplateFragment(result.children);
-        }
-
-        // Если это массив, оборачиваем в TemplateFragment
-        if (Array.isArray(result)) {
-          return new TemplateFragment(result);
-        }
-
-        // Если это Template, возвращаем как есть
-        if (result instanceof Template) {
-          return result;
-        }
-
-        throw new Error(
-          "Component must return Template, TemplateFragment or ElementChild[]",
-        );
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          logger.error("Function component failed", error, {
-            name: tag.name || "Anonymous",
-            props,
-            children,
-          });
-        } else {
-          logger.error(
-            "Unknown error in function component",
-            new Error(String(error)),
-            { name: tag.name || "Anonymous", props, children },
-          );
-        }
-        throw error;
-      }
+      // Вызываем компонент с props и children как отдельными аргументами
+      return tag(props || {}, children);
     }
 
     // Handle regular elements
     return new Template({
       tag,
       attributes: processAttributes(props || {}),
-      children: processJSXChildren(children),
+      children: children,
     });
   } catch (error: unknown) {
     if (error instanceof Error) {

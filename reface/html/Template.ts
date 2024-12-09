@@ -3,6 +3,7 @@ import type { ElementChildType, IHTMLAttributes } from "./types.ts";
 import { TemplateBase } from "./TemplateBase.ts";
 import { processAttributes } from "./attributes.ts";
 import { TemplateText } from "./TemplateText.ts";
+import { TemplateFragment } from "./TemplateFragment.ts";
 
 const logger = createLogger("HTML:Template");
 
@@ -176,7 +177,12 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
         hasProps: Boolean(props),
       });
 
-      const template = new Template<T>({ tag });
+      const template = new Template<T>({
+        tag,
+        attributes: props
+          ? processAttributes(props as Record<string, unknown>) as T
+          : {} as T,
+      });
 
       // Создаем функцию для template literals
       const templateLiteralFunction = (
@@ -189,18 +195,39 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
           valuesCount: values.length,
         });
 
-        return template.templateLiteral(strings, ...values);
+        // Собираем массив элементов
+        const result: ElementChildType[] = [];
+
+        for (let i = 0; i < strings.length; i++) {
+          if (strings[i]) {
+            result.push(strings[i]);
+          }
+
+          if (i < values.length) {
+            const value = values[i];
+            if (value != null) {
+              if (Array.isArray(value)) {
+                result.push(...value);
+              } else if (
+                value instanceof Template ||
+                value instanceof TemplateFragment
+              ) {
+                result.push(value);
+              } else {
+                result.push(new TemplateText(String(value)));
+              }
+            }
+          }
+        }
+
+        // Обновляем children шаблона
+        return new Template<T>({
+          ...template,
+          children: result,
+        });
       };
 
-      // Если есть props, применяем их
-      if (props) {
-        const processed = processAttributes(
-          props as Record<string, unknown>,
-        ) as T;
-        template.attributes = processed;
-      }
-
-      // Возвращаем функцию с поддержкой template literals
+      // Возвращаем функцию с метаданными
       return Object.assign(templateLiteralFunction, {
         tag,
         isTemplate: true as const,
