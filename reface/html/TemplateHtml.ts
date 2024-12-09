@@ -1,5 +1,4 @@
 import { createLogger } from "@reface/core";
-import { TemplateBase } from "./TemplateBase.ts";
 import type { ElementChildType } from "./types.ts";
 import type { RenderContext } from "./render.ts";
 import { escapeHTML } from "./escape.ts";
@@ -12,8 +11,12 @@ export class TemplateHtml {
   }
 
   toHtml(context: RenderContext): string {
-    return this.children.map((child) =>
-      "toHtml" in child ? child.toHtml(context) : escapeHTML(String(child))
-    ).join("");
+    return this.children.map((child) => {
+      if (typeof child === "object" && child !== null && "toHtml" in child) {
+        return child.toHtml(context);
+      }
+      // Экранируем только строки и другие примитивы
+      return escapeHTML(String(child));
+    }).join("");
   }
 }

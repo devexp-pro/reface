@@ -13,9 +13,6 @@ import { RenderContext } from "./render.ts";
 
 const logger = createLogger("HTML:Template");
 
-/**
- * HTML template class
- */
 export class Template implements ITemplate {
   constructor(
     private readonly options: {
@@ -39,6 +36,34 @@ export class Template implements ITemplate {
   readonly css?: string;
   readonly rootClass?: string;
 
+  static createTemplateFunction(tag: string) {
+    return (
+      attributes: Record<string, unknown> = {},
+      css?: string,
+      rootClass?: string,
+    ) => {
+      return (
+        strings: TemplateStringsArray,
+        ...values: ElementChild[]
+      ): Template => {
+        const children = strings.map((str, i) => {
+          if (i < values.length) {
+            return [str, values[i]];
+          }
+          return [str];
+        }).flat();
+
+        return new Template({
+          tag,
+          attributes,
+          children,
+          css,
+          rootClass,
+        });
+      };
+    };
+  }
+
   toHtml(context: RenderContext): string {
     if (this.css && this.rootClass) {
       context.addStyle(this.css, this.rootClass);
@@ -51,16 +76,15 @@ export class Template implements ITemplate {
     }
 
     const children = this.children.map((child) => {
-      if (typeof child === "object" && child !== null && "toHtml" in child) {
-        return child.toHtml(context);
+      if (typeof child === "object" && child !== null) {
+        if ("toHtml" in child) {
+          return child.toHtml(context);
+        }
+        if (child instanceof TemplateText) {
+          return child.toHtml(context);
+        }
       }
-
-      if (typeof child === "string") {
-        return escapeHTML(child);
-      }
-      if (child instanceof TemplateText) {
-        return child.toHtml();
-      }
+      // Экранируем только строки и другие примитивы
       return escapeHTML(String(child));
     }).join("");
 

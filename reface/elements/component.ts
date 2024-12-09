@@ -1,8 +1,26 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "@reface/html";
-import { Template, TemplateComponent, TemplateText } from "@reface/html";
+import {
+  Template,
+  TemplateComponent,
+  TemplateHtml,
+  TemplateText,
+} from "@reface/html";
 
 const logger = createLogger("Component");
+
+function convertToTemplateHtml(element: ElementChildType): TemplateHtml {
+  if (element instanceof TemplateHtml) {
+    return element;
+  }
+  if (element instanceof Template) {
+    return new TemplateHtml([element]);
+  }
+  if (typeof element === "string") {
+    return new TemplateHtml([new TemplateText(element)]);
+  }
+  return new TemplateHtml([element]);
+}
 
 /**
  * Create component with props
@@ -32,10 +50,10 @@ export function component<P extends object = {}>(
     // Template literal вызов
     return function (strings: TemplateStringsArray, ...values: any[]) {
       const children = strings.map((str, i) => {
-        const text = new TemplateText(str);
+        const text = new TemplateText(str, true);
         if (i < values.length) {
           const value = values[i];
-          if (value instanceof TemplateText) {
+          if (value instanceof TemplateHtml || value instanceof TemplateText) {
             return value;
           }
           return new TemplateText(String(value));
@@ -43,23 +61,13 @@ export function component<P extends object = {}>(
         return text;
       }).filter((child) => child.content !== "");
 
-      logger.debug("Rendering component with children", {
+      logger.debug("Template literal render", {
         children,
-        childrenContent: children.map((c) => c.content),
+        childrenContent: children.map((c) => c.toHtml({})),
       });
 
       const result = renderFn(props, children);
-      logger.debug("RenderFn result type", {
-        type: result?.constructor?.name,
-        hasToHtml: result && typeof result === "object" && "toHtml" in result,
-      });
-
-      if (!(result instanceof Template)) {
-        logger.error("RenderFn must return Template instance");
-        throw new Error("RenderFn must return Template instance");
-      }
-
-      return result;
+      return convertToTemplateHtml(result);
     };
   };
 
