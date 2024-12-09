@@ -30,16 +30,15 @@ export function component<P extends object = {}>(
 ) {
   logger.debug("Creating component", { renderFn: renderFn.name });
 
-  const componentFn = function (props: P, jsxChildren?: ElementChildType[]) {
+  const componentFn = function (props: P, children?: ElementChildType[]) {
     logger.debug("Component called", {
       props,
-      hasJsxChildren: !!jsxChildren,
-      childrenCount: jsxChildren?.length,
+      childrenCount: children?.length,
     });
 
     // JSX вызов (с children)
-    if (jsxChildren) {
-      const result = renderFn(props, jsxChildren);
+    if (children) {
+      const result = renderFn(props, children);
       logger.debug("JSX render result", {
         type: result?.constructor?.name,
         hasToHtml: result && typeof result === "object" && "toHtml" in result,

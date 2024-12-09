@@ -6,7 +6,7 @@ const logger = createLogger("JSX");
 
 export function createElement(
   type: string | Function,
-  props: Record<string, unknown> | null,
+  props: Record<string, unknown> | null = {},
   ...children: ElementChild[]
 ): ElementChild {
   logger.debug("Creating element", {
@@ -21,7 +21,7 @@ export function createElement(
       Array.isArray(child) ? child : [child]
     );
 
-    return type({ ...props, children: flatChildren });
+    return type(props, flatChildren);
   }
 
   // Если это функциональный компонент
@@ -30,7 +30,7 @@ export function createElement(
       name: type.name,
       props,
     });
-    const result = type(props, children);
+    const result = type(props || {}, children);
     if (!(result instanceof Template)) {
       logger.error("Function component must return a Template instance");
       throw new Error("Function component must return a Template instance");

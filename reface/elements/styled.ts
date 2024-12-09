@@ -5,57 +5,102 @@ import { component } from "./component.ts";
 
 const logger = createLogger("Styled");
 
-function createStyledComponent(tag: string) {
-  return function (strings: TemplateStringsArray, ...values: any[]) {
+type StyledComponent = ReturnType<typeof component> & {
+  rootClass: string;
+  css: string;
+  baseComponent?: StyledComponent;
+};
+
+function createStyledComponent(
+  tag: string | StyledComponent,
+  css: string,
+): StyledComponent {
+  const baseComponent = typeof tag !== "string" ? tag : undefined;
+  const rootClass = `styled-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+  const tagName = typeof tag === "string" ? tag : tag.rootClass;
+
+  logger.debug("Creating styled component", { tag: tagName, css });
+
+  const StyledComponent = component<{ class?: string }>(
+    function StyledComponent(props, children) {
+      logger.debug("Rendering styled component", {
+        tag: tagName,
+        props,
+        rootClass,
+        childrenCount: children?.length,
+      });
+
+      const baseClass = baseComponent ? baseComponent.rootClass : "";
+      const className = props.class
+        ? `${rootClass} ${baseClass} ${props.class}`
+        : `${rootClass} ${baseClass}`.trim();
+
+      const baseCss = baseComponent
+        ? baseComponent.css.replace(/&/g, `.${baseClass}`)
+        : "";
+      const newCss = css.replace(/&/g, `.${rootClass}`);
+      const combinedCss = `${baseCss}\n${newCss}`;
+
+      const newTemplateComponent = new TemplateComponent(
+        typeof tag === "string" ? tag : "button",
+        {
+          ...props,
+          class: className,
+        },
+        combinedCss,
+        rootClass,
+      );
+
+      return newTemplateComponent.template(children);
+    },
+  ) as StyledComponent;
+
+  StyledComponent.rootClass = rootClass;
+  StyledComponent.css = css;
+  StyledComponent.baseComponent = baseComponent;
+
+  return StyledComponent;
+}
+
+type StyledFunction = {
+  (
+    component: StyledComponent,
+  ): (strings: TemplateStringsArray, ...values: any[]) => StyledComponent;
+  [key: string]: (
+    strings: TemplateStringsArray,
+    ...values: any[]
+  ) => StyledComponent;
+};
+
+function createStyledTag(tag: string) {
+  return (strings: TemplateStringsArray, ...values: any[]) => {
     const css = strings.reduce((acc, str, i) => {
       return acc + str + (values[i] || "");
     }, "");
-
-    logger.debug("Creating styled component", { tag, css });
-
-    const rootClass = `styled-${Math.random().toString(36).slice(2)}`;
-
-    const StyledComponent = component<{ class?: string }>(
-      function StyledComponent(props = {}, children) {
-        logger.debug("Rendering styled component", {
-          tag,
-          props,
-          rootClass,
-          childrenCount: children?.length,
-        });
-
-        const className = props.class
-          ? `${rootClass} ${props.class}`
-          : rootClass;
-
-        const templateComponent = new TemplateComponent(
-          tag,
-          {
-            ...props,
-            class: className,
-          },
-          css,
-          rootClass,
-        );
-
-        return templateComponent.template(children);
-      },
-    );
-
-    // Добавляем rootClass как статическое свойство
-    Object.defineProperty(StyledComponent, "rootClass", {
-      value: rootClass,
-      writable: false,
-      configurable: false,
-    });
-
-    return StyledComponent;
+    return createStyledComponent(tag, css);
   };
 }
 
-// Создаем и экспортируем styled как прокси
-export const styled = new Proxy({}, {
-  get: (_, tag: string) => createStyledComponent(tag),
-}) as {
-  [K: string]: ReturnType<typeof createStyledComponent>;
-};
+function createStyledFromComponent(baseComponent: StyledComponent) {
+  return (strings: TemplateStringsArray, ...values: any[]) => {
+    const css = strings.reduce((acc, str, i) => {
+      return acc + str + (values[i] || "");
+    }, "");
+    return createStyledComponent(baseComponent, css);
+  };
+}
+
+const styledFunction =
+  ((component: StyledComponent) =>
+    createStyledFromComponent(component)) as StyledFunction;
+
+const styledProxy = new Proxy(styledFunction, {
+  get: (target, prop: string) => {
+    if (prop in target) {
+      return target[prop];
+    }
+    return createStyledTag(prop);
+  },
+});
+
+export const styled = styledProxy;

@@ -98,8 +98,6 @@ Deno.test("JSX - conditional rendering", () => {
       </div>
     );
   }
-  Message.isTemplate = true;
-  Message.tag = "div";
 
   compareHTML(
     render(<Message isError />),

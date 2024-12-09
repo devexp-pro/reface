@@ -8,7 +8,7 @@ import type { CompareHTMLOptions } from "./types.ts";
 export function compareHTML(
   actual: string,
   expected: string,
-  options: CompareHTMLOptions = {}
+  options: CompareHTMLOptions = {},
 ) {
   const { ignoreWhitespace = true } = options;
 
@@ -16,6 +16,5 @@ export function compareHTML(
     ocd: true,
     ...(ignoreWhitespace ? { preserveWhitespace: false } : {}),
   };
-
   assertEquals(pretty(actual, formatOptions), pretty(expected, formatOptions));
 }

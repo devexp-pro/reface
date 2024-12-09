@@ -2,6 +2,7 @@ import { createElement, Fragment } from "@reface/jsx";
 import { render } from "@reface/html";
 import { styled, component, div } from "@reface/elements";
 import { compareHTML } from "./utils.ts";
+import { assertNotEquals } from "@std/assert";
 
 // 1. Basic Elements
 Deno.test("Integration - Basic Elements - JSX", () => {
@@ -177,13 +178,15 @@ Deno.test("Integration - Extending Styled Components", () => {
       color: white;
     }
   `;
-  console.log(<PrimaryButton class="large">Click me</PrimaryButton>);
+
+
+  assertNotEquals(PrimaryButton.rootClass, BaseButton.rootClass);
 
   // JSX usage
   compareHTML(
     render(<PrimaryButton class="large">Click me</PrimaryButton>),
     `
-    <button class="${PrimaryButton.rootClass} large">Click me</button>
+    <button class="${PrimaryButton.rootClass} ${BaseButton.rootClass} large">Click me</button>
     <style>
       .${BaseButton.rootClass} {
         padding: 1rem;
