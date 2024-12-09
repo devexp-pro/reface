@@ -1,5 +1,6 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "./types.ts";
+import type { RenderContext } from "./context.ts";
 import { ITemplate } from "./types.ts";
 import { escapeHTML } from "./escape.ts";
 import { TemplateText } from "./TemplateText.ts";
@@ -13,23 +14,57 @@ export class TemplateFragment implements ITemplate {
   private readonly children: ElementChildType[];
 
   constructor(children: ElementChildType[] = []) {
-    this.children = children;
-    logger.debug("Creating fragment", { childrenCount: children.length });
+    this.children = children.flat();
+    logger.debug("Creating fragment", {
+      childrenCount: this.children.length,
+      childrenTypes: this.children.map((child) => child?.constructor?.name),
+    });
   }
 
-  toHtml(): string {
-    return this.children.map((child) => {
-      if (typeof child === "object" && child !== null && "toHtml" in child) {
-        return child.toHtml();
+  private renderNode(node: unknown, context: RenderContext): string {
+    // Если массив, рекурсивно обрабатываем каждый элемент
+    if (Array.isArray(node)) {
+      return node.map((item) => this.renderNode(item, context)).join("");
+    }
+
+    // Если HTML элемент
+    if (node && typeof node === "object") {
+      // Если компонент с toHtml
+      if ("toHtml" in node) {
+        return node.toHtml(context);
       }
-      if (typeof child === "string") {
-        return escapeHTML(child);
+
+      // Если HTML элемент
+      if ("tag" in node) {
+        const { tag, props, children } = node;
+        const attrs = props ? renderAttributes(props) : "";
+        const content = this.renderNode(children, context);
+        return `<${tag}${attrs}>${content}</${tag}>`;
       }
-      if (child instanceof TemplateText) {
-        return child.toHtml();
+
+      // Если текстовый узел
+      if ("content" in node) {
+        return node.trusted ? node.content : escapeHTML(node.content);
       }
-      return escapeHTML(String(child));
-    }).join("");
+    }
+
+    // Если примитив
+    return escapeHTML(String(node));
+  }
+
+  toHtml(context: RenderContext): string {
+    context.depth++;
+    logger.debug("Rendering fragment", {
+      depth: context.depth,
+      childrenCount: this.children.length,
+    });
+
+    const result = this.children
+      .map((child) => this.renderNode(child, context))
+      .join("");
+
+    context.depth--;
+    return result;
   }
 
   // Для отладки

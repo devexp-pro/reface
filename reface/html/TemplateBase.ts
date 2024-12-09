@@ -1,7 +1,9 @@
 import type { ElementChildType, IHTMLAttributes } from "./types.ts";
 import type { ITemplateBase } from "./ITemplateBase.ts";
+import type { RenderContext } from "./context.ts";
 import { TemplateText } from "./TemplateText.ts";
 import { formatTemplate } from "./utils/format.ts";
+
 /**
  * Base template class
  */
@@ -41,7 +43,7 @@ export abstract class TemplateBase<P extends IHTMLAttributes = IHTMLAttributes>
     this.scriptFile = scriptFile;
   }
 
-  abstract toString(): string;
+  abstract toHtml(context: RenderContext): string;
 
   private formatForInspect() {
     return {

@@ -63,7 +63,7 @@ Deno.test("Integration - Styled Components - JSX with class", () => {
 
   compareHTML(
     render(<Button class="primary">Click me</Button>),
-    `<button class="${Button.rootClass} primary">Click me</button>
+    `<button class="${Button.rootClass}  primary">Click me</button>
      <style>
        .${Button.rootClass} {
          color: blue;
@@ -81,7 +81,7 @@ Deno.test("Integration - Styled Components - Template literal with props", () =>
 
   compareHTML(
     render(Button({ class: "primary" })`Click me`),
-    `<button class="${Button.rootClass} primary">Click me</button>
+    `<button class="${Button.rootClass}  primary">Click me</button>
      <style>
        .${Button.rootClass} {
          color: blue;
@@ -133,7 +133,7 @@ Deno.test("Integration - Mixing Components", () => {
       </Article>
     ),
     `
-    <div class="${Card.rootClass} article">
+    <div class="${Card.rootClass}  article">
       <h1>Hello</h1>
       <div class="content">
         <p>Some content</p>
@@ -151,7 +151,7 @@ Deno.test("Integration - Mixing Components", () => {
   compareHTML(
     render(Article({ title: "Hello" })`<p>Some content</p>`),
     `
-    <div class="${Card.rootClass} article">
+    <div class="${Card.rootClass}  article">
       <h1>Hello</h1>
       <div class="content">
         <p>Some content</p>
@@ -203,7 +203,7 @@ Deno.test("Integration - Extending Styled Components", () => {
   compareHTML(
     render(PrimaryButton({ class: "large" })`Click me`),
     `
-    <button class="${PrimaryButton.rootClass} large">Click me</button>
+    <button class="${PrimaryButton.rootClass} ${BaseButton.rootClass} large">Click me</button>
     <style>
       .${BaseButton.rootClass} {
         padding: 1rem;
@@ -226,10 +226,6 @@ Deno.test("Integration - Fragments and Lists", () => {
       </Fragment>
     )
   );
-
-  console.log(Deno.inspect(<ul>
-    <List items={["One", "Two"]} />
-  </ul>));
 
   // Using in JSX
   compareHTML(
@@ -296,7 +292,7 @@ Deno.test("Integration - Complex Nesting", () => {
       </Section>
     ),
     `
-    <div class="${Container.rootClass} section">
+    <div class="${Container.rootClass}  section">
       <h2>My List</h2>
       <ul class="list">
         <li>A</li>

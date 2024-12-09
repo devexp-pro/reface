@@ -18,7 +18,7 @@ function createStyledComponent(
 ): StyledComponent {
   const baseComponent = typeof tag !== "string" ? tag : undefined;
   const rootClass = `styled-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-  const tagName = typeof tag === "string" ? tag : tag.rootClass;
+  const tagName = typeof tag === "string" ? tag : tag.tag;
 
   logger.debug("Creating styled component", { tag: tagName, css });
 
@@ -32,9 +32,12 @@ function createStyledComponent(
       });
 
       const baseClass = baseComponent ? baseComponent.rootClass : "";
-      const className = props.class
-        ? `${rootClass} ${baseClass} ${props.class}`
-        : `${rootClass} ${baseClass}`.trim();
+      const className =
+        (props.class
+          ? `${rootClass} ${baseClass} ${props.class}`
+          : `${rootClass} ${baseClass}`.trim())
+          .split(" ")
+          .join(" ");
 
       const baseCss = baseComponent
         ? baseComponent.css.replace(/&/g, `.${baseClass}`)
@@ -42,17 +45,18 @@ function createStyledComponent(
       const newCss = css.replace(/&/g, `.${rootClass}`);
       const combinedCss = `${baseCss}\n${newCss}`;
 
-      const newTemplateComponent = new TemplateComponent(
+      const template = new TemplateComponent(
         typeof tag === "string" ? tag : baseComponent?.tag || "div",
         {
           ...props,
           class: className,
         },
+        children,
         combinedCss,
         rootClass,
       );
 
-      return newTemplateComponent.template(children);
+      return template;
     },
   ) as StyledComponent;
 
@@ -106,5 +110,4 @@ const styledProxy = new Proxy(styledFunction, {
     return createStyledTag(prop);
   },
 });
-
 export const styled = styledProxy;

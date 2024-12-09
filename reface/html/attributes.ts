@@ -80,7 +80,7 @@ export function renderAttributes(attrs: TemplateAttributes = {}): string {
 
       if (key === "class" && Array.isArray(value)) {
         if (value.length > 0) {
-          const className = value.join(" ");
+          const className = value.join(" ").split(" ").join(" ");
           logger.debug("Rendering class attribute", {
             classes: value,
             result: className,

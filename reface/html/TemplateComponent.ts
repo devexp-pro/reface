@@ -1,40 +1,77 @@
 import { createLogger } from "@reface/core";
-import type { ElementChildType } from "./types.ts";
-import { Template } from "./Template.ts";
-import type { RenderContext } from "./render.ts";
+import type { ElementChildType, ITemplate } from "./types.ts";
+import type { RenderContext } from "./context.ts";
+import { renderAttributes } from "./attributes.ts";
+import { TemplateHtml } from "./TemplateHtml.ts";
 
-const logger = createLogger("TemplateComponent");
+const logger = createLogger("HTML:Component");
 
-export class TemplateComponent {
+// Перемещаем VOID_ELEMENTS в HTML слой
+const VOID_ELEMENTS = new Set([
+  "area",
+  "base",
+  "br",
+  "col",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
+]);
+
+export class TemplateComponent implements ITemplate {
   constructor(
-    private readonly tag: string,
-    private readonly attributes: Record<string, unknown>,
-    private readonly css?: string,
-    private readonly rootClass?: string,
-  ) {}
-
-  template(
-    strings: TemplateStringsArray | ElementChildType[],
-    ...values: ElementChildType[]
-  ): Template {
-    logger.debug("Rendering template", {
-      tag: this.tag,
-      attributes: this.attributes,
-      children: Array.isArray(strings) ? strings : [],
-    });
-
-    const children = Array.isArray(strings) ? strings : [];
-
-    return new Template({
-      tag: this.tag,
-      attributes: this.attributes,
-      children,
-      css: this.css,
-      rootClass: this.rootClass,
+    public readonly tag: string,
+    public readonly attributes: Record<string, unknown>,
+    public readonly children: ElementChildType[],
+    public readonly css?: string,
+    public readonly rootClass?: string,
+  ) {
+    logger.debug("Creating template component", {
+      tag,
+      attributes,
+      childrenCount: children.length,
+      hasCSS: Boolean(css),
+      rootClass,
     });
   }
 
   toHtml(context: RenderContext): string {
-    return this.template([]).toHtml(context);
+    context.depth++;
+    logger.debug("Rendering template component", {
+      depth: context.depth,
+      tag: this.tag,
+      rootClass: this.rootClass,
+    });
+
+    if (this.css) {
+      context.styles.add(this.css);
+      if (this.rootClass) {
+        context.components.add(this.rootClass);
+      }
+    }
+
+    const attrs = renderAttributes(this.attributes);
+    const isVoidElement = VOID_ELEMENTS.has(this.tag);
+
+    // Для void элементов не рендерим содержимое и используем самозакрывающийся тег
+    if (isVoidElement) {
+      context.depth--;
+      return `<${this.tag}${attrs}/>`;
+    }
+
+    const result = new TemplateHtml([{
+      tag: this.tag,
+      props: this.attributes,
+      children: this.children,
+    }]).toHtml(context);
+
+    context.depth--;
+    return result;
   }
 }

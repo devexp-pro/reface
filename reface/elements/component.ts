@@ -1,5 +1,6 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "@reface/html";
+import type { RenderContext } from "@reface/html/context.ts";
 import {
   Template,
   TemplateComponent,
@@ -9,7 +10,10 @@ import {
 
 const logger = createLogger("Component");
 
-function convertToTemplateHtml(element: ElementChildType): TemplateHtml {
+function convertToTemplateHtml(
+  element: ElementChildType,
+  context: RenderContext,
+): TemplateHtml {
   if (element instanceof TemplateHtml) {
     return element;
   }
@@ -22,9 +26,6 @@ function convertToTemplateHtml(element: ElementChildType): TemplateHtml {
   return new TemplateHtml([element]);
 }
 
-/**
- * Create component with props
- */
 export function component<P extends object = {}>(
   renderFn: (props: P, children: ElementChildType[]) => ElementChildType,
 ) {
@@ -41,7 +42,6 @@ export function component<P extends object = {}>(
       const result = renderFn(props, children);
       logger.debug("JSX render result", {
         type: result?.constructor?.name,
-        hasToHtml: result && typeof result === "object" && "toHtml" in result,
       });
       return result;
     }
@@ -60,13 +60,8 @@ export function component<P extends object = {}>(
         return text;
       }).filter((child) => child.content !== "");
 
-      logger.debug("Template literal render", {
-        children,
-        childrenContent: children.map((c) => c.toHtml({})),
-      });
-
       const result = renderFn(props, children);
-      return convertToTemplateHtml(result);
+      return result;
     };
   };
 
