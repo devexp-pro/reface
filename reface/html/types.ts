@@ -16,14 +16,7 @@ export interface IHTMLAttributes {
  * Base template interface
  */
 export interface ITemplate {
-  tag: string;
-  attributes: IHTMLAttributes;
-  children: ElementChildType[];
-  isTemplate: true;
-  css?: string;
-  rootClass?: string;
-  script?: string;
-  scriptFile?: string;
+  toHtml(): string;
 }
 
 /**

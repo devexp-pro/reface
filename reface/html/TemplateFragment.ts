@@ -1,21 +1,21 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "./types.ts";
+import { ITemplate } from "./types.ts";
 
 const logger = createLogger("Fragment");
 
 /**
  * Fragment template - группирует элементы без создания родительского элемента
  */
-export class TemplateFragment {
-  constructor(public readonly children: ElementChildType[]) {
+export class TemplateFragment implements ITemplate {
+  constructor(private readonly children: ElementChildType[]) {
     logger.debug("Creating fragment", { childrenCount: children.length });
   }
 
-  /**
-   * Получить дочерние элементы
-   */
-  getChildren(): ElementChildType[] {
-    return this.children;
+  toHtml(): string {
+    return this.children.map((child) =>
+      "toHtml" in child ? child.toHtml() : escapeHTML(String(child))
+    ).join("");
   }
 
   // Для отладки

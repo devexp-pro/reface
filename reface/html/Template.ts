@@ -5,17 +5,20 @@ import { processAttributes } from "./attributes.ts";
 import { TemplateText } from "./TemplateText.ts";
 import { TemplateFragment } from "./TemplateFragment.ts";
 import { TemplateHtml } from "./TemplateHtml.ts";
+import { ITemplate } from "./types.ts";
+import { renderAttributes } from "./attributes.ts";
+import { VOID_ELEMENTS } from "./constants.ts";
+import { escapeHTML } from "./utils.ts";
 
 const logger = createLogger("HTML:Template");
 
 /**
  * HTML template class
  */
-export class Template<T extends IHTMLAttributes = IHTMLAttributes>
-  extends TemplateBase {
+export class Template implements ITemplate {
   constructor(options: {
     tag: string;
-    attributes?: T;
+    attributes?: IHTMLAttributes;
     children?: ElementChildType[];
     css?: string;
     rootClass?: string;
@@ -36,10 +39,10 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
     });
   }
 
-  addClass(className: string): Template<T> {
+  addClass(className: string): Template {
     logger.debug("Adding class", { className });
     const currentClasses = this.attributes.class || [];
-    return new Template<T>({
+    return new Template({
       ...this,
       attributes: {
         ...this.attributes,
@@ -48,30 +51,33 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
     });
   }
 
-  setAttribute(name: keyof T, value: T[keyof T]): Template<T> {
+  setAttribute(
+    name: keyof IHTMLAttributes,
+    value: IHTMLAttributes[keyof IHTMLAttributes],
+  ): Template {
     logger.debug("Setting attribute", { name, value });
-    return new Template<T>({
+    return new Template({
       ...this,
       attributes: { ...this.attributes, [name]: value },
     });
   }
 
-  appendChild(child: ElementChildType): Template<T> {
+  appendChild(child: ElementChildType): Template {
     logger.debug("Appending child", { type: typeof child });
-    return new Template<T>({
+    return new Template({
       ...this,
       children: [...this.children, child],
     });
   }
 
-  setChildren(children: ElementChildType[]): Template<T> {
+  setChildren(children: ElementChildType[]): Template {
     logger.debug("Setting children", { count: children.length });
-    return new Template<T>({ ...this, children });
+    return new Template({ ...this, children });
   }
 
-  addCss(css: string): Template<T> {
+  addCss(css: string): Template {
     logger.debug("Adding CSS", { length: css.length });
-    return new Template<T>({
+    return new Template({
       ...this,
       css: this.css ? `${this.css}\n${css}` : css,
     });
@@ -80,7 +86,7 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
   templateLiteral(
     strings: TemplateStringsArray,
     ...values: ElementChildType[]
-  ): Template<T> {
+  ): Template {
     logger.debug("Processing template literal", {
       stringsCount: strings.length,
       valuesCount: values.length,
@@ -93,7 +99,7 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
         return acc;
       }, []);
 
-      return new Template<T>({
+      return new Template({
         ...this,
         children,
       });
@@ -117,18 +123,18 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
   /**
    * Create template from partial data
    */
-  static from<T extends IHTMLAttributes>(
-    template: Partial<TemplateBase<T>>,
-  ): Template<T> {
+  static from(
+    template: Partial<TemplateBase>,
+  ): Template {
     logger.debug("Creating template from partial", {
       tag: template.tag,
       hasAttributes: Boolean(template.attributes),
       childrenCount: template.children?.length,
     });
 
-    return new Template<T>({
+    return new Template({
       tag: template.tag || "div",
-      attributes: template.attributes || {} as T,
+      attributes: template.attributes || {},
       children: template.children || [],
       css: template.css || "",
       rootClass: template.rootClass || "",
@@ -140,9 +146,9 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
   /**
    * Create component with typed props
    */
-  static createComponent<T extends IHTMLAttributes>(
+  static createComponent(
     name: string,
-    defaultProps?: Partial<T>,
+    defaultProps?: Partial<IHTMLAttributes>,
   ) {
     logger.debug("Creating component", {
       name,
@@ -150,15 +156,15 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
     });
 
     return Object.assign(
-      (props?: T) => {
+      (props?: IHTMLAttributes) => {
         logger.debug("Component called", {
           name,
           hasProps: Boolean(props),
         });
 
-        return new Template<T>({
+        return new Template({
           tag: name,
-          attributes: { ...defaultProps, ...props } as T,
+          attributes: { ...defaultProps, ...props },
         });
       },
       {
@@ -172,17 +178,17 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
    * Create template function with template literals support
    */
   static createTemplateFunction(tag: string) {
-    const propsFunction = <T extends IHTMLAttributes>(props?: T) => {
+    const propsFunction = (props?: IHTMLAttributes) => {
       logger.debug("Props function called", {
         tag,
         hasProps: Boolean(props),
       });
 
-      const template = new Template<T>({
+      const template = new Template({
         tag,
         attributes: props
-          ? processAttributes(props as Record<string, unknown>) as T
-          : {} as T,
+          ? processAttributes(props as Record<string, unknown>)
+          : {},
       });
 
       // Создаем функцию для template literals
@@ -223,7 +229,7 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
         }
 
         // Обновляем children шаблона
-        return new Template<T>({
+        return new Template({
           ...template,
           children: result,
         });
@@ -241,5 +247,21 @@ export class Template<T extends IHTMLAttributes = IHTMLAttributes>
       tag,
       isTemplate: true as const,
     });
+  }
+
+  toHtml(): string {
+    const attrs = renderAttributes(this.attributes);
+
+    // Для void elements
+    if (VOID_ELEMENTS.has(this.tag)) {
+      return `<${this.tag}${attrs}/>`;
+    }
+
+    // Рендерим children
+    const children = this.children.map((child) =>
+      "toHtml" in child ? child.toHtml() : escapeHTML(String(child))
+    ).join("");
+
+    return `<${this.tag}${attrs}>${children}</${this.tag}>`;
   }
 }
