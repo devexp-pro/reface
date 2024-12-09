@@ -9,6 +9,7 @@ type StyledComponent = ReturnType<typeof component> & {
   rootClass: string;
   css: string;
   baseComponent?: StyledComponent;
+  tag?: string;
 };
 
 function createStyledComponent(
@@ -42,7 +43,7 @@ function createStyledComponent(
       const combinedCss = `${baseCss}\n${newCss}`;
 
       const newTemplateComponent = new TemplateComponent(
-        typeof tag === "string" ? tag : "button",
+        typeof tag === "string" ? tag : baseComponent?.tag || "div",
         {
           ...props,
           class: className,
@@ -58,6 +59,9 @@ function createStyledComponent(
   StyledComponent.rootClass = rootClass;
   StyledComponent.css = css;
   StyledComponent.baseComponent = baseComponent;
+  StyledComponent.tag = typeof tag === "string"
+    ? tag
+    : baseComponent?.tag || "div";
 
   return StyledComponent;
 }

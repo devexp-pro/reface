@@ -131,7 +131,7 @@ Deno.test(
     const component = SearchInput({ type: "search", placeholder: "Search..." })``;
     compareHTML(
       render(component),
-      `<input type="search" placeholder="Search..." class="${SearchInput.rootClass}" />
+      `<input type="search" placeholder="Search..." class="${SearchInput.rootClass} ${BaseInput.rootClass}" />
     <style>
   .${BaseInput.rootClass} {
   border: 1px solid gray;
