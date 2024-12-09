@@ -7,6 +7,7 @@ import { ScriptCollector } from "./ScriptCollector.ts";
 import { Template } from "./Template.ts";
 import { TemplateHtml } from "./TemplateHtml.ts";
 import { TemplateFragment } from "./TemplateFragment.ts";
+import { TemplateText } from "./TemplateText.ts";
 
 const logger = createLogger("HTML:Render");
 
@@ -29,12 +30,19 @@ function renderChild(child: ElementChild, styles: StyleCollector): string {
     }
 
     if (typeof child === "object" && child !== null) {
+      // Handle TemplateText
+      if (child instanceof TemplateText) {
+        logger.debug("Processing text node", {
+          length: child.content.length,
+        });
+        return child.toString(); // Уже включает escapeHTML
+      }
+
       // Handle TemplateFragment
       if (child instanceof TemplateFragment) {
         logger.debug("Processing fragment", {
           childrenCount: child.children.length,
         });
-        // Рендерим каждый child отдельно
         return child.children
           .map((c) => renderChild(c, styles))
           .join("");
@@ -63,9 +71,9 @@ function renderChild(child: ElementChild, styles: StyleCollector): string {
       }
     }
 
-    // Handle primitives
+    // Handle primitives by converting to TemplateText
     logger.debug("Processing primitive child", { value: String(child) });
-    return String(child);
+    return TemplateText.from(child).toString();
   } catch (error: unknown) {
     if (error instanceof Error) {
       logger.error("Failed to render child", error, { child });

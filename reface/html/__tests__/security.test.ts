@@ -12,9 +12,9 @@ Deno.test(
 
     compareHTML(
       result,
-      "<div>&lt;script&gt;window.xssAttack = true;&lt;/script&gt;</div>"
+      "<div>&lt;script&gt;window.xssAttack = true;&lt;/script&gt;</div>",
     );
-  }
+  },
 );
 
 Deno.test(
@@ -26,7 +26,7 @@ Deno.test(
     const result = render(template);
 
     compareHTML(result, "<div><span>Safe HTML</span></div>");
-  }
+  },
 );
 
 Deno.test(
@@ -39,9 +39,9 @@ Deno.test(
 
     compareHTML(
       result,
-      "<div data-test=\"&quot; onmouseover=&quot;alert('XSS')&quot;\"></div>"
+      "<div data-test=\"&quot; onmouseover=&quot;alert('XSS')&quot;\"></div>",
     );
-  }
+  },
 );
 
 Deno.test(
@@ -53,7 +53,7 @@ Deno.test(
     const template = html`
       <div>
         <p>${userContent}</p>
-        <p>${html(trusted)}</p>
+        <p>${html`${trusted}`}</p>
       </div>
     `;
 
@@ -64,7 +64,7 @@ Deno.test(
       `<div>
       <p>&lt;b&gt;bold&lt;/b&gt;</p>
       <p><i>italic</i></p>
-    </div>`
+    </div>`,
     );
-  }
+  },
 );

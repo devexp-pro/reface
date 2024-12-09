@@ -1,4 +1,5 @@
 import { createLogger } from "@reface/core";
+import type { TemplateText } from "./TemplateText.ts";
 
 const logger = createLogger("HTML:Types");
 
@@ -40,10 +41,13 @@ export type ElementChildType =
   | string
   | number
   | boolean
-  | ITemplate
-  | ITemplateFragment
   | null
-  | undefined;
+  | undefined
+  | Template
+  | TemplateHtml
+  | TemplateFragment
+  | TemplateText
+  | ElementChildType[];
 
 /**
  * Function that accepts template literals and returns Template

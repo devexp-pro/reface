@@ -2,24 +2,35 @@ import { createLogger } from "@reface/core";
 import type { ElementChildType, IHTMLAttributes } from "./types.ts";
 import { TemplateBase } from "./TemplateBase.ts";
 import { processAttributes } from "./attributes.ts";
-import { escapeHTML } from "./escape.ts";
+import { TemplateText } from "./TemplateText.ts";
 
 const logger = createLogger("HTML:Template");
 
 /**
- * Main template class for DOM elements
+ * HTML template class
  */
-export class Template<P extends IHTMLAttributes = IHTMLAttributes>
-  extends TemplateBase<P> {
+export class Template<T extends IHTMLAttributes = IHTMLAttributes>
+  extends TemplateBase {
   constructor(options: {
     tag: string;
-    attributes?: P;
+    attributes?: T;
     children?: ElementChildType[];
     css?: string;
     rootClass?: string;
     script?: string;
     scriptFile?: string;
   }) {
+    super({
+      ...options,
+      children: options.children?.map((child) => {
+        // Если это примитив, оборачиваем в TemplateText
+        if (child == null || typeof child !== "object") {
+          return TemplateText.from(child);
+        }
+        return child;
+      }),
+    });
+
     logger.debug("Creating template", {
       tag: options.tag,
       hasAttributes: Boolean(options.attributes),
@@ -27,19 +38,12 @@ export class Template<P extends IHTMLAttributes = IHTMLAttributes>
       hasCss: Boolean(options.css),
       hasRootClass: Boolean(options.rootClass),
     });
-
-    if (options.attributes?.class) {
-      options.attributes.class = Array.isArray(options.attributes.class)
-        ? options.attributes.class
-        : options.attributes.class.split(/\s+/).filter(Boolean);
-    }
-    super(options);
   }
 
-  addClass(className: string): Template<P> {
+  addClass(className: string): Template<T> {
     logger.debug("Adding class", { className });
     const currentClasses = this.attributes.class || [];
-    return new Template<P>({
+    return new Template<T>({
       ...this,
       attributes: {
         ...this.attributes,
@@ -48,33 +52,33 @@ export class Template<P extends IHTMLAttributes = IHTMLAttributes>
     });
   }
 
-  setAttribute(name: keyof P, value: P[keyof P]): Template<P> {
+  setAttribute(name: keyof T, value: T[keyof T]): Template<T> {
     logger.debug("Setting attribute", { name, value });
-    return new Template<P>({
+    return new Template<T>({
       ...this,
       attributes: { ...this.attributes, [name]: value },
     });
   }
 
-  appendChild(child: ElementChildType): Template<P> {
+  appendChild(child: ElementChildType): Template<T> {
     logger.debug("Appending child", {
       type: typeof child,
       isTemplate: child instanceof TemplateBase,
     });
-    return new Template<P>({
+    return new Template<T>({
       ...this,
       children: [...this.children, child],
     });
   }
 
-  setChildren(children: ElementChildType[]): Template<P> {
+  setChildren(children: ElementChildType[]): Template<T> {
     logger.debug("Setting children", { count: children.length });
-    return new Template<P>({ ...this, children });
+    return new Template<T>({ ...this, children });
   }
 
-  addCss(css: string): Template<P> {
+  addCss(css: string): Template<T> {
     logger.debug("Adding CSS", { length: css.length });
-    return new Template<P>({
+    return new Template<T>({
       ...this,
       css: this.css ? `${this.css}\n${css}` : css,
     });
@@ -83,7 +87,7 @@ export class Template<P extends IHTMLAttributes = IHTMLAttributes>
   templateLiteral(
     strings: TemplateStringsArray,
     ...values: ElementChildType[]
-  ): Template<P> {
+  ): Template<T> {
     logger.debug("Processing template literal", {
       stringsCount: strings.length,
       valuesCount: values.length,
@@ -91,20 +95,22 @@ export class Template<P extends IHTMLAttributes = IHTMLAttributes>
 
     try {
       const children = strings.reduce((acc: ElementChildType[], str, i) => {
-        if (str) acc.push(escapeHTML(str));
+        // Создаем TemplateText для строковой части
+        if (str) acc.push(new TemplateText(str));
 
         if (i < values.length) {
           const value = values[i];
           if (value instanceof TemplateBase) {
             acc.push(value);
           } else {
-            acc.push(escapeHTML(String(value)));
+            // Оборачиваем значение в TemplateText
+            acc.push(TemplateText.from(value));
           }
         }
         return acc;
       }, []);
 
-      return new Template<P>({
+      return new Template<T>({
         ...this,
         children,
       });
