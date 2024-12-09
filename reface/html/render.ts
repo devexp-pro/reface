@@ -1,10 +1,12 @@
 import { createLogger } from "@reface/core";
-import type { ElementChild, Template } from "./types.ts";
+import type { ElementChild } from "./types.ts";
 import { StyleCollector } from "./StyleCollector.ts";
 import { renderAttributes } from "./attributes.ts";
 import { VOID_ELEMENTS } from "./constants.ts";
-import { updateDevTools } from "@reface/devtools";
 import { ScriptCollector } from "./ScriptCollector.ts";
+import { Template } from "./Template.ts";
+import { TemplateHtml } from "./TemplateHtml.ts";
+import { TemplateFragment } from "./TemplateFragment.ts";
 
 const logger = createLogger("HTML:Render");
 
@@ -27,11 +29,31 @@ function renderChild(child: ElementChild, styles: StyleCollector): string {
     }
 
     if (typeof child === "object" && child !== null) {
-      // Handle Template
-      if ("isTemplate" in child) {
-        logger.debug("Processing template child", { tag: child.tag });
-        return renderTemplate(child as Template, styles);
+      // Handle TemplateFragment
+      if (child instanceof TemplateFragment) {
+        logger.debug("Processing fragment", {
+          childrenCount: child.children.length,
+        });
+        // Рендерим каждый child отдельно
+        return child.children
+          .map((c) => renderChild(c, styles))
+          .join("");
       }
+
+      // Handle Template
+      if (child instanceof Template) {
+        logger.debug("Processing template", { tag: child.tag });
+        return renderTemplate(child, styles, new ScriptCollector());
+      }
+
+      // Handle TemplateHtml
+      if (child instanceof TemplateHtml) {
+        logger.debug("Processing HTML template", {
+          content: child.children[0].length,
+        });
+        return child.children[0] as string;
+      }
+
       // Handle fragments
       if ("content" in child) {
         logger.debug("Processing fragment child", {
@@ -50,56 +72,6 @@ function renderChild(child: ElementChild, styles: StyleCollector): string {
     } else {
       logger.error("Unknown error rendering child", new Error(String(error)), {
         child,
-      });
-    }
-    throw error;
-  }
-}
-
-/**
- * Render template to HTML string
- */
-export function render(template: Template): string {
-  logger.debug("Starting render", { template });
-
-  try {
-    const styles = new StyleCollector();
-    const scripts = new ScriptCollector();
-    let result = renderTemplate(template, styles, scripts);
-
-    // Обновляем DevTools если мы в браузере
-    if (typeof window !== "undefined") {
-      updateDevTools(template);
-    }
-
-    // Add collected styles
-    const styleTag = styles.toString();
-    if (styleTag) {
-      logger.debug("Adding style tag", { styleTag });
-      result += styleTag;
-    }
-
-    // Add collected scripts
-    const scriptTags = scripts.toString();
-    if (scriptTags) {
-      logger.debug("Adding script tags", { scriptTags });
-      result += scriptTags;
-    }
-
-    logger.info("Render complete", {
-      templateTag: template.tag,
-      hasStyles: Boolean(styleTag),
-      hasScripts: Boolean(scriptTags),
-      childrenCount: template.children?.length,
-    });
-
-    return result;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error("Failed to render", error, { template });
-    } else {
-      logger.error("Unknown error rendering", new Error(String(error)), {
-        template,
       });
     }
     throw error;
@@ -136,10 +108,6 @@ function renderTemplate(
       scripts.addScriptFile(template.scriptFile);
     }
 
-    if (template.type === "html") {
-      return template.content;
-    }
-
     // Process attributes
     const attrs = renderAttributes(template.attributes);
 
@@ -156,13 +124,6 @@ function renderTemplate(
       children = template.children
         .map((child) => renderChild(child, styles))
         .join("");
-    }
-
-    // Добавляем уникальный идентификатор для DOM элементов
-    if (!template.isComponent) {
-      const id = generateId();
-      template.attributes["data-reface-id"] = id;
-      (template as any).key = id; // для Fiber
     }
 
     const result = `<${template.tag}${attrs}>${children}</${template.tag}>`;
@@ -184,6 +145,66 @@ function renderTemplate(
         new Error(String(error)),
         { template },
       );
+    }
+    throw error;
+  }
+}
+
+/**
+ * Render template to HTML string
+ */
+export function render(
+  template: Template | TemplateHtml | TemplateFragment,
+): string {
+  logger.debug("Starting render", { template });
+
+  try {
+    const styles = new StyleCollector();
+    const scripts = new ScriptCollector();
+
+    let result = "";
+    if (template instanceof TemplateHtml) {
+      // Для TemplateHtml просто берем первый child как HTML
+      result = template.children[0] as string;
+    } else if (template instanceof TemplateFragment) {
+      // Для TemplateFragment рендерим все children
+      result = template.children
+        .map((child) => renderChild(child, styles))
+        .join("");
+    } else {
+      // Для обычных Template рендерим полностью
+      result = renderTemplate(template, styles, scripts);
+    }
+
+    // Add collected styles
+    const styleTag = styles.toString();
+    if (styleTag) {
+      logger.debug("Adding style tag", { styleTag });
+      result += styleTag;
+    }
+
+    // Add collected scripts
+    const scriptTags = scripts.toString();
+    if (scriptTags) {
+      logger.debug("Adding script tags", { scriptTags });
+      result += scriptTags;
+    }
+
+    logger.info("Render complete", {
+      templateType: template.constructor.name,
+      hasStyles: Boolean(styleTag),
+      hasScripts: Boolean(scriptTags),
+      childrenCount: template.children?.length,
+    });
+
+    return result;
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      logger.error("Failed to render", error, { template });
+    } else {
+      logger.error("Unknown error rendering", new Error(String(error)), {
+        template,
+      });
     }
     throw error;
   }

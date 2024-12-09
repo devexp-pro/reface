@@ -1,87 +1,56 @@
 import { createLogger } from "@reface/core";
+import type { ElementChildType } from "@reface/html";
 import { Template } from "@reface/html";
-import type {
-  ComponentFunction,
-  ElementChild,
-  HTMLAttributes,
-  TemplateFragment,
-} from "@reface/html";
 import { html } from "@reface/html";
 
 const logger = createLogger("Component");
 
 /**
- * Create component function
+ * Create component with props
  */
-export function component<T extends object>(
-  render: (props: T, children: ElementChild[]) => Template<T & HTMLAttributes>,
-): ComponentFunction<T & HTMLAttributes> {
-  logger.debug("Creating component", { renderFn: render.name || "Anonymous" });
+export function component<P extends Record<string, unknown>>(
+  renderFn: (props: P, children?: ElementChildType[]) => Template,
+) {
+  logger.debug("Creating component", {
+    renderFn: renderFn.name || "Anonymous",
+  });
 
-  // Оборачиваем для поддержки компонентов
-  return Object.assign(
-    (props?: T & HTMLAttributes) => {
-      try {
-        // Props call: Component({ props })
-        const { children: propsChildren, ...restProps } = props ||
-          {} as T & HTMLAttributes;
+  const componentFn = (props: P) => {
+    logger.debug("Component called", { props });
 
-        logger.debug("Processing props call", {
-          hasChildren: Boolean(propsChildren),
-          props: restProps,
-        });
+    // Если есть children в props, это JSX вызов
+    if ("children" in props) {
+      const { children, ...restProps } = props;
+      return renderFn(
+        restProps as P,
+        Array.isArray(children) ? children : [children],
+      );
+    }
 
-        // Если есть children, это JSX вызов
-        if (propsChildren) {
-          return render(
-            restProps as T,
-            Array.isArray(propsChildren) ? propsChildren : [propsChildren],
-          );
-        }
+    // Создаем функцию для template literals
+    function templateLiteral(
+      strings: TemplateStringsArray,
+      ...values: ElementChildType[]
+    ): Template {
+      logger.debug("Template literal called", {
+        stringsCount: strings.length,
+        valuesCount: values.length,
+      });
 
-        // Иначе возвращаем функцию для template literals
-        const templateFn = (
-          strings: TemplateStringsArray,
-          ...templateValues: ElementChild[]
-        ) => {
-          // Собираем строки и значения в один массив
-          const children = strings.reduce((acc: ElementChild[], str, i) => {
-            // Добавляем строку как HTML фрагмент
-            if (str) {
-              acc.push(html`${str}` as TemplateFragment);
-            }
-            // Добавляем значение как есть
-            if (i < templateValues.length) {
-              acc.push(templateValues[i]);
-            }
-            return acc;
-          }, []);
+      // Используем html для создания Template
+      const template = html(strings, ...values);
 
-          return render(restProps as T, children);
-        };
+      // Передаем Template как children
+      return renderFn(props, [template]);
+    }
 
-        return Object.assign(templateFn, {
-          isTemplate: true as const,
-          tag: "div",
-        });
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          logger.error("Component function failed", error, {
-            props,
-          });
-        } else {
-          logger.error(
-            "Unknown error in component function",
-            new Error(String(error)),
-            { props },
-          );
-        }
-        throw error;
-      }
-    },
-    {
+    // Возвращаем функцию с поддержкой template literals
+    return Object.assign(templateLiteral, {
       isTemplate: true as const,
-      tag: "div",
-    },
-  );
+    });
+  };
+
+  return Object.assign(componentFn, {
+    isTemplate: true as const,
+  });
 }

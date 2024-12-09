@@ -1,8 +1,9 @@
 import { createLogger } from "@reface/core";
-import type { ElementChild } from "@reface/html";
+import type { ElementChildType } from "@reface/html";
 import { processAttributes, Template } from "@reface/html";
 import type { ComponentFunction } from "../elements/types.ts";
 import { processJSXChildren } from "./children.ts";
+import { TemplateFragment } from "@reface/html";
 
 const logger = createLogger("JSX");
 
@@ -12,8 +13,8 @@ const logger = createLogger("JSX");
 export function createElement(
   tag: string | ComponentFunction,
   props: Record<string, unknown> | null,
-  ...children: ElementChild[]
-): Template<HTMLAttributes> | TemplateFragment {
+  ...children: ElementChildType[]
+): Template | TemplateFragment {
   try {
     logger.debug("Creating element", {
       tag,
@@ -34,25 +35,29 @@ export function createElement(
           children: children.length === 1 ? children[0] : children,
         });
 
-        if (result.tag === "html" || result.tag === "fragment") {
+        // Если это фрагмент, возвращаем его
+        if (result instanceof TemplateFragment) {
+          return result;
+        }
+
+        // Если это Template с тегом fragment, преобразуем в TemplateFragment
+        if (result instanceof Template && result.tag === "fragment") {
           return new TemplateFragment(result.children);
         }
 
-        // Проверяем сначала на Template
-        if (result instanceof Template) {
-          // Если это фрагмент, возвращаем его children напрямую
-          if (result.tag === "fragment") {
-            return result.children;
-          }
-          return result;
-        }
-
-        // Если это массив (результат Fragment), возвращаем его
+        // Если это массив, оборачиваем в TemplateFragment
         if (Array.isArray(result)) {
+          return new TemplateFragment(result);
+        }
+
+        // Если это Template, возвращаем как есть
+        if (result instanceof Template) {
           return result;
         }
 
-        throw new Error("Component must return Template or ElementChild[]");
+        throw new Error(
+          "Component must return Template, TemplateFragment or ElementChild[]",
+        );
       } catch (error: unknown) {
         if (error instanceof Error) {
           logger.error("Function component failed", error, {
