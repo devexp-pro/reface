@@ -2,112 +2,65 @@ import { createLogger } from "@reface/core";
 import type { ElementChildType } from "@reface/html";
 import { TemplateComponent } from "@reface/html";
 import { component } from "./component.ts";
+import {
+  buildClassName,
+  buildCss,
+  createStyledTemplate,
+  type StyledTemplate,
+} from "./styled-template.ts";
 
 const logger = createLogger("Styled");
 
-type StyledComponent = ReturnType<typeof component> & {
-  rootClass: string;
-  css: string;
-  baseComponent?: StyledComponent;
-  tag?: string;
-};
+type StyledComponent = ReturnType<typeof component> & StyledTemplate;
 
 function createStyledComponent(
-  tag: string | StyledComponent,
-  css: string,
+  tag: string | StyledTemplate,
+  cssTemplate: TemplateStringsArray,
+  cssValues: unknown[],
 ): StyledComponent {
-  const baseComponent = typeof tag !== "string" ? tag : undefined;
-  const rootClass = `styled-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-  const tagName = typeof tag === "string" ? tag : tag.tag;
+  const css = String.raw(cssTemplate, ...cssValues);
+  logger.debug("Creating styled component", { tag, css });
 
-  logger.debug("Creating styled component", { tag: tagName, css });
+  const template = createStyledTemplate(tag, css);
 
-  const StyledComponent = component<{ class?: string }>(
+  const componentFn = component<{ class?: string }>(
     function StyledComponent(props = {}, children) {
       logger.debug("Rendering styled component", {
-        tag: tagName,
+        tag: template.tag,
         props,
-        rootClass,
+        rootClass: template.rootClass,
         childrenCount: children?.length,
       });
 
-      const baseClass = baseComponent ? baseComponent.rootClass : "";
-      const className =
-        (props.class
-          ? `${rootClass} ${baseClass} ${props.class}`
-          : `${rootClass} ${baseClass}`.trim())
-          .split(" ")
-          .join(" ");
+      const className = buildClassName(template, props.class);
+      const combinedCss = buildCss(template);
 
-      const baseCss = baseComponent
-        ? baseComponent.css.replace(/&/g, `.${baseClass}`)
-        : "";
-      const newCss = css.replace(/&/g, `.${rootClass}`);
-      const combinedCss = `${baseCss}\n${newCss}`;
-
-      const template = new TemplateComponent(
-        typeof tag === "string" ? tag : baseComponent?.tag || "div",
-        {
-          ...props,
-          class: className,
-        },
+      return new TemplateComponent(
+        template.tag,
+        { ...props, class: className },
         children,
         combinedCss,
-        rootClass,
+        template.rootClass,
       );
-
-      return template;
     },
   ) as StyledComponent;
 
-  StyledComponent.rootClass = rootClass;
-  StyledComponent.css = css;
-  StyledComponent.baseComponent = baseComponent;
-  StyledComponent.tag = typeof tag === "string"
-    ? tag
-    : baseComponent?.tag || "div";
+  // Копируем свойства шаблона в компонент
+  Object.assign(componentFn, template);
 
-  return StyledComponent;
+  return componentFn;
 }
 
-type StyledFunction = {
-  (
-    component: StyledComponent,
-  ): (strings: TemplateStringsArray, ...values: any[]) => StyledComponent;
-  [key: string]: (
-    strings: TemplateStringsArray,
-    ...values: any[]
-  ) => StyledComponent;
-};
-
-function createStyledTag(tag: string) {
-  return (strings: TemplateStringsArray, ...values: any[]) => {
-    const css = strings.reduce((acc, str, i) => {
-      return acc + str + (values[i] || "");
-    }, "");
-    return createStyledComponent(tag, css);
-  };
-}
-
-function createStyledFromComponent(baseComponent: StyledComponent) {
-  return (strings: TemplateStringsArray, ...values: any[]) => {
-    const css = strings.reduce((acc, str, i) => {
-      return acc + str + (values[i] || "");
-    }, "");
-    return createStyledComponent(baseComponent, css);
-  };
-}
-
-const styledFunction =
-  ((component: StyledComponent) =>
-    createStyledFromComponent(component)) as StyledFunction;
-
-const styledProxy = new Proxy(styledFunction, {
-  get: (target, prop: string) => {
-    if (prop in target) {
-      return target[prop];
-    }
-    return createStyledTag(prop);
+// Прокси для создания styled компонентов
+export const styled = new Proxy(
+  (baseComponent: StyledComponent) => {
+    return (strings: TemplateStringsArray, ...values: unknown[]) =>
+      createStyledComponent(baseComponent, strings, values);
   },
-});
-export const styled = styledProxy;
+  {
+    get(target, tag: string) {
+      return (strings: TemplateStringsArray, ...values: unknown[]) =>
+        createStyledComponent(tag, strings, values);
+    },
+  },
+);
