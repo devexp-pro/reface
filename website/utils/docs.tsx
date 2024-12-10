@@ -44,7 +44,7 @@ export async function loadDocs(docsDir: string): Promise<{
   // Загружаем все страницы
   for (const section of DOCS_STRUCTURE) {
     for (const item of section.items) {
-      const filePath = `${docsDir}/docs/${item.path}.md`;
+      const filePath = `${docsDir}/${item.path}.md`;
       try {
         const content = await Deno.readTextFile(filePath);
         const parsed = parseMarkdown(content);

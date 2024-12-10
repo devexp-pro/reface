@@ -1,14 +1,13 @@
-import { createElement } from "@reface/jsx";
-import { Reface } from "@reface";
+import { Hono } from 'hono'
+import { serveStatic } from 'hono/deno'
+import { Reface, createElement } from "@reface";
 import { clean } from "@reface/layouts";
-import { Hono } from "https://deno.land/x/hono@v3.11.7/mod.ts";
-import { serveStatic } from "https://deno.land/x/hono@v3.11.7/middleware.ts";
 import { loadDocs } from "./utils/docs.tsx";
 import { DocsViewer } from "./components/DocsViewer.tsx";
 import { Home } from "./components/Home.tsx";
 
 // Загружаем документацию
-const { sections, pages } = await loadDocs(".");
+const { sections, pages } = await loadDocs("../docs");
 
 if (!pages.size) {
   console.error("No documentation found!");
@@ -32,8 +31,8 @@ const reface = new Reface({
 const app = new Hono();
 
 // Статические файлы
-app.use("/assets/*", serveStatic({ root: "./website/public" }));
-app.use("/styles/*", serveStatic({ root: "./website/public" }));
+app.use("/assets/*", serveStatic({ root: "./public" }));
+app.use("/styles/*", serveStatic({ root: "./public" }));
 
 // Создаем роутеры
 const home = reface.page("/", Home).hono();
@@ -53,9 +52,7 @@ const docs = reface
   ))
   .hono();
 
-// Маршрутизация
 app.route("/", home);
 app.route("/docs", docs);
 
-console.log("Server running at http://localhost:8000");
 await Deno.serve(app.fetch);

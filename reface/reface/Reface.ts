@@ -1,7 +1,7 @@
 import type { Layout } from "../layouts/mod.ts";
 import type { RefaceOptions, RouteHandler } from "./types.ts";
 import { render } from "@reface/html";
-import { type Context, Hono } from "@hono/hono";
+import { type Context, Hono } from "hono";
 
 export class Reface {
   private layout: Layout;
