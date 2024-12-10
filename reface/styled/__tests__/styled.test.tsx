@@ -1,5 +1,5 @@
 import { createElement } from "@reface/jsx";
-import { styled } from "@reface/elements";
+import { styled } from "@reface/styled";
 import { render } from "@reface/html";
 import { compareHTML } from "@reface/test-utils";
 import { assertEquals } from "@std/assert";

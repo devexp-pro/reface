@@ -1,23 +1,16 @@
 import { createLogger } from "@reface/core";
-import type { ElementChildType } from "@reface/html";
 import { TemplateComponent } from "@reface/html";
-import { component } from "./component.ts";
-import {
-  buildClassName,
-  buildCss,
-  createStyledTemplate,
-  type StyledTemplate,
-} from "./styled-template.ts";
+import { component } from "@reface/elements";
+import { buildClassName, buildCss, createStyledTemplate } from "./template.ts";
+import type { StyledComponent } from "./types.ts";
 
-const logger = createLogger("Styled");
+const logger = createLogger("Styled:Component");
 
-type StyledComponent = ReturnType<typeof component> & StyledTemplate;
-
-function createStyledComponent(
-  tag: string | StyledTemplate,
+export function createStyledComponent<Tag extends string>(
+  tag: string | StyledComponent<Tag>,
   cssTemplate: TemplateStringsArray,
   cssValues: unknown[],
-): StyledComponent {
+): StyledComponent<Tag> {
   const css = String.raw(cssTemplate, ...cssValues);
   logger.debug("Creating styled component", { tag, css });
 
@@ -43,24 +36,8 @@ function createStyledComponent(
         template.rootClass,
       );
     },
-  ) as StyledComponent;
+  ) as unknown as StyledComponent<Tag>;
 
-  // Копируем свойства шаблона в компонент
   Object.assign(componentFn, template);
-
   return componentFn;
 }
-
-// Прокси для создания styled компонентов
-export const styled = new Proxy(
-  (baseComponent: StyledComponent) => {
-    return (strings: TemplateStringsArray, ...values: unknown[]) =>
-      createStyledComponent(baseComponent, strings, values);
-  },
-  {
-    get(target, tag: string) {
-      return (strings: TemplateStringsArray, ...values: unknown[]) =>
-        createStyledComponent(tag, strings, values);
-    },
-  },
-);

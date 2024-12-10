@@ -22,6 +22,7 @@ export type {
   ITemplateLiteralFunction as TemplateLiteralFunction,
   RenderOptionsType as RenderOptions,
 } from "./types.ts";
+export * from "./types.ts";
 
 // Type guards
 export { isTemplateFragment } from "./types.ts";

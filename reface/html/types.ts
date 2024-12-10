@@ -6,10 +6,11 @@ const logger = createLogger("HTML:Types");
 /**
  * Base HTML attributes interface
  */
-export interface IHTMLAttributes {
+export interface HTMLAttributes<T extends string = string> {
+  class?: string;
+  id?: string;
+  style?: string;
   [key: string]: unknown;
-  class?: string | string[];
-  style?: string | Record<string, string>;
 }
 
 /**
@@ -52,7 +53,7 @@ export interface ITemplateLiteralFunction {
 /**
  * Base component function type
  */
-export interface IComponentFunction<P = IHTMLAttributes> {
+export interface IComponentFunction<P = HTMLAttributes> {
   (props?: P): ITemplate | ITemplateLiteralFunction;
   (strings: TemplateStringsArray, ...values: ElementChildType[]): ITemplate;
   isTemplate: true;
@@ -62,14 +63,14 @@ export interface IComponentFunction<P = IHTMLAttributes> {
 /**
  * Simple component function type (only JSX)
  */
-export type SimpleComponentFunctionType<P = IHTMLAttributes> =
+export type SimpleComponentFunctionType<P = HTMLAttributes> =
   & ((props: P) => ITemplate)
   & Pick<ITemplate, "isTemplate" | "tag">;
 
 /**
  * Styled component function type
  */
-export interface IStyledComponentFunction<P = IHTMLAttributes> {
+export interface IStyledComponentFunction<P = HTMLAttributes> {
   (props?: P): ITemplateLiteralFunction;
   (strings: TemplateStringsArray, ...values: ElementChildType[]): ITemplate;
   isTemplate: true;
@@ -113,4 +114,108 @@ export function isTemplateFragment(value: unknown): value is ITemplateFragment {
     hasContent: value && typeof value === "object" && "content" in value,
   });
   return is;
+}
+
+// Базовые HTML типы
+export interface HTMLElement {
+  id?: string;
+  className?: string;
+  style?: string;
+}
+
+// Специфичные HTML элементы
+export interface HTMLAnchorElement extends HTMLElement {
+  href?: string;
+  target?: string;
+  rel?: string;
+}
+
+export interface HTMLButtonElement extends HTMLElement {
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+}
+
+export interface HTMLInputElement extends HTMLElement {
+  type?: string;
+  value?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  required?: boolean;
+  checked?: boolean;
+}
+
+export interface HTMLImageElement extends HTMLElement {
+  src?: string;
+  alt?: string;
+  width?: number | string;
+  height?: number | string;
+}
+
+export interface HTMLDivElement extends HTMLElement {}
+export interface HTMLSpanElement extends HTMLElement {}
+export interface HTMLParagraphElement extends HTMLElement {}
+export interface HTMLHeadingElement extends HTMLElement {}
+
+// Карта HTML элементов
+export interface HTMLElementTagNameMap {
+  a: HTMLAnchorElement;
+  button: HTMLButtonElement;
+  div: HTMLDivElement;
+  img: HTMLImageElement;
+  input: HTMLInputElement;
+  p: HTMLParagraphElement;
+  span: HTMLSpanElement;
+  h1: HTMLHeadingElement;
+  h2: HTMLHeadingElement;
+  h3: HTMLHeadingElement;
+  h4: HTMLHeadingElement;
+  h5: HTMLHeadingElement;
+  h6: HTMLHeadingElement;
+  [key: string]: HTMLElement;
+}
+
+// Специфичные HTML атрибуты
+export interface AnchorHTMLAttributes extends HTMLAttributes<"a"> {
+  href?: string;
+  target?: string;
+  rel?: string;
+}
+
+export interface ButtonHTMLAttributes extends HTMLAttributes<"button"> {
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+}
+
+export interface InputHTMLAttributes extends HTMLAttributes<"input"> {
+  type?: string;
+  value?: string;
+  placeholder?: string;
+  disabled?: boolean;
+  required?: boolean;
+  checked?: boolean;
+}
+
+export interface ImgHTMLAttributes extends HTMLAttributes<"img"> {
+  src?: string;
+  alt?: string;
+  width?: number | string;
+  height?: number | string;
+}
+
+// Карта HTML атрибутов
+export interface HTMLAttributesMap {
+  a: AnchorHTMLAttributes;
+  button: ButtonHTMLAttributes;
+  div: HTMLAttributes<"div">;
+  img: ImgHTMLAttributes;
+  input: InputHTMLAttributes;
+  p: HTMLAttributes<"p">;
+  span: HTMLAttributes<"span">;
+  h1: HTMLAttributes<"h1">;
+  h2: HTMLAttributes<"h2">;
+  h3: HTMLAttributes<"h3">;
+  h4: HTMLAttributes<"h4">;
+  h5: HTMLAttributes<"h5">;
+  h6: HTMLAttributes<"h6">;
+  [key: string]: HTMLAttributes;
 }

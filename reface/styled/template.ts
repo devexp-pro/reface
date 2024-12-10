@@ -1,6 +1,6 @@
 import { createLogger } from "@reface/core";
 
-const logger = createLogger("StyledTemplate");
+const logger = createLogger("Styled:Template");
 
 export interface StyledTemplate {
   rootClass: string;
