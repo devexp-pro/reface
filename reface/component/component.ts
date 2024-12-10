@@ -1,7 +1,11 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "@reface/html";
 import { TemplateHtml, TemplateText } from "@reface/html";
-import type { ComponentFunction, ComponentRenderFunction } from "./types.ts";
+import type {
+  ComponentFunction,
+  ComponentRenderFunction,
+  TemplateValue,
+} from "./types.ts";
 
 const logger = createLogger("Component");
 
@@ -26,7 +30,10 @@ export function component<Props extends object = {}>(
     }
 
     // Template literal вызов
-    return function (strings: TemplateStringsArray, ...values: any[]) {
+    return function (
+      strings: TemplateStringsArray,
+      ...values: TemplateValue[]
+    ) {
       const children = strings.map((str, i) => {
         const text = new TemplateText(str, true);
         if (i < values.length) {

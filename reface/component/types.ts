@@ -1,5 +1,8 @@
 import type { ElementChildType, Template } from "@reface/html";
 
+// Тип для значений в template literals
+export type TemplateValue = ElementChildType | Template;
+
 // Тип для функции рендеринга компонента
 export interface ComponentRenderFunction<Props = object> {
   (props: Props, children: ElementChildType[]): ElementChildType;
@@ -11,5 +14,8 @@ export interface ComponentFunction<Props = object> {
   (props: Props, children: ElementChildType[]): Template;
 
   // Template literal вызов
-  (props: Props): (strings: TemplateStringsArray, ...values: any[]) => Template;
+  (props: Props): (
+    strings: TemplateStringsArray,
+    ...values: TemplateValue[]
+  ) => Template;
 }
