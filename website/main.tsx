@@ -5,9 +5,9 @@ import { clean } from "@reface/layouts";
 import { loadDocs } from "./utils/docs.tsx";
 import { DocsViewer } from "./components/DocsViewer.tsx";
 import { Home } from "./components/Home.tsx";
+import { resolveFromFile } from "./utils/resolveFromFile.ts";
 
-// Загружаем документацию
-const { sections, pages } = await loadDocs("../docs");
+const { sections, pages } = await loadDocs(resolveFromFile("../docs", import.meta.url));
 
 if (!pages.size) {
   console.error("No documentation found!");
@@ -30,8 +30,8 @@ const reface = new Reface({
 const app = new Hono();
 
 // Статические файлы
-app.use("/assets/*", serveStatic({ root: "./public" }));
-app.use("/styles/*", serveStatic({ root: "./public" }));
+app.use("/assets/*", serveStatic({ root: resolveFromFile("./public", import.meta.url) }));
+app.use("/styles/*", serveStatic({ root: resolveFromFile("./public", import.meta.url) }));
 
 // Создаем роутеры
 const home = reface.page("/", Home).hono();
