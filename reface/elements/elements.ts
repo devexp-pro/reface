@@ -1,4 +1,33 @@
-import { createTemplateFunction } from "../html/createTemplateFunction.ts";
+import { type ElementChildType, Template } from "@reface/html";
+
+// TODO: move to core
+export function createTemplateFunction(tag: string) {
+  return (
+    attributes: Record<string, unknown> = {},
+    css?: string,
+    rootClass?: string,
+  ) => {
+    return (
+      strings: TemplateStringsArray,
+      ...values: ElementChildType[]
+    ): Template => {
+      const children = strings.map((str, i) => {
+        if (i < values.length) {
+          return [str, values[i]];
+        }
+        return [str];
+      }).flat();
+
+      return new Template({
+        tag,
+        attributes,
+        children,
+        css,
+        rootClass,
+      });
+    };
+  };
+}
 
 // Document Metadata
 export const head = createTemplateFunction("head");

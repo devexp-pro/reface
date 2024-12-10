@@ -1,4 +1,5 @@
 import { RenderContextManager } from "./context.ts";
+import type { Template } from "./Template.ts";
 
 export function render(template: Template): string {
   const context = RenderContextManager.createContext();

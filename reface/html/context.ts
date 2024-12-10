@@ -1,18 +1,14 @@
-import { createLogger } from "@reface/core";
-
-const logger = createLogger("HTML:Context");
-
-export interface RenderContext {
-  styles: Set<string>; // Уникальные стили
-  components: Set<string>; // Использованные компоненты
-  depth: number; // Глубина вложенности
-  parent?: unknown; // Родительский шаблон
+export interface IRenderContext {
+  styles: Set<string>;
+  components: Set<string>;
+  depth: number;
+  parent?: unknown;
 }
 
 export class RenderContextManager {
-  private static context: RenderContext;
+  private static context?: IRenderContext;
 
-  static getContext(): RenderContext {
+  static getContext(): IRenderContext {
     if (!this.context) {
       this.context = {
         styles: new Set(),
@@ -23,7 +19,7 @@ export class RenderContextManager {
     return this.context;
   }
 
-  static createContext(): RenderContext {
+  static createContext(): IRenderContext {
     this.context = {
       styles: new Set(),
       components: new Set(),
@@ -34,6 +30,5 @@ export class RenderContextManager {
 
   static reset(): void {
     this.context = undefined;
-    logger.debug("Context reset");
   }
 }
