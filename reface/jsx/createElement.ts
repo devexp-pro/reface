@@ -1,22 +1,25 @@
 import { createLogger } from "@reface/core";
-import { TemplateComponent } from "@reface/html";
+import { type ElementChildType, TemplateComponent } from "@reface/html";
+import type { ComponentFunction } from "./types.ts";
 
 const logger = createLogger("JSX");
 
-export function createElement(
-  tag: string | Function,
-  props: Record<string, unknown> | null,
-  ...children: unknown[]
+export function createElement<Props = object>(
+  tag: string | ComponentFunction<Props>,
+  props: Props | null,
+  ...children: ElementChildType[]
 ): TemplateComponent {
-  // Если это функция-компонент
+  logger.debug("Creating element", {
+    tag,
+    props,
+    childrenCount: children.length,
+  });
+
+  // Для функциональных компонентов
   if (typeof tag === "function") {
-    return tag(props ?? {}, children);
+    // Всегда передаем props первым аргументом, children - вторым
+    return tag(props ?? {} as Props, children);
   }
 
-  // Создаем такой же объект, как если бы делали руками
-  return new TemplateComponent(
-    tag,
-    props ?? {},
-    children,
-  );
+  return new TemplateComponent(tag, props ?? {}, children);
 }

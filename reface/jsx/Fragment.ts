@@ -1,12 +1,12 @@
 import { createLogger } from "@reface/core";
 import { TemplateFragment } from "@reface/html";
-import type { ElementChild } from "@reface/html";
+import type { ElementChildType } from "@reface/html";
 
 const logger = createLogger("JSX:Fragment");
 
 export function Fragment(
   _props: unknown,
-  children: ElementChild[],
+  children: ElementChildType[],
 ): TemplateFragment {
   logger.debug("Creating fragment", {
     childrenCount: children.length,
