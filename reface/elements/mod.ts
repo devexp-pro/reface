@@ -1,8 +1,8 @@
-// Core functionality
-export { component } from "./component.ts";
-
+// @deprecated
+export { component } from "../component/mod.ts";
 // @deprecated
 export { styled } from "../styled/mod.ts";
+
 export { js } from "./js.ts";
 export { css, cssVar, keyframes } from "./css.ts";
 

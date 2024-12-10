@@ -1,37 +1,16 @@
 import { createLogger } from "@reface/core";
 import type { ElementChildType } from "@reface/html";
-import type { RenderContext } from "@reface/html/context.ts";
-import {
-  Template,
-  TemplateComponent,
-  TemplateHtml,
-  TemplateText,
-} from "@reface/html";
+import { TemplateHtml, TemplateText } from "@reface/html";
+import type { ComponentFunction, ComponentRenderFunction } from "./types.ts";
 
 const logger = createLogger("Component");
 
-function convertToTemplateHtml(
-  element: ElementChildType,
-  context: RenderContext,
-): TemplateHtml {
-  if (element instanceof TemplateHtml) {
-    return element;
-  }
-  if (element instanceof Template) {
-    return new TemplateHtml([element]);
-  }
-  if (typeof element === "string") {
-    return new TemplateHtml([new TemplateText(element)]);
-  }
-  return new TemplateHtml([element]);
-}
-
-export function component<P extends object = {}>(
-  renderFn: (props: P, children: ElementChildType[]) => ElementChildType,
-) {
+export function component<Props extends object = {}>(
+  renderFn: ComponentRenderFunction<Props>,
+): ComponentFunction<Props> {
   logger.debug("Creating component", { renderFn: renderFn.name });
 
-  const componentFn = function (props: P, children?: ElementChildType[]) {
+  const componentFn = function (props: Props, children?: ElementChildType[]) {
     logger.debug("Component called", {
       props,
       childrenCount: children?.length,
@@ -65,5 +44,5 @@ export function component<P extends object = {}>(
     };
   };
 
-  return componentFn;
+  return componentFn as ComponentFunction<Props>;
 }
