@@ -12,7 +12,6 @@ const { sections, pages } = await loadDocs("../docs");
 if (!pages.size) {
   console.error("No documentation found!");
   console.log("Make sure you have documentation files in ./docs directory");
-  Deno.exit(1);
 }
 
 // Инициализируем приложение
