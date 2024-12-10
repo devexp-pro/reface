@@ -1,7 +1,6 @@
-import type { Template, TemplateGenerator, PageProps } from "../core/mod.ts";
 import type { Layout } from "../layouts/mod.ts";
 import type { RefaceOptions, RouteHandler } from "./types.ts";
-import { render } from "../core/mod.ts";
+import { render } from "@reface/html";
 import { type Context, Hono } from "@hono/hono";
 
 export class Reface {

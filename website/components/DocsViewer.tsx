@@ -1,6 +1,6 @@
 import { createElement } from "@reface/jsx";
 import type { Template } from "@reface/types";
-import { styled } from "@reface/elements";
+import { styled } from "@reface/styled";
 import { Container, Header, Layout } from "./Layout.tsx";
 import { Logo, LogoText, BrandName, BrandTagline } from "./Logo.tsx";
 import { Navigation } from "./Navigation.tsx";

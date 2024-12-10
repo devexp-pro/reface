@@ -1,6 +1,5 @@
 import { createElement } from "@reface/jsx";
-import type { Template } from "@reface/types";
-import { styled } from "@reface/elements";
+import { styled } from "@reface/styled";
 
 // Утилиты для токенизации
 function hashColor(str: string): string {
@@ -176,7 +175,7 @@ interface CodeProps {
   filename?: string;
 }
 
-export function Code({ content, language, filename = `example.${language}` }: CodeProps): Template {
+export function Code({ content, language, filename = `example.${language}` }: CodeProps) {
   const lines = content.split("\n");
   const totalLines = lines.length;
   const lineNumberWidth = totalLines.toString().length;

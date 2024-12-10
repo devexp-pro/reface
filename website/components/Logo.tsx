@@ -1,6 +1,6 @@
 import { createElement } from "@reface/jsx";
 import type { Template } from "@reface/types";
-import { styled } from "@reface/elements";
+import { styled } from "@reface/styled";
 
 const LogoIcon = styled.div`
   & {

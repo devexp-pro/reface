@@ -1,4 +1,4 @@
-import { styled } from "@reface/elements";
+import { styled } from "@reface/styled";
 
 const headingStyles = `
   color: #0f172a;

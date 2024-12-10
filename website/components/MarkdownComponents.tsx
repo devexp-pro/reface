@@ -1,7 +1,5 @@
-import { createElement } from "../../reface/jsx/createElement.ts";
+import { styled } from "@reface/styled";
 
-import { styled } from "@reface/elements";
-import { Code } from "./Code.tsx";
 
 // Базовые стили для заголовков
 const headingStyles = `

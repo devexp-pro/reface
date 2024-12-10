@@ -1,7 +1,7 @@
 import { createElement, Fragment } from "@reface/jsx";
 import type { Template } from "@reface/types";
 import type { HTMLAttributes } from "../types/html.ts";
-import { styled } from "@reface/elements";
+import { styled } from "@reface/styled";
 import { Code } from "./Code.tsx";
 import { Logo } from "./Logo.tsx";
 
