@@ -16,13 +16,10 @@ export const Header = styled.header`
   & {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     padding: 1rem 2rem;
     background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-    position: sticky;
-    top: 0;
-    z-index: 100;
   }
 `;
 
@@ -102,4 +99,57 @@ export const BrandTagline = styled.div`
     font-size: 0.875rem;
     color: #64748b;
   }
-`; 
+`;
+
+export const GitHubButton = styled.a`
+  & {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    color: var(--color-text);
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+  }
+
+  &:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+  }
+
+  & svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+`;
+
+export const HeaderLinks = styled.div`
+  & {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+`;
+
+export const DocsLink = styled.a`
+  & {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    color: var(--color-text);
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+  }
+
+  &:hover {
+    color: var(--color-primary);
+  }
+`;

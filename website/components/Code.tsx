@@ -32,26 +32,22 @@ function tokenize(code: string): Token[] {
         return {
           type: "tab",
           value: "  ",
-          color: "rgba(139, 92, 246, 0.4)",
+          color: "rgba(37, 99, 235, 0.2)",
         };
       }
       if (/^[│─┌┐└┘▶▼]$/.test(token)) {
         return {
           type: "punctuation",
           value: token,
-          color: "#4ade80"
+          color: "#4f46e5"
         };
       }
       if (/^\d+$/.test(token)) {
         const colors = [
-          "#f472b6",
-          "#fb923c",
-          "#fbbf24",
-          "#a3e635",
-          "#34d399",
-          "#22d3ee",
-          "#60a5fa",
-          "#818cf8",
+          "#2563eb",
+          "#7c3aed",
+          "#6366f1",
+          "#0891b2",
         ];
         return {
           type: "number",
@@ -60,20 +56,44 @@ function tokenize(code: string): Token[] {
         };
       }
       if (/^["']/.test(token)) {
-        return { type: "string", value: token, color: "#34d399" };
+        return { 
+          type: "string", 
+          value: token, 
+          color: "#0d9488"
+        };
       }
       if (/^\s+$/.test(token)) {
         return { type: "whitespace", value: token };
       }
       if (/^[.,{}[\]()=:]+$/.test(token)) {
-        return { type: "punctuation", value: token, color: "#94a3b8" };
+        return { 
+          type: "punctuation", 
+          value: token, 
+          color: "#6b7280"
+        };
       }
+      const colors = [
+        "#2563eb",
+        "#4f46e5",
+        "#0891b2",
+        "#1e40af",
+        "#3730a3",
+        "#0e7490",
+      ];
       return {
         type: "word",
         value: token,
-        color: hashColor(token),
+        color: colors[Math.abs(hashString(token)) % colors.length],
       };
     });
+}
+
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return hash;
 }
 
 // Стилизованные компоненты
@@ -82,8 +102,9 @@ const CodeContainer = styled.div`
     margin: 1.5rem 0;
     border-radius: 0.75rem;
     overflow: hidden;
-    background: #0f172a;
-    color: #e2e8f0;
+    background: #f1f5f9;
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
   }
 `;
 
@@ -92,18 +113,19 @@ const Header = styled.div`
     display: flex;
     align-items: center;
     padding: 0.5rem 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
+    background: #e2e8f0;
     gap: 0.75rem;
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: var(--color-text-light);
+    border-bottom: 1px solid var(--color-border);
   }
 `;
 
 const FileLang = styled.span`
   & {
-    color: #64748b;
+    color: var(--color-text-light);
     padding: 0.125rem 0.375rem;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(148, 163, 184, 0.2);
     border-radius: 0.25rem;
   }
 `;
@@ -118,11 +140,11 @@ const Content = styled.div`
     }
 
     &::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(226, 232, 240, 0.3);
     }
 
     &::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(100, 116, 139, 0.2);
       border-radius: 3px;
     }
   }
@@ -146,13 +168,13 @@ const Line = styled.div`
   }
 
   &:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: #e2e8f0;
   }
 `;
 
 const LineNumber = styled.span`
   & {
-    color: #475569;
+    color: var(--color-text-light);
     padding-right: 1.5rem;
     user-select: none;
     text-align: right;
