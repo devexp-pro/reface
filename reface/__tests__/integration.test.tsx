@@ -1,8 +1,13 @@
+import { assertNotEquals } from "@std/assert";
+
 import { createElement, Fragment } from "@reface/jsx";
 import { render } from "@reface/html";
-import { styled, component, div } from "@reface/elements";
+import { div } from "@reface/elements";
+import { styled } from "@reface/styled";
+import { component } from "@reface/component";
+
 import { compareHTML } from "./utils.ts";
-import { assertNotEquals } from "@std/assert";
+
 
 // 1. Basic Elements
 Deno.test("Integration - Basic Elements - JSX", () => {

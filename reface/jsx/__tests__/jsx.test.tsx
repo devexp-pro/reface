@@ -1,8 +1,8 @@
 import { createElement, Fragment } from "@reface/jsx";
 import { render } from "@reface/html";
 import type { Template } from "@reface/html";
+import { component } from "@reface/component";
 import { compareHTML } from "@reface/test-utils";
-import { component } from "@reface/elements";
 
 Deno.test("JSX - basic rendering", () => {
   const template = <div class="test">Hello World</div>;

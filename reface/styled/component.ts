@@ -1,6 +1,7 @@
 import { createLogger } from "@reface/core";
 import { TemplateComponent } from "@reface/html";
-import { component } from "@reface/elements";
+import { component } from "@reface/component";
+
 import { buildClassName, buildCss, createStyledTemplate } from "./template.ts";
 import type { StyledComponent } from "./types.ts";
 
