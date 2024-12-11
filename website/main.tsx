@@ -21,6 +21,7 @@ const reface = new Reface({
     title: "Reface - Modern Template Engine",
     description: "Type-safe template engine for HTML with JSX support",
     favicon: "/assets/logo.png",
+    htmx: true,
     head: `
       <link rel="stylesheet" href="/styles/fonts.css">
       <link rel="icon" type="image/png" href="/assets/logo.png">

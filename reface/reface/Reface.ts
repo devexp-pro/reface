@@ -1,73 +1,44 @@
 import { type Context, Hono } from "hono";
 import type { Layout } from "../layouts/mod.ts";
-import { render } from "@reface/html";
 import type { Template } from "@reface/html";
-import type {
-  IslandType,
-  RefaceRequestType,
-  RestHandlersType,
-  RpcCallsType,
-  RpcHandlersType,
-} from "../island/types.ts";
+import type { PagePropsType } from "./types.ts";
+import { RenderContextManager } from "../html/context.ts";
+import { createLogger } from "@reface/core";
+import { API_PATH } from "@reface/island";
 
-export type PagePropsType = {
-  route: string;
-  params: {
-    [x: string]: string;
-  };
-  headers: Record<string, string>;
-  query: Record<string, string>;
-};
+const logger = createLogger("Reface");
+
+function render(template: Template) {
+  const context = RenderContextManager.createContext();
+  if (typeof template === "string") {
+    return {
+      html: template,
+      islands: new Map(),
+      styles: "",
+    };
+  }
+
+  try {
+    const html = template.toHtml(context);
+    const styles = Array.from(context.styles).join("\n");
+    const islands = context.islands;
+
+    return {
+      html,
+      islands,
+      styles,
+    };
+  } finally {
+    RenderContextManager.reset();
+  }
+}
 
 export class Reface {
   private layout: Layout;
-  private static islandsCount = 0;
-  private static islandRestHandlers: Record<string, RestHandlersType> = {};
-  private static islandTemplateGenerators: Record<
-    string,
-    () => Template
-  > = {};
-  private static islandRpcHandlers: Record<string, RpcHandlersType<any>> = {};
-
   private pages: Record<string, any> = {};
+  private islands: Map<string, () => Template> = new Map();
 
-  static addIsland<R, P>(body: IslandType<R, P>) {
-    const name = body.name || `c${this.islandsCount++}`;
-
-    if (body.rest) {
-      this.islandRestHandlers[name] = body.rest;
-    }
-
-    const rpc: RpcCallsType<any> = { hx: {} };
-
-    if (body.rpc) {
-      this.islandRpcHandlers[name] = body.rpc;
-      Object.keys(body.rpc).map((key) => {
-        rpc.hx[key] = (args?: any) =>
-          `hx-ext='json-enc' hx-post='/rpc/${name}/${key}'` +
-          (args ? ` hx-vals='${JSON.stringify(args)}'` : "");
-      });
-    }
-
-    return (props: P) =>
-      body.template({
-        rpc,
-        props,
-        // api: `/api/${name}`,
-        rest: {
-          hx: (islandName, method, route: string) =>
-            islandName === "self"
-              ? `hx-${method}='/api/${name}${route}'`
-              : `hx-${method}='/api/${islandName}${route}'`,
-        },
-      });
-  }
-
-  constructor(
-    private options: {
-      layout: Layout;
-    },
-  ) {
+  constructor(private options: { layout: Layout }) {
     this.layout = options.layout;
   }
 
@@ -79,80 +50,57 @@ export class Reface {
         query: c.req.query(),
         headers: c.req.header(),
       });
-      const html = render(template);
-      return c.html(this.layout(html));
+
+      const { html, styles, islands } = render(template);
+
+      for (const [islandName, generator] of islands.entries()) {
+        this.islands.set(islandName, generator);
+        logger.debug(`Registered island "${islandName}" with generator`);
+      }
+
+      const layoutHtml = this.layout(html + `<style>\n${styles}\n</style>`);
+      return c.html(layoutHtml);
     };
 
     return this;
   }
 
-  partial(): Reface {
-    throw new Error("Not implemented");
-  }
-
   hono() {
     const router = new Hono();
-    // create component routes
-    // create page routes
+
+    // Регистрируем маршруты страниц
     for (const [route, handler] of Object.entries(this.pages)) {
       router.get(route, handler);
     }
-    // create partial routes
-    // create rest routes
-    for (const [name, handlers] of Object.entries(Reface.islandRestHandlers)) {
-      for (const [str, handler] of Object.entries(handlers)) {
-        const [method, path] = str.split("|");
-        const route = `/api/${name}${path}`;
-        const api = `/api/${name}`;
-        // @ts-ignore
-        router[method](
-          route,
-          async (c: Context) => {
-            const contentType = c.req.header("content-type");
-            const formData = contentType &&
-                (contentType.includes("multipart/form-data") ||
-                  contentType.includes("application/x-www-form-urlencoded"))
-              ? await c.req.formData()
-              : new FormData();
 
-            const request: RefaceRequestType = {
-              api,
-              route,
-              params: c.req.param(),
-              query: c.req.query(),
-              headers: c.req.header(),
-              formData,
-            };
+    // Добавляем обработчик для островов
+    router.get(`${API_PATH}/:name`, async (c) => {
+      const name = c.req.param("name");
+      if (!name) {
+        return c.text("Island name is required", 400);
+      }
 
-            const response = await handler(request);
-            return c.html(response.html || "", {
-              status: response.status || 200,
-            });
-          },
-        );
+      // Проверяем регистрацию острова
+      if (!this.islands.has(name)) {
+        logger.warn(`Island "${name}" not found`);
+        return c.text(`Island "${name}" not found`, 404);
       }
-    }
-    // create rpc routes
-    for (const [name, handlers] of Object.entries(Reface.islandRpcHandlers)) {
-      for (const [key, handler] of Object.entries(handlers)) {
-        router.post(`/rpc/${name}/${key}`, async (c: Context) => {
-          const args = await c.req.json();
-          const response = await handler({ args });
-          return c.html(response.html || "", {
-            status: response.status || 200,
-          });
-        });
+
+      // Получаем и вызываем генератор острова
+      const generator = this.islands.get(name);
+      if (!generator) {
+        logger.error(`Generator for island "${name}" not found`);
+        return c.text(`Island "${name}" generator not found`, 500);
       }
-    }
+
+      console.log(c.req.query());
+      const result = await generator();
+
+      return c.html(render(result).html, {
+        status: 200,
+      });
+    });
 
     return router;
-  }
-
-  oak() {
-    throw new Error("Not implemented");
-  }
-
-  express() {
-    throw new Error("Not implemented");
   }
 }

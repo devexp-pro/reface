@@ -468,6 +468,7 @@ export default function HomePage() {
             </FeatureDescription>
           </Feature>
         </Features>
+        <DemoReface />
         <p>
             Create interactive web applications with minimal setup. 
             Reface combines the best of modern web development in a simple package.
@@ -492,7 +493,7 @@ export default function HomePage() {
         </Install>
       
 
-        <DemoReface />
+        
 
         <CodeWrapper>
           <Code 

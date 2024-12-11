@@ -1,48 +1,46 @@
-import { Template } from "@reface/html";
-import type {
-  IslandTemplateArgs,
-  IslandTemplateData,
-  RestHandlersType,
-  RpcCallsType,
-  RpcHandlersType,
-} from "./types.ts";
+import { createLogger } from "@reface/core";
+import { TemplateComponent } from "@reface/html";
+import type { ElementChildType } from "@reface/html";
+import type { IRenderContext } from "@reface/html";
 
-export class TemplateIsland {
+const logger = createLogger("HTML:Island");
+
+export const API_PATH = "/reface-island";
+
+export class TemplateIsland extends TemplateComponent {
   constructor(
-    public readonly name: string,
-    public readonly templateData: IslandTemplateData,
-    public readonly rpc?: RpcHandlersType<any>,
-    public readonly rest?: RestHandlersType,
-  ) {}
-
-  private createRpcCalls(): RpcCallsType<any> {
-    const rpc: RpcCallsType<any> = { hx: {} };
-
-    if (this.rpc) {
-      Object.keys(this.rpc).forEach((key) => {
-        rpc.hx[key] = (args?: any) =>
-          `hx-ext='json-enc' hx-post='/rpc/${this.name}/${key}'` +
-          (args ? ` hx-vals='${JSON.stringify(args)}'` : "");
-      });
-    }
-
-    return rpc;
-  }
-
-  toHtml(): string {
-    const rpc = this.createRpcCalls();
-    const template = this.templateData.template({
-      props: this.templateData.props,
-      rpc,
-      rest: this.templateData.rest,
-    } as IslandTemplateArgs);
-
-    const attributes = {
-      ...template.attributes,
-      "data-island": this.name,
-      "data-island-id": crypto.randomUUID(),
+    private islandName: string,
+    private handler: () => Promise<unknown>,
+    attributes: Record<string, unknown>,
+    children: ElementChildType[],
+  ) {
+    const baseAttributes = {
+      "data-island": islandName,
+      "hx-get": `${API_PATH}/${islandName}`,
     };
 
-    return new Template(template.tag, attributes, template.children).toHtml();
+    super("div", {
+      ...baseAttributes,
+      ...attributes,
+    }, children);
+
+    this.handler = handler;
+    this.islandName = islandName;
+
+    logger.debug("Creating island template", {
+      name: islandName,
+      attributes: attributes,
+    });
+  }
+
+  override toHtml(context: IRenderContext): string {
+    context.islands.set(this.islandName, this.handler);
+
+    logger.debug("Rendering island template", {
+      name: this.islandName,
+      depth: context.depth,
+    });
+
+    return super.toHtml(context);
   }
 }

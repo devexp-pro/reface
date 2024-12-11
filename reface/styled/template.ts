@@ -40,7 +40,7 @@ export function buildClassName(
 
 export function buildCss(template: StyledTemplate): string {
   const baseCss = template.baseComponent
-    ? template.baseComponent.css.replace(
+    ? template.baseComponent.css?.replace(
       /&/g,
       `.${template.baseComponent.rootClass}`,
     )

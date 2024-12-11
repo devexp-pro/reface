@@ -33,3 +33,5 @@ export { ScriptCollector } from "./ScriptCollector.ts";
 
 // Constants
 export { HTML_ENTITIES, VOID_ELEMENTS } from "./constants.ts";
+
+export { type IRenderContext } from "./context.ts";

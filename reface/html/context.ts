@@ -1,8 +1,10 @@
+import type { Template } from "./template.ts";
+
 export interface IRenderContext {
+  depth: number;
   styles: Set<string>;
   components: Set<string>;
-  depth: number;
-  parent?: unknown;
+  islands: Map<string, () => Promise<unknown>>;
 }
 
 export class RenderContextManager {
@@ -11,9 +13,10 @@ export class RenderContextManager {
   static getContext(): IRenderContext {
     if (!this.context) {
       this.context = {
+        depth: 0,
         styles: new Set(),
         components: new Set(),
-        depth: 0,
+        islands: new Map(),
       };
     }
     return this.context;
@@ -21,9 +24,10 @@ export class RenderContextManager {
 
   static createContext(): IRenderContext {
     this.context = {
+      depth: 0,
       styles: new Set(),
       components: new Set(),
-      depth: 0,
+      islands: new Map(),
     };
     return this.context;
   }
