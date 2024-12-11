@@ -16,7 +16,6 @@
     "./jsx": "./reface/jsx/mod.ts",
     "./styled": "./reface/styled/mod.ts",
     "./layouts": "./reface/layouts/mod.ts",
-    "./devtools": "./reface/devtools/mod.ts",
     "./island": "./reface/island/mod.ts"
   },
   "imports": {
@@ -28,7 +27,6 @@
     "@reface/jsx": "./reface/jsx/mod.ts",
     "@reface/component": "./reface/component/mod.ts",
     "@reface/styled": "./reface/styled/mod.ts",
-    "@reface/devtools": "./reface/devtools/mod.ts",
     "@reface/layouts": "./reface/layouts/mod.ts",
     "@reface/island": "./reface/island/mod.ts",
     "@reface/types": "./reface/core/types.ts",

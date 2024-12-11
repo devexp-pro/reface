@@ -13,7 +13,6 @@
     "@reface/component": "./../reface/component/mod.ts",
     "@reface/styled": "./../reface/styled/mod.ts",
     "@reface/layouts": "./../reface/layouts/mod.ts",
-    "@reface/devtools": "./../reface/devtools/mod.ts",
     "@reface/island": "./../reface/island/mod.ts"
   },
   "compilerOptions": {
