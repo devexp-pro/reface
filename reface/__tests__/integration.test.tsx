@@ -315,3 +315,42 @@ Deno.test("Integration - Complex Nesting", () => {
     `
   );
 });
+
+// 7. Object Style Props
+Deno.test("Integration - Object Style Props - Styled Components", () => {
+  const Container = styled.div`
+    & {
+      padding: 1rem;
+    }
+  `;
+
+  compareHTML(
+    render(
+      <Container style={{ marginBottom: "4rem", color: "blue" }}>
+        Content
+      </Container>
+    ),
+    `
+    <div style="margin-bottom: 4rem; color: blue" class="${Container.rootClass}">Content</div>
+    <style>
+      .${Container.rootClass} {
+        padding: 1rem;
+      }
+    </style>
+    `
+  );
+});
+
+Deno.test("Integration - Object Style Props - elements", () => {
+
+  compareHTML(
+    render(
+      <div style={{ marginBottom: "4rem", color: "blue" }}>
+        Content
+      </div>
+    ),
+    `
+    <div style="margin-bottom: 4rem; color: blue">Content</div>
+    `
+  );
+});

@@ -1,4 +1,4 @@
-# Reface 🎭
+# Reface
 
 A type-safe template engine for HTML with JSX support.
 

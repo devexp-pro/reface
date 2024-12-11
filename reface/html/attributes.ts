@@ -62,6 +62,14 @@ export function processAttributes(
 }
 
 /**
+ * Converts camelCase to kebab-case
+ * marginBottom -> margin-bottom
+ */
+function toKebabCase(str: string): string {
+  return str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+}
+
+/**
  * Convert attributes to string for HTML
  */
 export function renderAttributes(attrs: TemplateAttributes = {}): string {
@@ -93,8 +101,8 @@ export function renderAttributes(attrs: TemplateAttributes = {}): string {
           parts.push(`style="${escapeAttribute(value)}"`);
         } else if (typeof value === "object") {
           const style = Object.entries(value)
-            .map(([k, v]) => `${k}:${v}`)
-            .join(";");
+            .map(([k, v]) => `${toKebabCase(k)}: ${v}`)
+            .join("; ");
           logger.debug("Rendering style object", {
             input: value,
             output: style,

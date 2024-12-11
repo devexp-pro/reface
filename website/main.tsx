@@ -3,9 +3,10 @@ import { serveStatic } from 'hono/deno'
 import { Reface, createElement } from "@reface";
 import { clean } from "@reface/layouts";
 import { loadDocs } from "./utils/docs.tsx";
-import { DocsViewer } from "./components/DocsViewer.tsx";
-import { Home } from "./components/Home.tsx";
 import { resolveFromFile } from "./utils/resolveFromFile.ts";
+
+import DocsPage from "./pages/DocsPage.tsx";
+import HomePage from "./pages/HomePage.tsx";
 
 const { sections, pages } = await loadDocs(resolveFromFile("../docs", import.meta.url));
 
@@ -34,16 +35,16 @@ app.use("/assets/*", serveStatic({ root: resolveFromFile("./public", import.meta
 app.use("/styles/*", serveStatic({ root: resolveFromFile("./public", import.meta.url) }));
 
 // Создаем роутеры
-const home = reface.page("/", Home).hono();
+const home = reface.page("/", HomePage).hono();
 const docs = reface
   .page("/", () => (
-    <DocsViewer 
+    <DocsPage 
       sections={sections} 
       pages={pages}
     />
   ))
   .page("/:page", ({ params }) => (
-    <DocsViewer 
+    <DocsPage 
       sections={sections}
       pages={pages}
       currentPath={params.page}

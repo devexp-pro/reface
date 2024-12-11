@@ -1,10 +1,9 @@
 import { createElement } from "@reface/jsx";
-import type { Template } from "@reface/types";
 import { styled } from "@reface/styled";
-import { Container, Header, Layout } from "./Layout.tsx";
-import { Logo, LogoText, BrandName, BrandTagline } from "./Logo.tsx";
-import { Navigation } from "./Navigation.tsx";
-import { Content, DocContent, TableOfContents } from "./Content.tsx";
+import { Container, Header, Layout } from "../components/Layout.tsx";
+import { Logo, LogoText, BrandName, BrandTagline } from "../components/Logo.tsx";
+import { Navigation } from "../components/Navigation.tsx";
+import { Content, DocContent, TableOfContents } from "../components/Content.tsx";
 import type { DocSection, DocPage } from "../utils/docs.tsx";
 
 interface DocsViewerProps {
@@ -48,9 +47,7 @@ const TocLink = styled.a`
   }
 `;
 
-// Функция для извлечения текста из markdown-сылки
 function extractTextFromMarkdown(text: string): string {
-  // Паттерн для поиска markdown-ссылок: [text](./path.md)
   const linkPattern = /\[(.*?)\]\(.*?\)/;
   const match = text.match(linkPattern);
   return match ? match[1] : text;
@@ -65,7 +62,7 @@ const LogoLink = styled.a`
   }
 `;
 
-export function DocsViewer({ sections, pages, currentPath }: DocsViewerProps): Template {
+export default function DocsPage({ sections, pages, currentPath }: DocsViewerProps) {
   const currentPage = currentPath ? pages.get(currentPath) : pages.get("readme");
 
   return (

@@ -1,10 +1,7 @@
 import { createElement, Fragment } from "@reface/jsx";
-import type { Template } from "@reface/types";
-import type { HTMLAttributes } from "../types/html.ts";
 import { styled } from "@reface/styled";
-import { Code } from "./Code.tsx";
-import { Logo } from "./Logo.tsx";
-import { Header, LogoIcon, LogoText, BrandName, BrandTagline, GitHubButton, HeaderLinks, DocsLink } from "./Layout.tsx";
+import { Code } from "../components/Code.tsx";
+import { GITHUB_URL, DOCS_URL } from "../constants.ts";
 
 const Hero = styled.div`
   & {
@@ -47,32 +44,6 @@ const Title = styled.h1`
   }
 `;
 
-const Subtitle = styled.p`
-  & {
-    font-size: var(--text-xl);
-    color: var(--color-text-light);
-    max-width: 42rem;
-    margin: 0 auto 4rem;
-    line-height: var(--leading-relaxed);
-  }
-
-  @media (max-width: 768px) {
-    & {
-      font-size: var(--text-lg);
-      margin-bottom: 3rem;
-    }
-  }
-`;
-
-const Badges = styled.div`
-  & {
-    display: flex;
-    gap: 0.75rem;
-    justify-content: center;
-    margin-bottom: 3rem;
-  }
-`;
-
 
 const Feature = styled.div`
   & {
@@ -97,13 +68,6 @@ const Feature = styled.div`
 `;
 
 const Example = styled.div`
-  & {
-    max-width: 64rem;
-    margin: 0 auto 6rem;
-    padding: 0 2rem;
-    text-align: center;
-  }
-
   & h2 {
     font-size: var(--text-3xl);
     font-weight: var(--font-semibold);
@@ -272,44 +236,6 @@ const app = new Reface({
 Deno.serve(app.fetch);
 `;
 
-const Nav = styled.nav`
-  & {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    padding: 1rem 2rem;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-`;
-
-const NavLinks = styled.div`
-  & {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
-  }
-`;
-
-const NavLink = styled.a`
-  & {
-    color: #64748b;
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-
-  &:hover {
-    color: #0f172a;
-  }
-`;
-
 const LogoIcon = styled.div`
   & {
     font-size: 4rem;
@@ -476,18 +402,18 @@ const Features = styled.div`
   }
 `;
 
-export function Home(): Template {
+export default function HomePage() {
   return (
     <>
       <HomeHeader>
         <HomeHeaderLinks>
-          <HomeLink href="/docs">
+          <HomeLink href={DOCS_URL}>
             Documentation
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M13 7l5 5-5 5M5 12h13" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </HomeLink>
-          <HomeGitHubButton href="https://github.com/refaceio/reface" target="_blank">
+          <HomeGitHubButton href={GITHUB_URL} target="_blank">
             GitHub
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.464-1.11-1.464-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
@@ -503,15 +429,10 @@ export function Home(): Template {
           <BrandTagline>Modern Template Engine</BrandTagline>
         </HeroLogo>
         
-        <Example>
-          <h2>Simple and Powerful</h2>
-          <p>
-            Create interactive web applications with minimal setup. 
-            Reface combines the best of modern web development in a simple package.
-          </p>
-        </Example>
         
-        <Features>
+        <Example>
+        <h2 style={{marginBottom: "2rem"}}>Simple and Powerful</h2>
+        <Features style={{marginBottom: "2rem"}}>
           <Feature>
             <FeatureIcon>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -523,7 +444,6 @@ export function Home(): Template {
               No compilation required. Write your templates and run them directly with Deno.
             </FeatureDescription>
           </Feature>
-
           <Feature>
             <FeatureIcon>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -535,7 +455,6 @@ export function Home(): Template {
               Full TypeScript support with type checking for your templates and components.
             </FeatureDescription>
           </Feature>
-
           <Feature>
             <FeatureIcon>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -548,7 +467,11 @@ export function Home(): Template {
             </FeatureDescription>
           </Feature>
         </Features>
-
+        <p>
+            Create interactive web applications with minimal setup. 
+            Reface combines the best of modern web development in a simple package.
+          </p>
+        </Example>
         <Install>
           <h2>Quick Start</h2>
           <p>Add Reface to your Deno project in one command</p>
