@@ -2,6 +2,7 @@ import { createElement, Fragment } from "@reface/jsx";
 import { styled } from "@reface/styled";
 import { Code } from "../components/Code.tsx";
 import { GITHUB_URL, DOCS_URL } from "../constants.ts";
+import { DemoReface } from "../components/DemoReface.tsx";
 
 const Hero = styled.div`
   & {
@@ -490,6 +491,8 @@ export default function HomePage() {
           </InstallCommand>
         </Install>
       
+
+        <DemoReface />
 
         <CodeWrapper>
           <Code 
