@@ -27,10 +27,6 @@ export * from "./types.ts";
 // Type guards
 export { isTemplateFragment } from "./types.ts";
 
-// Utilities
-export { StyleCollector } from "./StyleCollector.ts";
-export { ScriptCollector } from "./ScriptCollector.ts";
-
 // Constants
 export { HTML_ENTITIES, VOID_ELEMENTS } from "./constants.ts";
 
