@@ -4,7 +4,7 @@ import type { Template } from "@reface/html";
 import type { PagePropsType } from "./types.ts";
 import { RenderContextManager } from "../html/context.ts";
 import { createLogger } from "@reface/core";
-import { API_PATH } from "@reface/island";
+import { ISLAND_API_PREFIX } from "@reface/island";
 
 const logger = createLogger("Reface");
 
@@ -74,7 +74,7 @@ export class Reface {
     }
 
     // Добавляем обработчик для островов
-    router.get(`${API_PATH}/:name`, async (c) => {
+    router.get(`${ISLAND_API_PREFIX}/:name`, async (c) => {
       const name = c.req.param("name");
       if (!name) {
         return c.text("Island name is required", 400);

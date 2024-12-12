@@ -20,6 +20,5 @@ export function createElement<Props = object>(
     // Всегда передаем props первым аргументом, children - вторым
     return tag(props ?? {} as Props, children);
   }
-
   return new TemplateComponent(tag, props ?? {}, children);
 }

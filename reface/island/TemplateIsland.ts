@@ -5,7 +5,8 @@ import type { IRenderContext } from "@reface/html";
 
 const logger = createLogger("HTML:Island");
 
-export const API_PATH = "/reface-island";
+export const ISLAND_API_PREFIX = "/reface-island";
+export const ISLAND_HTML_ATTRIBUTE = "data-island";
 
 export class TemplateIsland extends TemplateComponent {
   constructor(
@@ -14,14 +15,9 @@ export class TemplateIsland extends TemplateComponent {
     attributes: Record<string, unknown>,
     children: ElementChildType[],
   ) {
-    const baseAttributes = {
-      "data-island": islandName,
-      "hx-get": `${API_PATH}/${islandName}`,
-    };
-
     super("div", {
-      ...baseAttributes,
       ...attributes,
+      [ISLAND_HTML_ATTRIBUTE]: islandName,
     }, children);
 
     this.handler = handler;

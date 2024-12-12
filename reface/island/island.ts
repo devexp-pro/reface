@@ -1,8 +1,12 @@
 import { createLogger } from "@reface/core";
-import { Template, TemplateComponent, TemplateText } from "@reface/html";
+import { type TemplateComponent, TemplateText } from "@reface/html";
 import type { ElementChildType } from "@reface/html";
-import type { IslandTrigger } from "./types.ts";
-import { API_PATH, TemplateIsland } from "./TemplateIsland.ts";
+import {
+  ISLAND_API_PREFIX,
+  ISLAND_HTML_ATTRIBUTE,
+  TemplateIsland,
+} from "./TemplateIsland.ts";
+import { hx, type HxBuilder, type HxTrigger } from "@reface/htmx";
 
 const logger = createLogger("Island");
 
@@ -89,43 +93,11 @@ export class Island<T = unknown> {
     return this.toTemplate(children);
   }
 
-  trigger(trigger: IslandTrigger): Record<string, string> {
-    if (!trigger) return {};
-
-    if (typeof trigger === "string") {
-      return {
-        "hx-trigger": trigger,
-        "hx-get": `${API_PATH}/${this.name}`,
-        "hx-target": `[data-island="${this.name}"]`,
-      };
-    }
-
-    if (Array.isArray(trigger)) {
-      return { "hx-trigger": trigger.join(", ") };
-    }
-
-    const parts: string[] = [];
-
-    if (trigger.event) parts.push(trigger.event);
-    if (trigger.every) {
-      const timing = typeof trigger.every === "number"
-        ? `${trigger.every}s`
-        : trigger.every;
-      parts.push(`every ${timing}`);
-    }
-    if (trigger.filter) parts.push(`[${trigger.filter}]`);
-    if (trigger.changed) parts.push("changed");
-    if (trigger.once) parts.push("once");
-    if (trigger.delay) {
-      const delay = typeof trigger.delay === "number"
-        ? `${trigger.delay}s`
-        : trigger.delay;
-      parts.push(`delay:${delay}`);
-    }
-    if (trigger.from) parts.push(`from:${trigger.from}`);
-    if (trigger.target) parts.push(`target:${trigger.target}`);
-
-    return { "hx-trigger": parts.join(" ") };
+  trigger(trigger: HxTrigger): HxBuilder {
+    return hx()
+      .get(`${ISLAND_API_PREFIX}/${this.name}`)
+      .target(`[${ISLAND_HTML_ATTRIBUTE}="${this.name}"]`)
+      .trigger(trigger);
   }
 
   async execute(): Promise<T> {

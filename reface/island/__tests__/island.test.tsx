@@ -3,7 +3,7 @@ import { island } from "../island.ts";
 import { assertEquals } from "@std/assert";
 import { render } from "@reface/html";
 import { styled } from "@reface/styled";
-import { API_PATH } from "../TemplateIsland.ts";
+import { ISLAND_API_PREFIX } from "../TemplateIsland.ts";
 import { compareHTML } from "@reface/test-utils";
 
 Deno.test("Island JSX rendering", () => {
@@ -12,7 +12,7 @@ Deno.test("Island JSX rendering", () => {
   // Простой рендер
   compareHTML(
     render(<TestIsland />),
-    `<div data-island="test-island" hx-get="${API_PATH}/test-island"></div>`
+    `<div data-island="test-island" hx-get="${ISLAND_API_PREFIX}/test-island"></div>`
   );
 
   // С children
@@ -22,7 +22,7 @@ Deno.test("Island JSX rendering", () => {
         <span>Loading...</span>
       </TestIsland>
     ),
-    `<div data-island="test-island" hx-get="${API_PATH}/test-island">
+    `<div data-island="test-island" hx-get="${ISLAND_API_PREFIX}/test-island">
       <span>Loading...</span>
     </div>`
   );
@@ -65,7 +65,7 @@ Deno.test("Island combined usage", () => {
       </div>
     ),
     `<div hx-trigger="click">
-      <div data-island="test-island" hx-get="${API_PATH}/test-island"></div>
+      <div data-island="test-island" hx-get="${ISLAND_API_PREFIX}/test-island"></div>
     </div>`
   );
 
@@ -77,7 +77,7 @@ Deno.test("Island combined usage", () => {
       </div>
     ),
     `<div hx-trigger="every 5s">
-      <div data-island="test-island" hx-get="${API_PATH}/test-island">Loading...</div>
+      <div data-island="test-island" hx-get="${ISLAND_API_PREFIX}/test-island">Loading...</div>
     </div>`
   );
 });
@@ -96,7 +96,7 @@ Deno.test("Island attributes handling", () => {
       </TestIsland>
     ),
     `<div data-island="test-island" 
-         hx-get="${API_PATH}/test-island" 
+         hx-get="${ISLAND_API_PREFIX}/test-island" 
          hx-include="#count" 
          hx-target="#result">
       <span>Content</span>
@@ -111,7 +111,7 @@ Deno.test("Island attributes handling", () => {
       </TestIsland>
     ),
     `<div data-island="test-island" 
-         hx-get="${API_PATH}/test-island" 
+         hx-get="${ISLAND_API_PREFIX}/test-island" 
          class="custom-class">
       <span>Content</span>
     </div>`
@@ -129,7 +129,7 @@ Deno.test("Island attributes handling", () => {
       </TestIsland>
     ),
     `<div data-island="test-island" 
-         hx-get="${API_PATH}/test-island" 
+         hx-get="${ISLAND_API_PREFIX}/test-island" 
          data-custom="value" 
          class="test-class" 
          hx-include="#count">
@@ -151,7 +151,7 @@ Deno.test("Island with styled components", () => {
       </StyledTestIsland>
     ),
     `<div data-island="test-island" 
-         hx-get="${API_PATH}/test-island" 
+         hx-get="${ISLAND_API_PREFIX}/test-island" 
          class="${StyledTestIsland.rootClass} custom-class">
       <span>Content</span>
     </div>`

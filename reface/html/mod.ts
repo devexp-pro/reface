@@ -7,7 +7,7 @@ export { TemplateHtml } from "./TemplateHtml.ts";
 export { TemplateComponent } from "./TemplateComponent.ts";
 export { html } from "./html.ts";
 export { render } from "./render.ts";
-export { processAttributes, renderAttributes } from "./attributes.ts";
+export { renderAttributes } from "./attributes.ts";
 export { escapeAttribute, escapeHTML } from "./escape.ts";
 export { combineClassNames, generateClassName } from "./classes.ts";
 export { createStylesheet, processCSS } from "./styles.ts";

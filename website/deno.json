@@ -13,7 +13,8 @@
     "@reface/component": "./../reface/component/mod.ts",
     "@reface/styled": "./../reface/styled/mod.ts",
     "@reface/layouts": "./../reface/layouts/mod.ts",
-    "@reface/island": "./../reface/island/mod.ts"
+    "@reface/island": "./../reface/island/mod.ts",
+    "@reface/htmx": "./../reface/htmx/mod.ts"
   },
   "compilerOptions": {
     "jsx": "react",

@@ -130,8 +130,7 @@ function WebTerminal() {
         </CommandRunner>
       </Terminal>
       <Form
-        {...CommandRunner.trigger("submit")}
-        hx-swap="afterbegin"
+        {...CommandRunner.trigger("submit").swap("afterbegin")}
       >
         <label htmlFor="command">Command:</label>
         <Input 

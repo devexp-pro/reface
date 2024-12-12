@@ -8,71 +8,9 @@ import { processHTMLAttributes } from "./utils.ts";
 const logger = createLogger("HTML:Attributes");
 
 /**
- * Convert props to TemplateAttributes
- */
-export function processAttributes(
-  props: Record<string, unknown>,
-): TemplateAttributes {
-  logger.debug("Processing attributes", {
-    count: Object.keys(props).length,
-  });
-
-  try {
-    const result: TemplateAttributes = {};
-
-    for (const [key, value] of Object.entries(props)) {
-      if (value === undefined || value === null || value === false) {
-        continue;
-      }
-
-      if (key === "class") {
-        const classes = Array.isArray(value)
-          ? value
-          : String(value).split(/\s+/).filter(Boolean);
-        result.class = classes;
-      } else if (key === "style" && typeof value === "object") {
-        result.style = value as Record<string, string>;
-      } else if (value === true) {
-        result[key] = key;
-      } else {
-        result[key] = value;
-      }
-    }
-
-    logger.info("Processed attributes", {
-      inputCount: Object.keys(props).length,
-      outputCount: Object.keys(result).length,
-      hasClass: "class" in result,
-      hasStyle: "style" in result,
-    });
-
-    return result;
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      logger.error("Failed to process attributes", error, { props });
-    } else {
-      logger.error(
-        "Unknown error processing attributes",
-        new Error(String(error)),
-        { props },
-      );
-    }
-    throw error;
-  }
-}
-
-/**
- * Converts camelCase to kebab-case
- * marginBottom -> margin-bottom
- */
-function toKebabCase(str: string): string {
-  return str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
-}
-
-/**
  * Convert attributes to string for HTML
  */
-export function renderAttributes(attrs: TemplateAttributes = {}): string {
+export function renderAttributes(attrs: Record<string, unknown> = {}): string {
   logger.debug("Rendering attributes", {
     count: Object.keys(attrs).length,
   });
@@ -141,4 +79,12 @@ export function renderAttributes(attrs: TemplateAttributes = {}): string {
     }
     throw error;
   }
+}
+
+/**
+ * Converts camelCase to kebab-case
+ * marginBottom -> margin-bottom
+ */
+function toKebabCase(str: string): string {
+  return str.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
 }
