@@ -1,11 +1,8 @@
 import { createLogger } from "@reface/core";
 import { type TemplateComponent, TemplateText } from "@reface/html";
 import type { ElementChildType } from "@reface/html";
-import {
-  ISLAND_API_PREFIX,
-  ISLAND_HTML_ATTRIBUTE,
-  TemplateIsland,
-} from "./TemplateIsland.ts";
+import { TemplateIsland } from "./TemplateIsland.ts";
+import { ISLAND_API_PREFIX, ISLAND_HTML_ATTRIBUTE } from "./constants.ts";
 import { hx, type HxBuilder, type HxTrigger } from "@reface/htmx";
 
 const logger = createLogger("Island");

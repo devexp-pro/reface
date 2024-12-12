@@ -2,36 +2,11 @@ import { type Context, Hono } from "hono";
 import type { Layout } from "../layouts/mod.ts";
 import type { Template } from "@reface/html";
 import type { PagePropsType } from "./types.ts";
-import { RenderContextManager } from "../html/context.ts";
 import { createLogger } from "@reface/core";
-import { ISLAND_API_PREFIX } from "@reface/island";
+import { createIslandHandler } from "@reface/island";
+import { render } from "@reface/html";
 
 const logger = createLogger("Reface");
-
-function render(template: Template) {
-  const context = RenderContextManager.createContext();
-  if (typeof template === "string") {
-    return {
-      html: template,
-      islands: new Map(),
-      styles: "",
-    };
-  }
-
-  try {
-    const html = template.toHtml(context);
-    const styles = Array.from(context.styles).join("\n");
-    const islands = context.islands;
-
-    return {
-      html,
-      islands,
-      styles,
-    };
-  } finally {
-    RenderContextManager.reset();
-  }
-}
 
 export class Reface {
   private layout: Layout;
@@ -51,7 +26,7 @@ export class Reface {
         headers: c.req.header(),
       });
 
-      const { html, styles, islands } = render(template);
+      const { html, styles, islands } = render(template, true);
 
       for (const [islandName, generator] of islands.entries()) {
         this.islands.set(islandName, generator);
@@ -74,32 +49,7 @@ export class Reface {
     }
 
     // Добавляем обработчик для островов
-    router.get(`${ISLAND_API_PREFIX}/:name`, async (c) => {
-      const name = c.req.param("name");
-      if (!name) {
-        return c.text("Island name is required", 400);
-      }
-
-      // Проверяем регистрацию острова
-      if (!this.islands.has(name)) {
-        logger.warn(`Island "${name}" not found`);
-        return c.text(`Island "${name}" not found`, 404);
-      }
-
-      // Получаем и вызываем генератор острова
-      const generator = this.islands.get(name);
-      if (!generator) {
-        logger.error(`Generator for island "${name}" not found`);
-        return c.text(`Island "${name}" generator not found`, 500);
-      }
-
-      console.log(c);
-      const result = await generator(c);
-
-      return c.html(render(result).html, {
-        status: 200,
-      });
-    });
+    router.route("/", createIslandHandler(this.islands));
 
     return router;
   }

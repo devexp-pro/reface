@@ -2,11 +2,9 @@ import { createLogger } from "@reface/core";
 import { TemplateComponent } from "@reface/html";
 import type { ElementChildType } from "@reface/html";
 import type { IRenderContext } from "@reface/html";
+import { ISLAND_HTML_ATTRIBUTE } from "./constants.ts";
 
 const logger = createLogger("HTML:Island");
-
-export const ISLAND_API_PREFIX = "/reface-island";
-export const ISLAND_HTML_ATTRIBUTE = "data-island";
 
 export class TemplateIsland extends TemplateComponent {
   constructor(
