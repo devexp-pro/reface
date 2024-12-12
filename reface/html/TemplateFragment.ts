@@ -83,9 +83,9 @@ export class TemplateFragment implements ITemplate {
         return `${childIndent}${child}`;
       })
       .filter(Boolean)
-      .join("\n");
+      .join("");
 
-    return `<>\n${children}\n${indent}</> // [TemplateFragment]`;
+    return `<>${children}${indent}</> // [TemplateFragment]`;
   }
 
   [Symbol.for("nodejs.util.inspect.custom")]() {

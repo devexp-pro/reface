@@ -22,7 +22,7 @@ export class TemplateHtml implements ITemplate {
 
     const result = this.children
       .map((child) => this.renderNode(child, context))
-      .join("\n");
+      .join("");
 
     context.depth--;
     return result;
@@ -31,7 +31,7 @@ export class TemplateHtml implements ITemplate {
   private renderNode(node: unknown, context: RenderContext): string {
     // Если массив, рекурсивно обрабатываем каждый элемент
     if (Array.isArray(node)) {
-      return node.map((item) => this.renderNode(item, context)).join("\n");
+      return node.map((item) => this.renderNode(item, context)).join("");
     }
 
     // Если HTML элемент
@@ -43,7 +43,7 @@ export class TemplateHtml implements ITemplate {
         const { tag, props, children } = node;
         const attrs = props ? renderAttributes(props) : "";
         const content = this.renderNode(children, context);
-        return `<${tag}${attrs}>\n${content}\n</${tag}>`;
+        return `<${tag}${attrs}>${content}</${tag}>`;
       }
 
       // Если текстовый узел

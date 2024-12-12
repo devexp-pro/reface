@@ -1,9 +1,8 @@
 import { createElement } from "@reface/jsx";
 import { island } from "../island.ts";
-import { assertEquals } from "@std/assert";
 import { render } from "@reface/html";
 import { styled } from "@reface/styled";
-import { ISLAND_API_PREFIX } from "../TemplateIsland.ts";
+import { ISLAND_API_PREFIX } from "../constants.ts";
 import { compareHTML } from "@reface/test-utils";
 
 Deno.test("Island JSX rendering", () => {
@@ -12,7 +11,7 @@ Deno.test("Island JSX rendering", () => {
   // Простой рендер
   compareHTML(
     render(<TestIsland />),
-    `<div data-island="test-island" hx-get="${ISLAND_API_PREFIX}/test-island"></div>`
+    `<div data-island="test-island"></div>`
   );
 
   // С children
@@ -22,62 +21,48 @@ Deno.test("Island JSX rendering", () => {
         <span>Loading...</span>
       </TestIsland>
     ),
-    `<div data-island="test-island" hx-get="${ISLAND_API_PREFIX}/test-island">
+    `<div data-island="test-island">
       <span>Loading...</span>
     </div>`
   );
 });
 
-Deno.test("Island trigger formatting", () => {
+Deno.test("Island with HxBuilder", () => {
   const TestIsland = island(async () => "test", "test-island");
 
-  // Строка
-  assertEquals(
-    TestIsland.trigger("click"),
-    { "hx-trigger": "click" }
-  );
-
-  // Массив
-  assertEquals(
-    TestIsland.trigger(["load", "click"]),
-    { "hx-trigger": "load, click" }
-  );
-
-  // Объект с настройками
-  assertEquals(
-    TestIsland.trigger({
-      event: "keyup",
-      changed: true,
-      delay: "1s"
-    }),
-    { "hx-trigger": "keyup changed delay:1s" }
-  );
-});
-
-Deno.test("Island combined usage", () => {
-  const TestIsland = island(async () => "test", "test-island");
-
-  // JSX с триггером
+  // Базовый триггер
   compareHTML(
     render(
-      <div {...TestIsland.trigger("click")}>
-        <TestIsland />
+      <div {...TestIsland.trigger("submit").swap("afterbegin")}>
+        <span>Content</span>
       </div>
     ),
-    `<div hx-trigger="click">
-      <div data-island="test-island" hx-get="${ISLAND_API_PREFIX}/test-island"></div>
+    `<div hx-trigger="submit" 
+         hx-swap="afterbegin" 
+         hx-get="${ISLAND_API_PREFIX}/test-island" 
+         hx-target='[data-island="test-island"]'>
+      <span>Content</span>
     </div>`
   );
 
-  // Template literal с триггером
+  // Сложный триггер
   compareHTML(
     render(
-      <div {...TestIsland.trigger({ every: 5 })}>
-        {TestIsland()`Loading...`}
+      <div {...TestIsland.trigger({ 
+        event: "keyup",
+        delay: 500,
+        throttle: 1000,
+        queue: "last",
+        once: true
+      }).swap("beforeend")}>
+        <span>Content</span>
       </div>
     ),
-    `<div hx-trigger="every 5s">
-      <div data-island="test-island" hx-get="${ISLAND_API_PREFIX}/test-island">Loading...</div>
+    `<div hx-trigger="keyup[delay:500ms throttle:1000ms queue:last once]" 
+         hx-swap="beforeend"
+         hx-get="${ISLAND_API_PREFIX}/test-island"
+         hx-target='[data-island="test-island"]'>
+      <span>Content</span>
     </div>`
   );
 });
@@ -85,20 +70,19 @@ Deno.test("Island combined usage", () => {
 Deno.test("Island attributes handling", () => {
   const TestIsland = island(async () => "test", "test-island");
 
-  // HTMX атрибуты
+  // HTMX атрибуты через spread
   compareHTML(
     render(
       <TestIsland 
-        hx-include="#count" 
-        hx-target="#result"
+        {...TestIsland.trigger("submit").target("#result").swap("afterbegin")}
       >
         <span>Content</span>
       </TestIsland>
     ),
     `<div data-island="test-island" 
-         hx-get="${ISLAND_API_PREFIX}/test-island" 
-         hx-include="#count" 
-         hx-target="#result">
+         hx-trigger="submit"
+         hx-target="#result"
+         hx-swap="afterbegin">
       <span>Content</span>
     </div>`
   );
@@ -111,7 +95,6 @@ Deno.test("Island attributes handling", () => {
       </TestIsland>
     ),
     `<div data-island="test-island" 
-         hx-get="${ISLAND_API_PREFIX}/test-island" 
          class="custom-class">
       <span>Content</span>
     </div>`
@@ -123,16 +106,16 @@ Deno.test("Island attributes handling", () => {
       <TestIsland 
         data-custom="value"
         class="test-class"
-        hx-include="#count"
+        {...TestIsland.trigger("submit").target("#result")}
       >
         <span>Content</span>
       </TestIsland>
     ),
     `<div data-island="test-island" 
-         hx-get="${ISLAND_API_PREFIX}/test-island" 
          data-custom="value" 
          class="test-class" 
-         hx-include="#count">
+         hx-trigger="submit"
+         hx-target="#result">
       <span>Content</span>
     </div>`
   );
@@ -146,13 +129,17 @@ Deno.test("Island with styled components", () => {
 
   compareHTML(
     render(
-      <StyledTestIsland class="custom-class">
+      <StyledTestIsland 
+        class="custom-class"
+        {...TestIsland.trigger("submit").swap("afterbegin")}
+      >
         <span>Content</span>
       </StyledTestIsland>
     ),
     `<div data-island="test-island" 
-         hx-get="${ISLAND_API_PREFIX}/test-island" 
-         class="${StyledTestIsland.rootClass} custom-class">
+         class="${StyledTestIsland.rootClass} custom-class"
+         hx-trigger="submit"
+         hx-swap="afterbegin">
       <span>Content</span>
     </div>`
   );

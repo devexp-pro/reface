@@ -54,7 +54,7 @@ function formatChildren(children: unknown[], indent = ""): string {
       return `${childIndent}${String(child)}`;
     })
     .filter(Boolean)
-    .join("\n");
+    .join("");
 
-  return formattedChildren ? `\n${formattedChildren}\n${indent}` : "";
+  return formattedChildren ? `${formattedChildren}${indent}` : "";
 }

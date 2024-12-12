@@ -62,7 +62,7 @@ export class TemplateComponent implements ITemplate {
     // Для void элементов не рендерим содержимое и используем самозакрывающийся тег
     if (isVoidElement) {
       context.depth--;
-      return `<${this.tag}${attrs}/>\n`;
+      return `<${this.tag}${attrs}/>`;
     }
 
     const result = new TemplateHtml([{
