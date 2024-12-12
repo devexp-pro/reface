@@ -93,8 +93,8 @@ export class Reface {
         return c.text(`Island "${name}" generator not found`, 500);
       }
 
-      console.log(c.req.query());
-      const result = await generator();
+      console.log(c);
+      const result = await generator(c);
 
       return c.html(render(result).html, {
         status: 200,
