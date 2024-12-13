@@ -1,9 +1,9 @@
-import { createElement } from "../jsx/createElement.ts";
-import { html } from "../html.ts";
-import { component } from "../component.ts";
-import { createElement as ce } from "../createElement.ts";
+import { createElement } from "../core/jsx/createElement.ts";
+import { html } from "../core/html.ts";
+import { component } from "../core/component.ts";
+import { createElement as ce } from "../core/createElement.ts";
 import { assertRender } from "./testUtils.ts";
-import { ElementChildType } from "../types.ts";
+import { ElementChildType } from "../core/types.ts";
 
 Deno.test("mixed usage - components with html and createElement", () => {
   const div = ce("div");

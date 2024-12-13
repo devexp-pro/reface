@@ -1,4 +1,4 @@
-import { html } from "../html.ts";
+import { html } from "../core/html.ts";
 import { assertRender } from "./testUtils.ts";
 
 Deno.test("html template literal - basic rendering", () => {

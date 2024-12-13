@@ -1,4 +1,4 @@
-import { createElement } from "../createElement.ts";
+import { createElement } from "../core/createElement.ts";
 import { assertRender } from "./testUtils.ts";
 
 Deno.test("createElement - basic usage", () => {

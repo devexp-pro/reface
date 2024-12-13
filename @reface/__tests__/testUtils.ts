@@ -1,10 +1,7 @@
 import { assertEquals } from "@std/assert";
-import type { ITemplate } from "../types.ts";
-import { Reface } from "../../Reface.ts";
-import {
-  LoggerPlugin,
-  type RenderLogEntry,
-} from "../../plugins/LoggerPlugin.ts";
+import type { ITemplate } from "../core/types.ts";
+import { Reface } from "../Reface.ts";
+import { LoggerPlugin, type RenderLogEntry } from "../plugins/LoggerPlugin.ts";
 
 export class TestUtils {
   private reface: Reface;

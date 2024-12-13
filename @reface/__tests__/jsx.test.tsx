@@ -1,4 +1,4 @@
-import { createElement, Fragment } from "../jsx/mod.ts";
+import { createElement, Fragment } from "../core/jsx/mod.ts";
 import { assertRender } from "./testUtils.ts";
 
 Deno.test("JSX - basic element rendering", () => {

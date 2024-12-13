@@ -1,6 +1,6 @@
-import { component } from "../component.ts";
+import { component } from "../core/component.ts";
 import { assertRender } from "./testUtils.ts";
-import { html } from "../html.ts";
+import { html } from "../core/html.ts";
 
 Deno.test("component - template literal usage", () => {
   const Button = component<{
