@@ -1,6 +1,6 @@
 import type { TemplateFn } from "./types.ts";
 import { TemplateElement } from "./templates/mod.ts";
-import { TemplateFn as TemplateFnClass } from "./templates/TemplateFn.ts";
+import { TemplateFn } from "./templates/TemplateFn.ts";
 
 /**
  * Creates a template function for HTML elements with template literal support.
@@ -25,7 +25,7 @@ export function createElement(tag: string) {
   return function (
     attributes: Record<string, unknown> = {},
   ): TemplateFn {
-    return new TemplateFnClass((children) =>
+    return new TemplateFn((children) =>
       new TemplateElement({
         tag,
         attributes,

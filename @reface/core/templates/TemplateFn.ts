@@ -26,42 +26,43 @@ import { TemplateText } from "./mod.ts";
  * div()`${fn.fn`nested`}`;
  */
 export class TemplateFn implements ITemplate {
-  private templateFn: ITemplateFn;
   private result: ITemplate | null = null;
+  private props: Record<string, unknown> | null = null;
+  public payload: Record<string, any> = {};
 
-  constructor(render: (children: ElementChildType[]) => ITemplate) {
-    // @ts-ignore TODO: fix this
-    this.templateFn = (
-      strings: TemplateStringsArray,
-      ...values: ElementChildType[]
-    ) => {
-      // Собираем массив детей из статического текста и значений
-      const children: ElementChildType[] = [];
-
-      for (let i = 0; i < strings.length; i++) {
-        if (strings[i].trim()) {
-          children.push(new TemplateText(strings[i]));
-        }
-
-        if (i < values.length) {
-          const value = values[i];
-          if (value != null) {
-            if (Array.isArray(value)) {
-              children.push(...value);
-            } else {
-              children.push(value);
-            }
-          }
-        }
+  constructor(
+    private render: (
+      props: Record<string, unknown>,
+      children: ElementChildType[],
+    ) => ITemplate,
+    public payload: Record<string, any> = {},
+  ) {
+    // Создаем функцию, которая будет нашим прокси
+    this.fn = function (this: TemplateFn, ...args: unknown[]) {
+      const [props, children] = args as [
+        Record<string, unknown>,
+        ElementChildType[]?,
+      ];
+      if (children) {
+        this.result = this.render(props, children);
+        return this.result;
       }
+      this.props = props;
+      return this;
+    }.bind(this);
 
-      this.result = render(children);
-      return this.result;
-    };
-  }
-
-  get fn(): ITemplateFn {
-    return this.templateFn;
+    // Добавляем поддержку template literals
+    return new Proxy(this, {
+      apply: (target, thisArg, args) => {
+        return this.fn.apply(thisArg, args);
+      },
+      get: (target, prop) => {
+        if (prop === Symbol.toPrimitive || prop === "toString") {
+          return () => "";
+        }
+        return (target as any)[prop];
+      },
+    }) as unknown as ITemplateFn & TemplateFn;
   }
 
   toHtml(manager: IRenderManager): string {

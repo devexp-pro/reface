@@ -4,65 +4,43 @@ import type {
   HTMLAttributes,
   IRenderManager,
   ITemplate,
-  RenderPhase,
-  RenderPhaseBase,
+  RefaceEvent,
+  RenderHandler,
   StyleValue,
 } from "../types.ts";
 import { isEmptyValue, isTemplate } from "./renderUtils.ts";
-import {
-  formatAttributes,
-  formatClassName,
-  formatStyle,
-} from "../utils/attributes.ts";
+import { REFACE_EVENT } from "../constants.ts";
 
 export class RenderManager implements IRenderManager {
-  private handlers = new Map<RenderPhase, Set<Function>>();
+  private handlers = new Map<RefaceEvent, Set<Function>>();
   private storage = new Map<string, unknown>();
 
   private withPhase<T extends unknown[], R>(
-    phase: RenderPhaseBase,
+    phase: typeof REFACE_EVENT.RENDER[keyof typeof REFACE_EVENT.RENDER],
     method: (...args: T) => R,
     ...args: T
   ): R {
-    const startPhase = `${phase}:start` as RenderPhase;
-    const endPhase = `${phase}:end` as RenderPhase;
-
-    const params = this.getPhaseParams(phase, args[0]);
-    const startResult = this.runHandlers(startPhase, params);
+    const startResult = this.runHandlers(phase.START, {
+      manager: this,
+      template: args[0],
+    });
     if (startResult) return startResult as R;
 
     const result = method.apply(this, args);
 
-    return (this.runHandlers(endPhase, { ...params, html: result }) ||
-      result) as R;
-  }
-
-  private getPhaseParams(
-    phase: string,
-    value: unknown,
-  ): Record<string, unknown> {
-    switch (phase) {
-      case "render":
-        return { template: value, manager: this };
-      case "renderTemplate":
-        return { template: value, manager: this };
-      case "renderChild":
-        return { child: value, manager: this };
-      case "renderChildren":
-        return { children: value, manager: this };
-      case "renderAttributes":
-        return { attributes: value, manager: this };
-      case "renderClassAttribute":
-        return { class: value, manager: this };
-      case "renderStyleAttribute":
-        return { style: value, manager: this };
-      default:
-        return { manager: this };
-    }
+    return (this.runHandlers(phase.END, {
+      manager: this,
+      template: args[0],
+      html: result,
+    }) || result) as R;
   }
 
   render(template: ITemplate): string {
-    return this.withPhase("render", this.renderImpl, template);
+    return this.withPhase(
+      REFACE_EVENT.RENDER.RENDER,
+      this.renderImpl,
+      template,
+    );
   }
 
   private renderImpl(template: ITemplate): string {
@@ -70,7 +48,11 @@ export class RenderManager implements IRenderManager {
   }
 
   renderTemplate(template: ITemplate): string {
-    return this.withPhase("renderTemplate", this.renderTemplateImpl, template);
+    return this.withPhase(
+      REFACE_EVENT.RENDER.TEMPLATE,
+      this.renderTemplateImpl,
+      template,
+    );
   }
 
   private renderTemplateImpl(template: ITemplate): string {
@@ -78,7 +60,11 @@ export class RenderManager implements IRenderManager {
   }
 
   renderChild(child: ElementChildType): string {
-    return this.withPhase("renderChild", this.renderChildImpl, child);
+    return this.withPhase(
+      REFACE_EVENT.RENDER.CHILD,
+      this.renderChildImpl,
+      child,
+    );
   }
 
   private renderChildImpl(child: ElementChildType): string {
@@ -95,54 +81,86 @@ export class RenderManager implements IRenderManager {
   }
 
   renderChildren(children: ElementChildType[]): string {
-    return this.withPhase("renderChildren", this.renderChildrenImpl, children);
+    return this.withPhase(
+      REFACE_EVENT.RENDER.CHILDREN,
+      this.renderChildrenImpl,
+      children,
+    );
   }
 
   private renderChildrenImpl(children: ElementChildType[]): string {
-    return children
-      .map((child) => this.renderChild(child))
-      .join("");
+    return children.map((child) => this.renderChild(child)).join("");
   }
 
   renderAttributes(attrs: HTMLAttributes): string {
-    return this.withPhase("renderAttributes", () => formatAttributes(attrs));
+    return this.withPhase(REFACE_EVENT.RENDER.ATTRIBUTES, () => {
+      const parts: string[] = [];
+      for (const [key, value] of Object.entries(attrs)) {
+        if (value == null) continue;
+        if (key === "class") {
+          const className = this.renderClassAttribute(value as ClassValue);
+          if (className) parts.push(`class="${className}"`);
+        } else if (key === "style") {
+          const style = this.renderStyleAttribute(value as StyleValue);
+          if (style) parts.push(`style="${style}"`);
+        } else {
+          parts.push(`${key}="${value}"`);
+        }
+      }
+      return parts.join(" ");
+    });
   }
 
   renderClassAttribute(value: ClassValue): string {
-    return this.withPhase("renderClassAttribute", () => formatClassName(value));
+    return this.withPhase(REFACE_EVENT.RENDER.CLASS, () => {
+      if (!value) return "";
+      if (Array.isArray(value)) {
+        return value.map((v) => this.renderClassAttribute(v)).filter(Boolean)
+          .join(" ");
+      }
+      if (typeof value === "object") {
+        return Object.entries(value)
+          .filter(([, enabled]) => enabled)
+          .map(([className]) => className)
+          .join(" ");
+      }
+      return String(value);
+    });
   }
 
   renderStyleAttribute(value: StyleValue): string {
-    return this.withPhase("renderStyleAttribute", () => formatStyle(value));
+    return this.withPhase(REFACE_EVENT.RENDER.STYLE, () => {
+      if (!value) return "";
+      if (Array.isArray(value)) {
+        return value.map((v) => this.renderStyleAttribute(v)).filter(Boolean)
+          .join(";");
+      }
+      if (typeof value === "object") {
+        return Object.entries(value)
+          .map(([prop, val]) => `${prop}:${val}`)
+          .join(";");
+      }
+      return String(value);
+    });
   }
 
-  isEmptyValue = isEmptyValue;
-  isTemplate = isTemplate;
-
-  store = {
-    get: <T>(pluginName: string) =>
-      this.storage.get(pluginName) as T | undefined,
-    set: <T>(pluginName: string, value: T) =>
-      this.storage.set(pluginName, value),
-  };
-
-  on(phase: RenderPhase, handler: Function): void {
-    if (!this.handlers.has(phase)) {
-      this.handlers.set(phase, new Set());
+  on(event: RefaceEvent, handler: RenderHandler): void {
+    if (!this.handlers.has(event)) {
+      this.handlers.set(event, new Set());
     }
-    this.handlers.get(phase)!.add(handler);
+    this.handlers.get(event)!.add(handler);
   }
 
-  off(phase: RenderPhase, handler: Function): void {
-    this.handlers.get(phase)?.delete(handler);
+  off(event: RefaceEvent, handler: Function): void {
+    this.handlers.get(event)?.delete(handler);
   }
 
   private runHandlers(
-    phase: RenderPhase,
+    event: RefaceEvent,
     params: Record<string, unknown>,
   ): unknown {
     let result;
-    const handlers = this.handlers.get(phase) || new Set();
+    const handlers = this.handlers.get(event) || new Set();
 
     for (const handler of handlers) {
       const handlerResult = handler(params);
@@ -153,4 +171,11 @@ export class RenderManager implements IRenderManager {
 
     return result;
   }
+
+  store = {
+    get: <T>(pluginName: string) =>
+      this.storage.get(pluginName) as T | undefined,
+    set: <T>(pluginName: string, value: T) =>
+      this.storage.set(pluginName, value),
+  };
 }

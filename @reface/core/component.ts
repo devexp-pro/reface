@@ -43,19 +43,5 @@ import { TemplateFn } from "./templates/TemplateFn.ts";
 export function component<P extends ComponentProps>(
   render: (props: P, children: ElementChildType[]) => ITemplate,
 ): Component<P> {
-  const componentFunction = ((props: P, children?: ElementChildType[]) => {
-    if (children) {
-      return render(props, children);
-    }
-
-    // Создаем функцию для template literal вызова
-    const templateFn = new TemplateFn((templateChildren) =>
-      render(props, templateChildren)
-    );
-
-    // Возвращаем fn свойство для template literal вызова
-    return templateFn.fn;
-  }) as Component<P>;
-
-  return componentFunction;
+  return new TemplateFn(render);
 }

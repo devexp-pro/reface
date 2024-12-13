@@ -92,3 +92,43 @@ export const HTML_ENTITIES: Record<string, string> = {
 };
 
 export const EMPTY_VALUES: any[] = [null, undefined, false, true, ""];
+
+export const REFACE_EVENT = {
+  RENDER: {
+    RENDER: {
+      ALL: "render.render",
+      START: "render.render.start",
+      END: "render.render.end",
+    },
+    TEMPLATE: {
+      ALL: "render.template",
+      START: "render.template.start",
+      END: "render.template.end",
+    },
+    CHILD: {
+      ALL: "render.child",
+      START: "render.child.start",
+      END: "render.child.end",
+    },
+    CHILDREN: {
+      ALL: "render.children",
+      START: "render.children.start",
+      END: "render.children.end",
+    },
+    ATTRIBUTES: {
+      ALL: "render.attributes",
+      START: "render.attributes.start",
+      END: "render.attributes.end",
+    },
+    CLASS: {
+      ALL: "render.class",
+      START: "render.class.start",
+      END: "render.class.end",
+    },
+    STYLE: {
+      ALL: "render.style",
+      START: "render.style.start",
+      END: "render.style.end",
+    },
+  },
+} as const;

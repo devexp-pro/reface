@@ -1,6 +1,7 @@
 import type { IRenderManager, ITemplate } from "./core/types.ts";
 import { RenderManager } from "./core/render/RenderManager.ts";
 import { LoggerPlugin } from "./plugins/LoggerPlugin.ts";
+import { StyledPlugin } from "./plugins/styled/StyledPlugin.ts";
 
 export interface IPlugin {
   name: string;
@@ -14,7 +15,7 @@ export class Reface {
   constructor() {
     this.renderManager = new RenderManager();
     // Включаем логгер по умолчанию
-    this.use(new LoggerPlugin());
+    this.use(new StyledPlugin());
   }
 
   // Регистрация плагина

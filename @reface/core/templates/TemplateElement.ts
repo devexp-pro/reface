@@ -10,6 +10,7 @@ export interface ITemplateElementOptions {
   tag?: string;
   attributes?: HTMLAttributes;
   children?: ElementChildType[];
+  payload?: Record<string, unknown>;
 }
 
 /**
@@ -44,11 +45,13 @@ export class TemplateElement implements ITemplateElement {
   public tag: string;
   public attributes: HTMLAttributes;
   public children: ElementChildType[];
+  public payload: Record<string, unknown>;
 
   constructor(options: ITemplateElementOptions) {
     this.tag = options.tag || "div";
     this.attributes = options.attributes || {};
     this.children = options.children || [];
+    this.payload = options.payload || {};
   }
 
   toHtml(manager: IRenderManager): string {

@@ -1,7 +1,15 @@
+import { REFACE_EVENT } from "./constants.ts";
+
+type ExtractValues<T> = T extends object
+  ? { [K in keyof T]: ExtractValues<T[K]> }[keyof T]
+  : T;
+
+export type RefaceEventType = ExtractValues<typeof REFACE_EVENT>;
+
 // Базовые типы для рендеринга
 export interface IRenderManager {
-  on(phase: RenderPhase, handler: RenderHandler): void;
-  off(phase: RenderPhase, handler: Function): void;
+  on(event: RefaceEventType, handler: RenderHandler): void;
+  off(event: RefaceEventType, handler: RenderHandler): void;
 
   render(template: ITemplate): string;
   renderTemplate(template: ITemplate): string;
@@ -43,6 +51,7 @@ export type RenderHandler = (params: {
 // Базовые типы для шаблонов
 export interface ITemplate {
   toHtml(manager: IRenderManager): string;
+  payload?: Record<string, unknown>;
 }
 
 export interface ITemplateElement extends ITemplate {

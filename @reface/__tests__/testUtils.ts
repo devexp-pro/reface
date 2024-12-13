@@ -9,7 +9,8 @@ export class TestUtils {
 
   constructor() {
     this.reface = new Reface();
-    this.logger = this.reface.getPlugin<LoggerPlugin>("logger");
+    this.logger = new LoggerPlugin();
+    this.reface.use(this.logger);
   }
 
   private formatRenderLog(logs: RenderLogEntry[]): string {
@@ -52,6 +53,7 @@ ${log.output ? `Output: ${log.output}` : ""}
     try {
       this.assertHtml(actual, expected);
     } catch (error) {
+      console.log("1111");
       if (this.logger) {
         const logs = this.logger.getLogs();
         const messages = [
