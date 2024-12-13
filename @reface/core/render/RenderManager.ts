@@ -32,64 +32,56 @@ export class RenderManager implements IRenderManager {
   private handlers = new Map<RenderPhase, Set<Function>>();
   private storage = new Map<string, unknown>();
 
-  constructor() {
-    // Initialize handlers for all phases
-    ["start", "beforeRender", "afterRender", "end"].forEach((phase) => {
-      this.handlers.set(phase as RenderPhase, new Set());
-    });
-  }
+  private withPhase<T extends unknown[], R>(
+    phase: "render" | "renderTemplate" | "renderChild" | "renderChildren",
+    method: (...args: T) => R,
+    ...args: T
+  ): R {
+    const startPhase = `${phase}:start` as RenderPhase;
+    const endPhase = `${phase}:end` as RenderPhase;
 
-  /**
-   * Renders a template to HTML string.
-   * Executes the full rendering pipeline with all lifecycle hooks.
-   *
-   * @param template - Template to render
-   * @returns Rendered HTML string
-   */
-  render(template: ITemplate): string {
-    this.runHandlers("start", { manager: this });
-    const result = this.renderTemplate(template);
-    const finalHtml = this.runHandlers("end", {
+    const startResult = this.runHandlers(startPhase, {
+      [
+        phase === "render"
+          ? "template"
+          : phase.replace("render", "").toLowerCase()
+      ]: args[0],
+    });
+    if (startResult) return startResult as R;
+
+    const result = method.apply(this, args);
+
+    return (this.runHandlers(endPhase, {
+      [
+        phase === "render"
+          ? "template"
+          : phase.replace("render", "").toLowerCase()
+      ]: args[0],
       html: result,
-      manager: this,
-    }) || result;
-    return finalHtml as string;
+    }) || result) as R;
   }
 
-  /**
-   * Renders a single template with beforeRender and afterRender hooks.
-   *
-   * @param template - Template to render
-   * @returns Rendered HTML string
-   */
+  render(template: ITemplate): string {
+    return this.withPhase("render", this.renderImpl, template);
+  }
+
+  private renderImpl(template: ITemplate): string {
+    return this.renderTemplate(template);
+  }
+
   renderTemplate(template: ITemplate): string {
-    const transformedTemplate = this.runHandlers("beforeRender", {
-      template,
-      manager: this,
-    }) || template;
-
-    const html = transformedTemplate.toHtml(this);
-
-    const transformedHtml = this.runHandlers("afterRender", {
-      template: transformedTemplate,
-      html,
-      manager: this,
-    });
-    console.log({
-      transformedHtml,
-      html,
-    });
-    return transformedHtml as string || html;
+    return this.withPhase("renderTemplate", this.renderTemplateImpl, template);
   }
 
-  /**
-   * Renders a single child element (template or primitive value).
-   *
-   * @param child - Child element to render
-   * @returns Rendered HTML string
-   */
+  private renderTemplateImpl(template: ITemplate): string {
+    return template.toHtml(this);
+  }
+
   renderChild(child: ElementChildType): string {
-    console.log("renderChild:", child);
+    return this.withPhase("renderChild", this.renderChildImpl, child);
+  }
+
+  private renderChildImpl(child: ElementChildType): string {
     if (this.isEmptyValue(child)) {
       return "";
     }
@@ -102,50 +94,36 @@ export class RenderManager implements IRenderManager {
     return String(child);
   }
 
-  /**
-   * Renders an array of child elements.
-   *
-   * @param children - Array of child elements
-   * @returns Concatenated HTML string
-   */
   renderChildren(children: ElementChildType[]): string {
-    console.log("renderChildren:", children);
+    return this.withPhase("renderChildren", this.renderChildrenImpl, children);
+  }
+
+  private renderChildrenImpl(children: ElementChildType[]): string {
     return children
       .map((child) => this.renderChild(child))
       .join("");
   }
 
-  /**
-   * Registers a handler for a specific render phase.
-   *
-   * @param phase - Render phase to hook into
-   * @param handler - Handler function
-   */
-  on(phase: RenderPhase, handler: Function): void {
-    const handlers = this.handlers.get(phase);
-    handlers?.add(handler);
-  }
+  isEmptyValue = isEmptyValue;
+  isTemplate = isTemplate;
 
-  /**
-   * Removes a handler from a specific render phase.
-   *
-   * @param phase - Render phase to remove handler from
-   * @param handler - Handler function to remove
-   */
-  off(phase: RenderPhase, handler: Function): void {
-    const handlers = this.handlers.get(phase);
-    handlers?.delete(handler);
-  }
-
-  /**
-   * Storage for plugins to share data during rendering.
-   */
   store = {
     get: <T>(pluginName: string) =>
       this.storage.get(pluginName) as T | undefined,
     set: <T>(pluginName: string, value: T) =>
       this.storage.set(pluginName, value),
   };
+
+  on(phase: RenderPhase, handler: Function): void {
+    if (!this.handlers.has(phase)) {
+      this.handlers.set(phase, new Set());
+    }
+    this.handlers.get(phase)!.add(handler);
+  }
+
+  off(phase: RenderPhase, handler: Function): void {
+    this.handlers.get(phase)?.delete(handler);
+  }
 
   private runHandlers(
     phase: RenderPhase,
@@ -163,7 +141,4 @@ export class RenderManager implements IRenderManager {
 
     return result;
   }
-
-  isEmptyValue = isEmptyValue;
-  isTemplate = isTemplate;
 }

@@ -1,10 +1,14 @@
 import type { ElementChildType, ITemplate } from "../templates/types.ts";
 
 export type RenderPhase =
-  | "start" // Начало всего рендеринга
-  | "beforeRender" // Перед рендерингом каждого шаблона
-  | "afterRender" // После рендеринга каждого шаблона
-  | "end"; // Конец всего рендеринга
+  | "render:start"
+  | "render:end"
+  | "renderTemplate:start"
+  | "renderTemplate:end"
+  | "renderChild:start"
+  | "renderChild:end"
+  | "renderChildren:start"
+  | "renderChildren:end";
 
 export interface IRenderManager {
   on(
