@@ -1,4 +1,4 @@
-import type { ITemplate } from "../templates/types.ts";
+import type { ITemplate } from "../types.ts";
 import { EMPTY_VALUES } from "../constants.ts";
 
 export function isEmptyValue(value: unknown): boolean {

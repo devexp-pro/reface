@@ -1,11 +1,13 @@
-import type { IRenderManager, RenderPhase } from "./types.ts";
 import type {
   ClassValue,
   ElementChildType,
   HTMLAttributes,
+  IRenderManager,
   ITemplate,
+  RenderPhase,
+  RenderPhaseBase,
   StyleValue,
-} from "../templates/types.ts";
+} from "../types.ts";
 import { isEmptyValue, isTemplate } from "./renderUtils.ts";
 import {
   formatAttributes,
@@ -18,7 +20,7 @@ export class RenderManager implements IRenderManager {
   private storage = new Map<string, unknown>();
 
   private withPhase<T extends unknown[], R>(
-    phase: Exclude<RenderPhase, `${string}:start` | `${string}:end`>,
+    phase: RenderPhaseBase,
     method: (...args: T) => R,
     ...args: T
   ): R {
@@ -103,26 +105,15 @@ export class RenderManager implements IRenderManager {
   }
 
   renderAttributes(attrs: HTMLAttributes): string {
-    return this.withPhase("renderAttributes", () => {
-      const formatted = formatAttributes(attrs);
-      return formatted.trimStart();
-    }, attrs);
+    return this.withPhase("renderAttributes", () => formatAttributes(attrs));
   }
 
   renderClassAttribute(value: ClassValue): string {
-    return this.withPhase(
-      "renderClassAttribute",
-      () => formatClassName(value),
-      value,
-    );
+    return this.withPhase("renderClassAttribute", () => formatClassName(value));
   }
 
   renderStyleAttribute(value: StyleValue): string {
-    return this.withPhase(
-      "renderStyleAttribute",
-      () => formatStyle(value),
-      value,
-    );
+    return this.withPhase("renderStyleAttribute", () => formatStyle(value));
   }
 
   isEmptyValue = isEmptyValue;

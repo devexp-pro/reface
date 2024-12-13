@@ -2,13 +2,11 @@ import { component } from "../component.ts";
 import { assertRender } from "./testUtils.ts";
 import { html } from "../html.ts";
 
-interface ButtonProps {
-  color?: string;
-  size?: string;
-}
-
 Deno.test("component - template literal usage", () => {
-  const Button = component<ButtonProps>((props, children) =>
+  const Button = component<{
+    color?: string;
+    size?: string;
+  }>((props, children) =>
     html`<button class="btn btn-${
       props.color || "default"
     }">${children}</button>`
@@ -21,7 +19,7 @@ Deno.test("component - template literal usage", () => {
 });
 
 Deno.test("component - without children", () => {
-  const Icon = component<{ name: string }, never>((props) =>
+  const Icon = component<{ name: string }>((props) =>
     html`<i class="icon-${props.name}"/>`
   );
 

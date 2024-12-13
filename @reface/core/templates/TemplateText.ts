@@ -1,5 +1,4 @@
-import type { ITemplate } from "./types.ts";
-import type { IRenderManager } from "../render/types.ts";
+import type { IRenderManager, ITemplate } from "../types.ts";
 import { escapeHTML } from "../utils/mod.ts";
 
 /**

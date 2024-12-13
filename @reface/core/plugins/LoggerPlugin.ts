@@ -1,4 +1,4 @@
-import type { IRenderManager, RenderPhase } from "../render/types.ts";
+import type { IRenderManager, RenderPhase } from "../types.ts";
 
 export interface RenderLogEntry {
   phase: RenderPhase;
@@ -31,7 +31,11 @@ export class LoggerPlugin {
         const input = params.template || params.child || params.children;
         const output = phase.endsWith(":end") ? params.html : undefined;
 
-        this.log({ phase, input, output });
+        this.log({
+          phase,
+          input,
+          output: output as string | undefined,
+        });
       };
 
     ["render", "renderTemplate", "renderChild", "renderChildren"].forEach(

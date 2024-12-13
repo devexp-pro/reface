@@ -1,4 +1,4 @@
-import type { ElementChildType, ITemplate } from "./templates/types.ts";
+import type { ElementChildType, ITemplate } from "./types.ts";
 import { TemplateHtml, TemplateText } from "./templates/mod.ts";
 import { isEmptyValue, isTemplate } from "./render/renderUtils.ts";
 

@@ -1,8 +1,9 @@
 import type {
   ElementChildType,
+  IRenderManager,
   ITemplate,
   TemplateFn as ITemplateFn,
-} from "./types.ts";
+} from "../types.ts";
 import { TemplateText } from "./mod.ts";
 
 /**
@@ -24,11 +25,12 @@ import { TemplateText } from "./mod.ts";
  * // Use in other templates
  * div()`${fn.fn`nested`}`;
  */
-export class TemplateFn {
+export class TemplateFn implements ITemplate {
   private templateFn: ITemplateFn;
   private result: ITemplate | null = null;
 
   constructor(render: (children: ElementChildType[]) => ITemplate) {
+    // @ts-ignore TODO: fix this
     this.templateFn = (
       strings: TemplateStringsArray,
       ...values: ElementChildType[]
@@ -60,5 +62,18 @@ export class TemplateFn {
 
   get fn(): ITemplateFn {
     return this.templateFn;
+  }
+
+  toHtml(manager: IRenderManager): string {
+    if (!this.result) {
+      throw new Error("Template function must be called before rendering");
+    }
+    return this.result.toHtml(manager);
+  }
+
+  [Symbol.iterator]() {
+    return {
+      next: () => ({ done: true, value: undefined as never }),
+    };
   }
 }

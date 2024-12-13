@@ -1,8 +1,4 @@
-import type {
-  ElementChildType,
-  ITemplate,
-  TemplateFn,
-} from "./templates/types.ts";
+import type { TemplateFn } from "./types.ts";
 import { TemplateElement } from "./templates/mod.ts";
 import { TemplateFn as TemplateFnClass } from "./templates/TemplateFn.ts";
 

@@ -3,11 +3,12 @@ import { html } from "../html.ts";
 import { component } from "../component.ts";
 import { createElement as ce } from "../createElement.ts";
 import { assertRender } from "./testUtils.ts";
+import { ElementChildType } from "../types.ts";
 
 Deno.test("mixed usage - components with html and createElement", () => {
   const div = ce("div");
   
-  const Layout = component<{ title: string }>((props, children) => (
+  const Layout = component<{ title: string, children: ElementChildType[] }>((props, children) => (
     <div class="layout">
       <header>{props.title}</header>
       <main>{children}</main>
@@ -36,7 +37,7 @@ Deno.test("mixed usage - components with html and createElement", () => {
 Deno.test("mixed usage - html with components and createElement", () => {
   const span = ce("span");
   
-  const Button = component<{ color: string }>((props, children) => (
+  const Button = component<{ color: string, children: ElementChildType[] | ElementChildType }>((props, children) => (
     <button class={`btn-${props.color}`}>{children}</button>
   ));
 

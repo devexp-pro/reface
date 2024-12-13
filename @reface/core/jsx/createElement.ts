@@ -1,6 +1,11 @@
-import type { ElementChildType, ITemplate } from "../templates/types.ts";
+import type {
+  Component,
+  ComponentProps,
+  ElementChildType,
+  ITemplate,
+  JSXComponent,
+} from "../types.ts";
 import { TemplateElement } from "../templates/mod.ts";
-import type { ComponentProps, JSXComponent } from "./types.ts";
 
 /**
  * Creates elements for JSX. Handles both HTML elements and components.
@@ -21,8 +26,8 @@ import type { ComponentProps, JSXComponent } from "./types.ts";
  * <div class="container">content</div>
  * <Button color="primary">Click me</Button>
  */
-export function createElement<P = ComponentProps>(
-  type: string | JSXComponent<P>,
+export function createElement<P extends ComponentProps = ComponentProps>(
+  type: string | Component<P>,
   props: P | null,
   ...children: ElementChildType[]
 ): ITemplate {

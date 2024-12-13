@@ -1,4 +1,4 @@
-import type { ElementChildType, ITemplate } from "../templates/types.ts";
+import type { ElementChildType, ITemplate } from "../types.ts";
 import { TemplateFragment } from "../templates/mod.ts";
 
 /**

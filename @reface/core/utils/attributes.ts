@@ -1,8 +1,4 @@
-import type {
-  ClassValue,
-  HTMLAttributes,
-  StyleValue,
-} from "../templates/types.ts";
+import type { ClassValue, HTMLAttributes, StyleValue } from "../types.ts";
 import { escapeHTML } from "./escape.ts";
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -68,14 +64,14 @@ export function formatStyle(value: StyleValue): string {
       val.split(";").forEach((style) => {
         const [prop, value] = style.split(":").map((s) => s.trim());
         if (prop && value) {
-          addStyle(prop, value);
+          addStyle(prop, value as string);
         }
       });
     } else if (Array.isArray(val)) {
       val.forEach(processStyleValue);
     } else if (isObject(val)) {
       for (const [prop, value] of Object.entries(val)) {
-        addStyle(prop, value);
+        addStyle(prop, value as string);
       }
     }
   }
@@ -97,9 +93,9 @@ export function formatAttributes(attrs: HTMLAttributes): string {
 
       let formatted: unknown;
       if (key === "class") {
-        formatted = formatClassName(value);
+        formatted = formatClassName(value as ClassValue);
       } else if (key === "style") {
-        formatted = formatStyle(value);
+        formatted = formatStyle(value as StyleValue);
       } else {
         formatted = Array.isArray(value) ? value[0] : value;
       }

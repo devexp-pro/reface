@@ -1,23 +1,10 @@
-import type { ElementChildType, ITemplate } from "./templates/types.ts";
+import type {
+  Component,
+  ComponentProps,
+  ElementChildType,
+  ITemplate,
+} from "./types.ts";
 import { TemplateFn } from "./templates/TemplateFn.ts";
-
-export interface IComponentWithChildren<
-  Props = Record<string, unknown>,
-  Children extends ElementChildType[] = ElementChildType[],
-> {
-  (props: Props): TemplateFn;
-  (props: Props, children: Children): ITemplate;
-}
-
-export interface IComponentWithoutChildren<Props = Record<string, unknown>> {
-  (props: Props): ITemplate;
-}
-
-export type IComponent<
-  Props = Record<string, unknown>,
-  Children extends ElementChildType[] | never = ElementChildType[],
-> = Children extends never ? IComponentWithoutChildren<Props>
-  : IComponentWithChildren<Props, Children>;
 
 /**
  * Creates a reusable component with support for both JSX and template literals.
@@ -53,25 +40,22 @@ export type IComponent<
  * Icon({ name: 'home' }); // OK
  * Icon({ name: 'home' })`content`; // Error: no children allowed
  */
-export function component<
-  Props = Record<string, unknown>,
-  Children extends ElementChildType[] | never = ElementChildType[],
->(
-  fn: (props: Props, children?: Children) => ITemplate,
-): IComponent<Props, Children> {
-  return function (props: Props, children?: Children) {
-    // Если переданы дети напрямую, убедимся что это массив
+export function component<P extends ComponentProps>(
+  render: (props: P, children: ElementChildType[]) => ITemplate,
+): Component<P> {
+  const componentFunction = ((props: P, children?: ElementChildType[]) => {
     if (children) {
-      return fn(
-        props,
-        Array.isArray(children) ? children : [children] as Children,
-      );
+      return render(props, children);
     }
 
-    // Template literal вариант
-    return new TemplateFn(
-      (children) =>
-        fn(props, Array.isArray(children) ? children : [children] as Children),
-    ).fn;
-  } as IComponent<Props, Children>;
+    // Создаем функцию для template literal вызова
+    const templateFn = new TemplateFn((templateChildren) =>
+      render(props, templateChildren)
+    );
+
+    // Возвращаем fn свойство для template literal вызова
+    return templateFn.fn;
+  }) as Component<P>;
+
+  return componentFunction;
 }

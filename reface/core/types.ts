@@ -43,8 +43,6 @@ export interface RestHandlers {
   [key: string]: (req: Request) => Promise<Response>;
 }
 
-import type { Template } from "../html/types.ts";
-
 export interface Island<R, P> {
   name?: string;
   template: (ctx: {
@@ -53,7 +51,7 @@ export interface Island<R, P> {
     rest: {
       hx: (name: string, method: string, route: string) => string;
     };
-  }) => Template;
+  }) => ITemplate;
   rest?: RestHandlers;
   rpc?: RpcHandlers<R>;
 }

@@ -1,10 +1,14 @@
-import type { ElementChildType, ITemplateElement } from "./types.ts";
-import type { IRenderManager } from "../render/types.ts";
+import type {
+  ElementChildType,
+  HTMLAttributes,
+  IRenderManager,
+  ITemplateElement,
+} from "../types.ts";
 import { VOID_ELEMENTS } from "../constants.ts";
 
 export interface ITemplateElementOptions {
   tag?: string;
-  attributes?: Record<string, unknown>;
+  attributes?: HTMLAttributes;
   children?: ElementChildType[];
 }
 
@@ -38,7 +42,7 @@ export interface ITemplateElementOptions {
  */
 export class TemplateElement implements ITemplateElement {
   public tag: string;
-  public attributes: Record<string, unknown>;
+  public attributes: HTMLAttributes;
   public children: ElementChildType[];
 
   constructor(options: ITemplateElementOptions) {

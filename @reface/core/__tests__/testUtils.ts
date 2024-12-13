@@ -1,5 +1,5 @@
 import { assertEquals, AssertionError } from "@std/assert";
-import type { ITemplate } from "../templates/types.ts";
+import type { ITemplate } from "../types.ts";
 import { RenderManager } from "../render/RenderManager.ts";
 import { LoggerPlugin, type RenderLogEntry } from "../plugins/LoggerPlugin.ts";
 

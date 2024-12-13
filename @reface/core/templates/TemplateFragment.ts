@@ -1,5 +1,4 @@
-import type { ElementChildType, ITemplate } from "./types.ts";
-import type { IRenderManager } from "../render/types.ts";
+import type { ElementChildType, IRenderManager, ITemplate } from "../types.ts";
 
 /**
  * Represents a group of templates without adding extra HTML elements.
