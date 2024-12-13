@@ -1,4 +1,5 @@
-import type { IRenderManager, RenderPhase } from "../types.ts";
+import type { IPlugin } from "../Reface.ts";
+import type { RenderPhase } from "../core/types.ts";
 
 export interface RenderLogEntry {
   phase: RenderPhase;
@@ -7,7 +8,8 @@ export interface RenderLogEntry {
   timestamp: number;
 }
 
-export class LoggerPlugin {
+export class LoggerPlugin implements IPlugin {
+  readonly name = "logger";
   private logs: RenderLogEntry[] = [];
 
   log(entry: Omit<RenderLogEntry, "timestamp">): void {
@@ -25,7 +27,8 @@ export class LoggerPlugin {
     this.logs = [];
   }
 
-  install(manager: IRenderManager) {
+  setup(reface: Reface): void {
+    const manager = reface.getRenderManager();
     const handlePhase =
       (phase: RenderPhase) => (params: Record<string, unknown>) => {
         const input = params.template || params.child || params.children;
