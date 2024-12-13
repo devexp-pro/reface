@@ -9,14 +9,58 @@ export type HxSwapMode =
   | "afterend"
   | "delete"
   | "none";
-export type HxTrigger = string | {
-  event: string;
+export type HxQueueOption = "first" | "last" | "all" | "none";
+
+export type HxIntersectRoot = `root:${string}`;
+export type HxIntersectThreshold = `threshold:${number}`;
+export type HxIntersectOption = HxIntersectRoot | HxIntersectThreshold;
+
+export type HxFromTarget =
+  | "document"
+  | "window"
+  | `closest ${string}`
+  | `find ${string}`
+  | "next"
+  | `next ${string}`
+  | "previous"
+  | `previous ${string}`;
+
+export interface HxTriggerModifiers {
+  once?: boolean;
+  changed?: boolean;
   delay?: number;
   throttle?: number;
-  queue?: "first" | "last" | "all" | "none";
-  once?: boolean;
-  every?: number;
-};
+  from?: string | HxFromTarget;
+  target?: string;
+  consume?: boolean;
+  queue?: HxQueueOption;
+  intersect?: HxIntersectOption[];
+  filter?: string;
+}
+
+export type HxTriggerEvent =
+  | "load"
+  | "revealed"
+  | "intersect"
+  | "click"
+  | "change"
+  | "keyup"
+  | "keydown"
+  | "submit"
+  | "focus"
+  | "blur"
+  | string;
+
+export interface HxTriggerConfig {
+  event: HxTriggerEvent;
+  polling?: `every ${number}s` | `every ${number}ms`;
+  modifiers?: HxTriggerModifiers;
+}
+
+export type HxTrigger =
+  | HxTriggerEvent
+  | HxTriggerConfig
+  | (HxTriggerEvent | HxTriggerConfig)[];
 
 // Типы для конфигурации
 export interface HxConfig {
@@ -43,6 +87,11 @@ export type HxAttributes = {
   "hx-trigger"?: string;
   "hx-target"?: string;
   "hx-swap"?: HxSwapMode;
+  "hx-on:*"?: string;
+  "hx-push-url"?: string;
+  "hx-select"?: string;
+  "hx-select-oob"?: string;
+  "hx-swap-oob"?: string;
   [key: `hx-${string}`]: string;
 };
 
