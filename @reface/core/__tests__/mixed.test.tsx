@@ -71,4 +71,99 @@ Deno.test("mixed usage - handles primitives", () => {
       "<div>0</div>" +
     "</div>"
   );
+});
+
+Deno.test("attributes - class object syntax", () => {
+  const Button = component<{ isActive: boolean }>((props) => (
+    <button class={{ 
+      btn: true, 
+      active: props.isActive, 
+      disabled: false 
+    }}>
+      Click me
+    </button>
+  ));
+
+  assertRender(
+    <Button isActive={true}/>,
+    '<button class="btn active">Click me</button>'
+  );
+});
+
+Deno.test("attributes - class array syntax", () => {
+  const Button = component<{ type: string }>((props) => (
+    <button class={[
+      "btn",
+      { [`btn-${props.type}`]: true },
+      ["nested", "classes"]
+    ]}>
+      Click me
+    </button>
+  ));
+
+  assertRender(
+    <Button type="primary"/>,
+    '<button class="btn btn-primary nested classes">Click me</button>'
+  );
+});
+
+Deno.test("attributes - style object syntax", () => {
+  const Box = component(() => (
+    <div style={{ 
+      marginTop: "10px",
+      fontSize: 14,
+      backgroundColor: "#fff" 
+    }}>
+      Content
+    </div>
+  ));
+
+  assertRender(
+    <Box/>,
+    '<div style="margin-top: 10px; font-size: 14; background-color: #fff">Content</div>'
+  );
+});
+
+Deno.test("attributes - style array syntax", () => {
+  const Box = component<{ theme: "light" | "dark" }>((props) => (
+    <div style={[
+      "padding: 10px",
+      { 
+        backgroundColor: props.theme === "dark" ? "#000" : "#fff",
+        color: props.theme === "dark" ? "#fff" : "#000"
+      },
+      ["border: 1px solid", "border-radius: 4px"]
+    ]}>
+      Content
+    </div>
+  ));
+
+  assertRender(
+    <Box theme="dark"/>,
+    '<div style="padding: 10px; background-color: #000; color: #fff; border: 1px solid; border-radius: 4px">Content</div>'
+  );
+});
+
+Deno.test("attributes - handles duplicates and empty values", () => {
+  assertRender(
+    <div 
+      class={[
+        "btn btn", // duplicate in string
+        { btn: true }, // duplicate as object
+        { hidden: false }, // should be excluded
+        null, // should be ignored
+        undefined // should be ignored
+      ]}
+      style={[
+        "color: red; color: blue", // duplicate property
+        { color: "green" }, // should override
+        { display: false }, // should be excluded
+        null, // should be ignored
+        undefined // should be ignored
+      ]}
+    >
+      Content
+    </div>,
+    '<div class="btn" style="color: green">Content</div>'
+  );
 }); 

@@ -38,9 +38,3 @@ export function createElement(tag: string) {
     ).fn;
   };
 }
-
-// Предопределенные HTML элементы
-export const div = createElement("div");
-export const span = createElement("span");
-export const p = createElement("p");
-// ... и так далее для всех HTML элементов

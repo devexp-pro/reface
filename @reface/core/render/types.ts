@@ -1,4 +1,10 @@
-import type { ElementChildType, ITemplate } from "../templates/types.ts";
+import type {
+  ClassValue,
+  ElementChildType,
+  HTMLAttributes,
+  ITemplate,
+  StyleValue,
+} from "../templates/types.ts";
 
 export type RenderPhase =
   | "render:start"
@@ -8,7 +14,13 @@ export type RenderPhase =
   | "renderChild:start"
   | "renderChild:end"
   | "renderChildren:start"
-  | "renderChildren:end";
+  | "renderChildren:end"
+  | "renderAttributes:start"
+  | "renderAttributes:end"
+  | "renderClassAttribute:start"
+  | "renderClassAttribute:end"
+  | "renderStyleAttribute:start"
+  | "renderStyleAttribute:end";
 
 export interface IRenderManager {
   on(
@@ -16,6 +28,9 @@ export interface IRenderManager {
     handler: (params: {
       template?: ITemplate;
       html?: string;
+      attributes?: HTMLAttributes;
+      class?: ClassValue;
+      style?: StyleValue;
       manager: IRenderManager;
     }) => void | ITemplate | string,
   ): void;
@@ -26,6 +41,9 @@ export interface IRenderManager {
   renderTemplate(template: ITemplate): string;
   renderChild(child: ElementChildType): string;
   renderChildren(children: ElementChildType[]): string;
+  renderAttributes(attrs: HTMLAttributes): string;
+  renderClassAttribute(value: ClassValue): string;
+  renderStyleAttribute(value: StyleValue): string;
 
   store: {
     get<T>(pluginName: string): T | undefined;

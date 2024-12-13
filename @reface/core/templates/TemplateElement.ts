@@ -1,7 +1,6 @@
 import type { ElementChildType, ITemplateElement } from "./types.ts";
 import type { IRenderManager } from "../render/types.ts";
 import { VOID_ELEMENTS } from "../constants.ts";
-import { formatAttributes } from "../utils/mod.ts";
 
 export interface ITemplateElementOptions {
   tag?: string;
@@ -49,13 +48,13 @@ export class TemplateElement implements ITemplateElement {
   }
 
   toHtml(manager: IRenderManager): string {
-    const attrs = formatAttributes(this.attributes);
+    const attrs = manager.renderAttributes(this.attributes);
 
     if (VOID_ELEMENTS.has(this.tag)) {
-      return `<${this.tag}${attrs}/>`;
+      return `<${this.tag}${attrs ? ` ${attrs}` : ""}/>`;
     }
 
     const content = manager.renderChildren(this.children);
-    return `<${this.tag}${attrs}>${content}</${this.tag}>`;
+    return `<${this.tag}${attrs ? ` ${attrs}` : ""}>${content}</${this.tag}>`;
   }
 }
