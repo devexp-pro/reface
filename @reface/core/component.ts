@@ -4,44 +4,34 @@ import type {
   ElementChildType,
   ITemplate,
 } from "./types.ts";
-import { TemplateFn } from "./templates/TemplateFn.ts";
 
-/**
- * Creates a reusable component with support for both JSX and template literals.
- *
- * @template Props - Component props type
- * @template Children - Children elements type (use 'never' to prevent children)
- * @param render - Function that renders the component
- * @returns Component function that can be used with JSX or template literals
- *
- * @example
- * // With children
- * const Button = component<ButtonProps>((props, children) => {
- *   return new TemplateElement({
- *     tag: 'button',
- *     attributes: props,
- *     children
- *   });
- * });
- *
- * // Usage:
- * Button({ color: 'primary' })`Click me`; // Template literal
- * <Button color="primary">Click me</Button>; // JSX
- *
- * // Without children
- * const Icon = component<IconProps, never>((props) => {
- *   return new TemplateElement({
- *     tag: 'i',
- *     attributes: { class: `icon-${props.name}` }
- *   });
- * });
- *
- * // Usage:
- * Icon({ name: 'home' }); // OK
- * Icon({ name: 'home' })`content`; // Error: no children allowed
- */
 export function component<P extends ComponentProps>(
   render: (props: P, children: ElementChildType[]) => ITemplate,
 ): Component<P> {
-  return new TemplateFn(render);
+  // Создаем функцию компонента с поддержкой обоих вариантов вызова
+  const componentFn = ((props: P = {} as P, children?: ElementChildType[]) => {
+    if (children) {
+      // Прямой вызов с children
+      return render(props, children);
+    }
+
+    // Возвращаем функцию для template literals
+    return (
+      strings: TemplateStringsArray = [],
+      ...values: ElementChildType[]
+    ) => {
+      const templateChildren = [];
+      for (let i = 0; i < strings.length; i++) {
+        if (strings[i].trim()) {
+          templateChildren.push(strings[i]);
+        }
+        if (i < values.length) {
+          templateChildren.push(values[i]);
+        }
+      }
+      return render(props, templateChildren);
+    };
+  }) as Component<P>;
+
+  return componentFn;
 }

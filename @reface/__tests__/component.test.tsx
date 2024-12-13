@@ -31,6 +31,6 @@ Deno.test("component - without children", () => {
 
   assertRender(
     template,
-    '<i class="icon-home"/>'
+    '<i class="icon-home"></i>'
   );
 }); 
