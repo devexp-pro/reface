@@ -50,7 +50,7 @@
     "test:coverage": "deno test -A --coverage=coverage && deno coverage coverage",
     "test:ci": "deno test -A --coverage=coverage --junit-path=junit.xml",
     "website:dev": "deno run -A --watch website/main.tsx",
-    "check": "deno check reface/"
+    "check": "deno check @reface/"
   },
   "fmt": {
     "exclude": [
