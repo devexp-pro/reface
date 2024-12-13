@@ -8,7 +8,7 @@ import type {
   RenderHandler,
   StyleValue,
 } from "../types.ts";
-import { isEmptyValue, isTemplate } from "./renderUtils.ts";
+import { isEmptyValue, isTemplate, toKebabCase } from "./renderUtils.ts";
 import { REFACE_EVENT } from "../constants.ts";
 
 export class RenderManager implements IRenderManager {
@@ -113,34 +113,69 @@ export class RenderManager implements IRenderManager {
 
   renderClassAttribute(value: ClassValue): string {
     return this.withPhase(REFACE_EVENT.RENDER.CLASS, () => {
-      if (!value) return "";
-      if (Array.isArray(value)) {
-        return value.map((v) => this.renderClassAttribute(v)).filter(Boolean)
-          .join(" ");
-      }
-      if (typeof value === "object") {
-        return Object.entries(value)
-          .filter(([, enabled]) => enabled)
-          .map(([className]) => className)
-          .join(" ");
-      }
-      return String(value);
+      const classes = new Set<string>();
+
+      const addClass = (val: ClassValue) => {
+        if (!val) return;
+
+        if (Array.isArray(val)) {
+          val.forEach((v) => addClass(v));
+        } else if (typeof val === "object") {
+          Object.entries(val)
+            .filter(([, enabled]) => enabled)
+            .forEach(([className]) => className && addClass(className));
+        } else {
+          String(val)
+            .split(/\s+/)
+            .filter(Boolean)
+            .forEach((className) => classes.add(className));
+        }
+      };
+
+      addClass(value);
+      return Array.from(classes).join(" ");
     });
   }
 
   renderStyleAttribute(value: StyleValue): string {
     return this.withPhase(REFACE_EVENT.RENDER.STYLE, () => {
-      if (!value) return "";
-      if (Array.isArray(value)) {
-        return value.map((v) => this.renderStyleAttribute(v)).filter(Boolean)
-          .join(";");
-      }
-      if (typeof value === "object") {
-        return Object.entries(value)
-          .map(([prop, val]) => `${prop}:${val}`)
-          .join(";");
-      }
-      return String(value);
+      const styles = new Map<string, string>();
+
+      const addStyle = (val: StyleValue) => {
+        if (!val) return;
+
+        if (Array.isArray(val)) {
+          val.forEach((v) => addStyle(v));
+        } else if (typeof val === "object") {
+          Object.entries(val)
+            .filter(([, value]) => value !== false && value != null)
+            .forEach(([prop, value]) => {
+              // Преобразуем camelCase в kebab-case
+              const kebabProp = prop.replace(
+                /[A-Z]/g,
+                (m) => `-${m.toLowerCase()}`,
+              );
+              styles.set(kebabProp, String(value));
+            });
+        } else if (typeof val === "string") {
+          // Парсим строку стилей
+          val.split(";")
+            .map((style) => style.trim())
+            .filter(Boolean)
+            .forEach((style) => {
+              const [prop, value] = style.split(":").map((s) => s.trim());
+              if (prop && value) {
+                styles.set(prop, value);
+              }
+            });
+        }
+      };
+
+      addStyle(value);
+
+      return Array.from(styles.entries())
+        .map(([prop, value]) => `${prop}: ${value}`)
+        .join("; ");
     });
   }
 

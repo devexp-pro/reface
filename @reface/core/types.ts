@@ -76,17 +76,12 @@ export interface TemplateTagFunction {
   (strings: TemplateStringsArray, ...values: ElementChildType[]): ITemplate;
 }
 
-// Тип для TemplateFn класса - сам является функцией
-export interface TemplateFn extends TemplateTagFunction, ITemplate {
-  fn: TemplateTagFunction;
-}
-
 // Тип для функции-компонента
 export interface Component<P extends ComponentProps = ComponentProps> {
   // Вызов с children как аргументом
   (props: P, children: ElementChildType[]): ITemplate;
   // Вызов с последующим template literal
-  (props: P): TemplateFn;
+  (props: P): TemplateTagFunction; // TODO: fix
 }
 
 // Тип для createElement

@@ -10,3 +10,6 @@ export function isTemplate(value: unknown): value is ITemplate {
     value !== null &&
     "toHtml" in value;
 }
+
+export const toKebabCase = (str: string) =>
+  str.replace(/([A-Z])/g, "-$1").toLowerCase();

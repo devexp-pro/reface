@@ -42,16 +42,9 @@ export class LoggerPlugin implements IPlugin {
         });
       };
 
-    const events = [
-      REFACE_EVENT.RENDER.RENDER,
-      REFACE_EVENT.RENDER.TEMPLATE,
-      REFACE_EVENT.RENDER.CHILD,
-      REFACE_EVENT.RENDER.CHILDREN,
-    ];
-
-    events.forEach((event) => {
-      manager.on(event.START, handlePhase(event.START));
-      manager.on(event.END, handlePhase(event.END));
+    Object.entries(REFACE_EVENT.RENDER).forEach(([_, value]) => {
+      manager.on(value.START, handlePhase(value.START));
+      manager.on(value.END, handlePhase(value.END));
     });
 
     manager.store.set("logger", this);
