@@ -6,7 +6,7 @@ import {
   island,
   Reface,
   RESPONSE,
-} from "jsr:@vseplet/reface@0.1.0";
+} from "../reface/mod.ts";
 
 const kv = await Deno.openKv();
 

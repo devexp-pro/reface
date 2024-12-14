@@ -6,7 +6,7 @@ import {
   type PageProps,
   Reface,
   RESPONSE,
-} from "@vseplet/reface";
+} from "../reface/mod.ts";
 
 const cmp1 = component<{ x: number }>((props) =>
   html`<div>Hello, ${props.x} World!</div>`

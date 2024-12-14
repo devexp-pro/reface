@@ -1,11 +1,25 @@
 {
-  "lock": false,
-  "imports": {
-    "$/": "./",
-    "@hono/hono": "jsr:@hono/hono@4.5.6",
-    "@vseplet/reface": "jsr:@vseplet/reface@0.0.24"
-  },
   "tasks": {
-    "dev": "deno run --watch=./main.ts --allow-all main.ts"
+    "start": "deno run -A --watch main.tsx"
+  },
+  "imports": {
+    "hono": "jsr:@hono/hono",
+    "@reface": "../@reface/mod.ts",
+    "@reface/htmx": "../@reface/htmx/mod.ts",
+    "@reface/elements": "../@reface/elements/mod.ts",
+    "@reface/plugins/styled": "../@reface/plugins/styled/mod.ts",
+    "@reface/plugins/island": "../@reface/plugins/island/mod.ts",
+    "@reface/components/LayoutSimple": "../@reface/components/LayoutSimple.ts",
+    "@reface/jsx.global.d.ts": "../@reface/jsx.global.d.ts"
+  },
+  "compilerOptions": {
+    "jsx": "react",
+    "jsxFactory": "createElement",
+    "jsxFragmentFactory": "Fragment"
+  },
+  "deploy": {
+    "exclude": [],
+    "include": [],
+    "entrypoint": "main.tsx"
   }
 }
