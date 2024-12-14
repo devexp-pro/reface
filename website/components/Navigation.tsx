@@ -1,4 +1,4 @@
-import type { Template } from "@reface/types";
+import type { Template } from "../@reface/mod.ts";
 import { styled } from "@reface/plugins/styled";
 import type { DocSection } from "../utils/docs.tsx";
 
