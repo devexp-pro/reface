@@ -8,40 +8,39 @@
 [![JSR Score](https://jsr.io/badges/@vseplet/reface/score)](https://jsr.io/@vseplet/reface)
 [![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/gT4gvVwqb8)
 
-Next-generation template engine for HTML with component system and plugin architecture.
+Modern web framework for building interactive applications with Islands Architecture.
 
 ## Features
 
-- 🎯 **Type-safe** - Full TypeScript support with JSX
-- 🧩 **Component-based** - Functional components with composition
-- 🔌 **Plugin System** - Extensible core architecture
+- 🎯 **Type-safe Templates** - Full TypeScript support with JSX
+- 🧩 **Template Composition** - Mix JSX and template literals
+- 🔌 **Plugin System** - Extensible composition pipeline
 - 🎨 **Styled Components** - CSS-in-JS with type safety
-- 🏝️ **Partials Architecture** - Interactive components with minimal JS
-- 🚀 **Platform Agnostic** - Works with any HTTP framework
+- 🏝️ **Partial System** - Interactive components with HTMX
+- 🚀 **Framework Agnostic** - Core composition engine
 
 ## Quick Start
 
 ```typescript
-import { Reface } from "jsr:@vseplet/reface";
-import { StyledPlugin } from "@vseplet/reface/styled";
-import { PartialPlugin } from "@vseplet/reface/partials";
+import { RefaceComposer } from "@reface/core";
+import { StyledPlugin } from "@reface/plugins/styled";
+import { PartialsPlugin } from "@reface/plugins/partials";
 
-// Create instance
-const reface = new Reface();
-reface.use(new StyledPlugin());
-reface.use(new PartialPlugin());
+// Create composer instance
+const composer = new RefaceComposer();
+composer.use(new StyledPlugin());
+composer.use(new PartialsPlugin());
 
-// Create components
+// Create styled component
 const Button = styled.button`
   & {
     background: var(--primary-color, #3182ce);
     color: white;
     padding: 0.5rem 1rem;
-    border: none;
-    border-radius: 4px;
   }
 `;
 
+// Create interactive component
 const Counter = partial(async () => {
   const count = 0;
   return (
@@ -52,7 +51,7 @@ const Counter = partial(async () => {
   );
 }, "counter");
 
-// Create page
+// Create page template
 function HomePage() {
   return (
     <div>
@@ -62,21 +61,21 @@ function HomePage() {
   );
 }
 
-// Render
-const html = reface.render(<HomePage />);
+// Compose HTML
+const html = composer.render(<HomePage />);
 ```
 
 ## Examples
 
-- [📚 Documentation Site](./examples/docs-viewer) - Documentation with markdown support
-- [✅ Todo App](./examples/todo) - Classic todo application
-- [💬 Chat App](./examples/chat) - Real-time chat application
-- [📝 Blog](./examples/blog) - Blog with SSR and partials
+- [📚 Basic Components](./examples/basic) - Component composition
+- [🧩 Styled Components](./examples/styled) - CSS-in-JS examples
+- [🏝️ Partial Components](./examples/partials) - Interactive components
+- [🔌 Custom Plugin](./examples/plugin) - Plugin development
 
 ## Documentation
 
-- [Architecture](./docs/architecture.md) - Core concepts and design
-- [Components](./docs/components.md) - Component system
+- [Architecture](./docs/architecture.md) - Core concepts and composition design
+- [Components](./docs/components.md) - Component composition system
 - [Styling](./docs/styling.md) - CSS-in-JS styling
 - [Partials](./docs/partials.md) - Interactive components
 - [Plugins](./docs/plugins.md) - Plugin system

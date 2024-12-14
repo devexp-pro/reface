@@ -1,145 +1,182 @@
 # Architecture
 
-## Core Architecture
+## System Architecture
 
 ```ts
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│     Reface      │     │     Plugin      │     │    Render       │
-│                 │────▶│    System       │────▶│    Manager      │
-│     (Core)      │     │   (Extensible)  │     │  (Pipeline)     │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-        │                       │                       │
-        │                       │                       │
-        ▼                       ▼                       ▼
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Components    │     │    Templates    │     │      HTML       │
-│                 │────▶│                 │────▶│                 │
-│   (Virtual)     │     │  (Processing)   │     │   (String)      │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
+┌─────────────────────────────────────────┐
+│               Reface                    │
+│                                         │
+│  ┌─────────────┐       ┌────────────┐   │
+│  │    Deno     │       │   Router   │   │
+│  │   Server    │─────▶ │   System   │   │
+│  └─────────────┘       └────────────┘   │
+│         │                    │          │
+│         ▼                    ▼          │
+│  ┌─────────────┐       ┌────────────┐   │
+│  │   Static    │       │  Layouts   │   │
+│  │   Files     │       │            │   │
+│  └─────────────┘       └────────────┘   │
+│                             │           │
+│                             ▼           │
+│  ┌─────────────────────────────────┐    │
+│  │         RefaceComposer          │    │
+│  │                                 │    │
+│  │    ┌──────────┐  ┌──────────┐   │    │
+│  │    │  Plugin  │  │ Template │   │    │
+│  │    │  System  │  │ Process  │   │    │
+│  │    └──────────┘  └──────────┘   │    │
+│  └─────────────────────────────────┘    │
+│                                         │
+│  ┌─────────────────────────────────┐    │
+│  │      Interactive System         │    │
+│  │                                 │    │
+│  │  ┌──────────┐      ┌────────┐   │    │
+│  │  │ Partials │      │Islands │   │    │
+│  │  │  (HTMX)  │      │ (RPC)  │   │    │
+│  │  └──────────┘      └────────┘   │    │
+│  └─────────────────────────────────┘    │
+└─────────────────────────────────────────┘
 ```
 
-## Core Concepts
+## Core Components
 
-### Platform Agnostic
+### 1. Reface Framework
 
-- Works with any HTTP framework (Hono, Express, etc)
-- Supports Deno, Node.js and other platforms
-- No framework-specific dependencies
-- Pure rendering library
+High-level framework providing:
 
-### Plugin System
+- Deno server integration
+- Static file handling
+- Routing system
+- Layout management
+- Plugin configuration
+- Interactive architecture
+
+### 2. RefaceComposer
+
+Template composition engine:
+
+- Plugin management
+- Template processing
+- HTML generation
+- Component system
+
+### 3. Interactive System
+
+#### Partials (HTMX)
+
+- Live components
+- REST-based updates
+- HTMX integration
+- State management
+
+#### Islands (RPC)
+
+- Micro-applications
+- RPC protocol support
+- Rich interactions
+- Isolated state
+
+## Implementation Details
+
+### Server Layer
 
 ```typescript
-// Creating a plugin
-class StyledPlugin implements IPlugin {
-  name = "styled";
+class Reface {
+  constructor(options: { layout: Layout }) {
+    this.layout = options.layout;
+  }
 
-  setup(reface: Reface) {
-    // Register handlers
+  // Page routing
+  page(route: string, generator: TemplateGenerator<PageProps>) {
+    // Page registration
+  }
+
+  // Server adapters
+  hono() {
+    /* Hono integration */
+  }
+  oak() {
+    /* Oak integration */
+  }
+  express() {
+    /* Express integration */
   }
 }
-
-// Usage
-const reface = new Reface();
-reface.use(new StyledPlugin());
 ```
 
-### Built-in Plugins
-
-#### Styled Plugin
-
-- CSS-in-JS support
-- Type-safe styles
-- Style optimization
-- Automatic prefixing
-
-#### Partial Plugin
-
-- Interactive components
-- Progressive enhancement
-- Minimal client JS
-- HTMX integration
-
-## Render Pipeline
+### Interactive Components
 
 ```typescript
-Template → Virtual Components → Plugin Processing → HTML String
+// Partial Component (HTMX-based)
+const Counter = partial(async () => {
+  return (
+    <div>
+      <button {...Counter.trigger()}>Increment</button>
+    </div>
+  );
+}, "counter");
 
-Example:
-<Button>Click</Button> →
-{ tag: 'button', children: ['Click'] } →
-{ tag: 'button', class: 'styled-xxx', children: ['Click'] } →
-<button class="styled-xxx">Click</button>
+// Island Component (RPC-based)
+const TodoApp = Reface.addIsland({
+  name: "todo",
+  template: ({ rpc, rest }) => (
+    <div>
+      <button {...rpc.hx.addTodo()}>Add</button>
+      <button {...rest.hx("self", "get", "/list")}>Refresh</button>
+    </div>
+  ),
+  rpc: {
+    addTodo: async ({ args }) => {
+      /* RPC handler */
+    },
+  },
+  rest: {
+    "get|/list": async (req) => {
+      /* REST handler */
+    },
+  },
+});
 ```
 
 ## Module Structure
 
-ts
+```
 @reface/
-├── core/ # Core functionality
-│ ├── render/ # Render pipeline
-│ ├── types/ # Core types
-│ └── plugins/ # Plugin system
+├── core/                  # Core composition engine
+│   └── RefaceComposer    # Template composition
 │
-├── components/ # Base components
-│ └── html/ # HTML elements
+├── framework/            # Reface framework
+│   ├── server/          # Deno server
+│   ├── router/          # Routing system
+│   └── static/          # Static files
 │
-└── plugins/ # Official plugins
-├── styled/ # CSS-in-JS
-└── partial/ # Interactive components
+├── interactive/         # Interactive components
+│   ├── partials/       # HTMX components
+│   └── islands/        # RPC components
+│
+└── plugins/            # Official plugins
+```
 
-````
+## Development Plans
 
-## Best Practices
+### Near Future
 
-1. **Component Design**
-   - Pure functions
-   - Immutable props
-   - Single responsibility
-   - Composition over inheritance
+1. **Framework Layer**
 
-2. **Plugin Development**
-   - Clear API
-   - Minimal dependencies
-   - Proper typings
-   - Documentation
+   - Full server integration
+   - Advanced routing
+   - Middleware system
+   - Static optimization
 
-3. **Performance**
-   - Virtual components
-   - Efficient updates
-   - Style optimization
-   - Minimal client JS
+2. **Islands Architecture**
 
-4. **Type Safety**
-   - TypeScript first
-   - Strict types
-   - Proper interfaces
-   - Validation
+   - Enhanced RPC system
+   - State management
+   - TypeScript integration
+   - Development tools
 
-## Integration Examples
-
-```typescript
-// With Hono
-import { Hono } from 'hono';
-import { Reface } from '@reface';
-
-const app = new Hono();
-const reface = new Reface();
-
-app.get('/', (c) => {
-  const content = reface.render(<HomePage />);
-  return c.html(content);
-});
-
-// With Express
-import express from 'express';
-import { Reface } from '@reface';
-
-const app = express();
-const reface = new Reface();
-
-app.get('/', (req, res) => {
-  const content = reface.render(<HomePage />);
-  res.send(content);
-});
-````
+3. **Build System**
+   - Asset optimization
+   - Code splitting
+   - Tree shaking
+   - Bundle analysis

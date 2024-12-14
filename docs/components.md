@@ -1,6 +1,6 @@
 # Components
 
-Reface provides a powerful component system for building reusable UI elements.
+RefaceComposer provides a component system for building reusable templates.
 
 ## Basic Components
 
@@ -27,80 +27,63 @@ function Container({ children }: { children: ElementChild[] }) {
 </Container>;
 ```
 
-### Component Properties
+### Template Literals
 
 ```typescript
-// Typed props
-interface CardProps {
+import { html } from "@reface/core";
+
+// HTML template
+const template = html`
+  <div class="container">
+    <h1>Title</h1>
+    <p>Content</p>
+  </div>
+`;
+
+// With interpolation
+const name = "John";
+const greeting = html`<div>Hello ${name}!</div>`;
+```
+
+## Mixed Usage
+
+### Components with Template Literals
+
+```typescript
+function Layout({
+  title,
+  children,
+}: {
   title: string;
-  description?: string;
-  image?: string;
-  onClick?: () => void;
-}
-
-function Card({ title, description, image, onClick }: CardProps) {
-  return (
-    <div class="card" onClick={onClick}>
-      {image && <img src={image} alt={title} />}
-      <h2>{title}</h2>
-      {description && <p>{description}</p>}
+  children: ElementChild[];
+}) {
+  return html`
+    <div class="layout">
+      <header>${title}</header>
+      <main>${children}</main>
     </div>
-  );
-}
-```
-
-## Component Composition
-
-### Nested Components
-
-```typescript
-function Header() {
-  return (
-    <header>
-      <Logo />
-      <Navigation />
-    </header>
-  );
-}
-
-function Page() {
-  return (
-    <>
-      <Header />
-      <main>
-        <Sidebar />
-        <Content />
-      </main>
-      <Footer />
-    </>
-  );
-}
-```
-
-### Component Patterns
-
-```typescript
-// Container Pattern
-function DataContainer({ children }) {
-  const data = useData();
-  return children(data);
+  `;
 }
 
 // Usage
-<DataContainer>{(data) => <UserProfile user={data} />}</DataContainer>;
+<Layout title="My Page">
+  <div>Content</div>
+</Layout>;
+```
 
-// Compound Components
-const Tab = {
-  Container: ({ children }) => <div class="tabs">{children}</div>,
-  Item: ({ label }) => <div class="tab">{label}</div>,
-  Content: ({ content }) => <div class="content">{content}</div>,
-};
+### Element Creation
+
+```typescript
+import { createElement } from "@reface/core";
+
+const div = createElement("div");
+const span = createElement("span");
 
 // Usage
-<Tab.Container>
-  <Tab.Item label="First" />
-  <Tab.Content content="First content" />
-</Tab.Container>;
+div({ class: "container" })`
+  ${span({ class: "text" })`Hello`}
+  ${span({ class: "text" })`World`}
+`;
 ```
 
 ## Type Safety
@@ -149,27 +132,27 @@ interface OptionalChildrenProps {
 
 1. **Component Design**
 
-   - Keep components small and focused
-   - Use TypeScript interfaces for props
-   - Follow single responsibility principle
+   - Keep components focused
+   - Use TypeScript interfaces
+   - Follow single responsibility
    - Implement proper error handling
 
 2. **Performance**
 
-   - Avoid unnecessary nesting
-   - Use fragments when possible
-   - Optimize renders
-   - Cache expensive computations
+   - Minimize nesting
+   - Use fragments when needed
+   - Optimize templates
+   - Cache when possible
 
 3. **Maintainability**
 
-   - Use meaningful component names
-   - Document complex props
-   - Follow consistent patterns
-   - Write unit tests
+   - Clear naming
+   - Document props
+   - Consistent patterns
+   - Unit tests
 
 4. **Accessibility**
-   - Use semantic HTML
-   - Include ARIA attributes
-   - Support keyboard navigation
-   - Test with screen readers
+   - Semantic HTML
+   - ARIA attributes
+   - Keyboard support
+   - Screen reader testing

@@ -1,8 +1,8 @@
 # Plugins
 
-Reface's plugin system allows extending core functionality in a modular way.
+RefaceComposer's plugin system allows extending the template composition process.
 
-## Plugin System
+## Core Plugin System
 
 ### Basic Plugin Structure
 
@@ -12,120 +12,140 @@ import type { IPlugin } from "@reface/core";
 class CustomPlugin implements IPlugin {
   name = "custom";
 
-  setup(reface: Reface) {
-    // Plugin initialization logic
+  setup(composer: RefaceComposer) {
+    const manager = composer.getRenderManager();
+    // Plugin initialization
   }
 }
 
 // Usage
-const reface = new Reface();
-reface.use(new CustomPlugin());
+const composer = new RefaceComposer();
+composer.use(new CustomPlugin());
 ```
 
-## Built-in Plugins
+## Official Plugins
 
 ### Styled Plugin
+
+CSS-in-JS support with type safety:
 
 ```typescript
 import { StyledPlugin } from "@reface/plugins/styled";
 
-const reface = new Reface();
-reface.use(new StyledPlugin());
+const composer = new RefaceComposer();
+composer.use(new StyledPlugin());
 
-// Now you can use styled components
+// Create styled component
 const Button = styled.button`
   & {
     background: blue;
     color: white;
   }
+
+  &:hover {
+    background: darkblue;
+  }
+`;
+
+// Extend existing component
+const PrimaryButton = styled(Button)`
+  & {
+    padding: 1rem 2rem;
+    border-radius: 4px;
+  }
 `;
 ```
 
-### Partial Plugin
+### Partials Plugin
+
+Interactive components with HTMX integration:
 
 ```typescript
-import { PartialPlugin } from "@reface/plugins/partials";
+import { PartialsPlugin } from "@reface/plugins/partials";
 
-const reface = new Reface();
-reface.use(new PartialPlugin());
+const composer = new RefaceComposer();
+composer.use(new PartialsPlugin());
 
 // Create interactive component
 const Counter = partial(async () => {
-  return <div>Interactive content</div>;
+  const count = 0;
+  return (
+    <div>
+      <span>{count}</span>
+      <button {...Counter.trigger()}>Increment</button>
+    </div>
+  );
 }, "counter");
+
+// With custom trigger
+const SearchBox = partial(async () => {
+  return (
+    <div>
+      <input type="text" />
+      <button {...SearchBox.trigger("keyup delay:500ms from:input")}>
+        Search
+      </button>
+    </div>
+  );
+}, "search");
 ```
 
-## Creating Custom Plugins
-
-### Plugin Interface
+## Plugin Interface
 
 ```typescript
 interface IPlugin {
   name: string;
-  setup(reface: Reface): void | Promise<void>;
+  setup(composer: RefaceComposer): void | Promise<void>;
 }
 ```
 
-### Example: Logger Plugin
+## Render Pipeline Hooks
 
 ```typescript
 class LoggerPlugin implements IPlugin {
   name = "logger";
 
-  setup(reface: Reface) {
-    reface.getRenderManager().on("beforeRender", (template) => {
-      console.log("Rendering template:", template);
+  setup(composer: RefaceComposer) {
+    const manager = composer.getRenderManager();
+
+    // Before render hook
+    manager.on("render.render.start", ({ template }) => {
+      console.log("Starting render:", template);
     });
 
-    reface.getRenderManager().on("afterRender", (html) => {
+    // After render hook
+    manager.on("render.render.end", ({ html }) => {
       console.log("Rendered HTML:", html);
     });
   }
 }
 ```
 
-### Example: Analytics Plugin
+### Available Hooks
+
+- render.render.start/end - Full render cycle
+- render.template.start/end - Template processing
+- render.child.start/end - Child element processing
+- render.children.start/end - Multiple children processing
+- render.attributes.start/end - Attribute handling
+- render.class.start/end - Class attribute processing
+- render.style.start/end - Style attribute processing
+
+## Plugin Storage
 
 ```typescript
-class AnalyticsPlugin implements IPlugin {
-  name = "analytics";
+class StatePlugin implements IPlugin {
+  name = "state";
 
-  setup(reface: Reface) {
-    // Add analytics script
-    reface.getRenderManager().on("afterRender", (html) => {
-      return html + '<script src="analytics.js"></script>';
-    });
+  setup(composer: RefaceComposer) {
+    const manager = composer.getRenderManager();
+
+    // Store plugin data
+    manager.store.set("state", { count: 0 });
+
+    // Access plugin data
+    const state = manager.store.get("state");
   }
-}
-```
-
-## Plugin Hooks
-
-### Render Pipeline Hooks
-
-- beforeRender
-- afterRender
-- onError
-
-```typescript
-interface RenderHooks {
-  beforeRender?: (template: ITemplate) => void | Promise<void>;
-  afterRender?: (html: string) => string | Promise<string>;
-  onError?: (error: Error) => void | Promise<void>;
-}
-```
-
-### Component Hooks
-
-- beforeMount
-- afterMount
-- beforeUnmount
-
-```typescript
-interface ComponentHooks {
-  beforeMount?: () => void | Promise<void>;
-  afterMount?: () => void | Promise<void>;
-  beforeUnmount?: () => void | Promise<void>;
 }
 ```
 
@@ -134,7 +154,7 @@ interface ComponentHooks {
 1. **Plugin Design**
 
    - Single responsibility
-   - Clear API
+   - Clear initialization
    - Proper error handling
    - TypeScript support
 
@@ -158,7 +178,7 @@ interface ComponentHooks {
    - Performance tests
    - Error scenarios
 
-## Plugin Development Guide
+## Development Guide
 
 1. **Setup**
 
@@ -169,10 +189,10 @@ interface ComponentHooks {
 
 2. **Implementation**
 
-   - Add core functionality
-   - Implement hooks
+   - Add render hooks
    - Handle errors
    - Add cleanup
+   - Optimize performance
 
 3. **Documentation**
 

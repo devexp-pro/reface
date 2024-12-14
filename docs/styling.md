@@ -1,6 +1,6 @@
 # Styling
 
-Reface provides powerful CSS-in-JS styling through the Styled Plugin.
+RefaceComposer provides CSS-in-JS styling through the Styled Plugin.
 
 ## Basic Usage
 
@@ -14,8 +14,6 @@ const Button = styled.button`
     background: blue;
     color: white;
     padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
   }
 
   &:hover {
@@ -27,31 +25,33 @@ const Button = styled.button`
 <Button>Click me</Button>;
 ```
 
-### With Props
+### Component Extension
 
 ```typescript
-interface ButtonProps {
-  primary?: boolean;
-  size?: "small" | "large";
-}
-
-const Button = styled.button<ButtonProps>`
+const BaseButton = styled.button`
   & {
-    padding: ${(props) => (props.size === "small" ? "4px 8px" : "12px 24px")};
-    background: ${(props) => (props.primary ? "blue" : "gray")};
-    color: white;
+    padding: 8px 16px;
     border: none;
     border-radius: 4px;
   }
 `;
 
-// Usage
-<Button primary size="small">
-  Small Primary
-</Button>;
+const PrimaryButton = styled(BaseButton)`
+  & {
+    background: blue;
+    color: white;
+  }
+`;
+
+const SecondaryButton = styled(BaseButton)`
+  & {
+    background: gray;
+    color: white;
+  }
+`;
 ```
 
-## Selectors
+## CSS Features
 
 ### Nested Selectors
 
@@ -78,7 +78,7 @@ const Card = styled.div`
 `;
 ```
 
-### Pseudo Selectors
+### Pseudo Classes
 
 ```typescript
 const Input = styled.input`
@@ -102,9 +102,7 @@ const Input = styled.input`
 `;
 ```
 
-## Media Queries
-
-### Responsive Design
+### Media Queries
 
 ```typescript
 const Container = styled.div`
@@ -128,117 +126,76 @@ const Container = styled.div`
 `;
 ```
 
-## Component Composition
+## Implementation Details
 
-### Extending Styles
-
-```typescript
-const BaseButton = styled.button`
-  & {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-  }
-`;
-
-const PrimaryButton = styled(BaseButton)`
-  & {
-    background: blue;
-    color: white;
-  }
-`;
-
-const SecondaryButton = styled(BaseButton)`
-  & {
-    background: gray;
-    color: white;
-  }
-`;
-```
-
-## Global Styles
-
-### Defining Global Styles
+### Class Generation
 
 ```typescript
-import { createGlobalStyle } from "@reface/plugins/styled";
+// Unique class names are automatically generated
+const Button = styled.button`...`;
+// Renders as: <button class="s1a">...</button>
 
-const GlobalStyle = createGlobalStyle`
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    font-family: -apple-system, system-ui, sans-serif;
-    line-height: 1.5;
-  }
-
-  a {
-    color: blue;
-    text-decoration: none;
-  }
-`;
-
-// Usage in root component
-<>
-  <GlobalStyle />
-  <App />
-</>;
+const Card = styled.div`...`;
+// Renders as: <div class="s1b">...</div>
 ```
+
+### Style Collection
+
+```typescript
+// Styles are automatically collected and added to <style> tag
+const composer = new RefaceComposer();
+composer.use(new StyledPlugin());
+
+const html = composer.render(
+  <div>
+    <Button>Click me</Button>
+    <Card>Content</Card>
+  </div>
+);
+
+// Renders as:
+// <div>
+//   <button class="s1a">Click me</button>
+//   <div class="s1b">Content</div>
+// </div>
+// <style>
+//   .s1a { ... }
+//   .s1b { ... }
+// </style>
+```
+
+### CSS Parser
+
+- Replaces `&` with generated class name
+- Handles nested selectors
+- Processes media queries
+- Maintains selector specificity
 
 ## Best Practices
 
-1. **Organization**
+1. **Component Design**
 
-   - Component-specific styles
-   - Reusable base components
-   - Consistent naming
-   - Theme variables
+   - Keep styles component-scoped
+   - Use semantic class names
+   - Follow BEM-like nesting
+   - Avoid deep nesting
 
 2. **Performance**
 
-   - Style reuse
-   - Minimal selectors
-   - Efficient media queries
-   - CSS optimization
+   - Reuse base components
+   - Minimize style rules
+   - Use efficient selectors
+   - Share common styles
 
 3. **Maintainability**
 
-   - Clear structure
+   - Clear style structure
+   - Consistent patterns
    - Documentation
    - Type safety
-   - Theme system
 
-4. **Responsive Design**
-   - Mobile-first approach
-   - Breakpoint system
-   - Flexible layouts
-   - Consistent spacing
-
-## Type Safety
-
-### Theme Types
-
-```typescript
-interface Theme {
-  colors: {
-    primary: string;
-    secondary: string;
-    text: string;
-  };
-  spacing: {
-    small: string;
-    medium: string;
-    large: string;
-  };
-}
-
-const Button = styled.button<{ variant: "primary" | "secondary" }>`
-  & {
-    background: ${(props) => props.theme.colors[props.variant]};
-    padding: ${(props) => props.theme.spacing.medium};
-  }
-`;
-```
+4. **Browser Support**
+   - Cross-browser testing
+   - Fallback styles
+   - Progressive enhancement
+   - Vendor prefixes
