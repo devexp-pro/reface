@@ -8,16 +8,16 @@ import type {
   RenderHandler,
   StyleValue,
 } from "../types.ts";
-import { isEmptyValue, isTemplate, toKebabCase } from "./renderUtils.ts";
+import { isEmptyValue, isTemplate } from "./renderUtils.ts";
 import { REFACE_EVENT } from "../constants.ts";
+import type { RefaceComposer } from "../../RefaceComposer.ts";
 
 export class RenderManager implements IRenderManager {
   private handlers = new Map<RefaceEvent, Set<Function>>();
   private storage = new Map<string, unknown>();
-  private reface: Reface;
-
-  constructor({ reface }: { reface: Reface }) {
-    this.reface = reface;
+  private composer: RefaceComposer;
+  constructor({ composer }: { composer: RefaceComposer }) {
+    this.composer = composer;
   }
 
   private withPhase<T extends unknown[], R>(

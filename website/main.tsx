@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { serveStatic } from 'hono/deno'
-import { Reface, registerJSX } from "@reface";
+import { RefaceComposer, registerJSX } from "@reface";
 import { StyledPlugin } from "@reface/plugins/styled";
 import { PartialsPlugin } from "@reface/plugins/partials";
 import { LayoutSimple } from "@reface/components/LayoutSimple";
@@ -12,12 +12,10 @@ import HomePage from "./pages/HomePage.tsx";
 import { component } from "../@reface/core/component.ts";
 
 import "@reface/jsx.global.d.ts";
-
-// Регистрируем JSX глобально
 registerJSX();
 
 // Загружаем документацию
-const { sections, pages } = await loadDocs(resolveFromFile("../docs", import.meta.url));
+const { sections, pages } = await loadDocs();
 
 if (!pages.size) {
   console.error("No documentation found!");
@@ -27,9 +25,9 @@ if (!pages.size) {
 const PARTIAL_API_PREFIX = '/reface-partial';
 
 // Инициализируем Reface с плагинами
-const reface = new Reface();
-reface.use(new StyledPlugin());
-reface.use(new PartialsPlugin({ apiPrefix: PARTIAL_API_PREFIX }));
+const refaceComposer = new RefaceComposer();
+refaceComposer.use(new StyledPlugin());
+refaceComposer.use(new PartialsPlugin({ apiPrefix: PARTIAL_API_PREFIX }));
 
 const Layout = component((_, children) =>
 <LayoutSimple
@@ -55,12 +53,12 @@ app.use("/styles/*", serveStatic({ root: resolveFromFile("./public", import.meta
 
 // Регистрируем страницы
 app.get("/", (c) => {
-  const content = reface.render(<Layout><HomePage /></Layout>);
+  const content = refaceComposer.render(<Layout><HomePage /></Layout>);
   return c.html(content);
 });
 
 app.get("/docs", (c) => {
-  const content = reface.render(
+  const content = refaceComposer.render(
     <Layout>
       <DocsPage 
         sections={sections} 
@@ -72,7 +70,7 @@ app.get("/docs", (c) => {
 });
 
 app.get("/docs/:page", (c) => {
-  const content = reface.render(
+  const content = refaceComposer.render(
     <Layout>
       <DocsPage 
         sections={sections}
@@ -89,8 +87,8 @@ app.get(`${PARTIAL_API_PREFIX}/:partial`, async (c) => {
   const partialName = c.req.param('partial');
   
   try {
-    const partialFn = await reface.getPlugin('partial').getHandler(partialName);
-    const content = reface.render(await partialFn?.(c));
+    const partialFn = await refaceComposer.getPlugin(PartialsPlugin)?.getHandler(partialName);
+    const content = refaceComposer.render(await partialFn?.(c));
     if (!content) {
       return c.text('Partial not found', 404);
     }

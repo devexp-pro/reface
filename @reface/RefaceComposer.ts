@@ -1,19 +1,17 @@
 import type { IRenderManager, ITemplate } from "./core/types.ts";
 import { RenderManager } from "./core/render/RenderManager.ts";
-import { LoggerPlugin } from "./plugins/LoggerPlugin.ts";
-import { StyledPlugin } from "./plugins/styled/StyledPlugin.ts";
 
 export interface IPlugin {
   name: string;
-  setup(reface: Reface): void | Promise<void>;
+  setup(composer: RefaceComposer): void | Promise<void>;
 }
 
-export class Reface {
+export class RefaceComposer {
   private plugins = new Map<string, IPlugin>();
   private renderManager: IRenderManager;
 
   constructor() {
-    this.renderManager = new RenderManager({ reface: this });
+    this.renderManager = new RenderManager({ composer: this });
   }
 
   // Регистрация плагина

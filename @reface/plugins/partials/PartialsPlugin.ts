@@ -3,7 +3,7 @@ import type { PartialPluginOptions } from "./types.ts";
 import { hx, type HxBuilder, type HxTrigger } from "@reface/htmx";
 import { TemplatePartial } from "./TemplatePartial.ts";
 import { REFACE_EVENT } from "../../core/constants.ts";
-import { Reface } from "../../Reface.ts";
+import { RefaceComposer } from "../../RefaceComposer.ts";
 export class PartialsPlugin implements IPlugin {
   readonly name = "partials";
   private partials = new Map<string, () => Promise<unknown>>();
@@ -13,8 +13,8 @@ export class PartialsPlugin implements IPlugin {
     this.apiPrefix = options.apiPrefix || "/reface-partial";
   }
 
-  setup(reface: Reface) {
-    const manager = reface.getRenderManager();
+  setup(composer: RefaceComposer) {
+    const manager = composer.getRenderManager();
 
     manager.on(
       REFACE_EVENT.RENDER.TEMPLATE.START,

@@ -1,6 +1,6 @@
 import { assertEquals } from "@std/assert";
 import type { IPlugin, ITemplate } from "../core/types.ts";
-import { Reface } from "../Reface.ts";
+import { RefaceComposer } from "../RefaceComposer.ts";
 import { LoggerPlugin, type RenderLogEntry } from "../plugins/LoggerPlugin.ts";
 
 export interface TestUtilsOptions {
@@ -8,11 +8,11 @@ export interface TestUtilsOptions {
 }
 
 export class TestUtils {
-  public reface: Reface;
+  public reface: RefaceComposer;
   private logger: LoggerPlugin;
 
   constructor(options: TestUtilsOptions = {}) {
-    this.reface = new Reface();
+    this.reface = new RefaceComposer();
     this.logger = new LoggerPlugin();
 
     // Добавляем логгер первым
