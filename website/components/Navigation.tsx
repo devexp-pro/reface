@@ -17,6 +17,14 @@ const NavContainer = styled.nav`
     position: sticky;
     top: 5rem;
   }
+
+  @media (max-width: 1024px) {
+    & {
+      width: 100%;
+      position: static;
+      padding: 1rem;
+    }
+  }
 `;
 
 const Section = styled.div`

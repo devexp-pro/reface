@@ -10,7 +10,12 @@
     "@reface/plugins/styled": "../@reface/plugins/styled/mod.ts",
     "@reface/plugins/partials": "../@reface/plugins/partials/mod.ts",
     "@reface/components/LayoutSimple": "../@reface/components/LayoutSimple.ts",
-    "@reface/jsx.global.d.ts": "../@reface/jsx.global.d.ts"
+    "@reface/jsx.global.d.ts": "../@reface/jsx.global.d.ts",
+    "marked": "https://esm.sh/marked@9.1.5",
+    "unified": "npm:unified",
+    "remark-parse": "npm:remark-parse",
+    "remark-gfm": "npm:remark-gfm",
+    "mdast": "npm:@types/mdast"
   },
   "compilerOptions": {
     "jsx": "react",

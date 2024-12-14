@@ -1,4 +1,5 @@
-import { parseMarkdown, type ParsedMarkdown } from "./markdown.tsx";
+import { parseMarkdown } from "../modules/markdown/mod.tsx";
+import type { ParsedMarkdown } from "../modules/markdown/types.ts";
 import { loadDocFiles, type DocItem } from "../../docs/mod.ts";
 
 export interface DocPage {

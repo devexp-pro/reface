@@ -28,7 +28,7 @@ export const Layout = styled.div`
     display: flex;
     gap: 2rem;
     flex: 1;
-    padding: 2rem;
+    padding: 1rem;
     max-width: 90rem;
     margin: 0 auto;
     width: 100%;
@@ -39,15 +39,7 @@ export const Layout = styled.div`
     & {
       padding: 1.5rem;
       gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-  }
-
-  @media (max-width: 768px) {
-    & {
       flex-direction: column;
-      padding: 1rem;
-      gap: 1rem;
     }
   }
 `;

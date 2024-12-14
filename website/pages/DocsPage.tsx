@@ -2,7 +2,7 @@ import { styled } from "@reface/plugins/styled";
 import { Container, Header, Layout } from "../components/Layout.tsx";
 import { Logo, LogoText, BrandName, BrandTagline } from "../components/Logo.tsx";
 import { Navigation } from "../components/Navigation.tsx";
-import { Content, DocContent, TableOfContents } from "../components/Content.tsx";
+import { MarkdownContent, TableOfContents } from "../modules/markdown/mod.tsx";
 import type { DocSection, DocPage } from "../utils/docs.tsx";
 import { html } from "@reface";
 
@@ -29,30 +29,6 @@ const PageTransition = styled.div`
   }
 `;
 
-
-const TocItem = styled.li`
-  & {
-    margin: 0.25rem 0;
-  }
-`;
-
-const TocLink = styled.a`
-  & {
-    color: #64748b;
-    text-decoration: none;
-    
-    &:hover {
-      color: #2563eb;
-    }
-  }
-`;
-
-function extractTextFromMarkdown(text: string): string {
-  const linkPattern = /\[(.*?)\]\(.*?\)/;
-  const match = text.match(linkPattern);
-  return match ? match[1] : text;
-}
-
 const LogoLink = styled.a`
   & {
     display: flex;
@@ -66,12 +42,13 @@ const MobileMenuButton = styled.button`
   & {
     display: none;
     padding: 0.5rem;
-    cursor: pointer;
     background: none;
     border: none;
+    cursor: pointer;
+    color: var(--color-text);
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     & {
       display: flex;
       align-items: center;
@@ -91,7 +68,7 @@ const MobileNav = styled.div`
     display: none;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     &.mobile-nav {
       position: fixed;
       top: 4rem;
@@ -101,11 +78,41 @@ const MobileNav = styled.div`
       background: white;
       z-index: 50;
       overflow-y: auto;
-      padding: 1rem;
+      padding: 1.5rem;
       border-top: 1px solid var(--color-border);
+      transform: translateX(-100%);
+      transition: transform 0.3s ease-in-out;
+      -webkit-overflow-scrolling: touch;
     }
 
     &.is-open {
+      display: block;
+      transform: translateX(0);
+    }
+  }
+`;
+
+const ContentWrapper = styled.div`
+  & {
+    flex: 1;
+    min-width: 0;
+  }
+`;
+
+const MobileToc = styled.div`
+  & {
+    display: none;
+    margin: -1rem -1rem 2rem;
+    padding: 1rem;
+    background: var(--color-background);
+    border-bottom: 1px solid var(--color-border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  @media (max-width: 1024px) {
+    & {
       display: block;
     }
   }
@@ -143,47 +150,28 @@ export default function DocsPage({ sections, pages, currentPath }: DocsViewerPro
             sections={sections} 
             currentPath={currentPath} 
           />
-          {currentPage && currentPage.content.headings.length > 0 && (
-            <div style={{ marginTop: "2rem" }}>
-              <h4>On this page</h4>
-              <ul>
-                {currentPage.content.headings.map(heading => (
-                  <TocItem style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}>
-                    <TocLink href={`#${heading.slug}`}>
-                      {extractTextFromMarkdown(heading.text)}
-                    </TocLink>
-                  </TocItem>
-                ))}
-              </ul>
-            </div>
-          )}
         </MobileNav>
 
-        <Content>
+        <ContentWrapper>
+          {currentPage && currentPage.content.headings.length > 0 && (
+            <MobileToc>
+              <TableOfContents headings={currentPage.content.headings} class="mobile" />
+            </MobileToc>
+          )}
+
           <PageTransition>
             {currentPage ? (
-              <DocContent>
+              <MarkdownContent>
                 {currentPage.content.content}
-              </DocContent>
+              </MarkdownContent>
             ) : (
               <p>Page not found</p>
             )}
           </PageTransition>
-        </Content>
+        </ContentWrapper>
 
         {currentPage && currentPage.content.headings.length > 0 && (
-          <TableOfContents>
-            <h4>On this page</h4>
-            <ul>
-              {currentPage.content.headings.map(heading => (
-                <TocItem style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}>
-                  <TocLink href={`#${heading.slug}`}>
-                    {extractTextFromMarkdown(heading.text)}
-                  </TocLink>
-                </TocItem>
-              ))}
-            </ul>
-          </TableOfContents>
+          <TableOfContents headings={currentPage.content.headings} class="desktop" />
         )}
       </Layout>
 
@@ -192,9 +180,12 @@ export default function DocsPage({ sections, pages, currentPath }: DocsViewerPro
           const menuToggle = document.getElementById('menu-toggle');
           const mobileNav = document.getElementById('mobile-nav');
           const menuIcon = menuToggle.querySelector('svg path');
+          const body = document.body;
 
           menuToggle.addEventListener('click', () => {
             mobileNav.classList.toggle('is-open');
+            body.style.overflow = mobileNav.classList.contains('is-open') ? 'hidden' : '';
+            
             if (mobileNav.classList.contains('is-open')) {
               menuIcon.setAttribute('d', 'M6 18L18 6M6 6l12 12');
             } else {
@@ -206,6 +197,7 @@ export default function DocsPage({ sections, pages, currentPath }: DocsViewerPro
           mobileNav.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
               mobileNav.classList.remove('is-open');
+              body.style.overflow = '';
               menuIcon.setAttribute('d', 'M4 6h16M4 12h16M4 18h16');
             });
           });
