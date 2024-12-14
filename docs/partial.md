@@ -1,12 +1,12 @@
-# Islands
+# Partials
 
-Islands architecture in Reface allows creating interactive components with minimal JavaScript.
+Partials architecture in Reface allows creating interactive components with minimal JavaScript.
 
 ## Basic Concepts
 
-### What is an Island?
+### What is an Partial?
 
-An island is an isolated interactive component that:
+An partial is an isolated interactive component that:
 
 - Renders on the server
 - Hydrates independently
@@ -15,12 +15,12 @@ An island is an isolated interactive component that:
 
 ## Basic Usage
 
-### Simple Island
+### Simple Partial
 
 ```typescript
-import { island } from "@reface/plugins/island";
+import { partial } from "@reface/plugins/partials";
 
-const Counter = island(async () => {
+const Counter = partial(async () => {
   const count = 0;
   return (
     <div>
@@ -37,7 +37,7 @@ const Counter = island(async () => {
 ### With Data Fetching
 
 ```typescript
-const UserProfile = island(async () => {
+const UserProfile = partial(async () => {
   const user = await fetch("/api/user").then((r) => r.json());
   return (
     <div>
@@ -53,7 +53,7 @@ const UserProfile = island(async () => {
 ### Triggers
 
 ```typescript
-const SearchBox = island(async () => {
+const SearchBox = partial(async () => {
   return (
     <div>
       <input type="text" />
@@ -68,7 +68,7 @@ const SearchBox = island(async () => {
 ### Custom Events
 
 ```typescript
-const Form = island(async () => {
+const Form = partial(async () => {
   return (
     <form {...Form.trigger("submit")}>
       <input type="text" name="title" />
@@ -83,7 +83,7 @@ const Form = island(async () => {
 ### Local State
 
 ```typescript
-const TodoList = island(async () => {
+const TodoList = partial(async () => {
   const todos = await fetch("/api/todos").then((r) => r.json());
 
   return (
@@ -104,12 +104,12 @@ const TodoList = island(async () => {
 ### Shared State
 
 ```typescript
-const CartCounter = island(async () => {
+const CartCounter = partial(async () => {
   const count = await getCartCount();
   return <span>{count} items</span>;
 }, "cart-counter");
 
-const AddToCart = island(async () => {
+const AddToCart = partial(async () => {
   return (
     <button {...AddToCart.trigger()} data-rerender="cart-counter">
       Add to Cart
@@ -123,7 +123,7 @@ const AddToCart = island(async () => {
 ### Lazy Loading
 
 ```typescript
-const LazyComponent = island(async () => {
+const LazyComponent = partial(async () => {
   const Component = await import("./heavy-component");
   return <Component />;
 }, "lazy-component");
@@ -132,7 +132,7 @@ const LazyComponent = island(async () => {
 ### Conditional Rendering
 
 ```typescript
-const ConditionalIsland = island(async () => {
+const ConditionalPartial = partial(async () => {
   const shouldRender = await checkCondition();
 
   if (!shouldRender) {
@@ -172,7 +172,7 @@ const ConditionalIsland = island(async () => {
 
 ## Type Safety
 
-### Island Types
+### Partial Types
 
 ```typescript
 interface TodoItem {
@@ -181,7 +181,7 @@ interface TodoItem {
   completed: boolean;
 }
 
-const TypedTodoList = island<TodoItem[]>(async () => {
+const TypedTodoList = partial<TodoItem[]>(async () => {
   const todos = await fetch("/api/todos").then((r) => r.json());
   return (
     <ul>
@@ -205,7 +205,7 @@ const TypedTodoList = island<TodoItem[]>(async () => {
 ### Graceful Degradation
 
 ```typescript
-const ErrorBoundaryIsland = island(async () => {
+const ErrorBoundaryPartial = partial(async () => {
   try {
     const data = await riskyOperation();
     return <div>{data}</div>;
@@ -213,7 +213,7 @@ const ErrorBoundaryIsland = island(async () => {
     return (
       <div class="error">
         Something went wrong
-        <button {...ErrorBoundaryIsland.trigger()}>Retry</button>
+        <button {...ErrorBoundaryPartial.trigger()}>Retry</button>
       </div>
     );
   }

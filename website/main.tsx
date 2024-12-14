@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { serveStatic } from 'hono/deno'
 import { Reface, registerJSX } from "@reface";
 import { StyledPlugin } from "@reface/plugins/styled";
-import { IslandPlugin } from "@reface/plugins/island";
+import { PartialsPlugin } from "@reface/plugins/partials";
 import { LayoutSimple } from "@reface/components/LayoutSimple";
 import { loadDocs } from "./utils/docs.tsx";
 import { resolveFromFile } from "./utils/resolveFromFile.ts";
@@ -24,12 +24,12 @@ if (!pages.size) {
   console.log("Make sure you have documentation files in ./docs directory");
 }
 
-const ISLAND_API_PREFIX = '/reface-island';
+const PARTIAL_API_PREFIX = '/reface-partial';
 
 // Инициализируем Reface с плагинами
 const reface = new Reface();
 reface.use(new StyledPlugin());
-reface.use(new IslandPlugin({ apiPrefix: ISLAND_API_PREFIX }));
+reface.use(new PartialsPlugin({ apiPrefix: PARTIAL_API_PREFIX }));
 
 const Layout = component((_, children) =>
 <LayoutSimple
@@ -85,20 +85,20 @@ app.get("/docs/:page", (c) => {
 });
 
 // Добавляем обработчик островов
-app.get(`${ISLAND_API_PREFIX}/:island`, async (c) => {
-  const islandName = c.req.param('island');
+app.get(`${PARTIAL_API_PREFIX}/:partial`, async (c) => {
+  const partialName = c.req.param('partial');
   
   try {
-    const islandFn = await reface.getPlugin('island').getHandler(islandName);
-    const content = reface.render(await islandFn?.(c));
+    const partialFn = await reface.getPlugin('partial').getHandler(partialName);
+    const content = reface.render(await partialFn?.(c));
     if (!content) {
-      return c.text('Island not found', 404);
+      return c.text('Partial not found', 404);
     }
     
     return c.html(content);
     
   } catch (error) {
-    console.error(`Error rendering island ${islandName}:`, error);
+    console.error(`Error rendering partial ${partialName}:`, error);
     return c.text('Internal server error', 500);
   }
 });

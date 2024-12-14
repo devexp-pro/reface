@@ -1,4 +1,4 @@
-import { island } from "../island.ts";
+import { partial } from "../partial.ts";
 import { styled } from "@reface/plugins/styled";
 
 const DemoContainer = styled.div`
@@ -34,7 +34,7 @@ const DemoContainer = styled.div`
   }
 `;
 
-const IslandIcon = styled.div`
+const PartialIcon = styled.div`
   & {
     display: flex;
     align-items: center;
@@ -114,9 +114,8 @@ const Button = styled.button`
   }
 `;
 
-const JokeIsland = island(
+const JokePartial = partial(
   async (data) => {
-    console.log(data);
     const joke = await (await fetch(
       "https://icanhazdadjoke.com/",
       { headers: { "Accept": "text/plain" } },
@@ -130,24 +129,24 @@ const JokeIsland = island(
 export function DemoReface() {
   return (
     <DemoContainer>
-      <IslandIcon>
+      <PartialIcon>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M7 17L19 5" strokeLinecap="round" />
           <path d="M5 19L7 17" strokeLinecap="round" />
           <path d="M19 5L20 4M16 8L17 7M14 4L15 3M20 8L21 7" strokeLinecap="round" />
         </svg>
-      </IslandIcon>
+      </PartialIcon>
       <h2>HTMX-First Interactions</h2>
       <p class="description">
         Create interactive components with zero JavaScript. 
-        Islands handle the server-side logic while HTMX manages the client updates.
+        Partials handle the server-side logic while HTMX manages the client updates.
       </p>
 
       <div>
-        <JokeIsland>
+        <JokePartial>
           <JokeText>Click the button to load a dad joke!</JokeText>
-        </JokeIsland>
-        <Button {...JokeIsland.trigger("click")}>
+        </JokePartial>
+        <Button {...JokePartial.trigger("click")}>
           Get New Joke
         </Button>
       </div>

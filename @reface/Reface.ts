@@ -27,8 +27,19 @@ export class Reface {
   }
 
   // Получение плагина по имени
-  getPlugin<T extends IPlugin>(name: string): T | undefined {
-    return this.plugins.get(name) as T;
+  getPlugin<T extends IPlugin>(name: string): T | undefined;
+  getPlugin<T extends IPlugin>(
+    plugin: { new (...args: any[]): T },
+  ): T | undefined;
+  getPlugin<T extends IPlugin>(
+    nameOrPlugin: string | { new (...args: any[]): T },
+  ): T | undefined {
+    if (typeof nameOrPlugin === "string") {
+      return this.plugins.get(nameOrPlugin) as T;
+    } else {
+      const instances = Array.from(this.plugins.values());
+      return instances.find((plugin) => plugin instanceof nameOrPlugin) as T;
+    }
   }
 
   // Рендеринг шаблона

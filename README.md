@@ -16,7 +16,7 @@ Next-generation template engine for HTML with component system and plugin archit
 - 🧩 **Component-based** - Functional components with composition
 - 🔌 **Plugin System** - Extensible core architecture
 - 🎨 **Styled Components** - CSS-in-JS with type safety
-- 🏝️ **Islands Architecture** - Interactive components with minimal JS
+- 🏝️ **Partials Architecture** - Interactive components with minimal JS
 - 🚀 **Platform Agnostic** - Works with any HTTP framework
 
 ## Quick Start
@@ -24,12 +24,12 @@ Next-generation template engine for HTML with component system and plugin archit
 ```typescript
 import { Reface } from "jsr:@vseplet/reface";
 import { StyledPlugin } from "@vseplet/reface/styled";
-import { IslandPlugin } from "@vseplet/reface/island";
+import { PartialPlugin } from "@vseplet/reface/partials";
 
 // Create instance
 const reface = new Reface();
 reface.use(new StyledPlugin());
-reface.use(new IslandPlugin());
+reface.use(new PartialPlugin());
 
 // Create components
 const Button = styled.button`
@@ -42,7 +42,7 @@ const Button = styled.button`
   }
 `;
 
-const Counter = island(async () => {
+const Counter = partial(async () => {
   const count = 0;
   return (
     <div>
@@ -71,14 +71,14 @@ const html = reface.render(<HomePage />);
 - [📚 Documentation Site](./examples/docs-viewer) - Documentation with markdown support
 - [✅ Todo App](./examples/todo) - Classic todo application
 - [💬 Chat App](./examples/chat) - Real-time chat application
-- [📝 Blog](./examples/blog) - Blog with SSR and islands
+- [📝 Blog](./examples/blog) - Blog with SSR and partials
 
 ## Documentation
 
 - [Architecture](./docs/architecture.md) - Core concepts and design
 - [Components](./docs/components.md) - Component system
 - [Styling](./docs/styling.md) - CSS-in-JS styling
-- [Islands](./docs/islands.md) - Interactive components
+- [Partials](./docs/partials.md) - Interactive components
 - [Plugins](./docs/plugins.md) - Plugin system
 
 ## Contributing

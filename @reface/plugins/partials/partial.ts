@@ -1,24 +1,24 @@
 import type { ElementChildType } from "../../core/types.ts";
-import { TemplateIsland } from "./TemplateIsland.ts";
-import type { IslandFn } from "./types.ts";
+import { TemplatePartial } from "./TemplatePartial.ts";
+import type { PartialFn } from "./types.ts";
 import { hx, type HxBuilder, type HxTrigger } from "@reface/htmx";
 
-export interface IslandAPI<T> {
+export interface PartialAPI<T> {
   (props?: Record<string, unknown>, children?: ElementChildType[]):
-    | TemplateIsland<T>
+    | TemplatePartial<T>
     | ((
       strings?: TemplateStringsArray,
       ...values: ElementChildType[]
-    ) => TemplateIsland<T>);
+    ) => TemplatePartial<T>);
   trigger: (trigger?: HxTrigger) => HxBuilder;
 }
 
-export const island: IslandFn<any> = (handler, name) => {
-  const islandFn =
+export const partial: PartialFn<any> = (handler, name) => {
+  const partialFn =
     ((props: Record<string, unknown> = {}, children?: ElementChildType[]) => {
       if (children) {
         // Прямой вызов с children
-        return new TemplateIsland({
+        return new TemplatePartial({
           name,
           handler,
           attributes: props,
@@ -41,22 +41,22 @@ export const island: IslandFn<any> = (handler, name) => {
           }
         }
 
-        return new TemplateIsland({
+        return new TemplatePartial({
           name,
           handler,
           attributes: props,
           children: templateChildren,
         });
       };
-    }) as IslandAPI<typeof handler>;
+    }) as PartialAPI<typeof handler>;
 
   // Добавляем API для триггеров
-  islandFn.trigger = (trigger?: HxTrigger) => {
+  partialFn.trigger = (trigger?: HxTrigger) => {
     return hx()
-      .get(`/reface-island/${name}`)
-      .target(`[data-island='${name}']`)
+      .get(`/reface-partial/${name}`)
+      .target(`[data-partial='${name}']`)
       .trigger(trigger || "click");
   };
 
-  return islandFn;
+  return partialFn;
 };

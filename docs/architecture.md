@@ -53,7 +53,7 @@ reface.use(new StyledPlugin());
 - Style optimization
 - Automatic prefixing
 
-#### Island Plugin
+#### Partial Plugin
 
 - Interactive components
 - Progressive enhancement
@@ -86,7 +86,7 @@ ts
 │
 └── plugins/ # Official plugins
 ├── styled/ # CSS-in-JS
-└── island/ # Interactive components
+└── partial/ # Interactive components
 
 ````
 

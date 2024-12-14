@@ -8,7 +8,7 @@
     "@reface/htmx": "../@reface/htmx/mod.ts",
     "@reface/elements": "../@reface/elements/mod.ts",
     "@reface/plugins/styled": "../@reface/plugins/styled/mod.ts",
-    "@reface/plugins/island": "../@reface/plugins/island/mod.ts",
+    "@reface/plugins/partials": "../@reface/plugins/partials/mod.ts",
     "@reface/components/LayoutSimple": "../@reface/components/LayoutSimple.ts",
     "@reface/jsx.global.d.ts": "../@reface/jsx.global.d.ts"
   },

@@ -41,16 +41,16 @@ const Button = styled.button`
 `;
 ```
 
-### Island Plugin
+### Partial Plugin
 
 ```typescript
-import { IslandPlugin } from "@reface/plugins/island";
+import { PartialPlugin } from "@reface/plugins/partials";
 
 const reface = new Reface();
-reface.use(new IslandPlugin());
+reface.use(new PartialPlugin());
 
 // Create interactive component
-const Counter = island(async () => {
+const Counter = partial(async () => {
   return <div>Interactive content</div>;
 }, "counter");
 ```

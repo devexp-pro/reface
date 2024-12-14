@@ -1,7 +1,7 @@
 import { Hono } from "jsr:@hono/hono@4.5.6";
 import { createElement } from "@reface/jsx";
 import { styled } from "@reface/styled";
-import { island } from "@reface/island";
+import { island } from "@reface/partials";
 import { Reface, clean } from "@reface/core";
 
 const JokeText = styled.h2`

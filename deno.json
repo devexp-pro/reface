@@ -12,7 +12,7 @@
     "./htmx": "./@reface/htmx/mod.ts",
     "./elements": "./@reface/elements/mod.ts",
     "./plugins/styled": "./@reface/plugins/styled/mod.ts",
-    "./plugins/island": "./@reface/plugins/island/mod.ts",
+    "./plugins/partials": "./@reface/plugins/partials/mod.ts",
     "./plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
     "./components/LayoutSimple": "./@reface/components/LayoutSimple.ts",
     "./components/LayoutTWA": "./@reface/components/LayoutTWA.ts",
@@ -23,7 +23,7 @@
     "@reface/htmx": "./@reface/htmx/mod.ts",
     "@reface/elements": "./@reface/elements/mod.ts",
     "@reface/plugins/styled": "./@reface/plugins/styled/mod.ts",
-    "@reface/plugins/island": "./@reface/plugins/island/mod.ts",
+    "@reface/plugins/partials": "./@reface/plugins/partials/mod.ts",
     "@std/assert": "jsr:@std/assert@^1.0.1",
     "@std/crypto": "jsr:@std/crypto@^1.0.2"
   },

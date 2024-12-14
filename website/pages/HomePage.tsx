@@ -186,7 +186,7 @@ const InstallCommand = styled.div`
 `;
 
 const exampleCode = `
-import { Reface, clean, component, island, RESPONSE } from "@vseplet/reface";
+import { Reface, clean, component, partial, RESPONSE } from "@vseplet/reface";
 import { styled } from "@vseplet/reface/styled";
 
 // Create styled component
@@ -200,8 +200,8 @@ const Button = styled.button\`
   }
 \`;
 
-// Create interactive island
-const Counter = island<{ increment: null }, { count: number }>({
+// Create interactive partial
+const Counter = partial<{ increment: null }, { count: number }>({
   template: ({ props, rpc }) => (
     <div class="counter">
       <span id="count">{props.count}</span>

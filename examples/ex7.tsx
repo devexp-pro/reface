@@ -1,6 +1,6 @@
 import { createElement } from "@reface/jsx";
 import { styled } from "@reface/styled";
-import { island } from "@reface/island";
+import { island } from "@reface/partials";
 import { Reface, clean } from "@reface/core";
 
 const Container = styled.div`
