@@ -10,3 +10,8 @@ export interface IslandAPI<T> {
   trigger(trigger?: HxTrigger): HxBuilder;
   execute(): Promise<T>;
 }
+
+export type IslandFn<T> = (
+  handler: (data: T) => Promise<any>,
+  name: string,
+) => IslandAPI<T>;

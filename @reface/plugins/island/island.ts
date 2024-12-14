@@ -1,5 +1,6 @@
 import type { ElementChildType } from "../../core/types.ts";
 import { TemplateIsland } from "./TemplateIsland.ts";
+import type { IslandFn } from "./types.ts";
 import { hx, type HxBuilder, type HxTrigger } from "@reface/htmx";
 
 export interface IslandAPI<T> {
@@ -12,10 +13,7 @@ export interface IslandAPI<T> {
   trigger: (trigger?: HxTrigger) => HxBuilder;
 }
 
-export function island<T>(
-  handler: () => Promise<T>,
-  name: string,
-): IslandAPI<T> {
+export const island: IslandFn<any> = (handler, name) => {
   const islandFn =
     ((props: Record<string, unknown> = {}, children?: ElementChildType[]) => {
       if (children) {
@@ -50,7 +48,7 @@ export function island<T>(
           children: templateChildren,
         });
       };
-    }) as IslandAPI<T>;
+    }) as IslandAPI<typeof handler>;
 
   // Добавляем API для триггеров
   islandFn.trigger = (trigger?: HxTrigger) => {
@@ -61,4 +59,4 @@ export function island<T>(
   };
 
   return islandFn;
-}
+};

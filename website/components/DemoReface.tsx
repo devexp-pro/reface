@@ -1,4 +1,4 @@
-import { island } from "@reface/plugins/island";
+import { island } from "../island.ts";
 import { styled } from "@reface/plugins/styled";
 
 const DemoContainer = styled.div`
@@ -115,7 +115,8 @@ const Button = styled.button`
 `;
 
 const JokeIsland = island(
-  async () => {
+  async (data) => {
+    console.log(data);
     const joke = await (await fetch(
       "https://icanhazdadjoke.com/",
       { headers: { "Accept": "text/plain" } },
