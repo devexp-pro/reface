@@ -1,8 +1,9 @@
 import { component } from "../core/component.ts";
-import { assertRender } from "./testUtils.ts";
 import { html } from "../core/html.ts";
+import { TestUtils } from "./testUtils.ts";
 
 Deno.test("component - template literal usage", () => {
+  const utils = new TestUtils();
   const Button = component<{
     color?: string;
     size?: string;
@@ -12,18 +13,19 @@ Deno.test("component - template literal usage", () => {
     }">${children}</button>`
   );
 
-  assertRender(
+  utils.assertRender(
     Button({ color: "primary" })`Click me`,
     '<button class="btn btn-primary">Click me</button>',
   );
 });
 
 Deno.test("component - without children", () => {
+  const utils = new TestUtils();
   const Icon = component<{ name: string }>((props) =>
     html`<i class="icon-${props.name}"/>`
   );
 
-  assertRender(
+  utils.assertRender(
     Icon({ name: "home" })``,
     '<i class="icon-home"/>',
   );

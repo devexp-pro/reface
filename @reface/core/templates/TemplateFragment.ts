@@ -20,6 +20,7 @@ import type { ElementChildType, IRenderManager, ITemplate } from "../types.ts";
  * </>;
  */
 export class TemplateFragment implements ITemplate {
+  public type = "fragment";
   public children: ElementChildType[];
 
   constructor(children: ElementChildType[] = []) {

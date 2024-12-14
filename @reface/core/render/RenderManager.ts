@@ -14,6 +14,11 @@ import { REFACE_EVENT } from "../constants.ts";
 export class RenderManager implements IRenderManager {
   private handlers = new Map<RefaceEvent, Set<Function>>();
   private storage = new Map<string, unknown>();
+  private reface: Reface;
+
+  constructor({ reface }: { reface: Reface }) {
+    this.reface = reface;
+  }
 
   private withPhase<T extends unknown[], R>(
     phase: typeof REFACE_EVENT.RENDER[keyof typeof REFACE_EVENT.RENDER],

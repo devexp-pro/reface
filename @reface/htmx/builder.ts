@@ -1,11 +1,4 @@
-import type {
-  HxAttributes,
-  HxConfig,
-  HxMethod,
-  HxSelectMode,
-  HxSwapMode,
-  HxTrigger,
-} from "./types.ts";
+import type { HxAttributes, HxSwapMode, HxTrigger } from "./types.ts";
 
 export class HxBuilder implements HxAttributes {
   constructor() {}

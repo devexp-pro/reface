@@ -1,59 +1,51 @@
 import { assertEquals } from "@std/assert";
-import type { ITemplate } from "../core/types.ts";
+import type { IPlugin, ITemplate } from "../core/types.ts";
 import { Reface } from "../Reface.ts";
 import { LoggerPlugin, type RenderLogEntry } from "../plugins/LoggerPlugin.ts";
 
-export class TestUtils {
-  private reface: Reface;
-  private logger: LoggerPlugin | undefined;
+export interface TestUtilsOptions {
+  plugins?: IPlugin[];
+}
 
-  constructor() {
+export class TestUtils {
+  public reface: Reface;
+  private logger: LoggerPlugin;
+
+  constructor(options: TestUtilsOptions = {}) {
     this.reface = new Reface();
     this.logger = new LoggerPlugin();
+
+    // Добавляем логгер первым
     this.reface.use(this.logger);
+
+    // Добавляем остальные плагины
+    options.plugins?.forEach((plugin) => this.reface.use(plugin));
   }
 
   private formatRenderLog(logs: RenderLogEntry[]): string {
     return logs
       .map((log) => {
         const time = new Date(log.timestamp).toISOString();
-        return `
-[${time}] ${log.phase}
-Input: ${JSON.stringify(log.input, null, 2)}
-${log.output ? `Output: ${log.output}` : ""}
-`.trim();
+        return `[${time}] ${log.phase}\nInput: ${
+          JSON.stringify(log.input, null, 2)
+        }\n${log.output ? `Output: ${log.output}` : ""}`.trim();
       })
       .join("\n\n");
   }
 
-  private assertHtml(
-    actual: string,
-    expected: string,
-    message?: string,
-  ): void {
+  private assertHtml(actual: string, expected: string, message?: string): void {
     const normalizeHtml = (html: string): string =>
-      html
-        .replace(/\s+/g, " ")
-        .replace(/>\s+</g, "><")
-        .trim();
+      html.replace(/\s+/g, " ").replace(/>\s+</g, "><").trim();
 
-    assertEquals(
-      normalizeHtml(actual),
-      normalizeHtml(expected),
-      message,
-    );
+    assertEquals(normalizeHtml(actual), normalizeHtml(expected), message);
   }
 
-  assertRender(
-    template: ITemplate,
-    expected: string,
-  ): void {
+  assertRender(template: ITemplate, expected: string): void {
     const actual = this.reface.render(template);
 
     try {
       this.assertHtml(actual, expected);
     } catch (error) {
-      console.log("1111");
       if (this.logger) {
         const logs = this.logger.getLogs();
         const messages = [
@@ -70,10 +62,4 @@ ${log.output ? `Output: ${log.output}` : ""}
       throw error;
     }
   }
-
-  static instance = new TestUtils();
 }
-
-export const assertRender = TestUtils.instance.assertRender.bind(
-  TestUtils.instance,
-);

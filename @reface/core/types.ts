@@ -50,6 +50,7 @@ export type RenderHandler = (params: {
 
 // Базовые типы для шаблонов
 export interface ITemplate {
+  type: string;
   toHtml(manager: IRenderManager): string;
   payload?: Record<string, unknown>;
 }

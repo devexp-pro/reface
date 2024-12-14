@@ -2,10 +2,11 @@ import { createElement } from "../core/jsx/createElement.ts";
 import { html } from "../core/html.ts";
 import { component } from "../core/component.ts";
 import { createElement as ce } from "../core/createElement.ts";
-import { assertRender } from "./testUtils.ts";
+import { TestUtils } from "./testUtils.ts";
 import { ElementChildType } from "../core/types.ts";
 
 Deno.test("mixed usage - components with html and createElement", () => {
+  const utils = new TestUtils();
   const div = ce("div");
   
   const Layout = component<{ title: string, children: ElementChildType[] }>((props, children) => (
@@ -19,7 +20,7 @@ Deno.test("mixed usage - components with html and createElement", () => {
     html`<div class="content">Static HTML Content</div>`
   );
 
-  assertRender(
+  utils.assertRender(
     <Layout title="My Page">
       <Content/>
       {div({ class: "dynamic" })`Dynamic Content`}
@@ -35,13 +36,14 @@ Deno.test("mixed usage - components with html and createElement", () => {
 });
 
 Deno.test("mixed usage - html with components and createElement", () => {
+  const utils = new TestUtils();
   const span = ce("span");
   
   const Button = component<{ color: string, children: ElementChildType[] | ElementChildType }>((props, children) => (
     <button class={`btn-${props.color}`}>{children}</button>
   ));
 
-  assertRender(
+  utils.assertRender(
     html`
       <div class="container">
         ${<Button color="primary">Click me</Button>}
@@ -56,13 +58,14 @@ Deno.test("mixed usage - html with components and createElement", () => {
 });
 
 Deno.test("mixed usage - handles primitives", () => {
+  const utils = new TestUtils();
   const div = ce("div");
   
   const Content = component(() => 
     html`<span>${false}${null}${undefined}${0}${true}${""}</span>`
   );
 
-  assertRender(
+  utils.assertRender(
     <div>
       <Content/>
       {div({})`${false}${null}${undefined}${0}${true}${""}`}
@@ -75,6 +78,7 @@ Deno.test("mixed usage - handles primitives", () => {
 });
 
 Deno.test("attributes - class object syntax", () => {
+  const utils = new TestUtils();
   const Button = component<{ isActive: boolean }>((props) => (
     <button class={{ 
       btn: true, 
@@ -85,13 +89,14 @@ Deno.test("attributes - class object syntax", () => {
     </button>
   ));
 
-  assertRender(
+  utils.assertRender(
     <Button isActive={true}/>,
     '<button class="btn active">Click me</button>'
   );
 });
 
 Deno.test("attributes - class array syntax", () => {
+  const utils = new TestUtils();
   const Button = component<{ type: string }>((props) => (
     <button class={[
       "btn",
@@ -102,13 +107,14 @@ Deno.test("attributes - class array syntax", () => {
     </button>
   ));
 
-  assertRender(
+  utils.assertRender(
     <Button type="primary"/>,
     '<button class="btn btn-primary nested classes">Click me</button>'
   );
 });
 
 Deno.test("attributes - style object syntax", () => {
+  const utils = new TestUtils();
   const Box = component(() => (
     <div style={{ 
       marginTop: "10px",
@@ -119,13 +125,14 @@ Deno.test("attributes - style object syntax", () => {
     </div>
   ));
 
-  assertRender(
+  utils.assertRender(
     <Box/>,
     '<div style="margin-top: 10px; font-size: 14; background-color: #fff">Content</div>'
   );
 });
 
 Deno.test("attributes - style array syntax", () => {
+  const utils = new TestUtils();
   const Box = component<{ theme: "light" | "dark" }>((props) => (
     <div style={[
       "padding: 10px",
@@ -139,14 +146,15 @@ Deno.test("attributes - style array syntax", () => {
     </div>
   ));
 
-  assertRender(
+  utils.assertRender(
     <Box theme="dark"/>,
     '<div style="padding: 10px; background-color: #000; color: #fff; border: 1px solid; border-radius: 4px">Content</div>'
   );
 });
 
 Deno.test("attributes - handles duplicates and empty values", () => {
-  assertRender(
+  const utils = new TestUtils();
+  utils.assertRender(
     <div 
       class={[
         "btn btn", // duplicate in string

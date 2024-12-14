@@ -1,19 +1,21 @@
 import { createElement } from "../core/createElement.ts";
-import { assertRender } from "./testUtils.ts";
+import { TestUtils } from "./testUtils.ts";
 
 Deno.test("createElement - basic usage", () => {
+  const utils = new TestUtils();
   const div = createElement("div");
-  assertRender(
+  utils.assertRender(
     div({ class: "container" })`Hello World`,
     '<div class="container">Hello World</div>',
   );
 });
 
 Deno.test("createElement - nested elements", () => {
+  const utils = new TestUtils();
   const div = createElement("div");
   const span = createElement("span");
 
-  assertRender(
+  utils.assertRender(
     div({ class: "container" })`
       ${span({ class: "text" })`Hello`}
       ${span({ class: "text" })`World`}
@@ -23,9 +25,10 @@ Deno.test("createElement - nested elements", () => {
 });
 
 Deno.test("createElement - handles primitives", () => {
+  const utils = new TestUtils();
   const div = createElement("div");
 
-  assertRender(
+  utils.assertRender(
     div({ class: "container" })`
       ${false}
       ${null}

@@ -1,15 +1,17 @@
 import { createElement, Fragment } from "../core/jsx/mod.ts";
-import { assertRender } from "./testUtils.ts";
+import { TestUtils } from "./testUtils.ts";
 
 Deno.test("JSX - basic element rendering", () => {
-  assertRender(
+  const utils = new TestUtils();
+  utils.assertRender(
     <div class="container">Hello World</div>,
     '<div class="container">Hello World</div>'
   );
 });
 
 Deno.test("JSX - nested elements", () => {
-  assertRender(
+  const utils = new TestUtils();
+  utils.assertRender(
     <div class="container">
       <h1>Title</h1>
       <p>Content</p>
@@ -19,7 +21,8 @@ Deno.test("JSX - nested elements", () => {
 });
 
 Deno.test("JSX - fragments", () => {
-  assertRender(
+  const utils = new TestUtils();
+  utils.assertRender(
     <>
       <div>First</div>
       <div>Second</div>
@@ -29,8 +32,9 @@ Deno.test("JSX - fragments", () => {
 });
 
 Deno.test("JSX - conditional rendering", () => {
+  const utils = new TestUtils();
   const showContent = true;
-  assertRender(
+  utils.assertRender(
     <div>
       {showContent && <span>Visible</span>}
       {!showContent && <span>Hidden</span>}
@@ -40,7 +44,8 @@ Deno.test("JSX - conditional rendering", () => {
 });
 
 Deno.test("JSX - handles primitives", () => {
-  assertRender(
+  const utils = new TestUtils();
+  utils.assertRender(
     <div>
       {false}
       {null}

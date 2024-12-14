@@ -13,9 +13,7 @@ export class Reface {
   private renderManager: IRenderManager;
 
   constructor() {
-    this.renderManager = new RenderManager();
-    // Включаем логгер по умолчанию
-    this.use(new StyledPlugin());
+    this.renderManager = new RenderManager({ reface: this });
   }
 
   // Регистрация плагина
@@ -24,8 +22,8 @@ export class Reface {
       throw new Error(`Plugin "${plugin.name}" is already registered`);
     }
 
-    await plugin.setup(this);
     this.plugins.set(plugin.name, plugin);
+    await plugin.setup(this);
   }
 
   // Получение плагина по имени

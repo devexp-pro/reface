@@ -42,6 +42,7 @@ export interface ITemplateElementOptions {
  * });
  */
 export class TemplateElement implements ITemplateElement {
+  public type = "element";
   public tag: string;
   public attributes: HTMLAttributes;
   public children: ElementChildType[];

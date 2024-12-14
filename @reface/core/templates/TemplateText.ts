@@ -16,6 +16,7 @@ import { escapeHTML } from "../utils/mod.ts";
  * html`<div>${userInput}</div>`;
  */
 export class TemplateText implements ITemplate {
+  public type = "text";
   private escaped: string | null = null;
   private content: string;
 

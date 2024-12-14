@@ -14,6 +14,7 @@ import type { ElementChildType, IRenderManager, ITemplate } from "../types.ts";
  * html`<div>${value}</div>`;
  */
 export class TemplateHtml implements ITemplate {
+  public type = "html";
   children: ElementChildType[];
 
   constructor(children: ElementChildType[]) {
