@@ -7,6 +7,7 @@ export const base = ce("base");
 export const link = ce("link");
 export const meta = ce("meta");
 export const style = ce("style");
+export const body = ce("body");
 
 // Content Sectioning
 export const header = ce("header");
