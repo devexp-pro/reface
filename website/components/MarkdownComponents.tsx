@@ -1,4 +1,4 @@
-import { styled } from "@reface/styled";
+import { styled } from "@reface/plugins/styled";
 
 
 // Базовые стили для заголовков

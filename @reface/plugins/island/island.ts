@@ -56,7 +56,7 @@ export function island<T>(
   islandFn.trigger = (trigger?: HxTrigger) => {
     return hx()
       .get(`/reface-island/${name}`)
-      .target(`[data-island="${name}"]`)
+      .target(`[data-island='${name}']`)
       .trigger(trigger || "click");
   };
 

@@ -1,47 +1,50 @@
 import { component } from "../core/component.ts";
 import { html } from "../core/html.ts";
 import { body, head, link, meta, script, title } from "../elements/elements.ts";
+import type { ElementChildType } from "@reface";
 
 export type LayoutSimpleProps = {
   htmx?: boolean;
   bootstrap?: boolean;
-  head?: string;
+  head?: ElementChildType;
   title?: string;
   description?: string;
   favicon?: string;
 };
 
-export const LayoutSimple = component<LayoutSimpleProps>(({
-  title: pageTitle,
-  description,
-  favicon,
-  htmx,
-  bootstrap,
-  head: pageHead,
-}, children) =>
-  html`
+export const LayoutSimple = component<LayoutSimpleProps>((props, children) => {
+  const {
+    title: pageTitle,
+    description,
+    favicon,
+    htmx,
+    bootstrap,
+    head: pageHead,
+  } = props;
+
+  return html`
     <!DOCTYPE html>
     <html>
-      ${
-    head({}, [
-      meta({ charset: "UTF-8" }),
-      meta({
-        name: "viewport",
-        content: "width=device-width, initial-scale=1.0",
-      }),
-      title({}, [pageTitle]),
-      description && meta({ name: "description", content: description }),
-      favicon && link({ rel: "icon", href: favicon }),
-      htmx && script({ src: "https://unpkg.com/htmx.org@1.9.6" }),
-      bootstrap && link({
-        href:
-          "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
-        rel: "stylesheet",
-      }),
-      pageHead,
-    ])
+      ${head()`
+        ${meta({ charset: "UTF-8" })``}
+        ${meta({
+    name: "viewport",
+    content: "width=device-width, initial-scale=1.0",
+  })``}
+        ${title()`${pageTitle}`}
+        ${description && meta({ name: "description", content: description })``}
+        ${favicon && link({ rel: "icon", href: favicon })``}
+        ${htmx && script({ src: "https://unpkg.com/htmx.org@1.9.6" })``}
+        ${
+    bootstrap && link({
+      href:
+        "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
+      rel: "stylesheet",
+    })``
   }
-      ${body([children])}
+        ${pageHead}
+      `}
+      ${body()`${children}`}
     </html>
-  `
-);
+  `;
+});

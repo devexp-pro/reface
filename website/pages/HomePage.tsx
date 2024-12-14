@@ -1,5 +1,4 @@
-import { createElement, Fragment } from "@reface/jsx";
-import { styled } from "@reface/styled";
+import { styled } from "@reface/plugins/styled";
 import { Code } from "../components/Code.tsx";
 import { GITHUB_URL, DOCS_URL } from "../constants.ts";
 import { DemoReface } from "../components/DemoReface.tsx";

@@ -1,11 +1,10 @@
-import { createElement } from "@reface/jsx";
-import { styled } from "@reface/styled";
+import { styled } from "@reface/plugins/styled";
 import { Container, Header, Layout } from "../components/Layout.tsx";
 import { Logo, LogoText, BrandName, BrandTagline } from "../components/Logo.tsx";
 import { Navigation } from "../components/Navigation.tsx";
 import { Content, DocContent, TableOfContents } from "../components/Content.tsx";
 import type { DocSection, DocPage } from "../utils/docs.tsx";
-import { html } from "@reface/html";
+import { html } from "@reface";
 
 interface DocsViewerProps {
   sections: DocSection[];

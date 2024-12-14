@@ -49,7 +49,7 @@ export class IslandPlugin implements IPlugin {
   getTrigger(name: string, trigger?: HxTrigger): HxBuilder {
     return hx()
       .get(this.getIslandUrl(name))
-      .target(`[data-island="${name}"]`)
+      .target(`[data-island='${name}']`)
       .trigger(trigger || "click");
   }
 }

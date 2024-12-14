@@ -1,7 +1,5 @@
-import { createElement } from "@reface/jsx";
-import { island } from "@reface/island";
-import { styled } from "@reface/styled";
-import { html } from "@reface/html";
+import { island } from "@reface/plugins/island";
+import { styled } from "@reface/plugins/styled";
 
 const DemoContainer = styled.div`
   & {

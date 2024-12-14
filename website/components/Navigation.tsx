@@ -1,6 +1,5 @@
-import { createElement } from "@reface/jsx";
 import type { Template } from "@reface/types";
-import { styled } from "@reface/styled";
+import { styled } from "@reface/plugins/styled";
 import type { DocSection } from "../utils/docs.tsx";
 
 interface NavigationProps {

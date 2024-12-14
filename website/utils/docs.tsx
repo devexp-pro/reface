@@ -1,4 +1,3 @@
-import { createElement } from "@reface/jsx";
 import { parseMarkdown, type ParsedMarkdown } from "./markdown.tsx";
 
 export interface DocPage {

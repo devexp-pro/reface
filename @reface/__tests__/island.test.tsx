@@ -80,7 +80,7 @@ Deno.test("Island - HTMX integration", () => {
     </button>,
     `<button 
       hx-get="/reface-island/test-htmx"
-      hx-target="[data-island="test-htmx"]"
+      hx-target="[data-island='test-htmx']"
       hx-trigger="click">Click me</button>`
   );
 });

@@ -1,5 +1,4 @@
-import { createElement } from "@reface/jsx";
-import { styled } from "@reface/styled";
+import { styled } from "@reface/plugins/styled";
 
 // Утилиты для токенизации
 function hashColor(str: string): string {
