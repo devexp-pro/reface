@@ -2,43 +2,36 @@
   <img src="./website/public/assets/logo.png" alt="Reface Logo" width="200" />
 </div>
 
-# [Reface 🎭](https://reface.deno.dev/)
+# [Reface](https://reface.deno.dev/)
 
 [![JSR](https://jsr.io/badges/@vseplet/reface)](https://jsr.io/@vseplet/reface)
 [![JSR Score](https://jsr.io/badges/@vseplet/reface/score)](https://jsr.io/@vseplet/reface)
 [![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/gT4gvVwqb8)
 
-Легкий и типизированный шаблонизатор для создания HTML с поддержкой компонентов, стилей и скриптов.
+Next-generation template engine for HTML with component system and plugin architecture.
 
-## Основные возможности
+## Features
 
-- Template literals для создания HTML
-- Компонентный подход
-- Встроенная поддержка стилей
-- Встроенная поддержка скриптов
-- Полная типизация TypeScript
-- Нет зависимостей
-- Поддержка SSR
-
-<div align="center">
-  <img src="./ex4.gif" alt="Web Terminal Example" width="600" />
-  <p><em>Simple Web Terminal Example</em></p>
-</div>
+- 🎯 **Type-safe** - Full TypeScript support with JSX
+- 🧩 **Component-based** - Functional components with composition
+- 🔌 **Plugin System** - Extensible core architecture
+- 🎨 **Styled Components** - CSS-in-JS with type safety
+- 🏝️ **Islands Architecture** - Interactive components with minimal JS
+- 🚀 **Platform Agnostic** - Works with any HTTP framework
 
 ## Quick Start
 
-```bash
-# Using Deno
-import { Reface } from "jsr:@vseplet/reface"
-```
+```typescript
+import { Reface } from "jsr:@vseplet/reface";
+import { StyledPlugin } from "@vseplet/reface/styled";
+import { IslandPlugin } from "@vseplet/reface/island";
 
-## Example
+// Create instance
+const reface = new Reface();
+reface.use(new StyledPlugin());
+reface.use(new IslandPlugin());
 
-```tsx
-import { Reface, clean, component, island, RESPONSE } from "@vseplet/reface";
-import { styled } from "@vseplet/reface/styled";
-
-// Create styled component
+// Create components
 const Button = styled.button`
   & {
     background: var(--primary-color, #3182ce);
@@ -49,43 +42,31 @@ const Button = styled.button`
   }
 `;
 
-// Create interactive island
-const Counter = island<{ increment: null }, { count: number }>({
-  template: ({ props, rpc }) => (
-    <div class="counter">
-      <span id="count">{props.count}</span>
-      <Button {...rpc.hx.increment()}>+1</Button>
+const Counter = island(async () => {
+  const count = 0;
+  return (
+    <div>
+      <span>{count}</span>
+      <Button {...Counter.trigger()}>Increment</Button>
     </div>
-  ),
-  rpc: {
-    increment: async ({ args }) => {
-      const newCount = args.count + 1;
-      return RESPONSE(<span>{newCount}</span>);
-    },
-  },
-});
+  );
+}, "counter");
 
-// Create page component
-const HomePage = component(() => (
-  <div class="container">
-    <h1>Welcome to Reface</h1>
-    <Counter count={0} />
-  </div>
-));
+// Create page
+function HomePage() {
+  return (
+    <div>
+      <h1>Welcome to Reface</h1>
+      <Counter />
+    </div>
+  );
+}
 
-// Setup application
-const app = new Reface({
-  layout: clean({
-    htmx: true,
-    bootstrap: true,
-  }),
-}).page("/", HomePage);
-
-// Start server
-Deno.serve(app.fetch);
+// Render
+const html = reface.render(<HomePage />);
 ```
 
-## More Examples
+## Examples
 
 - [📚 Documentation Site](./examples/docs-viewer) - Documentation with markdown support
 - [✅ Todo App](./examples/todo) - Classic todo application
@@ -94,11 +75,15 @@ Deno.serve(app.fetch);
 
 ## Documentation
 
-Check out our [documentation](./docs/readme.md) for detailed guides and API reference.
+- [Architecture](./docs/architecture.md) - Core concepts and design
+- [Components](./docs/components.md) - Component system
+- [Styling](./docs/styling.md) - CSS-in-JS styling
+- [Islands](./docs/islands.md) - Interactive components
+- [Plugins](./docs/plugins.md) - Plugin system
 
 ## Contributing
 
-We welcome contributions! Please see our [contributing guide](./CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
 
 ## License
 
