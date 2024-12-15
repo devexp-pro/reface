@@ -1,4 +1,4 @@
-import { createElement, Fragment } from "../core/jsx/mod.ts";
+import "@reface/jsx/global";
 import { TestUtils } from "./testUtils.ts";
 
 Deno.test("JSX - basic element rendering", () => {

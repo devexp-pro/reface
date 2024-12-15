@@ -1,5 +1,5 @@
-import type { ElementChildType, ITemplate } from "./types.ts";
-import { TemplateElement } from "./templates/TemplateElement.ts";
+import type { ElementChildType, IElementFactory } from "@reface/types";
+import { RefaceTemplateElement } from "@reface";
 
 /**
  * Creates a template function for HTML elements with template literal support.
@@ -9,7 +9,7 @@ import { TemplateElement } from "./templates/TemplateElement.ts";
  *
  * @example
  * // Create custom element
- * const customDiv = createElement('div');
+ * const customDiv = elementFactory('div');
  *
  * // Usage:
  * customDiv({ class: 'container' })`
@@ -20,7 +20,7 @@ import { TemplateElement } from "./templates/TemplateElement.ts";
  * div({ class: 'container' })`content`;
  * span({ id: 'text' })`text content`;
  */
-export function createElement(tag: string) {
+export const elementFactory: IElementFactory = (tag: string) => {
   // Создаем функцию элемента с поддержкой обоих вариантов вызова
   const elementFn = (
     attributes: Record<string, unknown> = {},
@@ -28,7 +28,7 @@ export function createElement(tag: string) {
   ) => {
     if (children) {
       // Прямой вызов с children
-      return new TemplateElement({
+      return new RefaceTemplateElement({
         tag,
         attributes,
         children,
@@ -37,7 +37,7 @@ export function createElement(tag: string) {
 
     // Возвращаем функцию для template literals
     return (
-      strings: TemplateStringsArray = [],
+      strings: TemplateStringsArray = Object.assign([], { raw: [] }),
       ...values: ElementChildType[]
     ) => {
       const templateChildren = [];
@@ -49,7 +49,7 @@ export function createElement(tag: string) {
           templateChildren.push(values[i]);
         }
       }
-      return new TemplateElement({
+      return new RefaceTemplateElement({
         tag,
         attributes,
         children: templateChildren,
@@ -58,4 +58,4 @@ export function createElement(tag: string) {
   };
 
   return elementFn;
-}
+};

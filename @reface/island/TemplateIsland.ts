@@ -1,12 +1,12 @@
-import { TemplateElement } from "../core/templates/TemplateElement.ts";
-import { Template } from "../core/types.ts";
+import { RefaceTemplateElement } from "@reface";
+import type { IRefaceTemplate } from "@reface/types";
 
-export class TemplateIsland extends TemplateElement {
-  readonly type = "island";
+export class TemplateIsland extends RefaceTemplateElement {
+  public override type = "island";
 
   constructor(
     public name: string,
-    public content: Template,
+    public content: IRefaceTemplate,
     public state?: unknown,
     public rpc?: Record<string, (args: unknown) => Promise<unknown>>,
   ) {
@@ -22,7 +22,7 @@ export class TemplateIsland extends TemplateElement {
 
   static create(
     name: string,
-    content: Template,
+    content: IRefaceTemplate,
     state?: unknown,
     rpc?: Record<string, (args: unknown) => Promise<unknown>>,
   ): TemplateIsland {

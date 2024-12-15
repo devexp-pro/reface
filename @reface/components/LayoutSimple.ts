@@ -1,7 +1,6 @@
-import { component } from "../core/component.ts";
-import { html } from "../core/html.ts";
-import { body, head, link, meta, script, title } from "../elements/elements.ts";
-import type { ElementChildType } from "@reface";
+import { component, html } from "@reface";
+import type { ElementChildType } from "@reface/types";
+import { body, head, link, meta, script, title } from "@reface/elements";
 
 export type LayoutSimpleProps = {
   htmx?: boolean;

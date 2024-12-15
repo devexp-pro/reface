@@ -1,5 +1,5 @@
-import { createElement } from "../core/jsx/createElement.ts";
-import { component } from "../core/component.ts";
+import "@reface/jsx/global";
+import { component } from "@reface";
 import { TestUtils } from "./testUtils.ts";
 
 interface ButtonProps {

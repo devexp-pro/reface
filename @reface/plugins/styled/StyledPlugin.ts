@@ -1,20 +1,20 @@
-import { REFACE_EVENT } from "../../core/constants.ts";
-import type { IPlugin } from "../../core/types.ts";
-import type { StyledComponent } from "./types.ts";
+import { REFACE_EVENT } from "@reface/constants";
+import type { IRefaceComposerPlugin } from "@reface/types";
+import type { IStyledComponent } from "./types.ts";
 
-export class StyledPlugin implements IPlugin {
+export class StyledPlugin implements IRefaceComposerPlugin {
   name = "styled";
   private collectedStyles = new Set<string>();
 
-  setup(reface) {
-    const manager = reface.getRenderManager();
+  setup: IRefaceComposerPlugin["setup"] = (composer) => {
+    const manager = composer.getRenderManager();
 
     manager.on(REFACE_EVENT.RENDER.RENDER.START, () => {
       this.collectedStyles.clear();
     });
 
     manager.on(REFACE_EVENT.RENDER.TEMPLATE.START, ({ template }) => {
-      const styledComponent = template as Partial<StyledComponent>;
+      const styledComponent = template as Partial<IStyledComponent>;
       if (styledComponent.payload?.styled?.styles) {
         this.collectedStyles.add(styledComponent.payload.styled.styles);
       }
@@ -27,5 +27,5 @@ export class StyledPlugin implements IPlugin {
       const styles = Array.from(this.collectedStyles).join("\n");
       return `${html}<style>\n${styles}\n</style>`;
     });
-  }
+  };
 }

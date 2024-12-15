@@ -1,8 +1,7 @@
-import { createElement } from "../core/jsx/mod.ts";
-import { styled } from "../plugins/styled/mod.ts";
+import "@reface/jsx/global";
+import { styled } from "@reface/plugins/styled";
+import { StyledPlugin } from "@reface/plugins/styled";
 import { TestUtils } from "./testUtils.ts";
-import { StyledPlugin } from "../plugins/styled/mod.ts";
-
 // Tag based components
 Deno.test("styled.div - should create basic styled div", () => {
   const utils = new TestUtils({ plugins: [new StyledPlugin()] });

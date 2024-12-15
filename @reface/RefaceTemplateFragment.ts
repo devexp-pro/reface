@@ -1,10 +1,14 @@
-import type { ElementChildType, IRenderManager, ITemplate } from "../types.ts";
+import type {
+  ElementChildType,
+  IRefaceRenderManager,
+  IRefaceTemplate,
+} from "@reface/types";
 
 /**
  * Represents a group of templates without adding extra HTML elements.
  * Used for JSX Fragments and grouping multiple elements.
  *
- * @implements {ITemplate}
+ * @implements {IRefaceTemplate}
  *
  * @example
  * // Basic fragment
@@ -19,7 +23,7 @@ import type { ElementChildType, IRenderManager, ITemplate } from "../types.ts";
  *   <div>Second</div>
  * </>;
  */
-export class TemplateFragment implements ITemplate {
+export class RefaceTemplateFragment implements IRefaceTemplate {
   public type = "fragment";
   public children: ElementChildType[];
 
@@ -27,7 +31,7 @@ export class TemplateFragment implements ITemplate {
     this.children = children;
   }
 
-  toHtml(manager: IRenderManager): string {
+  toHtml(manager: IRefaceRenderManager): string {
     return manager.renderChildren(this.children);
   }
 }

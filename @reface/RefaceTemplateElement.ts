@@ -1,23 +1,23 @@
 import type {
   ElementChildType,
   HTMLAttributes,
-  IRenderManager,
-  ITemplateElement,
-} from "../types.ts";
-import { VOID_ELEMENTS } from "../constants.ts";
+  IRefaceRenderManager,
+  IRefaceTemplateElement,
+} from "@reface/types";
+import { VOID_ELEMENTS } from "./constants.ts";
 
-export interface ITemplateElementOptions {
+export type IRefaceTemplateElementOptions = {
   tag?: string;
   attributes?: HTMLAttributes;
   children?: ElementChildType[];
   payload?: Record<string, unknown>;
-}
+};
 
 /**
  * Represents an HTML element in the template system.
  * Handles rendering of HTML tags, attributes and children.
  *
- * @implements {ITemplateElement}
+ * @implements {IRefaceTemplateElement}
  *
  * @example
  * // Basic element
@@ -41,21 +41,21 @@ export interface ITemplateElementOptions {
  *   ]
  * });
  */
-export class TemplateElement implements ITemplateElement {
+export class RefaceTemplateElement implements IRefaceTemplateElement {
   public type = "element";
   public tag: string;
   public attributes: HTMLAttributes;
   public children: ElementChildType[];
   public payload: Record<string, unknown>;
 
-  constructor(options: ITemplateElementOptions) {
+  constructor(options: IRefaceTemplateElementOptions) {
     this.tag = options.tag || "div";
     this.attributes = options.attributes || {};
     this.children = options.children || [];
     this.payload = options.payload || {};
   }
 
-  toHtml(manager: IRenderManager): string {
+  toHtml(manager: IRefaceRenderManager): string {
     const attrs = manager.renderAttributes(this.attributes);
 
     if (VOID_ELEMENTS.has(this.tag)) {

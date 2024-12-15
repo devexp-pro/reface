@@ -1,6 +1,7 @@
-import type { ElementChildType, ITemplate } from "./types.ts";
-import { TemplateHtml, TemplateText } from "./templates/mod.ts";
-import { isEmptyValue, isTemplate } from "./render/renderUtils.ts";
+import { RefaceTemplateHtml, RefaceTemplateText } from "@reface";
+import type { ElementChildType, IRefaceTemplate } from "@reface/types";
+
+import { isEmptyValue, isTemplate } from "./utils/renderUtils.ts";
 
 /**
  * Creates an HTML template from a template literal or string.
@@ -25,16 +26,16 @@ import { isEmptyValue, isTemplate } from "./render/renderUtils.ts";
 export function html(
   strings: TemplateStringsArray | string,
   ...values: ElementChildType[]
-): ITemplate {
+): IRefaceTemplate {
   if (typeof strings === "string") {
-    return new TemplateHtml([strings]);
+    return new RefaceTemplateHtml([strings]);
   }
 
   const children: ElementChildType[] = [];
 
   for (let i = 0; i < strings.length; i++) {
     if (strings[i]) {
-      children.push(new TemplateHtml([strings[i]]));
+      children.push(new RefaceTemplateHtml([strings[i]]));
     }
 
     if (i < values.length) {
@@ -44,10 +45,10 @@ export function html(
       } else if (isTemplate(value)) {
         children.push(value);
       } else if (!isEmptyValue(value)) {
-        children.push(new TemplateText(String(value)));
+        children.push(new RefaceTemplateText(String(value)));
       }
     }
   }
 
-  return new TemplateHtml(children);
+  return new RefaceTemplateHtml(children);
 }

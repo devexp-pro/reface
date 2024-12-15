@@ -1,8 +1,12 @@
-import type { ComponentProps, ElementChildType, ITemplate } from "../types.ts";
+import type {
+  ComponentProps,
+  ElementChildType,
+  IRefaceTemplate,
+} from "@reface/types";
 
 declare global {
   namespace JSX {
-    type Element = ITemplate;
+    type Element = IRefaceTemplate;
 
     interface ElementChildrenAttribute {
       children: ElementChildType | ElementChildType[];

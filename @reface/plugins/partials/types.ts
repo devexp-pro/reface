@@ -1,17 +1,22 @@
-import type { HxTrigger } from "../../htmx/builder.ts";
-import type { TemplatePartial } from "./TemplatePartial.ts";
+import type { IRefaceTemplateElement } from "@reface";
 
 export interface PartialPluginOptions {
   apiPrefix?: string;
 }
 
-export interface PartialAPI<T> {
-  (props?: Record<string, unknown>, children?: unknown[]): TemplatePartial;
-  trigger(trigger?: HxTrigger): HxBuilder;
-  execute(): Promise<T>;
+export interface IPartialHandler<T = unknown> {
+  (data?: unknown): Promise<T>;
+}
+
+export interface IPartialAPI<T> {
+  (props?: Record<string, unknown>): IRefaceTemplateElement;
+  handler: IPartialHandler<T>;
+  name: string;
+  execute: () => Promise<T>;
+  trigger: (event?: string) => Record<string, string>;
 }
 
 export type PartialFn<T> = (
   handler: (data: T) => Promise<any>,
   name: string,
-) => PartialAPI<T>;
+) => IPartialAPI<T>;

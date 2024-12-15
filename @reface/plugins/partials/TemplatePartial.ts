@@ -1,16 +1,16 @@
-import { TemplateElement } from "../../core/templates/TemplateElement.ts";
-import type { ElementChildType } from "../../core/types.ts";
+import { RefaceTemplateElement } from "../../RefaceTemplateElement.ts";
+import type { ElementChildType } from "@reface/types";
 
 export interface TemplatePartialOptions<T> {
   name: string;
-  handler: () => Promise<T>;
+  handler: (args?: any) => Promise<T>;
   attributes?: Record<string, unknown>;
   children?: ElementChildType[];
 }
 
-export class TemplatePartial<T> extends TemplateElement {
+export class TemplatePartial<T> extends RefaceTemplateElement {
   public override type = "partial";
-  public handler: () => Promise<T>;
+  public handler: (args?: any) => Promise<T>;
 
   constructor(options: TemplatePartialOptions<T>) {
     super({

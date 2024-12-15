@@ -1,4 +1,4 @@
-import { createElement as ce } from "../core/createElement.ts";
+import { elementFactory as ce } from "./elementFactory.ts";
 
 // Document Metadata
 export const head = ce("head");

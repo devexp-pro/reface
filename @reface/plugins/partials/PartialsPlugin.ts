@@ -1,10 +1,12 @@
-import type { IPlugin, ITemplate } from "../../core/types.ts";
+import type { IRefaceTemplate } from "@reface/types";
 import type { PartialPluginOptions } from "./types.ts";
 import { hx, type HxBuilder, type HxTrigger } from "@reface/htmx";
 import { TemplatePartial } from "./TemplatePartial.ts";
-import { REFACE_EVENT } from "../../core/constants.ts";
+import { REFACE_EVENT } from "@reface/constants";
 import { RefaceComposer } from "../../RefaceComposer.ts";
-export class PartialsPlugin implements IPlugin {
+import type { IRefaceComposerPlugin } from "@reface/types";
+
+export class PartialsPlugin implements IRefaceComposerPlugin {
   readonly name = "partials";
   private partials = new Map<string, () => Promise<unknown>>();
   private apiPrefix: string;
@@ -18,7 +20,7 @@ export class PartialsPlugin implements IPlugin {
 
     manager.on(
       REFACE_EVENT.RENDER.TEMPLATE.START,
-      ({ template }: { template: ITemplate }) => {
+      ({ template }: { template: IRefaceTemplate }) => {
         if (template instanceof TemplatePartial) {
           this.registerPartial(template);
         }

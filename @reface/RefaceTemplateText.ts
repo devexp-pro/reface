@@ -1,11 +1,11 @@
-import type { IRenderManager, ITemplate } from "../types.ts";
-import { escapeHTML } from "../utils/mod.ts";
+import type { IRefaceRenderManager, IRefaceTemplate } from "@reface/types";
+import { escapeHTML } from "./utils/mod.ts";
 
 /**
  * Represents text content that needs to be escaped for safe HTML rendering.
  * Handles HTML escaping and caches the result.
  *
- * @implements {ITemplate}
+ * @implements {IRefaceTemplate}
  *
  * @example
  * // Safe text content
@@ -15,7 +15,7 @@ import { escapeHTML } from "../utils/mod.ts";
  * // Used in template literals
  * html`<div>${userInput}</div>`;
  */
-export class TemplateText implements ITemplate {
+export class RefaceTemplateText implements IRefaceTemplate {
   public type = "text";
   private escaped: string | null = null;
   private content: string;
@@ -24,7 +24,7 @@ export class TemplateText implements ITemplate {
     this.content = content;
   }
 
-  toHtml(_manager: IRenderManager): string {
+  toHtml(_manager: IRefaceRenderManager): string {
     if (this.escaped === null) {
       this.escaped = escapeHTML(this.content);
     }

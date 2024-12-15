@@ -2,10 +2,9 @@ import type {
   Component,
   ComponentProps,
   ElementChildType,
-  ITemplate,
-  JSXComponent,
-} from "../types.ts";
-import { TemplateElement } from "../templates/mod.ts";
+  IRefaceTemplate,
+} from "@reface/types";
+import { RefaceTemplateElement } from "@reface";
 
 /**
  * Creates elements for JSX. Handles both HTML elements and components.
@@ -30,14 +29,14 @@ export function createElement<P extends ComponentProps = ComponentProps>(
   type: string | Component<P>,
   props: P | null,
   ...children: ElementChildType[]
-): ITemplate {
+): IRefaceTemplate {
   // Для функциональных компонентов
   if (typeof type === "function") {
     return type(props ?? {} as P, children);
   }
 
   // Для HTML элементов
-  return new TemplateElement({
+  return new RefaceTemplateElement({
     tag: type,
     attributes: props ?? {},
     children,

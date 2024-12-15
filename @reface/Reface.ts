@@ -1,4 +1,3 @@
-// @reface/Reface.ts
 import { RefaceComposer } from "./RefaceComposer.ts";
 import { PartialsPlugin } from "./plugins/partials/mod.ts";
 import { StyledPlugin } from "./plugins/styled/mod.ts";
@@ -8,14 +7,15 @@ import {
   type RpcResponse,
   TemplateIsland,
 } from "./island/mod.ts";
-import type { IPlugin } from "./RefaceComposer.ts";
-import type { Template } from "./core/types.ts";
+import type { IRefaceComposerPlugin, IRefaceTemplate } from "@reface/types";
 import { Hono } from "@hono/hono";
 import type { Context } from "@hono/hono";
 
+import "./jsx/jsx.global.d.ts";
+
 export interface RefaceOptions {
-  plugins?: IPlugin[];
-  layout?: (props: unknown, content: Template) => Template;
+  plugins?: IRefaceComposerPlugin[];
+  layout?: (props: unknown, content: IRefaceTemplate) => IRefaceTemplate;
   partialApiPrefix?: string;
 }
 
@@ -23,7 +23,10 @@ export class Reface {
   private composer: RefaceComposer;
   private islandPlugin: IslandPlugin;
   private partialsPlugin: PartialsPlugin;
-  private layout?: (props: unknown, content: Template) => Template;
+  private layout?: (
+    props: unknown,
+    content: IRefaceTemplate,
+  ) => IRefaceTemplate;
   private islands = new Map<string, Island<any, any, any>>();
   private islandProps = new Map<string, unknown>();
   private PARTIAL_API_PREFIX: string;
@@ -53,8 +56,8 @@ export class Reface {
         return c.text("Partial not found", 404);
       }
 
-      const template = await handler(c);
-      const content = this.composer.render(template);
+      const template = await handler();
+      const content = this.composer.render(template as IRefaceTemplate);
 
       return c.html(content);
     } catch (error) {
@@ -105,7 +108,7 @@ export class Reface {
       this.islandPlugin.setIslandState(name, island.initialState);
     }
 
-    return (props: Props): Template => {
+    return (props: Props): IRefaceTemplate => {
       this.islandProps.set(name, props);
 
       const state = this.islandPlugin.getIslandState<State>(name) ||
@@ -184,10 +187,11 @@ export class Reface {
         state: response.state,
         status: response.status || 200,
       };
-    } catch (error) {
+    } catch (e) {
+      const error = e as Error;
       console.error(`RPC Error:`, error);
       return {
-        html: `<div class="error">${error.message}</div>`,
+        html: `<div class="error">${error?.message || "Unknown error"}</div>`,
         status: 500,
       };
     }
@@ -201,7 +205,7 @@ export class Reface {
   }
 
   // Рендеринг шаблона
-  render(template: Template): string {
+  render(template: IRefaceTemplate): string {
     let content = template;
 
     // Если есть layout - оборачиваем контент
@@ -212,9 +216,12 @@ export class Reface {
     // Рендерим финальный шаблон через композер
     try {
       return this.composer.render(content);
-    } catch (error) {
+    } catch (e) {
+      const error = e as Error;
       console.error(`Render Error:`, error);
-      return `<div class="error">Render Error: ${error.message}</div>`;
+      return `<div class="error">Render Error: ${
+        error?.message || "Unknown error"
+      }</div>`;
     }
   }
 

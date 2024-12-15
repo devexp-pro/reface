@@ -1,5 +1,4 @@
-import { component } from "../core/component.ts";
-import { html } from "../core/html.ts";
+import { component, html } from "@reface";
 import { TestUtils } from "./testUtils.ts";
 
 Deno.test("component - template literal usage", () => {

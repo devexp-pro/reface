@@ -1,4 +1,4 @@
-import type { Template } from "../@reface/mod.ts";
+import type { IRefaceTemplate } from "@reface/types";
 import { styled } from "@reface/plugins/styled";
 import type { DocSection } from "../utils/docs.tsx";
 
@@ -86,7 +86,7 @@ const NavLink = styled.a`
   }
 `;
 
-export function Navigation({ sections, currentPath }: NavigationProps): Template {
+export function Navigation({ sections, currentPath }: NavigationProps): IRefaceTemplate {
   return (
     <NavContainer>
       {sections.map(section => (

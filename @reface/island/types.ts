@@ -1,12 +1,12 @@
 // @reface/island/types.ts
-import type { Template } from "../core/types.ts";
+import type { IRefaceTemplate } from "@reface/types";
 
 // Базовый интерфейс для RPC ответа
 export interface RpcResponse<S = unknown> {
   // Новое состояние (опционально)
   state?: Partial<S>;
   // HTML для обновления
-  html?: Template | string;
+  html?: IRefaceTemplate | string;
   // Статус ответа
   status?: number;
 }
@@ -19,8 +19,8 @@ export interface RpcContext<S> {
 
 // Преобразование RPC методов в HTMX атрибуты
 export type RpcToHtmx<T> = {
-  [K in keyof T]: T[K] extends (args: infer A) => Promise<any>
-    ? (args?: A) => string
+  [K in keyof T]: T[K] extends (...args: any[]) => Promise<any>
+    ? (args?: Parameters<T[K]>[0]) => Record<string, string>
     : never;
 };
 
@@ -31,13 +31,23 @@ export interface IslandContext<S, P, R> {
   rpc: RpcToHtmx<R>;
 }
 
+export type RpcMethod<T = unknown> = (
+  context: RpcContext<T>,
+) => Promise<RpcResponse>;
+
+export type RPC = Record<string, RpcMethod>;
+
 // Основной интерфейс острова
-export interface Island<State = unknown, Props = unknown, RPC = unknown> {
+export interface Island<
+  State = unknown,
+  Props = unknown,
+  RPC extends Record<string, RpcMethod> = Record<string, RpcMethod>,
+> {
   // Имя острова (опционально)
   name?: string;
 
   // Шаблон острова
-  template: (ctx: IslandContext<State, Props, RPC>) => Template;
+  template: (ctx: IslandContext<State, Props, RPC>) => IRefaceTemplate;
 
   // RPC методы
   rpc?: RPC;

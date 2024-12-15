@@ -1,19 +1,19 @@
-import { createElement } from "../core/createElement.ts";
+import { elementFactory } from "@reface";
 import { TestUtils } from "./testUtils.ts";
 
-Deno.test("createElement - basic usage", () => {
+Deno.test("elementFactory - basic usage", () => {
   const utils = new TestUtils();
-  const div = createElement("div");
+  const div = elementFactory("div");
   utils.assertRender(
     div({ class: "container" })`Hello World`,
     '<div class="container">Hello World</div>',
   );
 });
 
-Deno.test("createElement - nested elements", () => {
+Deno.test("elementFactory - nested elements", () => {
   const utils = new TestUtils();
-  const div = createElement("div");
-  const span = createElement("span");
+  const div = elementFactory("div");
+  const span = elementFactory("span");
 
   utils.assertRender(
     div({ class: "container" })`
@@ -24,9 +24,9 @@ Deno.test("createElement - nested elements", () => {
   );
 });
 
-Deno.test("createElement - handles primitives", () => {
+Deno.test("elementFactory - handles primitives", () => {
   const utils = new TestUtils();
-  const div = createElement("div");
+  const div = elementFactory("div");
 
   utils.assertRender(
     div({ class: "container" })`

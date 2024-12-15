@@ -1,14 +1,69 @@
-import type { HxAttributes, HxSwapMode, HxTrigger } from "./types.ts";
+import type { HxSwapMode, HxTrigger, IHxBuilder } from "./types.ts";
 
-export class HxBuilder implements HxAttributes {
-  constructor() {}
-
-  private add(key: string, value: string): this {
+export class HxBuilder implements IHxBuilder {
+  set(key: string, value: string): this {
+    // @ts-expect-error TODO: dont know how to fix this, custom interator is not working
     this[`hx-${key}`] = value;
     return this;
   }
 
-  private formatTrigger(trigger: HxTrigger): string {
+  get(url: string): this {
+    return this.set("get", url);
+  }
+
+  post(url: string): this {
+    return this.set("post", url);
+  }
+
+  put(url: string): this {
+    return this.set("put", url);
+  }
+
+  patch(url: string): this {
+    return this.set("patch", url);
+  }
+
+  delete(url: string): this {
+    return this.set("delete", url);
+  }
+
+  trigger(value: HxTrigger): this {
+    return this.set("trigger", this.formatTrigger(value));
+  }
+
+  target(selector: string): this {
+    return this.set("target", selector);
+  }
+
+  swap(value: HxSwapMode): this {
+    return this.set("swap", value);
+  }
+
+  on(event: string, script: string): this {
+    return this.set(`on:${event}`, script);
+  }
+
+  pushUrl(url: string | boolean): this {
+    return this.set("push-url", String(url));
+  }
+
+  select(selector: string): this {
+    return this.set("select", selector);
+  }
+
+  selectOob(selector: string): this {
+    return this.set("select-oob", selector);
+  }
+
+  swapOob(value: string): this {
+    return this.set("swap-oob", value);
+  }
+
+  vals(values: Record<string, unknown>): this {
+    return this.set("vals", JSON.stringify(values));
+  }
+
+  formatTrigger(trigger: HxTrigger): string {
     if (Array.isArray(trigger)) {
       return trigger.map((t) => this.formatTrigger(t)).join(", ");
     }
@@ -49,63 +104,4 @@ export class HxBuilder implements HxAttributes {
 
     return parts.join(" ");
   }
-
-  get(url: string): this {
-    return this.add("get", url);
-  }
-
-  post(url: string): this {
-    return this.add("post", url);
-  }
-
-  put(url: string): this {
-    return this.add("put", url);
-  }
-
-  patch(url: string): this {
-    return this.add("patch", url);
-  }
-
-  delete(url: string): this {
-    return this.add("delete", url);
-  }
-
-  trigger(value: HxTrigger): this {
-    return this.add("trigger", this.formatTrigger(value));
-  }
-
-  target(selector: string): this {
-    return this.add("target", selector);
-  }
-
-  swap(value: HxSwapMode): this {
-    return this.add("swap", value);
-  }
-
-  on(event: string, script: string): this {
-    this[`hx-on:${event}`] = script;
-    return this;
-  }
-
-  pushUrl(url: string | boolean): this {
-    return this.add("push-url", String(url));
-  }
-
-  select(selector: string): this {
-    return this.add("select", selector);
-  }
-
-  selectOob(selector: string): this {
-    return this.add("select-oob", selector);
-  }
-
-  swapOob(value: string): this {
-    return this.add("swap-oob", value);
-  }
-
-  vals(values: Record<string, unknown>): this {
-    return this.add("vals", JSON.stringify(values));
-  }
-
-  // ... остальные методы без изменений ...
 }

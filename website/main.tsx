@@ -1,6 +1,6 @@
-import { Hono } from 'hono'
-import { serveStatic } from 'hono/deno'
-import { RefaceComposer, registerJSX } from "@reface";
+import { Hono } from '@hono/hono'
+import { serveStatic } from '@hono/hono/deno'
+import { RefaceComposer } from "@reface";
 import { StyledPlugin } from "@reface/plugins/styled";
 import { PartialsPlugin } from "@reface/plugins/partials";
 import { LayoutSimple } from "@reface/components/LayoutSimple";
@@ -9,10 +9,9 @@ import { resolveFromFile } from "./utils/resolveFromFile.ts";
 
 import DocsPage from "./pages/DocsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
-import { component } from "../@reface/core/component.ts";
+import { component } from "../@reface/component.ts";
 
-import "@reface/jsx.global.d.ts";
-registerJSX();
+import "../@reface/jsx/global.ts";
 
 // Загружаем документацию
 const { sections, pages } = await loadDocs();

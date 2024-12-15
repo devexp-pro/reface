@@ -1,8 +1,10 @@
+declare const global: typeof globalThis;
+
 export function registerGlobal(
   namespace: string | undefined,
   exports: Record<string, unknown>,
 ): void {
-  const g: { [key: string]: any } | undefined =
+  const g: { [key: string]: unknown } | undefined =
     typeof globalThis !== "undefined"
       ? globalThis
       : typeof window !== "undefined"

@@ -1,13 +1,14 @@
 import type {
   Component,
+  ComponentFunction,
   ComponentProps,
   ElementChildType,
-  ITemplate,
+  IRefaceTemplate,
 } from "./types.ts";
 
-export function component<P extends ComponentProps>(
-  render: (props: P, children: ElementChildType[]) => ITemplate,
-): Component<P> {
+export const component: ComponentFunction = <P extends ComponentProps>(
+  render: (props: P, children: ElementChildType[]) => IRefaceTemplate,
+): Component<P> => {
   // Создаем функцию компонента с поддержкой обоих вариантов вызова
   const componentFn = ((props: P = {} as P, children?: ElementChildType[]) => {
     if (children) {
@@ -17,7 +18,7 @@ export function component<P extends ComponentProps>(
 
     // Возвращаем функцию для template literals
     return (
-      strings: TemplateStringsArray = [],
+      strings: TemplateStringsArray = Object.assign([], { raw: [] }),
       ...values: ElementChildType[]
     ) => {
       const templateChildren = [];
@@ -34,4 +35,4 @@ export function component<P extends ComponentProps>(
   }) as Component<P>;
 
   return componentFn;
-}
+};

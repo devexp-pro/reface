@@ -1,4 +1,4 @@
-import { html } from "../core/html.ts";
+import { html } from "@reface";
 import { TestUtils } from "./testUtils.ts";
 
 Deno.test("html template literal - basic rendering", () => {

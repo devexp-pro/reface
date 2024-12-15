@@ -1,15 +1,16 @@
-import { REFACE_EVENT } from "../core/constants.ts";
-import type { IPlugin } from "../Reface.ts";
-import type { RefaceEvent } from "../core/types.ts";
+import { REFACE_EVENT } from "@reface/constants";
+import type { RefaceEventType } from "@reface/types";
+import type { IRefaceComposerPlugin } from "@reface/types";
+import type { RefaceComposer } from "@reface";
 
 export interface RenderLogEntry {
-  phase: RefaceEvent;
+  phase: RefaceEventType;
   input: unknown;
   output?: string;
   timestamp: number;
 }
 
-export class LoggerPlugin implements IPlugin {
+export class LoggerPlugin implements IRefaceComposerPlugin {
   readonly name = "logger";
   private logs: RenderLogEntry[] = [];
 
@@ -28,10 +29,10 @@ export class LoggerPlugin implements IPlugin {
     this.logs = [];
   }
 
-  setup(reface) {
+  setup(reface: RefaceComposer) {
     const manager = reface.getRenderManager();
     const handlePhase =
-      (phase: RefaceEvent) => (params: Record<string, unknown>) => {
+      (phase: RefaceEventType) => (params: Record<string, unknown>) => {
         const input = params.template || params.child || params.children;
         const output = phase.endsWith(".end") ? params.html : undefined;
 

@@ -1,29 +1,28 @@
-import type { ElementChildType, ITemplate } from "../../core/types.ts";
+import type { ElementChildType, IRefaceTemplateElement } from "@reface";
 
-export interface StyledComponent<Tag extends string = string>
-  extends ITemplate {
-  tag: Tag;
-  rootClass: string;
-  styles: string;
-  (props?: Record<string, unknown>): StyledTagFunction<Tag>;
-  extend(css: TemplateStringsArray, ...values: unknown[]): StyledComponent<Tag>;
+export interface IStyledComponent<T extends string = string>
+  extends IRefaceTemplateElement {
+  (
+    props?: Record<string, unknown>,
+    children?: ElementChildType[],
+  ): IRefaceTemplateElement;
+  payload: {
+    styled: {
+      tag: T;
+      rootClass: string;
+      styles: string;
+    };
+  };
 }
 
-export type StyledTagFunction<Tag extends string> = {
-  (
-    strings: TemplateStringsArray,
-    ...values: ElementChildType[]
-  ): StyledComponent<Tag>;
-};
+export interface IStyledTagFunction<Tag extends string> {
+  (strings: TemplateStringsArray, ...values: unknown[]): IStyledComponent<Tag>;
+}
 
-type StyledFactory<Tag extends string> = (
-  strings: TemplateStringsArray,
-  ...values: unknown[]
-) => StyledComponent<Tag>;
-type StyledExtend<Tag extends string> = (
-  component: StyledComponent<Tag>,
-) => StyledFactory<Tag>;
-
-export type StyledType =
-  & StyledExtend<string>
-  & { [Tag in string]: StyledFactory<Tag> };
+// Основной тип styled API
+export interface IStyled {
+  <Tag extends string>(
+    baseComponent: IStyledComponent<Tag>,
+  ): IStyledTagFunction<Tag>;
+  [tag: string]: IStyledTagFunction<string>;
+}

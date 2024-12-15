@@ -1,30 +1,30 @@
-import { TemplateElement } from "../../core/templates/TemplateElement.ts";
+import { type ElementChildType, RefaceTemplateElement } from "@reface";
 import { generateClassName } from "./classGenerator.ts";
 import { parseCSS } from "./cssParser.ts";
-import type { Styled, StyledComponent, StyledTagFunction } from "./types.ts";
+import type { IStyled, IStyledComponent, IStyledTagFunction } from "./types.ts";
 
 function createStyledElement<Tag extends string>(
-  tagOrComponent: Tag | StyledComponent<Tag>,
+  tagOrComponent: Tag | IStyledComponent<Tag>,
   css: TemplateStringsArray,
   values: unknown[],
-  parentComponent?: StyledComponent<Tag>,
-): StyledComponent<Tag> {
+  parentComponent?: IStyledComponent<Tag>,
+): IStyledComponent<Tag> {
   const rootClass = generateClassName();
   const rawCss = String.raw({ raw: css }, ...values);
   const styles = parseCSS(rawCss, rootClass);
 
   const tag = typeof tagOrComponent === "string"
     ? tagOrComponent
-    : (tagOrComponent as StyledComponent<Tag>).tag;
+    : (tagOrComponent as IStyledComponent<Tag>).tag;
 
   const combinedStyles = parentComponent
-    ? `${parentComponent.payload.styled.styles}\n${styles}`
+    ? `${parentComponent.payload?.styled?.styles}\n${styles}`
     : styles;
 
   const componentFn =
     ((props: Record<string, unknown> = {}, children?: unknown[]) => {
       if (children) {
-        return new TemplateElement({
+        return new RefaceTemplateElement({
           tag,
           attributes: {
             ...props,
@@ -34,7 +34,7 @@ function createStyledElement<Tag extends string>(
               props.class,
             ].filter(Boolean).join(" "),
           },
-          children,
+          children: children as ElementChildType[],
           payload: {
             styled: {
               styles: combinedStyles,
@@ -45,7 +45,10 @@ function createStyledElement<Tag extends string>(
         });
       }
 
-      return (strings: TemplateStringsArray = [], ...values: unknown[]) => {
+      return (
+        strings: TemplateStringsArray = Object.assign([], { raw: [] }), // FIXME: magi
+        ...values: unknown[]
+      ) => {
         const templateChildren = [];
         for (let i = 0; i < strings.length; i++) {
           if (strings[i].trim()) {
@@ -56,7 +59,7 @@ function createStyledElement<Tag extends string>(
           }
         }
 
-        return new TemplateElement({
+        return new RefaceTemplateElement({
           tag,
           attributes: {
             ...props,
@@ -66,7 +69,7 @@ function createStyledElement<Tag extends string>(
               props.class,
             ].filter(Boolean).join(" "),
           },
-          children: templateChildren,
+          children: templateChildren as ElementChildType[],
           payload: {
             styled: {
               styles: combinedStyles,
@@ -76,7 +79,7 @@ function createStyledElement<Tag extends string>(
           },
         });
       };
-    }) as StyledComponent<Tag>;
+    }) as IStyledComponent<Tag>;
 
   Object.assign(componentFn, {
     tag,
@@ -93,7 +96,7 @@ function createStyledElement<Tag extends string>(
 }
 
 const styledFunction = <Tag extends string>(
-  baseComponent: StyledComponent<Tag>,
+  baseComponent: IStyledComponent<Tag>,
 ) => {
   return ((strings: TemplateStringsArray, ...values: unknown[]) =>
     createStyledElement<Tag>(
@@ -101,18 +104,20 @@ const styledFunction = <Tag extends string>(
       strings,
       values,
       baseComponent,
-    )) as unknown as StyledTagFunction<Tag>;
+    )) as unknown as IStyledTagFunction<Tag>;
 };
 
-export const styled = new Proxy(styledFunction, {
-  get<Tag extends string>(_target: Styled, tag: PropertyKey) {
+// @ts-ignore: Proxy is not supported in TypeScript
+export const styled: IStyled = new Proxy(styledFunction, {
+  // @ts-ignore: Proxy is not supported in TypeScript
+  get<Tag extends string>(_target: IStyledType, tag: string) {
     return ((strings: TemplateStringsArray, ...values: unknown[]) =>
-      createStyledElement<Tag>(
-        String(tag),
+      createStyledElement<string>(
+        tag,
         strings,
         values,
         undefined,
-      )) as unknown as StyledTagFunction<Tag>;
+      )) as unknown as IStyledTagFunction<Tag>;
   },
 });
 

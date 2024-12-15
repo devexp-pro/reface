@@ -2,17 +2,17 @@ import type {
   ClassValue,
   ElementChildType,
   HTMLAttributes,
-  IRenderManager,
-  ITemplate,
+  IRefaceRenderManager,
+  IRefaceTemplate,
   RefaceEvent,
   RenderHandler,
   StyleValue,
-} from "../types.ts";
-import { isEmptyValue, isTemplate } from "./renderUtils.ts";
-import { REFACE_EVENT } from "../constants.ts";
-import type { RefaceComposer } from "../../RefaceComposer.ts";
+} from "./types.ts";
+import { isEmptyValue, isTemplate } from "./utils/renderUtils.ts";
+import { REFACE_EVENT } from "./constants.ts";
+import type { RefaceComposer } from "./RefaceComposer.ts";
 
-export class RenderManager implements IRenderManager {
+export class RefaceRenderManager implements IRefaceRenderManager {
   private handlers = new Map<RefaceEvent, Set<Function>>();
   private storage = new Map<string, unknown>();
   private composer: RefaceComposer;
@@ -40,7 +40,7 @@ export class RenderManager implements IRenderManager {
     }) || result) as R;
   }
 
-  render(template: ITemplate): string {
+  render(template: IRefaceTemplate): string {
     return this.withPhase(
       REFACE_EVENT.RENDER.RENDER,
       this.renderImpl,
@@ -48,11 +48,11 @@ export class RenderManager implements IRenderManager {
     );
   }
 
-  private renderImpl(template: ITemplate): string {
+  private renderImpl(template: IRefaceTemplate): string {
     return this.renderTemplate(template);
   }
 
-  renderTemplate(template: ITemplate): string {
+  renderTemplate(template: IRefaceTemplate): string {
     return this.withPhase(
       REFACE_EVENT.RENDER.TEMPLATE,
       this.renderTemplateImpl,
@@ -60,7 +60,7 @@ export class RenderManager implements IRenderManager {
     );
   }
 
-  private renderTemplateImpl(template: ITemplate): string {
+  private renderTemplateImpl(template: IRefaceTemplate): string {
     return template.toHtml(this);
   }
 

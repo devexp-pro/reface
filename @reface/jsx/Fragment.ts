@@ -1,5 +1,5 @@
-import type { ElementChildType, ITemplate } from "../types.ts";
-import { TemplateFragment } from "../templates/mod.ts";
+import type { ElementChildType, IRefaceTemplate } from "@reface/types";
+import { RefaceTemplateFragment } from "@reface";
 
 /**
  * JSX Fragment component for grouping elements without adding extra nodes.
@@ -24,6 +24,6 @@ import { TemplateFragment } from "../templates/mod.ts";
 export function Fragment(
   _props: unknown,
   children: ElementChildType[],
-): ITemplate {
-  return new TemplateFragment(children);
+): IRefaceTemplate {
+  return new RefaceTemplateFragment(children);
 }

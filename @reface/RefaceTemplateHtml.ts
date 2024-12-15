@@ -1,10 +1,14 @@
-import type { ElementChildType, IRenderManager, ITemplate } from "../types.ts";
+import type {
+  ElementChildType,
+  IRefaceRenderManager,
+  IRefaceTemplate,
+} from "@reface/types";
 
 /**
  * Represents pre-rendered HTML content.
  * Used for raw HTML strings and template literals.
  *
- * @implements {ITemplate}
+ * @implements {IRefaceTemplate}
  *
  * @example
  * // Raw HTML content
@@ -13,7 +17,7 @@ import type { ElementChildType, IRenderManager, ITemplate } from "../types.ts";
  * // Used by html template literal
  * html`<div>${value}</div>`;
  */
-export class TemplateHtml implements ITemplate {
+export class RefaceTemplateHtml implements IRefaceTemplate {
   public type = "html";
   children: ElementChildType[];
 
@@ -21,7 +25,7 @@ export class TemplateHtml implements ITemplate {
     this.children = children;
   }
 
-  toHtml(manager: IRenderManager): string {
+  toHtml(manager: IRefaceRenderManager): string {
     return manager.renderChildren(this.children);
   }
 }

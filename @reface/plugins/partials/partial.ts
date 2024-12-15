@@ -1,4 +1,4 @@
-import type { ElementChildType } from "../../core/types.ts";
+import type { ElementChildType } from "@reface/types";
 import { TemplatePartial } from "./TemplatePartial.ts";
 import type { PartialFn } from "./types.ts";
 import { hx, type HxBuilder, type HxTrigger } from "@reface/htmx";
@@ -28,7 +28,7 @@ export const partial: PartialFn<any> = (handler, name) => {
 
       // Возвращаем функцию для template literals
       return (
-        strings: TemplateStringsArray = [],
+        strings: TemplateStringsArray = Object.assign([], { raw: [] }),
         ...values: ElementChildType[]
       ) => {
         const templateChildren = [];

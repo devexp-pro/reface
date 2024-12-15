@@ -1,13 +1,12 @@
-import { createElement } from "../core/jsx/createElement.ts";
-import { html } from "../core/html.ts";
-import { component } from "../core/component.ts";
-import { createElement as ce } from "../core/createElement.ts";
+import "@reface/jsx/global";
+import { html, component, elementFactory } from "@reface";
+import { ElementChildType } from "@reface/types";
 import { TestUtils } from "./testUtils.ts";
-import { ElementChildType } from "../core/types.ts";
+
 
 Deno.test("mixed usage - components with html and createElement", () => {
   const utils = new TestUtils();
-  const div = ce("div");
+  const div = elementFactory("div");
   
   const Layout = component<{ title: string, children: ElementChildType[] }>((props, children) => (
     <div class="layout">
@@ -37,7 +36,7 @@ Deno.test("mixed usage - components with html and createElement", () => {
 
 Deno.test("mixed usage - html with components and createElement", () => {
   const utils = new TestUtils();
-  const span = ce("span");
+  const span = elementFactory("span");
   
   const Button = component<{ color: string, children: ElementChildType[] | ElementChildType }>((props, children) => (
     <button class={`btn-${props.color}`}>{children}</button>
@@ -59,7 +58,7 @@ Deno.test("mixed usage - html with components and createElement", () => {
 
 Deno.test("mixed usage - handles primitives", () => {
   const utils = new TestUtils();
-  const div = ce("div");
+  const div = elementFactory("div");
   
   const Content = component(() => 
     html`<span>${false}${null}${undefined}${0}${true}${""}</span>`

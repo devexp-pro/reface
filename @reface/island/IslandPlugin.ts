@@ -1,13 +1,13 @@
-import { IPlugin } from "../core/types.ts";
-import { RefaceComposer } from "../RefaceComposer.ts";
-import { REFACE_EVENT } from "../core/constants.ts";
+import { REFACE_EVENT } from "@reface/constants";
 import { TemplateIsland } from "./TemplateIsland.ts";
+import type { IRefaceComposerPlugin } from "@reface/types";
+import type { RpcToHtmx } from "./types.ts";
 
-export class IslandPlugin implements IPlugin {
+export class IslandPlugin implements IRefaceComposerPlugin {
   name = "island";
   private islands = new Map<string, unknown>();
 
-  setup(composer: RefaceComposer): void {
+  setup: IRefaceComposerPlugin["setup"] = (composer): void => {
     composer.getRenderManager().on(
       REFACE_EVENT.RENDER.TEMPLATE.START,
       ({ template }) => {
@@ -31,7 +31,7 @@ export class IslandPlugin implements IPlugin {
         return html + script;
       },
     );
-  }
+  };
 
   createRpcProxy<R>(name: string): RpcToHtmx<R> {
     return new Proxy({} as RpcToHtmx<R>, {
@@ -41,7 +41,7 @@ export class IslandPlugin implements IPlugin {
           "hx-target": `#island-${name}`,
           "hx-ext": "json-enc",
           "hx-swap": "outerHTML",
-          ...(args && { "hx-vals": JSON.stringify(args) }),
+          ...(args ? { "hx-vals": JSON.stringify(args) } : {}),
         });
       },
     });

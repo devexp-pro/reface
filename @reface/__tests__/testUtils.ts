@@ -1,10 +1,13 @@
 import { assertEquals } from "@std/assert";
-import type { IPlugin, ITemplate } from "../core/types.ts";
-import { RefaceComposer } from "../RefaceComposer.ts";
-import { LoggerPlugin, type RenderLogEntry } from "../plugins/LoggerPlugin.ts";
+import type { IRefaceComposerPlugin, IRefaceTemplate } from "@reface/types";
+import { RefaceComposer } from "@reface";
+import {
+  LoggerPlugin,
+  type RenderLogEntry,
+} from "@reface/plugins/LoggerPlugin";
 
 export interface TestUtilsOptions {
-  plugins?: IPlugin[];
+  plugins?: IRefaceComposerPlugin[];
 }
 
 export class TestUtils {
@@ -40,7 +43,7 @@ export class TestUtils {
     assertEquals(normalizeHtml(actual), normalizeHtml(expected), message);
   }
 
-  assertRender(template: ITemplate, expected: string): void {
+  assertRender(template: IRefaceTemplate, expected: string): void {
     const actual = this.reface.render(template);
 
     try {

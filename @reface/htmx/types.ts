@@ -63,7 +63,7 @@ export type HxTrigger =
   | (HxTriggerEvent | HxTriggerConfig)[];
 
 // Типы для конфигурации
-export interface HxConfig {
+export interface IHxConfig {
   method?: HxMethod;
   url?: string;
   trigger?: HxTrigger;
@@ -78,25 +78,13 @@ export interface HxConfig {
 }
 
 // Тип для всех возможных hx-атрибутов
-export type HxAttributes = {
-  "hx-get"?: string;
-  "hx-post"?: string;
-  "hx-put"?: string;
-  "hx-patch"?: string;
-  "hx-delete"?: string;
-  "hx-trigger"?: string;
-  "hx-target"?: string;
-  "hx-swap"?: HxSwapMode;
-  "hx-on:*"?: string;
-  "hx-push-url"?: string;
-  "hx-select"?: string;
-  "hx-select-oob"?: string;
-  "hx-swap-oob"?: string;
+export interface IHxAttributes {
   [key: `hx-${string}`]: string;
-};
+  [key: `hx-on:${string}`]: string;
+}
 
 // Тип для самого билдера, теперь включает все возможные атрибуты
-export interface HxBuilder extends HxAttributes {
+export interface IHxBuilder {
   get(url: string): this;
   post(url: string): this;
   put(url: string): this;
@@ -105,5 +93,6 @@ export interface HxBuilder extends HxAttributes {
   trigger(value: HxTrigger | HxTrigger[]): this;
   target(selector: string): this;
   swap(value: HxSwapMode): this;
-  // ... остальные методы ...
+  on(event: string, script: string): this;
+  set(key: string, value: string): this;
 }
