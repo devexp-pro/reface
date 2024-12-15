@@ -109,7 +109,11 @@ export class RenderManager implements IRenderManager {
           const style = this.renderStyleAttribute(value as StyleValue);
           if (style) parts.push(`style="${style}"`);
         } else {
-          parts.push(`${key}="${value}"`);
+          if (typeof value === "string" && value.includes('"')) {
+            parts.push(`${key}='${value}'`);
+          } else {
+            parts.push(`${key}="${value}"`);
+          }
         }
       }
       return parts.join(" ");
