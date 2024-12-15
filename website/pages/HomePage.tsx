@@ -109,21 +109,21 @@ const Feature = styled.div`
 
 const FeatureIcon = styled.div`
   & {
-    width: 3rem;
-    height: 3rem;
+    width: 4rem;
+    height: 4rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(37, 99, 235, 0.1);
-    border-radius: 0.75rem;
-    color: #2563eb;
-    margin-bottom: 1rem;
-
-    & svg {
-      width: 1.5rem;
-      height: 1.5rem;
-      stroke-width: 1.5;
-    }
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    border-radius: 1rem;
+    color: white;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 30px -10px rgba(37, 99, 235, 0.3);
+  }
+  & svg {
+    width: 1.75rem;
+    height: 1.75rem;
+    stroke-width: 1.5;
   }
 `;
 
@@ -180,26 +180,31 @@ const Icons = {
   ),
   Composition: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M2 20h20" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13a3 3 0 0 0 6 0 3 3 0 0 0-6 0z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13 13a3 3 0 0 0 6 0 3 3 0 0 0-6 0z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 6h8" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M8 9h8" />
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
+      <path d="M10 7h4M7 10v4M17 10v4M10 17h4" />
     </svg>
   ),
   Plugin: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v3m0 12v3M3 12h3m12 0h3m-3.5-5.5l-2 2m-7 7l-2 2m0-11l2 2m7 7l2 2" />
-      <circle strokeLinecap="round" strokeLinejoin="round" cx="12" cy="12" r="4" />
+      <path d="M9 3H5a2 2 0 0 0-2 2v4" />
+      <path d="M9 21H5a2 2 0 0 1-2-2v-4" />
+      <path d="M15 3h4a2 2 0 0 1 2 2v4" />
+      <path d="M15 21h4a2 2 0 0 0 2-2v-4" />
+      <path d="M12 8v8" />
+      <path d="M8 12h8" />
     </svg>
   ),
   Styled: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3a9 9 0 0 0 9 9 9 9 0 0 1-9 9 9 9 0 0 1-9-9 9 9 0 0 1 9-9z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 12l4.5 4.5" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 12l-4.5 4.5" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 12l4.5-4.5" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 12l-4.5-4.5" />
+      <path d="M4 6h16" />
+      <path d="M4 12h16" />
+      <path d="M4 18h16" />
+      <circle cx="8" cy="6" r="1" fill="currentColor" />
+      <circle cx="14" cy="12" r="1" fill="currentColor" />
+      <circle cx="10" cy="18" r="1" fill="currentColor" />
     </svg>
   ),
   Partial: () => (
