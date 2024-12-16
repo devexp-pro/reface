@@ -344,10 +344,10 @@ export default function HomePage() {
             <LogoSquare>R</LogoSquare>
             <LogoText>eface</LogoText>
           </HeroLogo>
-          <Subtitle>Modern Web Framework for Template Composition</Subtitle>
+          <Subtitle>Meta-Framework for Modern Web Applications</Subtitle>
           <Description>
-            Build modern web applications with a lightweight and flexible framework that combines 
-            the power of JSX with the simplicity of template literals.
+            Zero-build framework that brings interactivity through HTMX, modern templating with JSX, 
+            and powerful server-side features - all without the complexity of traditional SPAs.
           </Description>
         </Hero>
 
@@ -415,10 +415,10 @@ export default function HomePage() {
             <FeatureIcon>
               <Icons.Framework />
             </FeatureIcon>
-            <FeatureTitle>Framework Agnostic</FeatureTitle>
+            <FeatureTitle>Meta-Framework</FeatureTitle>
             <FeatureDescription>
-              Core composition engine works with any framework. Build your own abstractions 
-              on top of it.
+              Complete solution for rendering and serving web applications. 
+              Build scalable applications with focus on performance.
             </FeatureDescription>
           </Feature>
         </Features>
