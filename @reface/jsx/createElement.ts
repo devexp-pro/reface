@@ -38,7 +38,7 @@ export function createElement<P extends ComponentProps = ComponentProps>(
     }
 
     // Иначе вызываем как template literal
-    return (result as RefaceTemplateFn<IRefaceTemplate>)(
+    return result(
       Object.assign(["", ""], { raw: ["", ""] }),
       children.length === 1 ? children[0] : children,
     );

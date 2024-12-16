@@ -229,9 +229,9 @@ Deno.test("styled component - should handle empty call for template literals", (
   const withEmptyCall = Title()`Hello`;
   utils.assertRender(
     withEmptyCall, 
-    `<h1 class="${withEmptyCall.payload.styled.rootClass}">Hello</h1>
+    `<h1 class="${withEmptyCall.payload?.styled.rootClass}">Hello</h1>
 <style>
-  .${withEmptyCall.payload.styled.rootClass} {
+  .${withEmptyCall.payload?.styled.rootClass} {
     font-size: 2em;
   }
 </style>`
@@ -240,9 +240,9 @@ Deno.test("styled component - should handle empty call for template literals", (
   const withEmptyProps = Title({})`Hello`;
   utils.assertRender(
     withEmptyProps, 
-    `<h1 class="${withEmptyProps.payload.styled.rootClass}">Hello</h1>
+    `<h1 class="${withEmptyProps.payload?.styled.rootClass}">Hello</h1>
 <style>
-  .${withEmptyProps.payload.styled.rootClass} {
+  .${withEmptyProps.payload?.styled.rootClass} {
     font-size: 2em;
   }
 </style>`

@@ -137,4 +137,5 @@ export type ElementChildType =
   | boolean
   | null
   | undefined
-  | IRefaceTemplate;
+  | IRefaceTemplate
+  | ElementChildType[];

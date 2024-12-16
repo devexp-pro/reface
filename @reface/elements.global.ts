@@ -1,53 +1,59 @@
-import type { IElementFunction } from "@reface/types";
 import * as elements from "./elements.ts";
+import type {
+  ComponentProps,
+  ComponentWithProps,
+  IRefaceTemplateElement,
+} from "@reface/types";
 import { registerGlobal } from "./utils/registerGlobal.ts";
+
+type El = ComponentWithProps<ComponentProps, IRefaceTemplateElement>;
 
 declare global {
   // Объявляем каждый элемент отдельно
-  const div: IElementFunction;
-  const span: IElementFunction;
-  const p: IElementFunction;
-  const section: IElementFunction;
-  const article: IElementFunction;
-  const main: IElementFunction;
-  const header: IElementFunction;
-  const footer: IElementFunction;
-  const nav: IElementFunction;
-  const aside: IElementFunction;
-  const body: IElementFunction;
-  const head: IElementFunction;
-  const h1: IElementFunction;
-  const h2: IElementFunction;
-  const h3: IElementFunction;
-  const h4: IElementFunction;
-  const h5: IElementFunction;
-  const h6: IElementFunction;
-  const strong: IElementFunction;
-  const em: IElementFunction;
-  const pre: IElementFunction;
-  const code: IElementFunction;
-  const a: IElementFunction;
-  const button: IElementFunction;
-  const form: IElementFunction;
-  const input: IElementFunction;
-  const textarea: IElementFunction;
-  const select: IElementFunction;
-  const option: IElementFunction;
-  const label: IElementFunction;
-  const table: IElementFunction;
-  const thead: IElementFunction;
-  const tbody: IElementFunction;
-  const tr: IElementFunction;
-  const th: IElementFunction;
-  const td: IElementFunction;
-  const img: IElementFunction;
-  const video: IElementFunction;
-  const audio: IElementFunction;
-  const meta: IElementFunction;
-  const link: IElementFunction;
-  const script: IElementFunction;
-  const style: IElementFunction;
-  const title: IElementFunction;
+  const div: El;
+  const span: El;
+  const p: El;
+  const section: El;
+  const article: El;
+  const main: El;
+  const header: El;
+  const footer: El;
+  const nav: El;
+  const aside: El;
+  const body: El;
+  const head: El;
+  const h1: El;
+  const h2: El;
+  const h3: El;
+  const h4: El;
+  const h5: El;
+  const h6: El;
+  const strong: El;
+  const em: El;
+  const pre: El;
+  const code: El;
+  const a: El;
+  const button: El;
+  const form: El;
+  const input: El;
+  const textarea: El;
+  const select: El;
+  const option: El;
+  const label: El;
+  const table: El;
+  const thead: El;
+  const tbody: El;
+  const tr: El;
+  const th: El;
+  const td: El;
+  const img: El;
+  const video: El;
+  const audio: El;
+  const meta: El;
+  const link: El;
+  const script: El;
+  const style: El;
+  const title: El;
 }
 
 registerGlobal("", elements);

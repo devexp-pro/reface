@@ -59,6 +59,7 @@ const styledFunction = (baseComponent: StyledComponent): StyledTagFn => {
 
 export const styled: StyledFn = new Proxy(styledFunction, {
   get(_target, tag: string) {
-    return (strings, ...values) => createStyledElement(tag, strings, values);
+    return (strings: TemplateStringsArray, ...values: unknown[]) =>
+      createStyledElement(tag, strings, values);
   },
 });
