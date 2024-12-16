@@ -37,6 +37,6 @@ Deno.test("elementFactory - handles primitives", () => {
       ${true}
       ${""}
     `,
-    '<div class="container">0</div>',
+    '<div class="container"> 0 </div>',
   );
 });

@@ -1,5 +1,62 @@
 import type { REFACE_EVENT } from "@reface/constants";
 
+// Базовые типы для шаблонов
+export interface IRefaceTemplate {
+  type: string;
+  toHtml(manager: IRefaceRenderManager): string;
+  payload?: Record<string, any>;
+}
+
+export interface IRefaceTemplateElement extends IRefaceTemplate {
+  tag: string;
+  attributes: HTMLAttributes;
+  children: ElementChildType[];
+}
+
+// Общий тип для template literal функций
+export type RefaceTemplateFn<T extends IRefaceTemplate = IRefaceTemplate> = {
+  (
+    strings: TemplateStringsArray | string,
+    ...values: (ElementChildType | ElementChildType[])[]
+  ): T;
+};
+
+// Базовый интерфейс для props
+export interface ComponentProps extends Record<string, unknown> {
+  [key: string]: unknown;
+}
+
+// Базовый компонент с поддержкой props и JSX
+export interface ComponentWithProps<
+  P extends ComponentProps = ComponentProps,
+  T extends IRefaceTemplate = IRefaceTemplate,
+> {
+  (props?: P): RefaceTemplateFn<T>;
+}
+
+// Тип для функции рендеринга компонента
+export type ComponentRenderFn<
+  P extends ComponentProps = ComponentProps,
+  T extends IRefaceTemplate = IRefaceTemplate,
+> = {
+  (props: P, children?: ElementChildType[]): T;
+};
+
+// Тип для фабрики компонентов
+export type ComponentFn = {
+  <
+    P extends ComponentProps = ComponentProps,
+    T extends IRefaceTemplate = IRefaceTemplate,
+  >(
+    fn: ComponentRenderFn<P, T>,
+  ): ComponentWithProps<P, T>;
+};
+
+// Типы для elementFactory
+export type ElementFactoryFn = {
+  (tag: string): ComponentWithProps<ComponentProps, IRefaceTemplateElement>;
+};
+
 export interface IRefaceComposer {
   plugins: Map<IRefaceComposerPlugin["name"], IRefaceComposerPlugin>;
   getRenderManager(): IRefaceRenderManager;
@@ -57,62 +114,6 @@ export type RenderHandler = (params: {
   manager: IRefaceRenderManager;
 }) => void | IRefaceTemplate | string;
 
-// Базовые типы для шаблонов
-export interface IRefaceTemplate {
-  type: string;
-  toHtml(manager: IRefaceRenderManager): string;
-  payload?: Record<string, any>;
-}
-
-export interface IRefaceTemplateElement extends IRefaceTemplate {
-  tag: string;
-  attributes: HTMLAttributes;
-  children: ElementChildType[];
-}
-
-// Типы для template literals
-export interface TemplateTagFunction {
-  (
-    strings: TemplateStringsArray,
-    ...values: ElementChildType[]
-  ): IRefaceTemplate;
-}
-
-// Базовый интерфейс для props компонентов
-export interface ComponentProps extends Record<string, unknown> {
-  [key: string]: unknown;
-}
-
-// Тип для template literal функции
-export interface TemplateTagFunction {
-  (
-    strings: TemplateStringsArray,
-    ...values: ElementChildType[]
-  ): IRefaceTemplate;
-}
-
-// Тип для функции-компонента
-export interface Component<P extends ComponentProps = ComponentProps> {
-  (props?: P): {
-    (
-      strings: TemplateStringsArray,
-      ...values: ElementChildType[]
-    ): IRefaceTemplateElement;
-  };
-  (props: P, children: ElementChildType[]): IRefaceTemplateElement;
-}
-
-export interface ComponentRenderFunction<
-  Props extends ComponentProps = ComponentProps,
-> {
-  (props: Props, children?: ElementChildType[]): IRefaceTemplate;
-}
-
-// Тип для createElement
-export interface IElementFactory {
-  (tag: string): IElementFunction;
-}
-
 // HTML атрибуты
 type ClassObject = Record<string, boolean>;
 type StyleObject = Record<string, string | number>;
@@ -137,41 +138,3 @@ export type ElementChildType =
   | null
   | undefined
   | IRefaceTemplate;
-
-// JSX специфичные типы
-export interface JSXComponent<P extends ComponentProps = ComponentProps> {
-  (
-    props: P & { children?: ElementChildType | ElementChildType[] },
-  ): IRefaceTemplate;
-}
-
-// Базовый тип для тегированного вызова
-export interface TaggedTemplate {
-  (
-    strings: TemplateStringsArray,
-    ...values: ElementChildType[]
-  ): IRefaceTemplate;
-}
-
-// Компонент с поддержкой обоих типов вызова
-export interface ComponentWithTemplate<
-  Props extends ComponentProps = ComponentProps,
-> {
-  (props?: Props): TaggedTemplate;
-  (props?: Props, children?: ElementChildType[]): IRefaceTemplate;
-}
-
-// Обновленный тип для функции component
-export interface ComponentFunction {
-  <Props extends ComponentProps = ComponentProps>(
-    render: ComponentRenderFunction<Props>,
-  ): ComponentWithTemplate<Props>;
-}
-
-export interface IElementFunction {
-  (attrs?: Record<string, unknown>): TaggedTemplate;
-  (
-    attrs?: Record<string, unknown>,
-    children?: ElementChildType[],
-  ): IRefaceTemplate;
-}

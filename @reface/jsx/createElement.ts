@@ -1,13 +1,13 @@
 import type {
-  Component,
   ComponentProps,
+  ComponentWithProps,
   ElementChildType,
   IRefaceTemplate,
 } from "@reface/types";
 import { RefaceTemplateElement } from "@reface";
 
 /**
- * Creates elements for JSX. Handles both HTML elements and components.
+ * Creates elements for JSX. All components are called using template literal syntax.
  *
  * @param type - HTML tag name or component function
  * @param props - Element/component properties
@@ -17,25 +17,34 @@ import { RefaceTemplateElement } from "@reface";
  * @example
  * // HTML elements
  * createElement('div', { class: 'container' }, 'content');
+ * // -> <div class="container">content</div>
  *
- * // Components
+ * // Components are called using template literal syntax internally
  * createElement(Button, { color: 'primary' }, 'Click me');
- *
- * // JSX transformation
- * <div class="container">content</div>
- * <Button color="primary">Click me</Button>
+ * // -> Button({ color: 'primary' })`Click me`
  */
 export function createElement<P extends ComponentProps = ComponentProps>(
-  type: string | Component<P>,
+  type: string | ComponentWithProps,
   props: P | null,
   ...children: ElementChildType[]
 ): IRefaceTemplate {
-  // Для функциональных компонентов
+  // Для компонентов всегда используем template literal синтаксис
   if (typeof type === "function") {
-    return type(props ?? {} as P, children);
+    const result = type(props ?? {});
+
+    // Если компонент сразу вернул шаблон
+    if ("type" in result) {
+      return result as IRefaceTemplate;
+    }
+
+    // Иначе вызываем как template literal
+    return (result as RefaceTemplateFn<IRefaceTemplate>)(
+      Object.assign(["", ""], { raw: ["", ""] }),
+      children.length === 1 ? children[0] : children,
+    );
   }
 
-  // Для HTML элементов
+  // Для HTML элементов создаем базовый шаблон
   return new RefaceTemplateElement({
     tag: type,
     attributes: props ?? {},

@@ -1,7 +1,12 @@
 import { RefaceTemplateHtml, RefaceTemplateText } from "@reface";
-import type { ElementChildType, IRefaceTemplate } from "@reface/types";
+import type {
+  ElementChildType,
+  IRefaceTemplate,
+  RefaceTemplateFn,
+} from "@reface/types";
 
 import { isEmptyValue, isTemplate } from "./utils/renderUtils.ts";
+import { getChildren } from "./utils/getChildren.ts";
 
 /**
  * Creates an HTML template from a template literal or string.
@@ -23,32 +28,6 @@ import { isEmptyValue, isTemplate } from "./utils/renderUtils.ts";
  * const safe = html`<b>safe</b>`;
  * html`<div>${safe}</div>`;
  */
-export function html(
-  strings: TemplateStringsArray | string,
-  ...values: ElementChildType[]
-): IRefaceTemplate {
-  if (typeof strings === "string") {
-    return new RefaceTemplateHtml([strings]);
-  }
-
-  const children: ElementChildType[] = [];
-
-  for (let i = 0; i < strings.length; i++) {
-    if (strings[i]) {
-      children.push(new RefaceTemplateHtml([strings[i]]));
-    }
-
-    if (i < values.length) {
-      const value = values[i];
-      if (Array.isArray(value)) {
-        children.push(...value);
-      } else if (isTemplate(value)) {
-        children.push(value);
-      } else if (!isEmptyValue(value)) {
-        children.push(new RefaceTemplateText(String(value)));
-      }
-    }
-  }
-
-  return new RefaceTemplateHtml(children);
-}
+export const html: RefaceTemplateFn<IRefaceTemplate> = (strings, ...values) => {
+  return new RefaceTemplateHtml(getChildren(strings, values));
+};
