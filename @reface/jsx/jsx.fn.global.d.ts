@@ -4,7 +4,7 @@ import type {
   ComponentWithProps,
   ElementChildType,
   IRefaceTemplate,
-} from "../types.ts";
+} from "@reface/types";
 
 declare global {
   const createElement: <P extends ComponentProps = ComponentProps>(

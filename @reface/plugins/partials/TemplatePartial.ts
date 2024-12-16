@@ -4,7 +4,7 @@ import type { IPartialComponent } from "./types.ts";
 
 export interface TemplatePartialOptions<T> {
   name: string;
-  handler: (args?: any) => Promise<T>;
+  handler: (args?: unknown) => Promise<T>;
   attributes?: Record<string, unknown>;
   children?: ElementChildType[];
 }
@@ -12,7 +12,7 @@ export interface TemplatePartialOptions<T> {
 export class TemplatePartial<T> extends RefaceTemplateElement
   implements IPartialComponent<T> {
   public override type = "partial";
-  public handler: (args?: any) => Promise<T>;
+  public handler: (args?: unknown) => Promise<T>;
 
   constructor(options: TemplatePartialOptions<T>) {
     super({

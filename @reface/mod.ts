@@ -1,4 +1,4 @@
-export type * from "./types.ts";
+export type * from "@reface/types";
 export { Reface } from "./Reface.ts";
 export { RefaceComposer } from "./RefaceComposer.ts";
 export { RefaceRenderManager } from "./RefaceRenderManager.ts";

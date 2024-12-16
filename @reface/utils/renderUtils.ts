@@ -1,5 +1,5 @@
-import type { IRefaceTemplate } from "../types.ts";
-import { EMPTY_VALUES } from "../constants.ts";
+import type { IRefaceTemplate } from "@reface/types";
+import { EMPTY_VALUES } from "@reface/constants";
 
 export function isEmptyValue(value: unknown): boolean {
   return EMPTY_VALUES.includes(value);

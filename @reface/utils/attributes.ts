@@ -1,4 +1,4 @@
-import type { ClassValue, HTMLAttributes, StyleValue } from "../types.ts";
+import type { ClassValue, HTMLAttributes, StyleValue } from "@reface/types";
 import { escapeHTML } from "./escape.ts";
 
 function isObject(value: unknown): value is Record<string, unknown> {

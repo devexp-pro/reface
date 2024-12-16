@@ -21,7 +21,7 @@
   "imports": {
     "@reface/jsx/global": "./@reface/jsx/global.ts",
     "@reface": "./@reface/mod.ts",
-    "@reface/types": "./@reface/types.ts",
+    "@reface/types": "./@reface/types/mod.ts",
     "@reface/constants": "./@reface/constants.ts",
     "@reface/island": "./@reface/island/mod.ts",
     "@reface/htmx": "./@reface/htmx/mod.ts",

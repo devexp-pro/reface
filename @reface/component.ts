@@ -5,7 +5,7 @@ import type {
   ComponentWithProps,
   ElementChildType,
   IRefaceTemplate,
-} from "./types.ts";
+} from "@reface/types";
 import { getChildren } from "./utils/getChildren.ts";
 
 export const component: ComponentFn = <

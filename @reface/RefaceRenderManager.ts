@@ -4,16 +4,16 @@ import type {
   HTMLAttributes,
   IRefaceRenderManager,
   IRefaceTemplate,
-  RefaceEvent,
+  RefaceEventType,
   RenderHandler,
   StyleValue,
-} from "./types.ts";
+} from "@reface/types";
 import { isEmptyValue, isTemplate } from "./utils/renderUtils.ts";
 import { REFACE_EVENT } from "./constants.ts";
 import type { RefaceComposer } from "./RefaceComposer.ts";
 
 export class RefaceRenderManager implements IRefaceRenderManager {
-  private handlers = new Map<RefaceEvent, Set<Function>>();
+  private handlers = new Map<RefaceEventType, Set<Function>>();
   private storage = new Map<string, unknown>();
   private composer: RefaceComposer;
   constructor({ composer }: { composer: RefaceComposer }) {
@@ -188,19 +188,19 @@ export class RefaceRenderManager implements IRefaceRenderManager {
     });
   }
 
-  on(event: RefaceEvent, handler: RenderHandler): void {
+  on(event: RefaceEventType, handler: RenderHandler): void {
     if (!this.handlers.has(event)) {
       this.handlers.set(event, new Set());
     }
     this.handlers.get(event)!.add(handler);
   }
 
-  off(event: RefaceEvent, handler: Function): void {
+  off(event: RefaceEventType, handler: RenderHandler): void {
     this.handlers.get(event)?.delete(handler);
   }
 
   private runHandlers(
-    event: RefaceEvent,
+    event: RefaceEventType,
     params: Record<string, unknown>,
   ): unknown {
     let result;
