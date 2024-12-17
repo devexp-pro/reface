@@ -1,33 +1,8 @@
-// @reface/jsx/Fragment.ts
-import type {
-  ComponentWithProps,
-  ElementChildType,
-  IRefaceTemplate,
-} from "@reface/types";
-import { RefaceTemplateFragment } from "@reface";
+import { getChildren } from "../utils/getChildren.ts";
+import { RefaceTemplate } from "../RefaceTemplate.ts";
 
-/**
- * JSX Fragment component for grouping elements without adding extra nodes.
- * Uses template literal syntax internally.
- *
- * @example
- * // JSX usage (transformed to template literal internally)
- * <>
- *   <div>First</div>
- *   <div>Second</div>
- * </>;
- *
- * // Direct template literal usage
- * Fragment()`
- *   ${div()`First`}
- *   ${div()`Second`}
- * `;
- */
-export const Fragment: ComponentWithProps<IRefaceTemplate> = () => {
-  return (
-    strings = Object.assign([], { raw: [] }),
-    ...values: ElementChildType[]
-  ) => {
-    return new RefaceTemplateFragment(values);
-  };
-};
+export function Fragment(_, children) {
+  return new RefaceTemplate({
+    children: getChildren(children),
+  });
+}

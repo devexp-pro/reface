@@ -40,7 +40,6 @@ function App() {
   );
 }
 
-// Рендерим приложение
 app.get("/", (c) => {
   return c.html(reface.render(<App />));
 });

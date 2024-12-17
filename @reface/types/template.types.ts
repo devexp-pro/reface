@@ -1,17 +1,23 @@
-import type { BaseTemplate, ElementChildType } from "./base.types.ts";
+import type { ElementChildType } from "./base.types.ts";
+import type { IRefaceRenderManager } from "./composer.types.ts";
 import type { HTMLAttributes } from "./html.types.ts";
 
-export interface IRefaceTemplate extends BaseTemplate {}
-
-export interface IRefaceTemplateElement extends IRefaceTemplate {
-  tag: string;
-  attributes: HTMLAttributes;
-  children: ElementChildType[];
+export interface ITemplateData<
+  A extends HTMLAttributes = HTMLAttributes,
+  P extends Record<string, unknown> = Record<string, unknown>,
+> {
+  type: string;
+  children?: ElementChildType[];
+  attributes?: A;
+  payload?: P;
+  tag?: string;
 }
 
-export type RefaceTemplateFn<T extends IRefaceTemplate = IRefaceTemplate> = {
-  (
-    strings: TemplateStringsArray | string,
-    ...values: (ElementChildType | ElementChildType[])[]
-  ): T;
-};
+export interface IRefaceTemplate<
+  A extends HTMLAttributes = HTMLAttributes,
+  P extends Record<string, unknown> = Record<string, unknown>,
+> extends ITemplateData<A, P> {
+  (attributes: A): void;
+  (strings: TemplateStringsArray, ...values: any[]): void;
+  toHtml(manager: IRefaceRenderManager): string;
+}

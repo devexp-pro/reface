@@ -5,10 +5,10 @@ import { isEmptyValue, isTemplate } from "./renderUtils.ts";
 
 export const getChildren = (
   strings: TemplateStringsArray | string,
-  values: ElementChildType[],
+  values: ElementChildType[] = [],
 ): ElementChildType[] => {
   if (typeof strings === "string") {
-    return [new RefaceTemplateHtml([strings.trim()])];
+    return [new RefaceTemplateHtml({ children: [strings.trim()] })];
   }
 
   const children: ElementChildType[] = [];
@@ -16,7 +16,7 @@ export const getChildren = (
   for (let i = 0; i < strings.length; i++) {
     const trimmed = strings[i];
     if (trimmed) {
-      children.push(new RefaceTemplateHtml([trimmed]));
+      children.push(new RefaceTemplateHtml({ children: [trimmed] }));
     }
 
     if (i < values.length) {
@@ -26,7 +26,9 @@ export const getChildren = (
       } else if (isTemplate(value)) {
         children.push(value);
       } else if (!isEmptyValue(value)) {
-        children.push(new RefaceTemplateText(String(value)));
+        children.push(new RefaceTemplateText({ children: [value] }));
+      } else {
+        console.warn("Unknown value type", value, typeof value);
       }
     }
   }

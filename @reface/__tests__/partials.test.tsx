@@ -65,7 +65,6 @@ Deno.test("Parital - data passing", async () => {
 Deno.test("Parital - HTMX integration", () => {
   const utils = new TestUtils({ plugins: [new PartialsPlugin()] });
   const TestParital = partial(() => Promise.resolve("test"), "test-htmx");
-
   utils.assertRender(
     <button {...TestParital.trigger("click")}>
       Click me

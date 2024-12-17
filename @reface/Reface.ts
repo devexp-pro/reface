@@ -210,7 +210,7 @@ export class Reface {
 
     // Если есть layout - оборачиваем контент
     if (this.layout) {
-      content = this.layout({}, content);
+      content = this.layout`${content}`;
     }
 
     // Рендерим финальный шаблон через композер

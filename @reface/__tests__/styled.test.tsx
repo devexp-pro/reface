@@ -107,7 +107,7 @@ Deno.test("styled(Component) - should handle props in extended component", () =>
 
   utils.assertRender(
     SearchInput({ type: "search", placeholder: "Search..." })``,
-    `<input type="search" placeholder="Search..." class="${SearchInput.payload.styled.rootClass} ${BaseInput.payload.styled.rootClass}"/>
+    `<input class="${SearchInput.payload.styled.rootClass} ${BaseInput.payload.styled.rootClass}" type="search" placeholder="Search..."/>
 <style>
   .${BaseInput.payload.styled.rootClass} {
     border: 1px solid gray;

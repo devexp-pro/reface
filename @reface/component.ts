@@ -3,10 +3,9 @@ import type {
   ComponentProps,
   ComponentRenderFn,
   ComponentWithProps,
-  ElementChildType,
   IRefaceTemplate,
 } from "@reface/types";
-import { getChildren } from "./utils/getChildren.ts";
+import { RefaceTemplate } from "./RefaceTemplate.ts";
 
 export const component: ComponentFn = <
   P extends ComponentProps,
@@ -14,12 +13,9 @@ export const component: ComponentFn = <
 >(
   render: ComponentRenderFn<P, T>,
 ) => {
-  return ((props = {} as P) => {
-    return (
-      strings = Object.assign([], { raw: [] }),
-      ...values: ElementChildType[]
-    ) => {
-      return render(props, getChildren(strings, values));
-    };
-  }) as ComponentWithProps<P, T>;
+  return new RefaceTemplate({
+    transformer: (attributes, children) => {
+      return render(attributes, children);
+    },
+  });
 };

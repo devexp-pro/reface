@@ -1,6 +1,6 @@
-import { RefaceTemplateElement } from "../../RefaceTemplateElement.ts";
 import type { ElementChildType } from "@reface/types";
-import type { IPartialComponent } from "./types.ts";
+import { RefaceTemplate } from "../../RefaceTemplate.ts";
+import { hx } from "@reface/htmx";
 
 export interface TemplatePartialOptions<T> {
   name: string;
@@ -9,25 +9,20 @@ export interface TemplatePartialOptions<T> {
   children?: ElementChildType[];
 }
 
-export class TemplatePartial<T> extends RefaceTemplateElement
-  implements IPartialComponent<T> {
-  public override type = "partial";
-  public handler: (args?: unknown) => Promise<T>;
+export class TemplatePartial extends RefaceTemplate {
+  static readonly type = "partial";
 
-  constructor(options: TemplatePartialOptions<T>) {
-    super({
-      tag: "div",
-      attributes: {
-        ...options.attributes,
-        "data-partial": options.name,
-      },
-      children: options.children || [],
-    });
-
-    this.handler = options.handler;
+  constructor(data: TemplatePartialOptions<T>) {
+    return super(data);
   }
 
   execute(): Promise<T> {
-    return this.handler();
+    return this.payload.partial.handler();
   }
+  trigger = (trigger: string) => {
+    return hx()
+      .get(`/reface-partial/${this.payload.partial.name}`)
+      .target(`[data-partial='${this.payload.partial.name}']`)
+      .trigger(trigger || "click");
+  };
 }

@@ -11,6 +11,7 @@ import type {
 import { isEmptyValue, isTemplate } from "./utils/renderUtils.ts";
 import { REFACE_EVENT } from "./constants.ts";
 import type { RefaceComposer } from "./RefaceComposer.ts";
+import { getChildren } from "./utils/getChildren.ts";
 
 export class RefaceRenderManager implements IRefaceRenderManager {
   private handlers = new Map<RefaceEventType, Set<Function>>();

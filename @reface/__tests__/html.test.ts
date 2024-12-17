@@ -12,6 +12,7 @@ Deno.test("html template literal - basic rendering", () => {
 Deno.test("html template literal - with interpolation", () => {
   const name = "John";
   const utils = new TestUtils();
+
   utils.assertRender(
     html`<div>Hello ${name}!</div>`,
     "<div>Hello John!</div>",

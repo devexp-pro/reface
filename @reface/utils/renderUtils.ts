@@ -6,9 +6,10 @@ export function isEmptyValue(value: unknown): boolean {
 }
 
 export function isTemplate(value: unknown): value is IRefaceTemplate {
-  return typeof value === "object" &&
-    value !== null &&
-    "toHtml" in value;
+  return (
+    (typeof value === "object" && value !== null && "toHtml" in value) ||
+    (typeof value === "function" && typeof value.toHtml === "function")
+  );
 }
 
 export const toKebabCase = (str: string) =>

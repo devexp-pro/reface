@@ -1,11 +1,27 @@
 import "@reface/jsx/global";
-import { component } from "@reface";
+import { component, RefaceTemplateElement } from "@reface";
 import { TestUtils } from "./testUtils.ts";
 
 interface ButtonProps {
   color?: string;
   size?: string;
 }
+
+Deno.test('fn as component', () => {
+  const utils = new TestUtils();
+  const FnComponent = () => {
+    return <div>Hello</div>;
+  };
+  utils.assertRender(FnComponent(), '<div>Hello</div>');
+})
+
+Deno.test('fn as component with props', () => {
+  const utils = new TestUtils();
+  const FnComponent = (props: { name: string }) => {
+    return <div>Hello {props.name}</div>;
+  };
+  utils.assertRender(FnComponent({ name: 'John' }), '<div>Hello John</div>');
+})
 
 Deno.test("component - template literal usage", () => {
   const utils = new TestUtils();

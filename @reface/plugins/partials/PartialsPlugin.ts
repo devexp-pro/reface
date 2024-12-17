@@ -19,7 +19,7 @@ export class PartialsPlugin implements IRefaceComposerPlugin {
     manager.on(
       REFACE_EVENT.RENDER.TEMPLATE.START,
       ({ template }) => {
-        if (template instanceof TemplatePartial) {
+        if (template?.type === "partial") {
           this.registerPartial(template);
         }
       },
@@ -28,9 +28,9 @@ export class PartialsPlugin implements IRefaceComposerPlugin {
   }
 
   private registerPartial(partial: TemplatePartial<unknown>) {
-    const name = partial.attributes["data-partial"] as string;
+    const name = partial.payload.partial.name as string;
     if (!this.partials.has(name)) {
-      this.partials.set(name, partial.handler);
+      this.partials.set(name, partial.payload.partial.handler);
     }
   }
 

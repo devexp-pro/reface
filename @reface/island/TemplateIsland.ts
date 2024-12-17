@@ -1,14 +1,25 @@
-import { RefaceTemplateElement } from "@reface";
 import type { IRefaceTemplate } from "@reface/types";
+import { RefaceTemplate } from "../RefaceTemplate.ts";
 
-export class TemplateIsland extends RefaceTemplateElement {
-  public override type = "island";
+interface IslandPayload {
+  island: {
+    name: string;
+    state?: unknown;
+    rpc?: Record<string, (args: unknown) => Promise<unknown>>;
+  };
+}
+
+export class TemplateIsland extends RefaceTemplate<
+  { "data-island": string; id: string },
+  IslandPayload
+> {
+  static override readonly type = "island";
 
   constructor(
-    public name: string,
-    public content: IRefaceTemplate,
-    public state?: unknown,
-    public rpc?: Record<string, (args: unknown) => Promise<unknown>>,
+    name: string,
+    content: IRefaceTemplate,
+    state?: unknown,
+    rpc?: Record<string, (args: unknown) => Promise<unknown>>,
   ) {
     super({
       tag: "div",
@@ -17,6 +28,13 @@ export class TemplateIsland extends RefaceTemplateElement {
         id: `island-${name}`,
       },
       children: [content],
+      payload: {
+        island: {
+          name,
+          state,
+          rpc,
+        },
+      },
     });
   }
 
