@@ -54,6 +54,11 @@
       "./reface/versions.ts"
     ]
   },
+  "lint": {
+    "rules": {
+      "exclude": ["no-explicit-any"]
+    }
+  },
   "compilerOptions": {
     "jsx": "react",
     "jsxFactory": "createElement",
