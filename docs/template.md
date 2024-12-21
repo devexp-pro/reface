@@ -4,6 +4,8 @@
 
 Template API предоставляет способ создания HTML-шаблонов с поддержкой атрибутов и вложенного содержимого.
 
+В конечном итоге, Reface работает на уровне строк и генерирует чистый HTML, что делает его идеальным для серверного рендеринга. JSX - это просто удобная обертка для разработки, которая транслируется в те же вызовы Template API.
+
 ### Создание шаблона
 
 Есть два способа получить Template для HTML-элементов:
@@ -355,4 +357,230 @@ fragment`
     ${div`First`}
     ${div`Second`}
 `; // <div>First</div><div>Second</div>
+```
+
+## Типы
+
+### TemplatePayload
+
+Базовый интерфейс для пользовательских данных, который могут расширять плагины:
+
+```typescript
+interface TemplatePayload {
+  // Базовые поля, которые могут использовать все шаблоны
+  [key: string]: any;
+}
+```
+
+### RawTemplate
+
+Базовая структура данных шаблона:
+
+```typescript
+interface RawTemplate<
+  Attributes = any,
+  Payload extends TemplatePayload = TemplatePayload
+> {
+  // Тип шаблона
+  type: string;
+  // HTML тег
+  tag?: string;
+  // Нормализованные атрибуты
+  attributes: {
+    // Обычные HTML атрибуты
+    [key: string]: any;
+    // Массив классов
+    classes?: string[];
+    // Объект стилей
+    styles?: Record<string, string>;
+  };
+  // Массив дочерних элементов
+  children: any[];
+  // Пользовательские данные
+  payload: Payload;
+}
+```
+
+### Template
+
+Callable интерфейс для работы с шаблоном:
+
+```typescript
+interface Template<Attributes = any, Payload = any> {
+  // Вызов с атрибутами - возвращает новый Template
+  (attributes: Attributes): Template<Attributes, Payload>;
+
+  // Вызов с содержимым - возвращает новый Template
+  (strings: TemplateStringsArray, ...values: any[]): Template<
+    Attributes,
+    Payload
+  >;
+
+  // Доступ к RawTemplate
+  raw: RawTemplate<Attributes, Payload>;
+}
+```
+
+### TemplateFactory
+
+Функция для создания шаблонов с кастомной логикой:
+
+```typescript
+interface TemplateFactory<Attributes = any, Payload = any> {
+  // Создание нового шаблона
+  (config: TemplateConfig): Template<Attributes, Payload>;
+
+  // Тип создаваемых шаблонов
+  type: string;
+}
+
+// Конфигурация для создания шаблона
+interface TemplateConfig<Attributes = any, Payload = any> {
+  tag?: string;
+  attributes?: Attributes;
+  children?: any[];
+  payload?: Payload;
+}
+```
+
+### TemplateFactoryConfig
+
+Конфигурация для создания фабрики шаблонов:
+
+```typescript
+interface TemplateFactoryConfig<Attributes = any, Payload = any> {
+    // Уникальный тип шаблона
+    type: string;
+
+    // Настройки создания шаблона
+    create: {
+        // Трансформация входных параметров
+        transform: ({
+            attrs: Attributes,
+            children: any[],
+            manager: RenderManager
+        }) => RawTemplate<Attributes, Payload>;
+
+        // Значения по умолчанию
+        defaults?: {
+            attributes?: Attributes;
+            payload?: Payload;
+        };
+    };
+
+    // Настройки обработки вызовов
+    process?: {
+        // Обработка атрибутов
+        attributes?: ({
+            oldAttrs: Attributes,
+            newAttrs: Attributes,
+            template: RawTemplate<Attributes, Payload>,
+            manager: RenderManager
+        }) => Attributes;
+
+        // Обработка children
+        children?: ({
+            oldChildren: any[],
+            newChildren: any[],
+            template: RawTemplate<Attributes, Payload>
+        }) => any[];
+    };
+
+    // Методы экземпляра
+    methods?: {
+        [key: string]: ({
+            template: RawTemplate<Attributes, Payload>
+        }) => any;
+    };
+
+    // Настройки рендеринга
+    render?: {
+        // Рендеринг всего шаблона
+        template?: ({
+            template: RawTemplate<Attributes, Payload>,
+            manager: RenderManager
+        }) => string;
+
+        // Рендеринг атрибутов
+        attributes?: ({
+            attrs: Attributes,
+            template: RawTemplate<Attributes, Payload>,
+            manager: RenderManager
+        }) => string;
+
+        // Рендеринг стилей
+        styles?: ({
+            styles: Record<string, string>,
+            template: RawTemplate<Attributes, Payload>,
+            manager: RenderManager
+        }) => string;
+
+        // Рендеринг классов
+        classes?: ({
+            classes: string[],
+            template: RawTemplate<Attributes, Payload>,
+            manager: RenderManager
+        }) => string;
+    };
+}
+```
+
+Эти типы формируют основу системы шаблонов:
+
+1. `RawTemplate` - хранит данные в нормализованном виде
+2. `Template` - предоставляет интерфейс для работы с шаблоном
+3. `TemplateFactory` - создает шаблоны с кастомной логикой
+4. `TemplateFactoryConfig` - конфигурация для создания фабрики шаблонов
+
+### JSX Поддержка
+
+@reface/jsx предоставляет возможность использовать JSX синтаксис с Template API:
+
+```typescript
+import { Fragment, createElement } from "@reface/jsx";
+import { div, button } from "@reface/elements";
+
+// JSX транслируется в вызовы template
+const App = () => (
+  <>
+    <div className="container">
+      <button type="button">Click me</button>
+    </div>
+  </>
+);
+
+// Эквивалентно:
+const App = () =>
+  div({ class: "container" })`
+        ${button({ type: "button" })`Click me`}
+    `;
+
+// Можно комбинировать JSX и Template API
+const Header = () => (
+  <div className="header">{button({ class: "primary" })`Submit`}</div>
+);
+
+// И наоборот
+const Container = () =>
+  div({ class: "container" })`
+        ${(<button type="button">Click me</button>)}
+    `;
+```
+
+JSX это просто синтаксический сахар, который транслируется в вызовы Template API:
+
+1. `createElement` преобразует JSX в вызовы template
+2. `Fragment` позволяет группировать элементы без обертки
+3. Можно свободно комбинировать JSX и Template API в одном компоненте
+
+⚠️ Для использования JSX необходимо настроить TypeScript/Babel для работы с @reface/jsx.
+
+```json
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "jsxFactory": "createElement",
+    "jsxFragmentFactory": "Fragment"
+  }
+}
 ```
