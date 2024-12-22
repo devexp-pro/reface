@@ -3,11 +3,14 @@
 export const REFACE_TEMPLATE = Symbol("REFACE_TEMPLATE");
 
 export type NormalizeAttributes<T extends TemplateAttributes> =
-  & Omit<T, "classes" | "styles">
-  & {
-    classes?: string[];
-    styles?: Record<string, string>;
-  };
+  | (
+    & Omit<T, "class" | "style">
+    & {
+      class?: string[];
+      styl?: Record<string, string>;
+    }
+  )
+  | Record<string, never>;
 
 // Базовые типы для атрибутов
 export type ClassValue =
@@ -67,8 +70,8 @@ export type TemplateAttributesStyle =
   | Record<string, boolean>;
 
 export type TemplateAttributes = {
-  classes?: TemplateAttributesClass;
-  styles?: TemplateAttributesStyle;
+  class?: TemplateAttributesClass;
+  style?: TemplateAttributesStyle;
   [key: string]: any;
 } | Record<string, never>;
 
@@ -87,6 +90,7 @@ export type Template<
   & M
   & {
     [REFACE_TEMPLATE]: true;
+    raw: RawTemplate<NormalizeAttributes<A>, P>;
   };
 
 // Фабрика шаблонов
@@ -156,7 +160,7 @@ export interface TemplateFactoryConfig<
 > {
   type: string;
 
-  create: {
+  create?: {
     defaults?: {
       attributes?: A;
       payload?: P;

@@ -13,9 +13,9 @@ Deno.test("styled.div - should create basic styled div", () => {
 
   utils.assertRender(
     <StyledDiv></StyledDiv>,
-    `<div class="${StyledDiv.payload.styled.rootClass}"></div>
+    `<div class="${StyledDiv.raw.payload.styled.rootClass}"></div>
 <style>
-  .${StyledDiv.payload.styled.rootClass} {
+  .${StyledDiv.raw.payload.styled.rootClass} {
     color: red;
   }
 </style>`
@@ -32,9 +32,9 @@ Deno.test("styled.button - should handle props", () => {
 
   utils.assertRender(
     <Button class="primary"></Button>,
-    `<button class="${Button.payload.styled.rootClass} primary"></button>
+    `<button class="${Button.raw.payload.styled.rootClass} primary"></button>
 <style>
-  .${Button.payload.styled.rootClass} {
+  .${Button.raw.payload.styled.rootClass} {
     background: blue;
   }
 </style>`
@@ -51,9 +51,9 @@ Deno.test("styled.h1 - should handle children", () => {
 
   utils.assertRender(
     Title()`Hello`,
-    `<h1 class="${Title.payload.styled.rootClass}">Hello</h1>
+    `<h1 class="${Title.raw.payload.styled.rootClass}">Hello</h1>
 <style>
-  .${Title.payload.styled.rootClass} {
+  .${Title.raw.payload.styled.rootClass} {
     font-size: 2em;
   }
 </style>`
@@ -78,12 +78,12 @@ Deno.test("styled(Component) - should extend existing component", () => {
 
   utils.assertRender(
     PrimaryButton({})``,
-    `<button class="${PrimaryButton.payload.styled.rootClass} ${BaseButton.payload.styled.rootClass}"></button>
+    `<button class="${PrimaryButton.raw.payload.styled.rootClass} ${BaseButton.raw.payload.styled.rootClass}"></button>
 <style>
-  .${BaseButton.payload.styled.rootClass} {
+  .${BaseButton.raw.payload.styled.rootClass} {
     padding: 1rem;
   }
-  .${PrimaryButton.payload.styled.rootClass} {
+  .${PrimaryButton.raw.payload.styled.rootClass} {
     background: blue;
     color: white;
   }
@@ -107,12 +107,12 @@ Deno.test("styled(Component) - should handle props in extended component", () =>
 
   utils.assertRender(
     SearchInput({ type: "search", placeholder: "Search..." })``,
-    `<input class="${SearchInput.payload.styled.rootClass} ${BaseInput.payload.styled.rootClass}" type="search" placeholder="Search..."/>
+    `<input class="${SearchInput.raw.payload.styled.rootClass} ${BaseInput.raw.payload.styled.rootClass}" type="search" placeholder="Search..."/>
 <style>
-  .${BaseInput.payload.styled.rootClass} {
+  .${BaseInput.raw.payload.styled.rootClass} {
     border: 1px solid gray;
   }
-  .${SearchInput.payload.styled.rootClass} {
+  .${SearchInput.raw.payload.styled.rootClass} {
     padding-left: 2rem;
   }
 </style>`
@@ -133,12 +133,12 @@ Deno.test("styled CSS - should handle pseudo-classes", () => {
 
   utils.assertRender(
     <Button></Button>,
-    `<button class="${Button.payload.styled.rootClass}"></button>
+    `<button class="${Button.raw.payload.styled.rootClass}"></button>
 <style>
-  .${Button.payload.styled.rootClass} {
+  .${Button.raw.payload.styled.rootClass} {
     color: blue;
   }
-  .${Button.payload.styled.rootClass}:hover {
+  .${Button.raw.payload.styled.rootClass}:hover {
     color: darkblue;
   }
 </style>`
@@ -158,12 +158,12 @@ Deno.test("styled CSS - should handle nested selectors", () => {
 
   utils.assertRender(
     <Card></Card>,
-    `<div class="${Card.payload.styled.rootClass}"></div>
+    `<div class="${Card.raw.payload.styled.rootClass}"></div>
 <style>
-  .${Card.payload.styled.rootClass} {
+  .${Card.raw.payload.styled.rootClass} {
     padding: 1rem;
   }
-  .${Card.payload.styled.rootClass} h1 {
+  .${Card.raw.payload.styled.rootClass} h1 {
     font-size: 2em;
   }
 </style>`
@@ -185,13 +185,13 @@ Deno.test("styled CSS - should handle media queries", () => {
 
   utils.assertRender(
     <Container></Container>,
-    `<div class="${Container.payload.styled.rootClass}"></div>
+    `<div class="${Container.raw.payload.styled.rootClass}"></div>
 <style>
-  .${Container.payload.styled.rootClass} {
+  .${Container.raw.payload.styled.rootClass} {
     width: 100%;
   }
   @media (min-width: 768px) {
-    .${Container.payload.styled.rootClass} {
+    .${Container.raw.payload.styled.rootClass} {
       width: 50%;
     }
   }
@@ -209,9 +209,9 @@ Deno.test("styled with custom element", () => {
 
   utils.assertRender(
     <CustomEl>Custom content</CustomEl>,
-    `<custom-element class="${CustomEl.payload.styled.rootClass}">Custom content</custom-element>
+    `<custom-element class="${CustomEl.raw.payload.styled.rootClass}">Custom content</custom-element>
 <style>
-  .${CustomEl.payload.styled.rootClass} {
+  .${CustomEl.raw.payload.styled.rootClass} {
     color: blue;
   }
 </style>`

@@ -1,32 +1,38 @@
 import type { NormalizeAttributes, TemplateAttributes } from "./types.ts";
 
+export const normalizeClassAttribute = (
+  classess: TemplateAttributes["class"],
+) => {
+  if (Array.isArray(classess)) {
+    return classess.map(String);
+  } else if (typeof classess === "object") {
+    return Object.entries(classess)
+      .filter(([, enabled]) => enabled)
+      .map(([className]) => className);
+  } else {
+    return [String(classess)];
+  }
+};
+
 export function normalizeAttributes<A extends TemplateAttributes>(
-  attrs: A,
+  attrs: A = {} as A,
 ): NormalizeAttributes<A> {
   const result = { ...attrs } as NormalizeAttributes<A>;
-  const classes: string[] = [];
-  const styles: Record<string, string> = {};
+  const newClassess: string[] = [];
+  const newStyles: Record<string, string> = {};
 
   // Обработка classes
-  if (attrs.classes) {
-    if (Array.isArray(attrs.classes)) {
-      classes.push(...attrs.classes.map(String));
-    } else if (typeof attrs.classes === "object") {
-      Object.entries(attrs.classes)
-        .filter(([, enabled]) => enabled)
-        .forEach(([className]) => classes.push(className));
-    } else {
-      classes.push(String(attrs.classes));
-    }
+  if (attrs.class) {
+    newClassess.push(...normalizeClassAttribute(attrs.class));
   }
 
   // Обработка styles
-  if (attrs.styles) {
-    Object.assign(styles, attrs.styles);
+  if (attrs.style) {
+    Object.assign(newStyles, attrs.style);
   }
 
-  result.classes = classes;
-  result.styles = styles;
+  result.class = newClassess;
+  result.style = newStyles;
 
   return result;
 }

@@ -1,6 +1,7 @@
 import { REFACE_EVENT } from "@reface/constants";
 import type { IRefaceComposerPlugin } from "@reface/types";
-import type { StyledComponent } from "./types.ts";
+import type { StyledPayload } from "./types.ts";
+import type { Template } from "@reface/template";
 
 export class StyledPlugin implements IRefaceComposerPlugin {
   name = "styled";
@@ -9,14 +10,16 @@ export class StyledPlugin implements IRefaceComposerPlugin {
   setup: IRefaceComposerPlugin["setup"] = (composer) => {
     const manager = composer.getRenderManager();
 
+    // Очищаем стили перед каждым рендерингом
     manager.on(REFACE_EVENT.RENDER.RENDER.START, () => {
       this.collectedStyles.clear();
     });
 
+    // Собираем стили из шаблонов
     manager.on(REFACE_EVENT.RENDER.TEMPLATE.START, ({ template }) => {
-      const styledComponent = template as Partial<StyledComponent>;
-      if (styledComponent.payload?.styled?.styles) {
-        this.collectedStyles.add(styledComponent.payload.styled.styles);
+      const styledTemplate = template as Template<any, StyledPayload>;
+      if (styledTemplate.raw.type === "styled") {
+        this.collectedStyles.add(styledTemplate.raw.payload.styled.styles);
       }
     });
 

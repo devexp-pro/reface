@@ -13,65 +13,80 @@ import type {
 } from "./types.ts";
 import { createTemplateProxy } from "./createTemplateProxy.ts";
 import { normalizeAttributes } from "./normalizeAttributes.ts";
-
-const renderManager: any = {};
-
-function isBaseTemplateConfig<P>(input: any): input is BaseTemplateConfig<P> {
-  return "children" in input && !("attributes" in input);
-}
-
-function isHTMLTemplateConfig<A, P>(
-  input: any,
-): input is HTMLTemplateConfig<A, P> {
-  return "attributes" in input && "children" in input;
-}
+import { isHTMLTemplateConfig } from "./utils.ts";
 
 export const createTemplateFactory: CreateTemplateFactory = <
   A extends TemplateAttributes,
   P extends TemplatePayload,
   M extends TemplateMethods<A, P>,
 >(
-  config: TemplateFactoryConfig<A, P, M>,
+  createTemplateFactoryConfig: TemplateFactoryConfig<A, P, M>,
 ): TemplateFactory<A, P, M> => {
   const factory: TemplateFactory<A, P, M> = ((
-    input:
+    templateFactoryConfig:
       | ComponentFn<A, P>
       | BaseTemplateConfig<P>
       | HTMLTemplateConfig<A, P>,
   ) => {
     // Компонент
-    if (typeof input === "function") {
+    if (typeof templateFactoryConfig === "function") {
       const rawTemplate: RawTemplate<NormalizeAttributes<A>, P> = {
-        type: config.type,
+        type: createTemplateFactoryConfig.type,
         attributes: {},
         children: [],
         payload: {} as P,
       };
 
-      return createTemplateProxy(rawTemplate, config, input);
+      return createTemplateProxy({
+        rawTemplate,
+        createTemplateFactoryConfig,
+        templateFactoryConfig,
+      });
     }
 
     // HTML элемент или базовый вызов
-    if (isHTMLTemplateConfig<A, P>(input)) {
+    if (isHTMLTemplateConfig<A, P>(templateFactoryConfig)) {
+      const attributes = normalizeAttributes(
+        createTemplateFactoryConfig.process?.attributes?.(
+          {
+            oldAttrs:
+              createTemplateFactoryConfig.create?.defaults?.attributes || {},
+            newAttrs: templateFactoryConfig.attributes || {},
+            template: templateFactoryConfig,
+          },
+        ) || templateFactoryConfig.attributes || {},
+      );
+
       const rawTemplate: RawTemplate<NormalizeAttributes<A>, P> = {
-        type: config.type,
-        tag: input.tag,
-        attributes: normalizeAttributes(input.attributes || {}),
-        children: input.children || [],
-        payload: input.payload || {} as P,
+        type: createTemplateFactoryConfig.type,
+        tag: templateFactoryConfig.tag,
+        attributes,
+        children: templateFactoryConfig.children || [],
+        payload: {
+          ...createTemplateFactoryConfig.create?.defaults?.payload,
+          ...(templateFactoryConfig.payload || {}),
+        } as P,
       };
-      return createTemplateProxy(rawTemplate, config);
+      return createTemplateProxy({
+        rawTemplate,
+        createTemplateFactoryConfig,
+        templateFactoryConfig,
+      });
     }
 
     const rawTemplate: RawTemplate<NormalizeAttributes<A>, P> = {
-      type: config.type,
-      attributes: normalizeAttributes(
-        config.create?.defaults?.attributes || {},
-      ),
-      children: input.children || [],
-      payload: config.create?.defaults?.payload || {} as P,
+      type: createTemplateFactoryConfig.type,
+      children: templateFactoryConfig.children || [],
+      payload: {
+        ...createTemplateFactoryConfig.create?.defaults?.payload,
+        ...(templateFactoryConfig.payload || {}),
+      } as P,
     };
-    return createTemplateProxy(rawTemplate, config);
+    return createTemplateProxy({
+      rawTemplate,
+      createTemplateFactoryConfig,
+      templateFactoryConfig,
+    });
   }) as TemplateFactory<A, P, M>;
 
   return factory;

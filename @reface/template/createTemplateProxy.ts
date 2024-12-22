@@ -9,6 +9,8 @@ import type {
 } from "./types.ts";
 import { REFACE_TEMPLATE } from "./types.ts";
 import { processChildren } from "./processChildren.ts";
+import { isComponentFn } from "./utils.ts";
+import { normalizeAttributes } from "./normalizeAttributes.ts";
 
 type ProxyTarget<
   A extends TemplateAttributes,
@@ -42,12 +44,19 @@ export function createTemplateProxy<
   P extends TemplatePayload,
   M extends TemplateMethods<A, P>,
 >(
-  rawTemplate: RawTemplate<NormalizeAttributes<A>, P>,
-  config: TemplateFactoryConfig<A, P, M>,
+  {
+    rawTemplate,
+    createTemplateFactoryConfig,
+    templateFactoryConfig,
+  }: {
+    rawTemplate: RawTemplate<NormalizeAttributes<A>, P>;
+    createTemplateFactoryConfig: TemplateFactoryConfig<A, P, M>;
+    templateFactoryConfig: TemplateFactoryConfig<A, P, M>;
+  },
 ): Template<A, P, M> {
   const target: ProxyTarget<A, P, M> = Object.assign(
     function () {} as ProxyTarget<A, P, M>,
-    config.methods || {},
+    createTemplateFactoryConfig.methods || {},
   );
 
   const handler: ProxyHandler<A, P, M> = {
@@ -55,35 +64,64 @@ export function createTemplateProxy<
       const [first, ...rest] = args;
 
       if (first?.raw) {
-        return createTemplateProxy(
-          {
+        return createTemplateProxy({
+          rawTemplate: {
             ...rawTemplate,
             children: processChildren(first, rest),
           },
-          config,
-        );
+          templateFactoryConfig,
+          createTemplateFactoryConfig,
+        });
       }
 
-      return createTemplateProxy(
-        {
-          ...rawTemplate,
-          attributes: { ...rawTemplate.attributes, ...first },
+      const attributes = normalizeAttributes(
+        createTemplateFactoryConfig.process?.attributes?.(
+          {
+            oldAttrs: rawTemplate.attributes,
+            newAttrs: normalizeAttributes(first),
+            template: templateFactoryConfig,
+          },
+        ) || {
+          ...rawTemplate.attributes,
+          ...first,
         },
-        config,
       );
+      return createTemplateProxy({
+        rawTemplate: {
+          ...rawTemplate,
+          attributes,
+        },
+        templateFactoryConfig,
+        createTemplateFactoryConfig,
+      });
     },
 
     get(_target, prop) {
       if (prop === REFACE_TEMPLATE) {
         return true;
       }
+      if (prop === "raw") {
+        if (isComponentFn(templateFactoryConfig)) {
+          return {
+            ...rawTemplate,
+            children: [
+              templateFactoryConfig(
+                rawTemplate.attributes,
+                rawTemplate.children,
+              ),
+            ],
+          };
+        }
+
+        return rawTemplate;
+      }
 
       if (
         typeof prop === "string" &&
-        typeof config.methods === "object" &&
-        prop in config.methods
+        typeof templateFactoryConfig.methods === "object" &&
+        prop in templateFactoryConfig.methods
       ) {
-        const method = config.methods[prop];
+        const method = templateFactoryConfig.methods[prop];
         return (...args: any[]) => method({ template: rawTemplate, ...args });
       }
       return undefined;

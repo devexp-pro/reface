@@ -1,21 +1,28 @@
-import type {
-  ComponentFn,
-  ComponentProps,
-  ComponentRenderFn,
-  ComponentWithProps,
-  IRefaceTemplate,
-} from "@reface/types";
-import { RefaceTemplate } from "./RefaceTemplate.ts";
+import {
+  type ComponentProps,
+  type ComponentRenderFn,
+  type ComponentWithProps,
+  createTemplateFactory,
+  type TemplatePayload,
+} from "./template/mod.ts";
 
-export const component: ComponentFn = <
+export const component = <
   P extends ComponentProps,
-  T extends IRefaceTemplate,
+  T extends TemplatePayload = TemplatePayload,
 >(
   render: ComponentRenderFn<P, T>,
-) => {
-  return new RefaceTemplate({
-    transformer: (attributes, children) => {
-      return render(attributes, children);
+): ComponentWithProps<P, T> => {
+  const componentTemplate = createTemplateFactory({
+    type: "component",
+    create: {
+      defaults: {
+        attributes: {} as P,
+        payload: {} as T,
+      },
     },
   });
+
+  return componentTemplate((attrs: P, children) => {
+    return render(attrs, children);
+  }) as ComponentWithProps<P, T>;
 };

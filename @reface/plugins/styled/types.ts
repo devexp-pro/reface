@@ -1,11 +1,11 @@
 import type {
-  ComponentProps,
-  ComponentWithProps,
-  IRefaceTemplateElement,
-} from "@reface/types";
+  Template,
+  TemplateAttributes,
+  TemplatePayload,
+} from "@reface/template";
 
-// Тип для styled компонента, расширяющий ComponentWithProps
-export interface StyledPayload {
+// Базовый интерфейс для styled payload
+export interface StyledPayload extends TemplatePayload {
   styled: {
     styles: string;
     rootClass: string;
@@ -13,20 +13,26 @@ export interface StyledPayload {
   };
 }
 
-export interface StyledComponent<
-  P extends ComponentProps = ComponentProps,
-> extends ComponentWithProps<P, IRefaceTemplateElement> {
-  tag: string;
-  payload: StyledPayload;
-}
+// Тип для styled компонента
+export type StyledComponent = Template<TemplateAttributes, StyledPayload>;
 
-export interface StyledTagFn<P extends ComponentProps = ComponentProps> {
-  (strings: TemplateStringsArray, ...values: unknown[]): StyledComponent<P>;
-}
+// Функция для создания styled компонента из тега
+export type StyledTagFn = (
+  strings: TemplateStringsArray,
+  ...values: unknown[]
+) => StyledComponent;
 
-export interface StyledFn {
-  <P extends ComponentProps = ComponentProps>(
-    component: StyledComponent<P>,
-  ): StyledTagFn<P>;
-  [tag: string]: StyledTagFn<ComponentProps>;
+// Основная функция styled
+export type StyledFn = {
+  // Вызов styled для существующего компонента
+  (component: StyledComponent): StyledTagFn;
+  // Доступ к HTML тегам через proxy
+  [tag: string]: StyledTagFn;
+};
+
+// Тип для атрибутов styled компонента
+export interface StyledAttributes extends TemplateAttributes {
+  class?: string | string[];
+  style?: string | Record<string, string | number>;
+  [key: string]: unknown;
 }

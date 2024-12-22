@@ -1,6 +1,5 @@
-import type { ElementFactoryFn } from "@reface/types";
-import { RefaceTemplateElement } from "./RefaceTemplateElement.ts";
+import { createElementTemplate } from "./elements.ts";
 
-export const elementFactory: ElementFactoryFn = (tag) => {
-  return new RefaceTemplateElement({ tag });
+export const elementFactory = (tag: string) => {
+  return createElementTemplate({ tag });
 };
