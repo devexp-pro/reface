@@ -1,34 +1,94 @@
-import type { ElementChildType, HTMLAttributes } from "@reface/types";
-import type { Template, TemplateInstance } from "./types.ts";
+import type {
+  NormalizeAttributes,
+  RawTemplate,
+  Template,
+  TemplateAttributes,
+  TemplateFactoryConfig,
+  TemplateMethods,
+  TemplatePayload,
+} from "./types.ts";
+import { REFACE_TEMPLATE } from "./types.ts";
+import { processChildren } from "./processChildren.ts";
 
-export function createTemplateProxy<A extends HTMLAttributes, P>(
-  instance: TemplateInstance<A, P>,
-  factory: (attrs: A, children: ElementChildType[]) => Template<A, P>,
-): Template<A, P> {
-  return new Proxy(function () {}, {
+type ProxyTarget<
+  A extends TemplateAttributes,
+  P extends TemplatePayload,
+  M extends TemplateMethods<A, P>,
+> = {
+  (attributes: A): Template<A, P, M>;
+  (strings: TemplateStringsArray, ...values: any[]): Template<A, P, M>;
+} & M;
+
+type ProxyHandler<
+  A extends TemplateAttributes,
+  P extends TemplatePayload,
+  M extends TemplateMethods<A, P>,
+> = {
+  apply: (
+    target: ProxyTarget<A, P, M>,
+    thisArg: any,
+    args: [A] | [TemplateStringsArray, ...any[]],
+  ) => Template<A, P, M>;
+
+  get: (
+    target: ProxyTarget<A, P, M>,
+    prop: string | symbol,
+    receiver: any,
+  ) => ((...args: any[]) => Template<A, P, M>) | undefined;
+};
+
+export function createTemplateProxy<
+  A extends TemplateAttributes,
+  P extends TemplatePayload,
+  M extends TemplateMethods<A, P>,
+>(
+  rawTemplate: RawTemplate<NormalizeAttributes<A>, P>,
+  config: TemplateFactoryConfig<A, P, M>,
+): Template<A, P, M> {
+  const target: ProxyTarget<A, P, M> = Object.assign(
+    function () {} as ProxyTarget<A, P, M>,
+    config.methods || {},
+  );
+
+  const handler: ProxyHandler<A, P, M> = {
     apply(_target, _thisArg, args) {
-      const [stringsOrAttrs, ...values] = args;
+      const [first, ...rest] = args;
 
-      // Вызов с template literal
-      if (stringsOrAttrs?.raw) {
-        return factory(
-          instance.attributes,
-          processChildren(stringsOrAttrs, values),
+      if (first?.raw) {
+        return createTemplateProxy(
+          {
+            ...rawTemplate,
+            children: processChildren(first, rest),
+          },
+          config,
         );
       }
 
-      // Вызов с атрибутами
-      return factory(
-        normalizeAttributes({ ...instance.attributes, ...stringsOrAttrs }),
-        instance.children,
+      return createTemplateProxy(
+        {
+          ...rawTemplate,
+          attributes: { ...rawTemplate.attributes, ...first },
+        },
+        config,
       );
     },
+
     get(_target, prop) {
-      if (prop in instance) {
-        const value = instance[prop];
-        return typeof value === "function" ? value.bind(instance) : value;
+      if (prop === REFACE_TEMPLATE) {
+        return true;
+      }
+
+      if (
+        typeof prop === "string" &&
+        typeof config.methods === "object" &&
+        prop in config.methods
+      ) {
+        const method = config.methods[prop];
+        return (...args: any[]) => method({ template: rawTemplate, ...args });
       }
       return undefined;
     },
-  }) as Template<A, P>;
+  };
+
+  return new Proxy(target, handler);
 }

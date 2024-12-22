@@ -1,5 +1,8 @@
+import type { ElementChildType, Template } from "./types.ts";
+import { REFACE_TEMPLATE } from "./types.ts";
+
 function isTemplate(value: unknown): value is Template {
-  return typeof value === "function" && "type" in value;
+  return typeof value === "function" && value[REFACE_TEMPLATE] === true;
 }
 
 function isEmptyValue(value: unknown): boolean {
@@ -9,7 +12,7 @@ function isEmptyValue(value: unknown): boolean {
 
 export function processChildren(
   strings: TemplateStringsArray,
-  values: any[],
+  values: unknown[],
 ): ElementChildType[] {
   const children: ElementChildType[] = [];
 
@@ -21,12 +24,13 @@ export function processChildren(
 
     if (i < values.length) {
       const value = values[i];
+
       if (Array.isArray(value)) {
         children.push(...value);
       } else if (isTemplate(value)) {
         children.push(value);
       } else if (!isEmptyValue(value)) {
-        children.push(escapeHTML(String(value)));
+        children.push(String(value));
       }
     }
   }

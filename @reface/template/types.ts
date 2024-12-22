@@ -1,5 +1,8 @@
 // utility types
-type NormalizeAttributes<T extends TemplateAttributes> =
+
+export const REFACE_TEMPLATE = Symbol("REFACE_TEMPLATE");
+
+export type NormalizeAttributes<T extends TemplateAttributes> =
   & Omit<T, "classes" | "styles">
   & {
     classes?: string[];
@@ -7,27 +10,27 @@ type NormalizeAttributes<T extends TemplateAttributes> =
   };
 
 // Базовые типы для атрибутов
-type ClassValue =
+export type ClassValue =
   | string
   | Record<string, boolean>
   | (string | Record<string, boolean>)[];
-type StyleValue =
+export type StyleValue =
   | string
   | Record<string, string | number>
   | (string | Record<string, string | number>)[];
 
 // Базовый интерфейс для пользовательских данных
-interface TemplatePayload {
+export interface TemplatePayload {
   [key: string]: any;
 }
 
 // Типы для children
-type PrimitiveChild = string | number | boolean | null | undefined;
-type ComplexChild = Template | ElementChildType[];
-type ElementChildType = PrimitiveChild | ComplexChild;
+export type PrimitiveChild = string | number | boolean | null | undefined;
+export type ComplexChild = Template | ElementChildType[];
+export type ElementChildType = PrimitiveChild | ComplexChild;
 
 // Функция-компонент
-type ComponentFn<
+export type ComponentFn<
   A extends TemplateAttributes = TemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
 > = (
@@ -35,14 +38,14 @@ type ComponentFn<
   children: ElementChildType[],
 ) => Template<A, P>;
 
-type RawTemplateAttributes = {
+export type RawTemplateAttributes = {
   [key: string]: any;
   classes?: string[];
   styles?: Record<string, string>;
 };
 
 // Базовая структура шаблона
-interface RawTemplate<
+export interface RawTemplate<
   A extends RawTemplateAttributes = RawTemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
 > {
@@ -53,56 +56,62 @@ interface RawTemplate<
   payload: P;
 }
 
-type TemplateAttributesClass =
+export type TemplateAttributesClass =
   | string
   | Record<string, boolean>
   | TemplateAttributesClass[];
-type TemplateAttributesStyle =
+export type TemplateAttributesStyle =
   | Record<string, string | number>
   | string[]
   | string
   | Record<string, boolean>;
 
-type TemplateAttributes = {
+export type TemplateAttributes = {
   classes?: TemplateAttributesClass;
   styles?: TemplateAttributesStyle;
   [key: string]: any;
-};
+} | Record<string, never>;
 
 // Callable интерфейс шаблона
-type Template<
+export type Template<
+  A extends TemplateAttributes = TemplateAttributes,
+  P extends TemplatePayload = TemplatePayload,
+  M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
+> =
+  & {
+    // Вызов с атрибутами
+    (attributes: A): Template<A, P, M>;
+    // Вызов с содержимым
+    (strings: TemplateStringsArray, ...values: any[]): Template<A, P, M>;
+  }
+  & M
+  & {
+    [REFACE_TEMPLATE]: true;
+  };
+
+// Фабрика шаблонов
+export type TemplateFactory<
   A extends TemplateAttributes = TemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
   M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
 > = {
-  // Вызов с атрибутами
-  (attributes: A): Template<A, P, M>;
-  // Вызов с содержимым
-  (strings: TemplateStringsArray, ...values: any[]): Template<A, P, M>;
-} & M;
-
-// Фабрика шаблонов
-type TemplateFactory<
-  A extends TemplateAttributes = TemplateAttributes,
-  P extends TemplatePayload = TemplatePayload,
-> = {
   // Базовый вызов
-  (config: BaseTemplateConfig<P>): Template<A, P>;
+  (config: BaseTemplateConfig<P>): Template<A, P, M>;
   // HTML элемент
-  (config: HTMLTemplateConfig<A, P>): Template<A, P>;
+  (config: HTMLTemplateConfig<A, P>): Template<A, P, M>;
   // Компонент с выводом типа атрибутов
   <CA extends Record<string, any>>(
     component: ComponentFn<CA, P>,
-  ): Template<CA, P>;
+  ): Template<CA, P, M>;
 };
 
-type BaseTemplateConfig<P extends TemplatePayload = TemplatePayload> = {
+export type BaseTemplateConfig<P extends TemplatePayload = TemplatePayload> = {
   payload?: P;
   children?: ElementChildType[];
 };
 
 // HTML конфигурация с условным типом для children
-type HTMLTemplateConfig<
+export type HTMLTemplateConfig<
   A extends TemplateAttributes = TemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
 > =
@@ -118,7 +127,7 @@ type HTMLTemplateConfig<
   );
 
 // Менеджер рендеринга
-interface RenderManager {
+export interface RenderManager {
   combineClasses(...classes: (string | undefined)[]): string;
   renderChildren(children: ElementChildType[]): string;
   renderAttributes(
@@ -131,7 +140,7 @@ interface RenderManager {
 
 // Полная конфигурация фабрики шаблонов
 
-type TransformTemplate<
+export type TransformTemplate<
   A extends TemplateAttributes = TemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
 > = (params: {
@@ -140,7 +149,7 @@ type TransformTemplate<
   manager: RenderManager;
 }) => RawTemplate<NormalizeAttributes<A>, P>;
 
-interface TemplateFactoryConfig<
+export interface TemplateFactoryConfig<
   A extends TemplateAttributes = TemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
   M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
@@ -148,7 +157,6 @@ interface TemplateFactoryConfig<
   type: string;
 
   create: {
-    transform: TransformTemplate<A, P>;
     defaults?: {
       attributes?: A;
       payload?: P;
@@ -199,7 +207,7 @@ interface TemplateFactoryConfig<
 }
 
 // Интерфейс для методов шаблона
-type TemplateMethods<
+export type TemplateMethods<
   A extends TemplateAttributes = TemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
 > = {
@@ -208,14 +216,10 @@ type TemplateMethods<
   }) => any;
 };
 
-export type {
-  ClassValue,
-  ElementChildType,
-  RawTemplate,
-  RenderManager,
-  StyleValue,
-  Template,
-  TemplateFactory,
-  TemplateFactoryConfig,
-  TemplatePayload,
-};
+export type CreateTemplateFactory = <
+  A extends TemplateAttributes = TemplateAttributes,
+  P extends TemplatePayload = TemplatePayload,
+  M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
+>(
+  config: TemplateFactoryConfig<A, P, M>,
+) => TemplateFactory<A, P, M>;
