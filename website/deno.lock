@@ -2,6 +2,7 @@
   "version": "4",
   "specifiers": {
     "jsr:@hono/hono@*": "4.6.12",
+    "jsr:@std/fmt@*": "1.0.3",
     "npm:remark-gfm@*": "4.0.0",
     "npm:remark-parse@*": "11.0.0",
     "npm:unified@*": "11.0.5"
@@ -9,6 +10,9 @@
   "jsr": {
     "@hono/hono@4.6.12": {
       "integrity": "fa0b97fa7c3292f0d9957109ac07a475fe485868795b71b8e3114c284152cdb5"
+    },
+    "@std/fmt@1.0.3": {
+      "integrity": "97765c16aa32245ff4e2204ecf7d8562496a3cb8592340a80e7e554e0bb9149f"
     }
   },
   "npm": {

@@ -3,11 +3,13 @@ import { PartialsPlugin } from "./plugins/partials/mod.ts";
 import { StyledPlugin } from "./plugins/styled/mod.ts";
 import {
   createIsland,
+  createIslandComponent,
   type Island,
   IslandPlugin,
   type RpcResponse,
 } from "./island/mod.ts";
-import type { IRefaceComposerPlugin, Template } from "@reface/types";
+import type { IRefaceComposerPlugin } from "@reface/types";
+import type { Template } from "@reface/template";
 import { Hono } from "@hono/hono";
 import type { Context } from "@hono/hono";
 
@@ -96,35 +98,8 @@ export class Reface {
   }
 
   // Создание острова
-  island<State, Props, RPC>(island: Island<State, Props, RPC>) {
-    const name = island.name || `island-${crypto.randomUUID()}`;
-
-    this.islands.set(name, island);
-
-    if (island.initialState) {
-      this.islandPlugin.setIslandState(name, island.initialState);
-    }
-
-    return (props: Props): Template => {
-      this.islandProps.set(name, props);
-
-      const state = this.islandPlugin.getIslandState<State>(name) ||
-        island.initialState;
-      const rpc = this.islandPlugin.createRpcProxy<RPC>(name);
-
-      const context = {
-        props,
-        state: state as State,
-        rpc,
-      };
-
-      return createIsland(
-        name,
-        island.template(context),
-        state,
-        island.rpc,
-      );
-    };
+  island<State, Props, RPC>(islandConfig: Island<State, Props, RPC>) {
+    return createIslandComponent(islandConfig, this.islandPlugin);
   }
 
   // Обработка RPC вызова
@@ -207,7 +182,7 @@ export class Reface {
 
     // Если есть layout - оборачиваем контент
     if (this.layout) {
-      content = this.layout({}, content);
+      content = this.layout`${content}`;
     }
 
     // Рендерим финальный шаблон через композер
