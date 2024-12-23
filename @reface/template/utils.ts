@@ -5,7 +5,7 @@ import type {
   RawTemplate,
   Template,
 } from "./types.ts";
-import { REFACE_TEMPLATE } from "./constants.ts";
+import { HTML_ENTITIES, REFACE_TEMPLATE } from "./constants.ts";
 
 export function isBaseTemplateConfig<P>(
   input: any,
@@ -34,4 +34,12 @@ export function isRawTemplate(value: unknown): value is RawTemplate {
 export function isEmptyValue(value: unknown): boolean {
   return value === null || value === undefined || typeof value === "boolean" ||
     value === "";
+}
+
+export function escapeHTML(str: string): string {
+  return str.replace(/[&<>"']/g, (char) => HTML_ENTITIES[char]);
+}
+
+export function escapeAttribute(str: string): string {
+  return str.replace(/["&]/g, (char) => HTML_ENTITIES[char]);
 }

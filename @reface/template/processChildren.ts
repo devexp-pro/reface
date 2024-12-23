@@ -1,5 +1,5 @@
 import type { ElementChildType } from "./types.ts";
-import { isEmptyValue, isTemplate } from "./utils.ts";
+import { escapeHTML, isEmptyValue, isTemplate } from "./utils.ts";
 
 export function processChildren(
   strings: TemplateStringsArray,
@@ -20,7 +20,7 @@ export function processChildren(
       } else if (isTemplate(value)) {
         children.push(value);
       } else if (!isEmptyValue(value)) {
-        children.push(String(value));
+        children.push(escapeHTML(String(value)));
       }
     }
   }

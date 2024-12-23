@@ -16,3 +16,11 @@ export const VOID_ELEMENTS = new Set([
   "track",
   "wbr",
 ]);
+
+export const HTML_ENTITIES: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#x27;",
+};
