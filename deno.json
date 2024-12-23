@@ -17,7 +17,7 @@
     "./plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
     "./components/LayoutSimple": "./@reface/components/LayoutSimple.ts",
     "./components/LayoutTWA": "./@reface/components/LayoutTWA.ts",
-    "./jsx.global.d.ts": "./@reface/jsx.global.d.ts"
+    "./jsx.global.d.ts": "./@reface/jsx/jsx.global.d.ts"
   },
   "imports": {
     "@reface/jsx/global": "./@reface/jsx/global.ts",
