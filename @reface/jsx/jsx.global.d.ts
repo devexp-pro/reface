@@ -7,7 +7,7 @@ import type {
 declare global {
   namespace JSX {
     // Базовый тип для JSX элементов
-    type Element = Template;
+    type Element = Template<any, any, any>;
 
     // Определяем как компоненты получают children
     interface ElementChildrenAttribute {
@@ -22,9 +22,12 @@ declare global {
     // Определяем тип компонента
     type ElementType =
       | string
-      | ((props: any, children?: ElementChildType) => Template);
+      | ((
+        props: any,
+        children?: ElementChildType[],
+      ) => Template<any, any, any>);
 
     // Определяем атрибуты для пользовательских компонентов
-    interface IntrinsicAttributes extends TemplateAttributes {}
+    interface IntrinsicAttributes extends Record<string, any> {}
   }
 }

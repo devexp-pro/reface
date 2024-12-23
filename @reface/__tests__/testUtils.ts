@@ -29,7 +29,7 @@ export class TestUtils {
     assertEquals(normalizeHtml(actual), normalizeHtml(expected), message);
   }
 
-  assertRender(template: Template, expected: string): void {
+  assertRender(template: Template<any, any>, expected: string): void {
     const actual = this.reface.render(template);
 
     try {

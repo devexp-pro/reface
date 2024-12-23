@@ -28,8 +28,8 @@ export interface TemplatePayload {
 
 // Типы для children
 export type PrimitiveChild = string | number | boolean | null | undefined;
-export type ComplexChild = Template | ElementChildType[];
-export type ElementChildType = PrimitiveChild | ComplexChild;
+export type ComplexChild = Template<any, any, any>;
+export type ElementChildType = Arrayable<PrimitiveChild | ComplexChild>;
 
 // Функция-компонент
 export type ComponentFn<
@@ -58,15 +58,23 @@ export interface RawTemplate<
   payload: P;
 }
 
-export type TemplateAttributesClass =
+type Arrayable<T> = T | T[];
+
+export type TemplateAttributesClass = Arrayable<
   | string
-  | Record<string, boolean>
-  | TemplateAttributesClass[];
-export type TemplateAttributesStyle =
-  | Record<string, string | number>
+  | null
+  | undefined
+  | boolean
+  | { [key: string]: boolean }
+>;
+export type TemplateAttributesStyle = Arrayable<
+  | string
   | string[]
-  | string
-  | Record<string, boolean>;
+  | { [key: string]: boolean | string | number }
+  | null
+  | undefined
+  | boolean
+>;
 
 export type TemplateAttributes = {
   class?: TemplateAttributesClass;
