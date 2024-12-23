@@ -1,4 +1,4 @@
-import { IRefaceRenderManager } from "../types/composer.types.ts";
+import type { IRefaceRenderManager } from "../types/composer.types.ts";
 import type { REFACE_TEMPLATE } from "./constants.ts";
 
 export type NormalizeAttributes<T extends TemplateAttributes> =
@@ -6,7 +6,7 @@ export type NormalizeAttributes<T extends TemplateAttributes> =
     & Omit<T, "class" | "style">
     & {
       class?: string[];
-      style?: Record<string, string>;
+      style?: string[];
     }
   )
   | Record<string, never>;
@@ -62,6 +62,7 @@ type Arrayable<T> = T | T[];
 
 export type TemplateAttributesClass = Arrayable<
   | string
+  | string[]
   | null
   | undefined
   | boolean
@@ -80,7 +81,7 @@ export type TemplateAttributes = {
   class?: TemplateAttributesClass;
   style?: TemplateAttributesStyle;
   [key: string]: any;
-} | Record<string, never>;
+};
 
 export type TransformedMethods<M extends TemplateMethods> = {
   [K in keyof M]: M[K] extends (first: any, ...args: infer Args) => infer R
@@ -92,12 +93,10 @@ export type TransformedMethods<M extends TemplateMethods> = {
 export type Template<
   A extends TemplateAttributes = TemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
-  M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
+  M extends TemplateMethods<any, P> = TemplateMethods<A, P>,
 > =
   & {
-    // Вызов с атрибутами
     (attributes: A): Template<A, P, M>;
-    // Вызов с содержимым
     (strings: TemplateStringsArray, ...values: any[]): Template<A, P, M>;
   }
   & TransformedMethods<M>
@@ -117,9 +116,9 @@ export type TemplateFactory<
   // HTML элемент
   (config: HTMLTemplateConfig<A, P>): Template<A, P, M>;
   // Компонент с выводом типа атрибутов
-  <CA extends Record<string, any>>(
+  <CA extends TemplateAttributes>(
     component: ComponentFn<CA, P>,
-  ): Template<CA, P, M>;
+  ): Template<CA, P, TemplateMethods<CA, P>>;
 };
 
 export type BaseTemplateConfig<P extends TemplatePayload = TemplatePayload> = {
@@ -173,7 +172,7 @@ export interface TemplateFactoryConfig<
       oldAttrs: A;
       newAttrs: A;
       template: RawTemplate<NormalizeAttributes<A>, P>;
-      manager: RenderManager;
+      manager: IRefaceRenderManager;
     }) => A;
 
     children?: (params: {
@@ -188,25 +187,25 @@ export interface TemplateFactoryConfig<
   render?: {
     template?: (params: {
       template: RawTemplate<NormalizeAttributes<A>, P>;
-      manager: RenderManager;
+      manager: IRefaceRenderManager;
     }) => string;
 
     attributes?: (params: {
       attrs: A;
       template: RawTemplate<NormalizeAttributes<A>, P>;
-      manager: RenderManager;
+      manager: IRefaceRenderManager;
     }) => string;
 
     styles?: (params: {
       styles: Record<string, string>;
       template: RawTemplate<NormalizeAttributes<A>, P>;
-      manager: RenderManager;
+      manager: IRefaceRenderManager;
     }) => string;
 
     classes?: (params: {
       classes: string[];
       template: RawTemplate<NormalizeAttributes<A>, P>;
-      manager: RenderManager;
+      manager: IRefaceRenderManager;
     }) => string;
   };
 }

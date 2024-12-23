@@ -4,22 +4,28 @@ import type {
   HTMLTemplateConfig,
   RawTemplate,
   Template,
+  TemplateAttributes,
+  TemplatePayload,
 } from "./types.ts";
 import { HTML_ENTITIES, REFACE_TEMPLATE } from "./constants.ts";
 
-export function isBaseTemplateConfig<P>(
+export function isBaseTemplateConfig<P extends TemplatePayload>(
   input: any,
 ): input is BaseTemplateConfig<P> {
   return "children" in input && !("attributes" in input);
 }
 
-export function isHTMLTemplateConfig<A, P>(
-  input: any,
-): input is HTMLTemplateConfig<A, P> {
+export function isHTMLTemplateConfig<
+  A extends TemplateAttributes,
+  P extends TemplatePayload,
+>(input: any): input is HTMLTemplateConfig<A, P> {
   return "tag" in input;
 }
 
-export function isComponentFn<A, P>(input: any): input is ComponentFn<A, P> {
+export function isComponentFn<
+  A extends TemplateAttributes,
+  P extends TemplatePayload,
+>(input: any): input is ComponentFn<A, P> {
   return typeof input === "function";
 }
 

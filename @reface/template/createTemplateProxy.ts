@@ -42,18 +42,12 @@ type ProxyHandler<
 export function createTemplateProxy<
   A extends TemplateAttributes,
   P extends TemplatePayload,
-  M extends TemplateMethods<A, P>,
->(
-  {
-    rawTemplate,
-    createTemplateFactoryConfig,
-    templateFactoryConfig,
-  }: {
-    rawTemplate: RawTemplate<NormalizeAttributes<A>, P>;
-    createTemplateFactoryConfig: TemplateFactoryConfig<A, P, M>;
-    templateFactoryConfig: TemplateFactoryConfig<A, P, M>;
-  },
-): Template<A, P, M> {
+  M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
+>({ rawTemplate, createTemplateFactoryConfig, templateFactoryConfig }: {
+  rawTemplate: RawTemplate<NormalizeAttributes<A>, P>;
+  createTemplateFactoryConfig: TemplateFactoryConfig<A, P, M>;
+  templateFactoryConfig: TemplateFactoryConfig<A, P, M>;
+}): Template<A, P, M> {
   const target: ProxyTarget<A, P, M> = Object.assign(
     function () {} as ProxyTarget<A, P, M>,
     createTemplateFactoryConfig.methods || {},

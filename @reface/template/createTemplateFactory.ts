@@ -15,9 +15,10 @@ import { createTemplateProxy } from "./createTemplateProxy.ts";
 import { normalizeAttributes } from "./normalizeAttributes.ts";
 import { isHTMLTemplateConfig } from "./utils.ts";
 import { VOID_ELEMENTS } from "./constants.ts";
+
 export const createTemplateFactory: CreateTemplateFactory = <
-  A extends Record<string, any> = TemplateAttributes,
-  P extends TemplatePayload = TemplatePayload,
+  A extends TemplateAttributes,
+  P extends TemplatePayload,
   M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
 >(
   createTemplateFactoryConfig: TemplateFactoryConfig<A, P, M>,
