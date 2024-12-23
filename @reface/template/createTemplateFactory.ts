@@ -33,7 +33,7 @@ export const createTemplateFactory: CreateTemplateFactory = <
     if (typeof templateFactoryConfig === "function") {
       const rawTemplate: RawTemplate<NormalizeAttributes<A>, P> = {
         type: createTemplateFactoryConfig.type,
-        attributes: {},
+        attributes: {} as NormalizeAttributes<A>,
         children: [],
         payload: {} as P,
       };

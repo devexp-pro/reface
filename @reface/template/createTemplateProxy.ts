@@ -1,8 +1,9 @@
 import type {
+  BaseAttributes,
+  BaseTemplateConfig,
   NormalizeAttributes,
   RawTemplate,
   Template,
-  TemplateAttributes,
   TemplateFactoryConfig,
   TemplateMethods,
   TemplatePayload,
@@ -12,47 +13,41 @@ import { processChildren } from "./processChildren.ts";
 import { isComponentFn } from "./utils.ts";
 import { normalizeAttributes } from "./normalizeAttributes.ts";
 
-type ProxyTarget<
-  A extends TemplateAttributes,
-  P extends TemplatePayload,
-  M extends TemplateMethods<A, P>,
-> = {
-  (attributes: A): Template<A, P, M>;
-  (strings: TemplateStringsArray, ...values: any[]): Template<A, P, M>;
-} & M;
-
 type ProxyHandler<
-  A extends TemplateAttributes,
+  A extends BaseAttributes,
   P extends TemplatePayload,
   M extends TemplateMethods<A, P>,
 > = {
   apply: (
-    target: ProxyTarget<A, P, M>,
+    target: Template<A, P, M>,
     thisArg: any,
     args: [A] | [TemplateStringsArray, ...any[]],
   ) => Template<A, P, M>;
 
   get: (
-    target: ProxyTarget<A, P, M>,
+    target: Template<A, P, M>,
     prop: string | symbol,
     receiver: any,
-  ) => ((...args: any[]) => Template<A, P, M>) | undefined;
+  ) =>
+    | ((...args: any[]) => Template<A, P, M>)
+    | boolean
+    | RawTemplate<NormalizeAttributes<A>, P>
+    | undefined;
 };
 
 export function createTemplateProxy<
-  A extends TemplateAttributes,
+  A extends BaseAttributes,
   P extends TemplatePayload,
-  M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
->({ rawTemplate, createTemplateFactoryConfig, templateFactoryConfig }: {
+  M extends TemplateMethods<A, P>,
+>({
+  rawTemplate,
+  createTemplateFactoryConfig,
+  templateFactoryConfig,
+}: {
   rawTemplate: RawTemplate<NormalizeAttributes<A>, P>;
   createTemplateFactoryConfig: TemplateFactoryConfig<A, P, M>;
-  templateFactoryConfig: TemplateFactoryConfig<A, P, M>;
+  templateFactoryConfig: BaseTemplateConfig<P>;
 }): Template<A, P, M> {
-  const target: ProxyTarget<A, P, M> = Object.assign(
-    function () {} as ProxyTarget<A, P, M>,
-    createTemplateFactoryConfig.methods || {},
-  );
-
   const handler: ProxyHandler<A, P, M> = {
     apply(_target, _thisArg, args) {
       const [first, ...rest] = args;
@@ -61,32 +56,31 @@ export function createTemplateProxy<
         return createTemplateProxy({
           rawTemplate: {
             ...rawTemplate,
-            children: processChildren(first, rest),
+            children: processChildren(first as TemplateStringsArray, rest),
           },
-          templateFactoryConfig,
           createTemplateFactoryConfig,
+          templateFactoryConfig,
         });
       }
 
       const attributes = normalizeAttributes(
-        createTemplateFactoryConfig.process?.attributes?.(
-          {
-            oldAttrs: rawTemplate.attributes,
-            newAttrs: normalizeAttributes(first),
-            template: templateFactoryConfig,
-          },
-        ) || {
+        createTemplateFactoryConfig.process?.attributes?.({
+          oldAttrs: rawTemplate.attributes,
+          newAttrs: normalizeAttributes(first as A),
+          template: rawTemplate,
+        }) || {
           ...rawTemplate.attributes,
-          ...first,
+          ...(first as A),
         },
       );
+
       return createTemplateProxy({
         rawTemplate: {
           ...rawTemplate,
           attributes,
         },
-        templateFactoryConfig,
         createTemplateFactoryConfig,
+        templateFactoryConfig,
       });
     },
 
@@ -116,11 +110,17 @@ export function createTemplateProxy<
         prop in createTemplateFactoryConfig.methods
       ) {
         const method = createTemplateFactoryConfig.methods[prop];
-        return (...args: any[]) => method({ template: rawTemplate, ...args });
+        return function (this: any, ...args: any[]) {
+          return method({ template: rawTemplate }, ...args);
+        };
       }
       return undefined;
     },
   };
 
-  return new Proxy(target, handler);
+  // FIXME: how to fix this?
+  return new Proxy(
+    function () {} as unknown as Template<A, P, M>,
+    handler,
+  ) as Template<A, P, M>;
 }

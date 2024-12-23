@@ -10,7 +10,7 @@ Deno.test("Parital - markup rendering", () => {
 
   // HTML синтаксис
   utils.assertRender(
-    TestPartial()`Content`,
+    TestPartial`Content`,
     `<div data-partial="test-partial">Content</div>`,
   );
   // JSX синтаксис

@@ -1,4 +1,8 @@
-import type { NormalizeAttributes, TemplateAttributes } from "./types.ts";
+import type {
+  BaseAttributes,
+  NormalizeAttributes,
+  TemplateAttributes,
+} from "./types.ts";
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -84,7 +88,7 @@ export const normalizeStyleAttribute = (
     .map(([prop, value]) => `${prop}: ${value}`);
 };
 
-export function normalizeAttributes<A extends TemplateAttributes>(
+export function normalizeAttributes<A extends BaseAttributes>(
   attrs: A = {} as A,
 ): NormalizeAttributes<A> {
   const result = { ...attrs } as NormalizeAttributes<A>;
