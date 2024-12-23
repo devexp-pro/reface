@@ -86,16 +86,18 @@ const NavLink = styled.a`
   }
 `;
 
-export function Navigation({ sections, currentPath }: NavigationProps): IRefaceTemplate {
+export function Navigation(
+  { sections, currentPath }: NavigationProps,
+): IRefaceTemplate {
   return (
     <NavContainer>
-      {sections.map(section => (
+      {sections.map((section) => (
         <Section>
           <SectionTitle>{section.title}</SectionTitle>
           <NavList>
-            {section.items.map(item => (
+            {section.items.map((item) => (
               <NavItem>
-                <NavLink 
+                <NavLink
                   href={`/docs/${item.path}`}
                   class={currentPath === item.path ? "active" : ""}
                 >
@@ -108,4 +110,4 @@ export function Navigation({ sections, currentPath }: NavigationProps): IRefaceT
       ))}
     </NavContainer>
   );
-} 
+}

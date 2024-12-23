@@ -82,9 +82,9 @@ const Button = styled.button`
 `;
 
 // Компонент для вывода результата команды
-function OutputBlock({ out, err, code, command }: { 
-  out: string; 
-  err: string; 
+function OutputBlock({ out, err, code, command }: {
+  out: string;
+  err: string;
   code: number;
   command: string;
 }) {
@@ -104,7 +104,7 @@ const CommandRunner = island(
     const { code, stdout, stderr } = await process.output();
 
     return (
-      <OutputBlock 
+      <OutputBlock
         command={command}
         code={code}
         out={new TextDecoder().decode(stdout)}
@@ -112,7 +112,7 @@ const CommandRunner = island(
       />
     );
   },
-  "command-runner"
+  "command-runner",
 );
 
 function WebTerminal() {
@@ -121,7 +121,7 @@ function WebTerminal() {
       <h1>Simple Web Terminal</h1>
       <Terminal>
         <CommandRunner>
-          <OutputBlock 
+          <OutputBlock
             out={"Тут будет вывод команды"}
             err={""}
             code={0}
@@ -133,10 +133,10 @@ function WebTerminal() {
         {...CommandRunner.trigger("submit").swap("afterbegin")}
       >
         <label htmlFor="command">Command:</label>
-        <Input 
-          type="text" 
-          id="command" 
-          name="command" 
+        <Input
+          type="text"
+          id="command"
+          name="command"
         />
         <Button type="submit">Run</Button>
       </Form>

@@ -18,7 +18,7 @@ Deno.test("styled.div - should create basic styled div", () => {
   .${StyledDiv.raw.payload.styled.rootClass} {
     color: red;
   }
-</style>`
+</style>`,
   );
 });
 
@@ -37,7 +37,7 @@ Deno.test("styled.button - should handle props", () => {
   .${Button.raw.payload.styled.rootClass} {
     background: blue;
   }
-</style>`
+</style>`,
   );
 });
 
@@ -56,7 +56,7 @@ Deno.test("styled.h1 - should handle children", () => {
   .${Title.raw.payload.styled.rootClass} {
     font-size: 2em;
   }
-</style>`
+</style>`,
   );
 });
 
@@ -87,7 +87,7 @@ Deno.test("styled(Component) - should extend existing component", () => {
     background: blue;
     color: white;
   }
-</style>`
+</style>`,
   );
 });
 
@@ -115,7 +115,7 @@ Deno.test("styled(Component) - should handle props in extended component", () =>
   .${SearchInput.getRootClass()} {
     padding-left: 2rem;
   }
-</style>`
+</style>`,
   );
 });
 
@@ -141,7 +141,7 @@ Deno.test("styled CSS - should handle pseudo-classes", () => {
   .${Button.getRootClass()}:hover {
     color: darkblue;
   }
-</style>`
+</style>`,
   );
 });
 
@@ -166,7 +166,7 @@ Deno.test("styled CSS - should handle nested selectors", () => {
   .${Card.getRootClass()} h1 {
     font-size: 2em;
   }
-</style>`
+</style>`,
   );
 });
 
@@ -195,7 +195,7 @@ Deno.test("styled CSS - should handle media queries", () => {
       width: 50%;
     }
   }
-</style>`
+</style>`,
   );
 });
 
@@ -214,7 +214,7 @@ Deno.test("styled with custom element", () => {
   .${CustomEl.getRootClass()} {
     color: blue;
   }
-</style>`
+</style>`,
   );
 });
 
@@ -228,23 +228,23 @@ Deno.test("styled component - should handle empty call for template literals", (
 
   const withEmptyCall = Title()`Hello`;
   utils.assertRender(
-    withEmptyCall, 
+    withEmptyCall,
     `<h1 class="${withEmptyCall.getRootClass()}">Hello</h1>
 <style>
   .${withEmptyCall.getRootClass()} {
     font-size: 2em;
   }
-</style>`
+</style>`,
   );
 
   const withEmptyProps = Title({})`Hello`;
   utils.assertRender(
-    withEmptyProps, 
+    withEmptyProps,
     `<h1 class="${withEmptyProps.getRootClass()}">Hello</h1>
 <style>
   .${withEmptyProps.getRootClass()} {
     font-size: 2em;
   }
-</style>`
+</style>`,
   );
-}); 
+});

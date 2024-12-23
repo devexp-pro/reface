@@ -2,9 +2,12 @@
 
 ## Основное использование
 
-Template API предоставляет способ создания HTML-шаблонов с поддержкой атрибутов и вложенного содержимого.
+Template API предоставляет способ создания HTML-шаблонов с поддержкой атрибутов
+и вложенного содержимого.
 
-В конечном итоге, Reface работает на уровне строк и генерирует чистый HTML, что делает его идеальным для серверного рендеринга. JSX - это просто удобная обертка для разработки, которая транслируется в те же вызовы Template API.
+В конечном итоге, Reface работает на уровне строк и генерирует чистый HTML, что
+делает его идеальным для серверного рендеринга. JSX - это просто удобная обертка
+для разработки, которая транслируется в те же вызовы Template API.
 
 ### Создание шаблона
 
@@ -23,14 +26,15 @@ const span = createTemplate({ tag: "span" });
 2. Использование готовых элементов из @reface/elements:
 
 ```typescript
-import { div, span, button } from "@reface/elements";
+import { button, div, span } from "@reface/elements";
 
 // Элементы уже готовы к использованию
 div`Hello world`; // <div>Hello world</div>
 button`Click me`; // <button>Click me</button>
 ```
 
-@reface/elements предоставляет готовые Template-функции для всех HTML-элементов, что избавляет от необходимости создавать их вручную.
+@reface/elements предоставляет готовые Template-функции для всех HTML-элементов,
+что избавляет от необходимости создавать их вручную.
 
 ### Принцип работы
 
@@ -77,10 +81,10 @@ Template поддерживает два типа вызовов:
 // Атрибуты накапливаются при каждом вызове
 const btn = createTemplate({ class: "button" })(
   // class="button"
-  { id: "submit" }
+  { id: "submit" },
 )(
   // class="button" id="submit"
-  { "data-type": "primary" }
+  { "data-type": "primary" },
 ); // class="button" id="submit" data-type="primary"
 ```
 
@@ -131,7 +135,8 @@ div({
 
 ### Безопасность
 
-По умолчанию все строковые значения и переменные автоматически экранируются для предотвращения XSS-атак:
+По умолчанию все строковые значения и переменные автоматически экранируются для
+предотвращения XSS-атак:
 
 ```typescript
 const userInput = '<script>alert("XSS")</script>';
@@ -211,9 +216,11 @@ const buttonFactory = createTemplateFactory<ButtonAttributes, ButtonPayload>({
   render: {
     // template - это RawTemplate, только для чтения данных
     template: ({ template, manager }) => {
-      return `<custom-button>${manager.renderChildren(
-        template.children
-      )}</custom-button>`;
+      return `<custom-button>${
+        manager.renderChildren(
+          template.children,
+        )
+      }</custom-button>`;
     },
 
     attributes: ({ attrs, template, manager }) =>
@@ -228,7 +235,10 @@ const buttonFactory = createTemplateFactory<ButtonAttributes, ButtonPayload>({
 
 Важно:
 
-1. Во всех методах параметр `template` является `RawTemplate` - это объект, содержащий только данные шаблона, без возможности вызова. Callable сигнатура (`template()` и template``) доступна только в финальном Template после создания.
+1. Во всех методах параметр `template` является `RawTemplate` - это объект,
+   содержащий только данные шаблона, без возможности вызова. Callable сигнатура
+   (`template()` и template``) доступна только в финальном Template после
+   создания.
 
 2. RawTemplate хранит данные в нормализованном виде:
    - `attributes` - обычные атрибуты
@@ -237,16 +247,19 @@ const buttonFactory = createTemplateFactory<ButtonAttributes, ButtonPayload>({
    - `children` - массив дочерних элементов
    - `payload` - пользовательские данные
 
-Это позволяет удобно работать с данными внутри методов фабрики, а RenderManager предоставляет утилиты для работы с этими нормализованными данными.
+Это позволяет удобно работать с данными внутри методов фабрики, а RenderManager
+предоставляет утилиты для работы с этими нормализованными данными.
 
 Основные разделы API:
 
 1. `type` - идентификатор типа шаблона
 2. `create` - настройки создания шаблона
-   - `transform({ attrs, children, manager })` - трансформация входных параметров
+   - `transform({ attrs, children, manager })` - трансформация входных
+     параметров
    - `defaults` - значения по умолчанию
 3. `process` - обработка вызовов
-   - `attributes({ oldAttrs, newAttrs, template, manager })` - обработка атрибутов
+   - `attributes({ oldAttrs, newAttrs, template, manager })` - обработка
+     атрибутов
    - `children({ oldChildren, newChildren, template })` - обработка содержимого
 4. `methods` - методы экземпляра, получают `{ template }`
 5. `render` - настройки рендеринга, все методы получают `{ template, manager }`
@@ -265,7 +278,8 @@ RenderManager предоставляет полезные утилиты для 
 
 #### Пример: Создание styled компонентов
 
-Пример того, как можно использовать createTemplateFactory для создания styled-components (уже реализовано в @reface/styled):
+Пример того, как можно использовать createTemplateFactory для создания
+styled-components (уже реализовано в @reface/styled):
 
 ```typescript
 // 1. Создаем фабрику для styled компонентов
@@ -296,12 +310,12 @@ const styledFactory = createTemplateFactory<StyledAttributes, StyledPayload>({
   render: {
     template: ({ template, manager }) => {
       // CSS добавится в head при рендеринге
-      return `<${template.tag} ${manager.renderAttributes(
-        template.attributes
-      )}>${manager.renderChildren(template.children)}</${template.tag}>
-                   <style>.${template.payload.className} { ${
-        template.payload.css
-      } }</style>`;
+      return `<${template.tag} ${
+        manager.renderAttributes(
+          template.attributes,
+        )
+      }>${manager.renderChildren(template.children)}</${template.tag}>
+                   <style>.${template.payload.className} { ${template.payload.css} }</style>`;
     },
   },
 });
@@ -339,7 +353,8 @@ RedButton`Click me!`; // <div class="styled-xxx">Click me!</div>
 // + <style>.styled-xxx { color: red; ... }</style>
 ```
 
-⚠️ Примечание: Это упрощенный пример. Полная реализация styled-components уже доступна в пакете @reface/styled.
+⚠️ Примечание: Это упрощенный пример. Полная реализация styled-components уже
+доступна в пакете @reface/styled.
 
 ### Альтернативные способы создания
 
@@ -379,7 +394,7 @@ interface TemplatePayload {
 ```typescript
 interface RawTemplate<
   Attributes = any,
-  Payload extends TemplatePayload = TemplatePayload
+  Payload extends TemplatePayload = TemplatePayload,
 > {
   // Тип шаблона
   type: string;
@@ -537,8 +552,8 @@ interface TemplateFactoryConfig<Attributes = any, Payload = any> {
 @reface/jsx предоставляет возможность использовать JSX синтаксис с Template API:
 
 ```typescript
-import { Fragment, createElement } from "@reface/jsx";
-import { div, button } from "@reface/elements";
+import { createElement, Fragment } from "@reface/jsx";
+import { button, div } from "@reface/elements";
 
 // JSX транслируется в вызовы template
 const App = () => (
@@ -563,17 +578,19 @@ const Header = () => (
 // И наоборот
 const Container = () =>
   div({ class: "container" })`
-        ${(<button type="button">Click me</button>)}
+        ${<button type="button">Click me</button>}
     `;
 ```
 
-JSX это просто синтаксический сахар, который транслируется в вызовы Template API:
+JSX это просто синтаксический сахар, который транслируется в вызовы Template
+API:
 
 1. `createElement` преобразует JSX в вызовы template
 2. `Fragment` позволяет группировать элементы без обертки
 3. Можно свободно комбинировать JSX и Template API в одном компоненте
 
-⚠️ Для использования JSX необходимо настроить TypeScript/Babel для работы с @reface/jsx.
+⚠️ Для использования JSX необходимо настроить TypeScript/Babel для работы с
+@reface/jsx.
 
 ```json
 {

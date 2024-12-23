@@ -1,6 +1,17 @@
 import { styled } from "@reface/plugins/styled";
-import { Container, Header, HeaderLinks, GitHubButton, DocsLink } from "../components/Layout.tsx";
-import { Logo, LogoText, BrandName, BrandTagline } from "../components/Logo.tsx";
+import {
+  Container,
+  DocsLink,
+  GitHubButton,
+  Header,
+  HeaderLinks,
+} from "../components/Layout.tsx";
+import {
+  BrandName,
+  BrandTagline,
+  Logo,
+  LogoText,
+} from "../components/Logo.tsx";
 import { DemoReface } from "../components/DemoReface.tsx";
 
 const Hero = styled.div`
@@ -173,9 +184,27 @@ const BigLogo = styled.div`
 const Icons = {
   TypeSafe: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z" />
-      <line strokeLinecap="round" strokeLinejoin="round" x1="16" y1="8" x2="2" y2="22" />
-      <line strokeLinecap="round" strokeLinejoin="round" x1="17.5" y1="15" x2="9" y2="15" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"
+      />
+      <line
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        x1="16"
+        y1="8"
+        x2="2"
+        y2="22"
+      />
+      <line
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        x1="17.5"
+        y1="15"
+        x2="9"
+        y2="15"
+      />
     </svg>
   ),
   Composition: () => (
@@ -209,14 +238,26 @@ const Icons = {
   ),
   Partial: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <rect strokeLinecap="round" strokeLinejoin="round" x="3" y="3" width="18" height="18" rx="2" />
+      <rect
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        x="3"
+        y="3"
+        width="18"
+        height="18"
+        rx="2"
+      />
       <path strokeLinecap="round" strokeLinejoin="round" d="M3 9h18" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 21V9" />
     </svg>
   ),
   Framework: () => (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 2L2 7l10 5 10-5-10-5z" />
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M12 2L2 7l10 5 10-5-10-5z"
+      />
       <path strokeLinecap="round" strokeLinejoin="round" d="M2 17l10 5 10-5" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M2 12l10 5 10-5" />
     </svg>
@@ -346,8 +387,9 @@ export default function HomePage() {
           </HeroLogo>
           <Subtitle>Meta-Framework for Modern Web Applications</Subtitle>
           <Description>
-            Zero-build framework that brings interactivity through HTMX, modern templating with JSX, 
-            and powerful server-side features - all without the complexity of traditional SPAs.
+            Zero-build framework that brings interactivity through HTMX, modern
+            templating with JSX, and powerful server-side features - all without
+            the complexity of traditional SPAs.
           </Description>
         </Hero>
 
@@ -362,8 +404,8 @@ export default function HomePage() {
             </FeatureIcon>
             <FeatureTitle>Type-safe Templates</FeatureTitle>
             <FeatureDescription>
-              Write templates using JSX or template literals with full TypeScript support. 
-              Get compile-time safety and great DX.
+              Write templates using JSX or template literals with full
+              TypeScript support. Get compile-time safety and great DX.
             </FeatureDescription>
           </Feature>
 
@@ -373,8 +415,8 @@ export default function HomePage() {
             </FeatureIcon>
             <FeatureTitle>Template Composition</FeatureTitle>
             <FeatureDescription>
-              Compose complex UIs from simple templates. Mix JSX and template literals 
-              for maximum flexibility.
+              Compose complex UIs from simple templates. Mix JSX and template
+              literals for maximum flexibility.
             </FeatureDescription>
           </Feature>
 
@@ -384,8 +426,8 @@ export default function HomePage() {
             </FeatureIcon>
             <FeatureTitle>Plugin System</FeatureTitle>
             <FeatureDescription>
-              Extend functionality through plugins. Create custom transformations 
-              and optimizations for your templates.
+              Extend functionality through plugins. Create custom
+              transformations and optimizations for your templates.
             </FeatureDescription>
           </Feature>
 
@@ -395,8 +437,8 @@ export default function HomePage() {
             </FeatureIcon>
             <FeatureTitle>Styled Components</FeatureTitle>
             <FeatureDescription>
-              Type-safe CSS-in-JS with theme support. Create isolated and reusable 
-              styled components.
+              Type-safe CSS-in-JS with theme support. Create isolated and
+              reusable styled components.
             </FeatureDescription>
           </Feature>
 
@@ -406,8 +448,8 @@ export default function HomePage() {
             </FeatureIcon>
             <FeatureTitle>Partial System</FeatureTitle>
             <FeatureDescription>
-              Create interactive components with HTMX integration. Update parts of your page 
-              without writing JavaScript.
+              Create interactive components with HTMX integration. Update parts
+              of your page without writing JavaScript.
             </FeatureDescription>
           </Feature>
 
@@ -417,7 +459,7 @@ export default function HomePage() {
             </FeatureIcon>
             <FeatureTitle>Meta-Framework</FeatureTitle>
             <FeatureDescription>
-              Complete solution for rendering and serving web applications. 
+              Complete solution for rendering and serving web applications.
               Build scalable applications with focus on performance.
             </FeatureDescription>
           </Feature>
@@ -425,4 +467,4 @@ export default function HomePage() {
       </Container>
     </>
   );
-} 
+}

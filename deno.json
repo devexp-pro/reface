@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "workflows": {
     "UpdateSemverDeployJsr": {
-      "versionsFilePath": "./reface/versions.ts"
+      "versionsFilePath": "./versions.ts"
     }
   },
   "exports": {
@@ -53,7 +53,7 @@
   },
   "fmt": {
     "exclude": [
-      "./reface/versions.ts"
+      "./versions.ts"
     ]
   },
   "lint": {

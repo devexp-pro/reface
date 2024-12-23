@@ -2,7 +2,7 @@ import { Hono } from "jsr:@hono/hono@4.5.6";
 import { createElement } from "@reface/jsx";
 import { styled } from "@reface/styled";
 import { island } from "@reface/partials";
-import { Reface, clean } from "@reface/core";
+import { clean, Reface } from "@reface/core";
 
 const JokeText = styled.h2`
   font-size: 1.5rem;
@@ -19,7 +19,7 @@ const RandomJoke = island(
 
     return <JokeText>{joke}</JokeText>;
   },
-  "random-joke"
+  "random-joke",
 );
 
 const Form = styled.form`
@@ -77,4 +77,4 @@ const app = new Hono().route(
   }).page("/", Home).hono(),
 );
 
-Deno.serve(app.fetch); 
+Deno.serve(app.fetch);

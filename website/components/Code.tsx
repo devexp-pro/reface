@@ -38,7 +38,7 @@ function tokenize(code: string): Token[] {
         return {
           type: "punctuation",
           value: token,
-          color: "#4f46e5"
+          color: "#4f46e5",
         };
       }
       if (/^\d+$/.test(token)) {
@@ -55,20 +55,20 @@ function tokenize(code: string): Token[] {
         };
       }
       if (/^["']/.test(token)) {
-        return { 
-          type: "string", 
-          value: token, 
-          color: "#0d9488"
+        return {
+          type: "string",
+          value: token,
+          color: "#0d9488",
         };
       }
       if (/^\s+$/.test(token)) {
         return { type: "whitespace", value: token };
       }
       if (/^[.,{}[\]()=:]+$/.test(token)) {
-        return { 
-          type: "punctuation", 
-          value: token, 
-          color: "#6b7280"
+        return {
+          type: "punctuation",
+          value: token,
+          color: "#6b7280",
         };
       }
       const colors = [
@@ -186,7 +186,7 @@ const LineNumber = styled.span`
 
 const Token = styled.span<TokenProps>`
   & {
-    color: ${props => props.color || '#e2e8f0'};
+    color: ${(props) => props.color || "#e2e8f0"};
   }
 `;
 
@@ -196,7 +196,9 @@ interface CodeProps {
   filename?: string;
 }
 
-export function Code({ content, language, filename = `example.${language}` }: CodeProps) {
+export function Code(
+  { content, language, filename = `example.${language}` }: CodeProps,
+) {
   const lines = content.split("\n");
   const totalLines = lines.length;
   const lineNumberWidth = totalLines.toString().length;
@@ -214,7 +216,7 @@ export function Code({ content, language, filename = `example.${language}` }: Co
               <LineNumber style={`width: ${lineNumberWidth}ch`}>
                 {(i + 1).toString().padStart(lineNumberWidth)}
               </LineNumber>
-              {tokenize(line).map(token => (
+              {tokenize(line).map((token) => (
                 <Token style={`color: ${token.color}`}>{token.value}</Token>
               ))}
             </Line>
@@ -223,4 +225,4 @@ export function Code({ content, language, filename = `example.${language}` }: Co
       </Content>
     </CodeContainer>
   );
-} 
+}

@@ -8,7 +8,8 @@
 [![JSR Score](https://jsr.io/badges/@vseplet/reface/score)](https://jsr.io/@vseplet/reface)
 [![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/gT4gvVwqb8)
 
-Modern web framework for building interactive applications with Islands Architecture.
+Modern web framework for building interactive applications with Islands
+Architecture.
 
 ## Features
 
@@ -82,7 +83,8 @@ const html = composer.render(<HomePage />);
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
+for details.
 
 ## License
 

@@ -5,7 +5,7 @@ Deno.test("JSX - basic element rendering", () => {
   const utils = new TestUtils();
   utils.assertRender(
     <div class="container">Hello World</div>,
-    '<div class="container">Hello World</div>'
+    '<div class="container">Hello World</div>',
   );
 });
 
@@ -16,7 +16,7 @@ Deno.test("JSX - nested elements", () => {
       <h1>Title</h1>
       <p>Content</p>
     </div>,
-    '<div class="container"><h1>Title</h1><p>Content</p></div>'
+    '<div class="container"><h1>Title</h1><p>Content</p></div>',
   );
 });
 
@@ -27,7 +27,7 @@ Deno.test("JSX - fragments", () => {
       <div>First</div>
       <div>Second</div>
     </>,
-    "<div>First</div><div>Second</div>"
+    "<div>First</div><div>Second</div>",
   );
 });
 
@@ -39,7 +39,7 @@ Deno.test("JSX - conditional rendering", () => {
       {showContent && <span>Visible</span>}
       {!showContent && <span>Hidden</span>}
     </div>,
-    "<div><span>Visible</span></div>"
+    "<div><span>Visible</span></div>",
   );
 });
 
@@ -54,6 +54,6 @@ Deno.test("JSX - handles primitives", () => {
       {true}
       {""}
     </div>,
-    "<div>0</div>"
+    "<div>0</div>",
   );
-}); 
+});

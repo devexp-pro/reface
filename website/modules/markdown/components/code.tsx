@@ -21,7 +21,7 @@ export const InlineCode = styled.code`
 // Блок кода
 export function Code({ content, language, filename }: CodeProps) {
   return (
-    <BaseCode 
+    <BaseCode
       content={content}
       language={language}
       filename={filename}

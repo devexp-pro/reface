@@ -1,7 +1,7 @@
 import { createElement } from "@reface/jsx";
 import { styled } from "@reface/styled";
 import { island } from "@reface/partials";
-import { Reface, clean } from "@reface/core";
+import { clean, Reface } from "@reface/core";
 
 const Container = styled.div`
   padding: 1rem;
@@ -27,7 +27,7 @@ const JokeIsland = island(
 
     return <Container>{text}</Container>;
   },
-  "joke-island"
+  "joke-island",
 );
 
 // Главная страница
@@ -39,4 +39,4 @@ function Home() {
       <JokeIsland />
     </div>
   );
-} 
+}

@@ -1,6 +1,6 @@
 import { parseMarkdown } from "../modules/markdown/mod.tsx";
 import type { ParsedMarkdown } from "../modules/markdown/types.ts";
-import { loadDocFiles, type DocItem } from "../../docs/mod.ts";
+import { type DocItem, loadDocFiles } from "../../docs/mod.ts";
 
 export interface DocPage {
   path: string;
@@ -23,13 +23,13 @@ function generateDocsStructure(pages: Map<string, DocPage>): DocSection[] {
     items: [
       { path: "readme", title: "Introduction" },
       { path: "architecture", title: "Architecture" },
-    ]
+    ],
   };
 
   // Core содержит основные модули
   const core: DocSection = {
     title: "Core",
-    items: []
+    items: [],
   };
 
   // Распределяем остальные страницы
@@ -39,7 +39,7 @@ function generateDocsStructure(pages: Map<string, DocPage>): DocSection[] {
 
     core.items.push({
       path,
-      title: page.title
+      title: page.title,
     });
   }
 
@@ -54,17 +54,17 @@ export async function loadDocs(): Promise<{
   pages: Map<string, DocPage>;
 }> {
   const pages = new Map<string, DocPage>();
-  
+
   // Загружаем все файлы документации
   const docFiles = await loadDocFiles();
-  
+
   // Создаем страницы из загруженных файлов
   for (const doc of docFiles) {
     const parsed = parseMarkdown(doc.content);
     pages.set(doc.slug, {
       path: doc.slug,
       title: doc.title,
-      content: parsed
+      content: parsed,
     });
   }
 
@@ -73,6 +73,6 @@ export async function loadDocs(): Promise<{
 
   return {
     sections,
-    pages
+    pages,
   };
 }

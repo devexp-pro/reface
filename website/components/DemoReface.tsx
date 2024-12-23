@@ -122,24 +122,32 @@ const JokePartial = partial(
     )).text();
 
     return <JokeText>${joke}</JokeText>;
-  }, 
-  "demo-joke"
+  },
+  "demo-joke",
 );
 
 export function DemoReface() {
   return (
     <DemoContainer>
       <PartialIcon>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M7 17L19 5" strokeLinecap="round" />
           <path d="M5 19L7 17" strokeLinecap="round" />
-          <path d="M19 5L20 4M16 8L17 7M14 4L15 3M20 8L21 7" strokeLinecap="round" />
+          <path
+            d="M19 5L20 4M16 8L17 7M14 4L15 3M20 8L21 7"
+            strokeLinecap="round"
+          />
         </svg>
       </PartialIcon>
       <h2>HTMX-First Interactions</h2>
       <p class="description">
-        Create interactive components with zero JavaScript. 
-        Partials handle the server-side logic while HTMX manages the client updates.
+        Create interactive components with zero JavaScript. Partials handle the
+        server-side logic while HTMX manages the client updates.
       </p>
 
       <div>
@@ -152,4 +160,4 @@ export function DemoReface() {
       </div>
     </DemoContainer>
   );
-} 
+}

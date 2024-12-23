@@ -11,12 +11,12 @@ Deno.test("Parital - markup rendering", () => {
   // HTML синтаксис
   utils.assertRender(
     TestPartial()`Content`,
-    `<div data-partial="test-partial">Content</div>`
+    `<div data-partial="test-partial">Content</div>`,
   );
   // JSX синтаксис
   utils.assertRender(
     <TestPartial>Content</TestPartial>,
-    `<div data-partial="test-partial">Content</div>`
+    `<div data-partial="test-partial">Content</div>`,
   );
 });
 
@@ -25,11 +25,11 @@ Deno.test("Parital - automatic registration and execution", async () => {
   const utils = new TestUtils({ plugins: [new PartialsPlugin()] });
   const handler = () => Promise.resolve({ value: "test" });
   const TestPartial = partial(handler, "test-handler");
-  
+
   // Рендерим для регистрации
   utils.assertRender(
     <TestPartial>Content</TestPartial>,
-    `<div data-partial="test-handler">Content</div>`
+    `<div data-partial="test-handler">Content</div>`,
   );
 
   // Проверяем регистрацию
@@ -47,17 +47,17 @@ Deno.test("Parital - data passing", async () => {
   const utils = new TestUtils({ plugins: [new PartialsPlugin()] });
   const handler = () => Promise.resolve({ message: "Hello" });
   const TestParital = partial(handler, "test-data");
-  
+
   // Рендерим для регистрации
   utils.assertRender(
     <TestParital>Test</TestParital>,
-    `<div data-partial="test-data">Test</div>`
+    `<div data-partial="test-data">Test</div>`,
   );
-  
+
   const plugin = utils.reface.getPlugin(PartialsPlugin);
   const registeredHandler = plugin?.getHandler("test-data");
   const result = await registeredHandler?.();
-  
+
   assertEquals(result, { message: "Hello" });
 });
 
@@ -72,7 +72,7 @@ Deno.test("Parital - HTMX integration", () => {
     `<button 
       hx-get="/reface-partial/test-htmx"
       hx-target="[data-partial='test-htmx']"
-      hx-trigger="click">Click me</button>`
+      hx-trigger="click">Click me</button>`,
   );
 });
 
@@ -90,9 +90,9 @@ Deno.test("Parital - multiple partials", () => {
     `<div>
       <div data-partial="first">First Content</div>
       <div data-partial="second">Second Content</div>
-    </div>`
+    </div>`,
   );
 
   const plugin = utils.reface.getPlugin(PartialsPlugin);
   assertEquals(plugin?.getPartials().size, 2);
-}); 
+});

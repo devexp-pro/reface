@@ -1,6 +1,7 @@
 # Partials
 
-RefaceComposer's Partials Plugin provides interactive components with HTMX integration.
+RefaceComposer's Partials Plugin provides interactive components with HTMX
+integration.
 
 ## Basic Usage
 

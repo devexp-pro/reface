@@ -1,8 +1,8 @@
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
-import type { Root, Heading } from "mdast";
-import type { ParsedMarkdown, MdNode } from "./types.ts";
+import type { Heading, Root } from "mdast";
+import type { MdNode, ParsedMarkdown } from "./types.ts";
 import type { Template } from "../../../@reface/mod.ts";
 import { components } from "./components/mod.ts";
 import { component } from "@reface";
@@ -33,8 +33,8 @@ function processNode(node: MdNode): Template {
       );
 
     case "link":
-      const href = node.url.startsWith('./') 
-        ? node.url.replace('./', '/') 
+      const href = node.url.startsWith("./")
+        ? node.url.replace("./", "/")
         : node.url;
 
       return (
@@ -62,7 +62,7 @@ function processNode(node: MdNode): Template {
     case "heading":
       const Component = components[`h${node.depth}`];
       const slug = node.children
-        .map(child => child.type === "text" ? child.value : "")
+        .map((child) => child.type === "text" ? child.value : "")
         .join("")
         .toLowerCase()
         .replace(/[^\w]+/g, "-");
@@ -119,17 +119,25 @@ function processNode(node: MdNode): Template {
           <components.thead>
             <components.tr>
               {node.children[0].children.map((cell, i) => (
-                <components.th style={node.align?.[i] ? `text-align: ${node.align[i]}` : undefined}>
+                <components.th
+                  style={node.align?.[i]
+                    ? `text-align: ${node.align[i]}`
+                    : undefined}
+                >
                   {cell.children.map(processNode)}
                 </components.th>
               ))}
             </components.tr>
           </components.thead>
           <tbody>
-            {node.children.slice(1).map(row => (
+            {node.children.slice(1).map((row) => (
               <components.tr>
                 {row.children.map((cell, i) => (
-                  <components.td style={node.align?.[i] ? `text-align: ${node.align[i]}` : undefined}>
+                  <components.td
+                    style={node.align?.[i]
+                      ? `text-align: ${node.align[i]}`
+                      : undefined}
+                  >
                     {cell.children.map(processNode)}
                   </components.td>
                 ))}
@@ -161,16 +169,16 @@ function processNode(node: MdNode): Template {
 
 export function parseMarkdown(content: string): ParsedMarkdown {
   const ast = parser.parse(content) as Root;
-  
+
   const headings = ast.children
     .filter((node): node is Heading => node.type === "heading")
-    .map(node => ({
+    .map((node) => ({
       level: node.depth,
       text: node.children
-        .map(child => child.type === "text" ? child.value : "")
+        .map((child) => child.type === "text" ? child.value : "")
         .join(""),
       slug: node.children
-        .map(child => child.type === "text" ? child.value : "")
+        .map((child) => child.type === "text" ? child.value : "")
         .join("")
         .toLowerCase()
         .replace(/[^\w]+/g, "-"),
@@ -189,13 +197,15 @@ export function parseMarkdown(content: string): ParsedMarkdown {
 /**
  * Создает оглавление из заголовков
  */
-export const TableOfContents = component(({headings}) => {
+export const TableOfContents = component(({ headings }) => {
   return (
     <components.TableOfContents>
       <components.h4>On this page</components.h4>
       <components.ul>
         {headings.map((heading) => (
-          <components.TocItem style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}>
+          <components.TocItem
+            style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}
+          >
             <components.TocLink href={`#${heading.slug}`}>
               {heading.text}
             </components.TocLink>

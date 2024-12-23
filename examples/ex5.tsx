@@ -2,7 +2,7 @@ import { Hono } from "jsr:@hono/hono@4.5.6";
 import { createElement } from "@reface/jsx";
 import { styled } from "@reface/styled";
 import { island } from "@reface/partials";
-import { Reface, clean } from "@reface/core";
+import { clean, Reface } from "@reface/core";
 
 const JokeContainer = styled.div`
   padding: 10px;
@@ -27,7 +27,7 @@ const RandomJoke = island(
       </JokeContainer>
     );
   },
-  "random-joke"
+  "random-joke",
 );
 
 function Home() {
@@ -48,4 +48,4 @@ const app = new Hono().route(
   }).page("/", Home).hono(),
 );
 
-Deno.serve(app.fetch); 
+Deno.serve(app.fetch);

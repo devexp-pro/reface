@@ -150,7 +150,7 @@ const html = composer.render(
   <div>
     <Button>Click me</Button>
     <Card>Content</Card>
-  </div>
+  </div>,
 );
 
 // Renders as:

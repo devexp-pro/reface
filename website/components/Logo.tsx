@@ -51,6 +51,8 @@ export const BrandTagline = styled.div`
   }
 `;
 
-export function Logo({ size = "default" }: { size?: "default" | "large" }): Template {
+export function Logo(
+  { size = "default" }: { size?: "default" | "large" },
+): Template {
   return <LogoIcon class={`size-${size}`}>R</LogoIcon>;
 }

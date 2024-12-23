@@ -1,9 +1,14 @@
 import { styled } from "@reface/plugins/styled";
 import { Container, Header, Layout } from "../components/Layout.tsx";
-import { Logo, LogoText, BrandName, BrandTagline } from "../components/Logo.tsx";
+import {
+  BrandName,
+  BrandTagline,
+  Logo,
+  LogoText,
+} from "../components/Logo.tsx";
 import { Navigation } from "../components/Navigation.tsx";
 import { MarkdownContent, TableOfContents } from "../modules/markdown/mod.tsx";
-import type { DocSection, DocPage } from "../utils/docs.tsx";
+import type { DocPage, DocSection } from "../utils/docs.tsx";
 import { html } from "@reface";
 
 interface DocsViewerProps {
@@ -118,8 +123,12 @@ const MobileToc = styled.div`
   }
 `;
 
-export default function DocsPage({ sections, pages, currentPath }: DocsViewerProps) {
-  const currentPage = currentPath ? pages.get(currentPath) : pages.get("readme");
+export default function DocsPage(
+  { sections, pages, currentPath }: DocsViewerProps,
+) {
+  const currentPage = currentPath
+    ? pages.get(currentPath)
+    : pages.get("readme");
 
   return (
     <Container>
@@ -138,40 +147,46 @@ export default function DocsPage({ sections, pages, currentPath }: DocsViewerPro
           </svg>
         </MobileMenuButton>
       </Header>
-      
+
       <Layout>
-        <Navigation 
-          sections={sections} 
-          currentPath={currentPath} 
+        <Navigation
+          sections={sections}
+          currentPath={currentPath}
         />
 
         <MobileNav id="mobile-nav" class="mobile-nav">
-          <Navigation 
-            sections={sections} 
-            currentPath={currentPath} 
+          <Navigation
+            sections={sections}
+            currentPath={currentPath}
           />
         </MobileNav>
 
         <ContentWrapper>
           {currentPage && currentPage.content.headings.length > 0 && (
             <MobileToc>
-              <TableOfContents headings={currentPage.content.headings} class="mobile" />
+              <TableOfContents
+                headings={currentPage.content.headings}
+                class="mobile"
+              />
             </MobileToc>
           )}
 
           <PageTransition>
-            {currentPage ? (
-              <MarkdownContent>
-                {currentPage.content.content}
-              </MarkdownContent>
-            ) : (
-              <p>Page not found</p>
-            )}
+            {currentPage
+              ? (
+                <MarkdownContent>
+                  {currentPage.content.content}
+                </MarkdownContent>
+              )
+              : <p>Page not found</p>}
           </PageTransition>
         </ContentWrapper>
 
         {currentPage && currentPage.content.headings.length > 0 && (
-          <TableOfContents headings={currentPage.content.headings} class="desktop" />
+          <TableOfContents
+            headings={currentPage.content.headings}
+            class="desktop"
+          />
         )}
       </Layout>
 

@@ -1,6 +1,11 @@
 import { styled } from "@reface/plugins/styled";
 import { theme } from "../styles/theme.ts";
-import { textStyles, headingStyles, linkStyles, blockStyles } from "../styles/utils.ts";
+import {
+  blockStyles,
+  headingStyles,
+  linkStyles,
+  textStyles,
+} from "../styles/utils.ts";
 
 // Text Components
 export const Text = styled.span`
@@ -17,17 +22,23 @@ export const Paragraph = styled.p`
 `;
 
 // Heading Components
-const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) => styled[`h${level}`]`
+const createHeading = (level: 1 | 2 | 3 | 4 | 5 | 6) =>
+  styled[`h${level}`]`
   & {
     ${headingStyles}
     font-size: ${
-      level === 1 ? theme.typography.sizes["4xl"] :
-      level === 2 ? theme.typography.sizes["3xl"] :
-      level === 3 ? theme.typography.sizes["2xl"] :
-      level === 4 ? theme.typography.sizes.xl :
-      level === 5 ? theme.typography.sizes.lg :
-      theme.typography.sizes.base
-    };
+    level === 1
+      ? theme.typography.sizes["4xl"]
+      : level === 2
+      ? theme.typography.sizes["3xl"]
+      : level === 3
+      ? theme.typography.sizes["2xl"]
+      : level === 4
+      ? theme.typography.sizes.xl
+      : level === 5
+      ? theme.typography.sizes.lg
+      : theme.typography.sizes.base
+  };
   }
 `;
 

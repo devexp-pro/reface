@@ -1,6 +1,7 @@
 # Plugins
 
-RefaceComposer's plugin system allows extending the template composition process.
+RefaceComposer's plugin system allows extending the template composition
+process.
 
 ## Core Plugin System
 
