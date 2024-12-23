@@ -1,4 +1,5 @@
 import type {
+  BaseAttributes,
   NormalizeAttributes,
   RawTemplate,
   Template,
@@ -11,9 +12,10 @@ import { REFACE_TEMPLATE } from "./constants.ts";
 import { processChildren } from "./processChildren.ts";
 import { isComponentFn } from "./utils.ts";
 import { normalizeAttributes } from "./normalizeAttributes.ts";
+import { TemplateMethod } from "@reface/types";
 
 type ProxyTarget<
-  A extends TemplateAttributes,
+  A extends BaseAttributes,
   P extends TemplatePayload,
   M extends TemplateMethods<A, P>,
 > = {
@@ -22,7 +24,7 @@ type ProxyTarget<
 } & M;
 
 type ProxyHandler<
-  A extends TemplateAttributes,
+  A extends BaseAttributes,
   P extends TemplatePayload,
   M extends TemplateMethods<A, P>,
 > = {
@@ -36,19 +38,27 @@ type ProxyHandler<
     target: ProxyTarget<A, P, M>,
     prop: string | symbol,
     receiver: any,
-  ) => ((...args: any[]) => Template<A, P, M>) | undefined;
+  ) =>
+    | ((...args: any[]) => Template<A, P, M>)
+    | boolean
+    | RawTemplate<NormalizeAttributes<A>, P>
+    | undefined;
 };
 
 export function createTemplateProxy<
-  A extends TemplateAttributes,
+  A extends BaseAttributes,
   P extends TemplatePayload,
-  M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
->({ rawTemplate, createTemplateFactoryConfig, templateFactoryConfig }: {
+  M extends TemplateMethods<A, P>,
+>({
+  rawTemplate,
+  createTemplateFactoryConfig,
+  templateFactoryConfig,
+}: {
   rawTemplate: RawTemplate<NormalizeAttributes<A>, P>;
   createTemplateFactoryConfig: TemplateFactoryConfig<A, P, M>;
   templateFactoryConfig: TemplateFactoryConfig<A, P, M>;
 }): Template<A, P, M> {
-  const target: ProxyTarget<A, P, M> = Object.assign(
+  const target = Object.assign(
     function () {} as ProxyTarget<A, P, M>,
     createTemplateFactoryConfig.methods || {},
   );
@@ -61,32 +71,31 @@ export function createTemplateProxy<
         return createTemplateProxy({
           rawTemplate: {
             ...rawTemplate,
-            children: processChildren(first, rest),
+            children: processChildren(first as TemplateStringsArray, rest),
           },
-          templateFactoryConfig,
           createTemplateFactoryConfig,
+          templateFactoryConfig,
         });
       }
 
       const attributes = normalizeAttributes(
-        createTemplateFactoryConfig.process?.attributes?.(
-          {
-            oldAttrs: rawTemplate.attributes,
-            newAttrs: normalizeAttributes(first),
-            template: templateFactoryConfig,
-          },
-        ) || {
+        createTemplateFactoryConfig.process?.attributes?.({
+          oldAttrs: rawTemplate.attributes as A,
+          newAttrs: normalizeAttributes(first as A),
+          template: rawTemplate,
+        }) || {
           ...rawTemplate.attributes,
-          ...first,
+          ...(first as A),
         },
       );
+
       return createTemplateProxy({
         rawTemplate: {
           ...rawTemplate,
           attributes,
         },
-        templateFactoryConfig,
         createTemplateFactoryConfig,
+        templateFactoryConfig,
       });
     },
 
@@ -116,11 +125,13 @@ export function createTemplateProxy<
         prop in createTemplateFactoryConfig.methods
       ) {
         const method = createTemplateFactoryConfig.methods[prop];
-        return (...args: any[]) => method({ template: rawTemplate }, ...args);
+        return function (this: any, ...args: any[]) {
+          return method({ template: rawTemplate }, ...args);
+        };
       }
       return undefined;
     },
   };
 
-  return new Proxy(target, handler);
+  return new Proxy(target, handler) as Template<A, P, M>;
 }

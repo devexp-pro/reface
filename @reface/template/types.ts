@@ -85,7 +85,7 @@ export type TemplateAttributes = {
 export type TemplateMethod<
   A extends TemplateAttributes,
   P extends TemplatePayload,
-  Args extends any[] = [],
+  Args extends any[] = any[],
   R = any,
 > = (
   first: { template: RawTemplate<NormalizeAttributes<A>, P> },
