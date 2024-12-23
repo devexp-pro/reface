@@ -1,5 +1,6 @@
 import type {
   BaseAttributes,
+  BaseTemplateConfig,
   NormalizeAttributes,
   RawTemplate,
   Template,
@@ -12,28 +13,19 @@ import { processChildren } from "./processChildren.ts";
 import { isComponentFn } from "./utils.ts";
 import { normalizeAttributes } from "./normalizeAttributes.ts";
 
-type ProxyTarget<
-  A extends BaseAttributes,
-  P extends TemplatePayload,
-  M extends TemplateMethods<A, P>,
-> = {
-  (attributes: A): Template<A, P, M>;
-  (strings: TemplateStringsArray, ...values: any[]): Template<A, P, M>;
-} & M;
-
 type ProxyHandler<
   A extends BaseAttributes,
   P extends TemplatePayload,
   M extends TemplateMethods<A, P>,
 > = {
   apply: (
-    target: ProxyTarget<A, P, M>,
+    target: Template<A, P, M>,
     thisArg: any,
     args: [A] | [TemplateStringsArray, ...any[]],
   ) => Template<A, P, M>;
 
   get: (
-    target: ProxyTarget<A, P, M>,
+    target: Template<A, P, M>,
     prop: string | symbol,
     receiver: any,
   ) =>
@@ -54,13 +46,8 @@ export function createTemplateProxy<
 }: {
   rawTemplate: RawTemplate<NormalizeAttributes<A>, P>;
   createTemplateFactoryConfig: TemplateFactoryConfig<A, P, M>;
-  templateFactoryConfig: TemplateFactoryConfig<A, P, M>;
+  templateFactoryConfig: BaseTemplateConfig<P>;
 }): Template<A, P, M> {
-  const target = Object.assign(
-    function () {} as ProxyTarget<A, P, M>,
-    createTemplateFactoryConfig.methods || {},
-  );
-
   const handler: ProxyHandler<A, P, M> = {
     apply(_target, _thisArg, args) {
       const [first, ...rest] = args;
@@ -131,5 +118,9 @@ export function createTemplateProxy<
     },
   };
 
-  return new Proxy(target, handler) as Template<A, P, M>;
+  // FIXME: how to fix this?
+  return new Proxy(
+    function () {} as unknown as Template<A, P, M>,
+    handler,
+  ) as Template<A, P, M>;
 }
