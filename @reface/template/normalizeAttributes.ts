@@ -13,7 +13,7 @@ function processValue<T>(value: T): unknown[] {
 
 export const normalizeClassAttribute = (
   classess: TemplateAttributes["class"],
-) => {
+): string[] => {
   if (!classess) return [];
 
   const classes = new Set<string>();
@@ -42,12 +42,54 @@ export const normalizeClassAttribute = (
   return Array.from(classes);
 };
 
+export const normalizeStyleAttribute = (
+  styles: TemplateAttributes["style"],
+): string[] => {
+  if (!styles) return [];
+
+  const newStyles = new Map<string, string>();
+
+  function addStyle(
+    prop: string,
+    value: string | number | boolean | null | undefined,
+  ) {
+    if (!prop || value == null || value === false) return;
+    newStyles.set(
+      prop.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase(),
+      String(value),
+    );
+  }
+
+  function processStyleValue(val: unknown) {
+    if (!val) return;
+
+    if (typeof val === "string") {
+      val.split(";").forEach((style) => {
+        const [prop, value] = style.split(":").map((s) => s.trim());
+        if (prop && value) {
+          addStyle(prop, value as string);
+        }
+      });
+    } else if (Array.isArray(val)) {
+      val.forEach(processStyleValue);
+    } else if (isObject(val)) {
+      for (const [prop, value] of Object.entries(val)) {
+        addStyle(prop, value as string);
+      }
+    }
+  }
+
+  processValue(styles).forEach(processStyleValue);
+  return Array.from(newStyles.entries())
+    .map(([prop, value]) => `${prop}: ${value}`);
+};
+
 export function normalizeAttributes<A extends TemplateAttributes>(
   attrs: A = {} as A,
 ): NormalizeAttributes<A> {
   const result = { ...attrs } as NormalizeAttributes<A>;
   const newClassess: string[] = [];
-  const newStyles: Record<string, string> = {};
+  const newStyles: string[] = [];
 
   // Обработка classes
   if (attrs.class) {
@@ -56,7 +98,7 @@ export function normalizeAttributes<A extends TemplateAttributes>(
 
   // Обработка styles
   if (attrs.style) {
-    Object.assign(newStyles, attrs.style);
+    newStyles.push(...normalizeStyleAttribute(attrs.style));
   }
 
   result.class = newClassess;
