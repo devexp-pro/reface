@@ -19,7 +19,6 @@ export class RefaceComposer implements IRefaceComposer {
     if (this.plugins.has(plugin.name)) {
       throw new Error(`Plugin "${plugin.name}" is already registered`);
     }
-
     this.plugins.set(plugin.name, plugin);
     await plugin.setup(this);
   }
