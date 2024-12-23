@@ -50,7 +50,7 @@ Deno.test("styled.h1 - should handle children", () => {
   `;
 
   utils.assertRender(
-    Title()`Hello`,
+    Title`Hello`,
     `<h1 class="${Title.raw.payload.styled.rootClass}">Hello</h1>
 <style>
   .${Title.raw.payload.styled.rootClass} {
@@ -77,7 +77,7 @@ Deno.test("styled(Component) - should extend existing component", () => {
   `;
 
   utils.assertRender(
-    PrimaryButton({})``,
+    PrimaryButton,
     `<button class="${BaseButton.getRootClass()} ${PrimaryButton.getRootClass()}"></button>
 <style>
   .${BaseButton.getRootClass()} {
@@ -226,7 +226,7 @@ Deno.test("styled component - should handle empty call for template literals", (
     }
   `;
 
-  const withEmptyCall = Title()`Hello`;
+  const withEmptyCall = Title`Hello`;
   utils.assertRender(
     withEmptyCall,
     `<h1 class="${withEmptyCall.getRootClass()}">Hello</h1>

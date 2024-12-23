@@ -116,7 +116,7 @@ export function createTemplateProxy<
         prop in createTemplateFactoryConfig.methods
       ) {
         const method = createTemplateFactoryConfig.methods[prop];
-        return (...args: any[]) => method({ template: rawTemplate, ...args });
+        return (...args: any[]) => method({ template: rawTemplate }, ...args);
       }
       return undefined;
     },

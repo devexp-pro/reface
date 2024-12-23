@@ -1,5 +1,5 @@
 import "@reface/jsx/global";
-import { component, RefaceTemplateElement } from "@reface";
+import { component } from "@reface";
 import { TestUtils } from "./testUtils.ts";
 
 interface ButtonProps {
