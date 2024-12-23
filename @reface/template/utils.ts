@@ -5,7 +5,7 @@ import type {
   RawTemplate,
   Template,
 } from "./types.ts";
-import { REFACE_TEMPLATE } from "./types.ts";
+import { REFACE_TEMPLATE } from "./constants.ts";
 
 export function isBaseTemplateConfig<P>(
   input: any,

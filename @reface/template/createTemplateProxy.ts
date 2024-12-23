@@ -7,7 +7,7 @@ import type {
   TemplateMethods,
   TemplatePayload,
 } from "./types.ts";
-import { REFACE_TEMPLATE } from "./types.ts";
+import { REFACE_TEMPLATE } from "./constants.ts";
 import { processChildren } from "./processChildren.ts";
 import { isComponentFn } from "./utils.ts";
 import { normalizeAttributes } from "./normalizeAttributes.ts";
@@ -118,10 +118,10 @@ export function createTemplateProxy<
 
       if (
         typeof prop === "string" &&
-        typeof templateFactoryConfig.methods === "object" &&
-        prop in templateFactoryConfig.methods
+        typeof createTemplateFactoryConfig.methods === "object" &&
+        prop in createTemplateFactoryConfig.methods
       ) {
-        const method = templateFactoryConfig.methods[prop];
+        const method = createTemplateFactoryConfig.methods[prop];
         return (...args: any[]) => method({ template: rawTemplate, ...args });
       }
       return undefined;

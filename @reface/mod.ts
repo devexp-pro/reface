@@ -1,8 +1,6 @@
 export type * from "@reface/types";
-export { RefaceTemplate } from "./RefaceTemplate.ts";
-export { RefaceTemplateHtml } from "./RefaceTemplateHtml.ts";
-export { RefaceTemplateText } from "./RefaceTemplateText.ts";
-export { RefaceTemplateElement } from "./RefaceTemplateElement.ts";
+
+export * from "./template/mod.ts";
 
 export { component } from "./component.ts";
 export { createElement, Fragment } from "./jsx/mod.ts";

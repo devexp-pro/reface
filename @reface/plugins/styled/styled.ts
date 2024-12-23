@@ -4,6 +4,7 @@ import { parseCSS } from "./cssParser.ts";
 import {
   createTemplateFactory,
   type TemplateAttributes,
+  VOID_ELEMENTS,
 } from "@reface/template";
 
 interface StyledPayload {
@@ -34,6 +35,10 @@ const styledTemplate = createTemplateFactory<TemplateAttributes, StyledPayload>(
         };
       },
     },
+    methods: {
+      getRootClass: ({ template }: { template: RawTemplate }) =>
+        template.payload.styled.rootClass,
+    },
   },
 );
 
@@ -57,6 +62,7 @@ function createStyledElement(
 
   return styledTemplate({
     tag,
+    void: VOID_ELEMENTS.has(tag),
     attributes: {
       class: [
         parentComponent?.raw.payload.styled.rootClass,

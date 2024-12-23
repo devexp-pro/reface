@@ -78,9 +78,9 @@ Deno.test("styled(Component) - should extend existing component", () => {
 
   utils.assertRender(
     PrimaryButton({})``,
-    `<button class="${PrimaryButton.raw.payload.styled.rootClass} ${BaseButton.raw.payload.styled.rootClass}"></button>
+    `<button class="${BaseButton.getRootClass()} ${PrimaryButton.getRootClass()}"></button>
 <style>
-  .${BaseButton.raw.payload.styled.rootClass} {
+  .${BaseButton.getRootClass()} {
     padding: 1rem;
   }
   .${PrimaryButton.raw.payload.styled.rootClass} {
@@ -107,12 +107,12 @@ Deno.test("styled(Component) - should handle props in extended component", () =>
 
   utils.assertRender(
     SearchInput({ type: "search", placeholder: "Search..." })``,
-    `<input class="${SearchInput.raw.payload.styled.rootClass} ${BaseInput.raw.payload.styled.rootClass}" type="search" placeholder="Search..."/>
+    `<input class="${BaseInput.getRootClass()} ${SearchInput.getRootClass()}" type="search" placeholder="Search..."/>
 <style>
-  .${BaseInput.raw.payload.styled.rootClass} {
+  .${BaseInput.getRootClass()} {
     border: 1px solid gray;
   }
-  .${SearchInput.raw.payload.styled.rootClass} {
+  .${SearchInput.getRootClass()} {
     padding-left: 2rem;
   }
 </style>`
@@ -133,12 +133,12 @@ Deno.test("styled CSS - should handle pseudo-classes", () => {
 
   utils.assertRender(
     <Button></Button>,
-    `<button class="${Button.raw.payload.styled.rootClass}"></button>
+    `<button class="${Button.getRootClass()}"></button>
 <style>
-  .${Button.raw.payload.styled.rootClass} {
+  .${Button.getRootClass()} {
     color: blue;
   }
-  .${Button.raw.payload.styled.rootClass}:hover {
+  .${Button.getRootClass()}:hover {
     color: darkblue;
   }
 </style>`
@@ -158,12 +158,12 @@ Deno.test("styled CSS - should handle nested selectors", () => {
 
   utils.assertRender(
     <Card></Card>,
-    `<div class="${Card.raw.payload.styled.rootClass}"></div>
+    `<div class="${Card.getRootClass()}"></div>
 <style>
-  .${Card.raw.payload.styled.rootClass} {
+  .${Card.getRootClass()} {
     padding: 1rem;
   }
-  .${Card.raw.payload.styled.rootClass} h1 {
+  .${Card.getRootClass()} h1 {
     font-size: 2em;
   }
 </style>`
@@ -185,13 +185,13 @@ Deno.test("styled CSS - should handle media queries", () => {
 
   utils.assertRender(
     <Container></Container>,
-    `<div class="${Container.raw.payload.styled.rootClass}"></div>
+    `<div class="${Container.getRootClass()}"></div>
 <style>
-  .${Container.raw.payload.styled.rootClass} {
+  .${Container.getRootClass()} {
     width: 100%;
   }
   @media (min-width: 768px) {
-    .${Container.raw.payload.styled.rootClass} {
+    .${Container.getRootClass()} {
       width: 50%;
     }
   }
@@ -211,7 +211,7 @@ Deno.test("styled with custom element", () => {
     <CustomEl>Custom content</CustomEl>,
     `<custom-element class="${CustomEl.raw.payload.styled.rootClass}">Custom content</custom-element>
 <style>
-  .${CustomEl.raw.payload.styled.rootClass} {
+  .${CustomEl.getRootClass()} {
     color: blue;
   }
 </style>`
@@ -229,9 +229,9 @@ Deno.test("styled component - should handle empty call for template literals", (
   const withEmptyCall = Title()`Hello`;
   utils.assertRender(
     withEmptyCall, 
-    `<h1 class="${withEmptyCall.payload?.styled.rootClass}">Hello</h1>
+    `<h1 class="${withEmptyCall.getRootClass()}">Hello</h1>
 <style>
-  .${withEmptyCall.payload?.styled.rootClass} {
+  .${withEmptyCall.getRootClass()} {
     font-size: 2em;
   }
 </style>`
@@ -240,9 +240,9 @@ Deno.test("styled component - should handle empty call for template literals", (
   const withEmptyProps = Title({})`Hello`;
   utils.assertRender(
     withEmptyProps, 
-    `<h1 class="${withEmptyProps.payload?.styled.rootClass}">Hello</h1>
+    `<h1 class="${withEmptyProps.getRootClass()}">Hello</h1>
 <style>
-  .${withEmptyProps.payload?.styled.rootClass} {
+  .${withEmptyProps.getRootClass()} {
     font-size: 2em;
   }
 </style>`

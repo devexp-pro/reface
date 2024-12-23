@@ -2,12 +2,12 @@ import { RefaceComposer } from "./RefaceComposer.ts";
 import { PartialsPlugin } from "./plugins/partials/mod.ts";
 import { StyledPlugin } from "./plugins/styled/mod.ts";
 import {
+  createIsland,
   type Island,
   IslandPlugin,
   type RpcResponse,
-  TemplateIsland,
 } from "./island/mod.ts";
-import type { IRefaceComposerPlugin, IRefaceTemplate } from "@reface/types";
+import type { IRefaceComposerPlugin, Template } from "@reface/types";
 import { Hono } from "@hono/hono";
 import type { Context } from "@hono/hono";
 
@@ -15,7 +15,7 @@ import "./jsx/jsx.global.d.ts";
 
 export interface RefaceOptions {
   plugins?: IRefaceComposerPlugin[];
-  layout?: (props: unknown, content: IRefaceTemplate) => IRefaceTemplate;
+  layout?: (props: unknown, content: Template) => Template;
   partialApiPrefix?: string;
 }
 
@@ -23,10 +23,7 @@ export class Reface {
   private composer: RefaceComposer;
   private islandPlugin: IslandPlugin;
   private partialsPlugin: PartialsPlugin;
-  private layout?: (
-    props: unknown,
-    content: IRefaceTemplate,
-  ) => IRefaceTemplate;
+  private layout?: (props: unknown, content: Template) => Template;
   private islands = new Map<string, Island<any, any, any>>();
   private islandProps = new Map<string, unknown>();
   private PARTIAL_API_PREFIX: string;
@@ -57,7 +54,7 @@ export class Reface {
       }
 
       const template = await handler();
-      const content = this.composer.render(template as IRefaceTemplate);
+      const content = this.composer.render(template as Template);
 
       return c.html(content);
     } catch (error) {
@@ -108,7 +105,7 @@ export class Reface {
       this.islandPlugin.setIslandState(name, island.initialState);
     }
 
-    return (props: Props): IRefaceTemplate => {
+    return (props: Props): Template => {
       this.islandProps.set(name, props);
 
       const state = this.islandPlugin.getIslandState<State>(name) ||
@@ -121,7 +118,7 @@ export class Reface {
         rpc,
       };
 
-      return TemplateIsland.create(
+      return createIsland(
         name,
         island.template(context),
         state,
@@ -174,7 +171,7 @@ export class Reface {
         };
 
         // Рендерим новый HTML
-        const template = TemplateIsland.create(
+        const template = createIsland(
           islandName,
           island.template(context),
           newState,
@@ -205,12 +202,12 @@ export class Reface {
   }
 
   // Рендеринг шаблона
-  render(template: IRefaceTemplate): string {
+  render(template: Template): string {
     let content = template;
 
     // Если есть layout - оборачиваем контент
     if (this.layout) {
-      content = this.layout`${content}`;
+      content = this.layout({}, content);
     }
 
     // Рендерим финальный шаблон через композер

@@ -1,13 +1,11 @@
-// utility types
-
-export const REFACE_TEMPLATE = Symbol("REFACE_TEMPLATE");
+import type { REFACE_TEMPLATE } from "./constants.ts";
 
 export type NormalizeAttributes<T extends TemplateAttributes> =
   | (
     & Omit<T, "class" | "style">
     & {
       class?: string[];
-      styl?: Record<string, string>;
+      style?: Record<string, string>;
     }
   )
   | Record<string, never>;
@@ -75,6 +73,12 @@ export type TemplateAttributes = {
   [key: string]: any;
 } | Record<string, never>;
 
+export type TransformedMethods<M extends TemplateMethods> = {
+  [K in keyof M]: M[K] extends (first: any, ...args: infer Args) => infer R
+    ? (...args: Args) => R
+    : never;
+};
+
 // Callable интерфейс шаблона
 export type Template<
   A extends TemplateAttributes = TemplateAttributes,
@@ -87,7 +91,7 @@ export type Template<
     // Вызов с содержимым
     (strings: TemplateStringsArray, ...values: any[]): Template<A, P, M>;
   }
-  & M
+  & TransformedMethods<M>
   & {
     [REFACE_TEMPLATE]: true;
     raw: RawTemplate<NormalizeAttributes<A>, P>;

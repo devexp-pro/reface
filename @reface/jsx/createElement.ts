@@ -3,7 +3,7 @@ import {
   REFACE_TEMPLATE,
   type Template,
   type TemplateAttributes,
-} from "../template/types.ts";
+} from "@reface/template";
 import { createTemplateFactory } from "../template/createTemplateFactory.ts";
 
 // Добавляем типы для компонентов из template/types

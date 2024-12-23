@@ -14,7 +14,7 @@ import type {
 import { createTemplateProxy } from "./createTemplateProxy.ts";
 import { normalizeAttributes } from "./normalizeAttributes.ts";
 import { isHTMLTemplateConfig } from "./utils.ts";
-
+import { VOID_ELEMENTS } from "./constants.ts";
 export const createTemplateFactory: CreateTemplateFactory = <
   A extends TemplateAttributes,
   P extends TemplatePayload,
@@ -62,6 +62,9 @@ export const createTemplateFactory: CreateTemplateFactory = <
         tag: templateFactoryConfig.tag,
         attributes,
         children: templateFactoryConfig.children || [],
+        void: typeof templateFactoryConfig.void === "boolean"
+          ? templateFactoryConfig.void
+          : VOID_ELEMENTS.has(templateFactoryConfig.tag),
         payload: {
           ...createTemplateFactoryConfig.create?.defaults?.payload,
           ...(templateFactoryConfig.payload || {}),
