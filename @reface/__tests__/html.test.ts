@@ -31,7 +31,7 @@ Deno.test("html template literal - escapes unsafe content", () => {
 Deno.test("html string - renders raw HTML", () => {
   const utils = new TestUtils();
   utils.assertRender(
-    html("<div>Static HTML</div>"),
+    html`<div>Static HTML</div>`,
     "<div>Static HTML</div>",
   );
 });

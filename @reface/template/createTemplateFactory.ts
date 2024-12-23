@@ -59,7 +59,8 @@ export const createTemplateFactory: CreateTemplateFactory = <
 
       const rawTemplate: RawTemplate<NormalizeAttributes<A>, P> = {
         type: createTemplateFactoryConfig.type,
-        tag: templateFactoryConfig.tag,
+        tag: templateFactoryConfig.tag ||
+          createTemplateFactoryConfig.create?.defaults?.tag,
         attributes,
         children: templateFactoryConfig.children || [],
         void: typeof templateFactoryConfig.void === "boolean"

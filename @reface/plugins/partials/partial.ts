@@ -29,12 +29,12 @@ const partialTemplate = createTemplateFactory<
   },
   methods: {
     execute: ({ template }) => {
-      return template.raw.payload.partial.handler();
+      return template.payload.partial.handler();
     },
     trigger: ({ template }) => {
       return hx()
-        .get(`/reface-partial/${template.raw.payload.partial.name}`)
-        .target(`[data-partial='${template.raw.payload.partial.name}']`)
+        .get(`/reface-partial/${template.payload.partial.name}`)
+        .target(`[data-partial='${template.payload.partial.name}']`)
         .trigger("click");
     },
   },
@@ -45,6 +45,7 @@ function createPartial<T>(
   name: string,
 ): PartialComponent<T> {
   return partialTemplate({
+    tag: "div",
     attributes: {
       "data-partial": name,
     },
