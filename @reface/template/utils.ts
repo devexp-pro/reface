@@ -24,7 +24,8 @@ export function isComponentFn<A, P>(input: any): input is ComponentFn<A, P> {
 }
 
 export function isTemplate(value: unknown): value is Template {
-  return typeof value === "function" && value[REFACE_TEMPLATE] === true;
+  return typeof value === "function" &&
+    (value as any)[REFACE_TEMPLATE] === true;
 }
 
 export function isRawTemplate(value: unknown): value is RawTemplate {
