@@ -11,6 +11,7 @@
     ".": "./@reface/mod.ts",
     "./htmx": "./@reface/htmx/mod.ts",
     "./elements": "./@reface/elements.ts",
+    "./template": "./@reface/template/mod.ts",
     "./plugins/styled": "./@reface/plugins/styled/mod.ts",
     "./plugins/partials": "./@reface/plugins/partials/mod.ts",
     "./plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
@@ -26,6 +27,7 @@
     "@reface/island": "./@reface/island/mod.ts",
     "@reface/htmx": "./@reface/htmx/mod.ts",
     "@reface/elements": "./@reface/elements.ts",
+    "@reface/template": "./@reface/template/mod.ts",
     "@reface/plugins/styled": "./@reface/plugins/styled/mod.ts",
     "@reface/plugins/partials": "./@reface/plugins/partials/mod.ts",
     "@reface/plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
@@ -53,6 +55,11 @@
     "exclude": [
       "./reface/versions.ts"
     ]
+  },
+  "lint": {
+    "rules": {
+      "exclude": ["no-explicit-any"]
+    }
   },
   "compilerOptions": {
     "jsx": "react",

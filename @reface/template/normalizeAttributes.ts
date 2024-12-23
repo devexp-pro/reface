@@ -1,5 +1,4 @@
-import type { ClassValue, HTMLAttributes, StyleValue } from "@reface/types";
-import { escapeHTML } from "./escape.ts";
+import type { NormalizeAttributes, TemplateAttributes } from "./types.ts";
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -12,8 +11,10 @@ function processValue<T>(value: T): unknown[] {
   return [value];
 }
 
-export function formatClassName(value: ClassValue): string {
-  if (!value) return "";
+export const normalizeClassAttribute = (
+  classess: TemplateAttributes["class"],
+): string[] => {
+  if (!classess) return [];
 
   const classes = new Set<string>();
 
@@ -37,21 +38,23 @@ export function formatClassName(value: ClassValue): string {
     }
   }
 
-  processValue(value).forEach(processClassValue);
-  return Array.from(classes).join(" ");
-}
+  processValue(classess).forEach(processClassValue);
+  return Array.from(classes);
+};
 
-export function formatStyle(value: StyleValue): string {
-  if (!value) return "";
+export const normalizeStyleAttribute = (
+  styles: TemplateAttributes["style"],
+): string[] => {
+  if (!styles) return [];
 
-  const styles = new Map<string, string>();
+  const newStyles = new Map<string, string>();
 
   function addStyle(
     prop: string,
     value: string | number | boolean | null | undefined,
   ) {
     if (!prop || value == null || value === false) return;
-    styles.set(
+    newStyles.set(
       prop.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase(),
       String(value),
     );
@@ -76,35 +79,30 @@ export function formatStyle(value: StyleValue): string {
     }
   }
 
-  processValue(value).forEach(processStyleValue);
-  return Array.from(styles.entries())
-    .map(([prop, value]) => `${prop}: ${value}`)
-    .join("; ");
-}
+  processValue(styles).forEach(processStyleValue);
+  return Array.from(newStyles.entries())
+    .map(([prop, value]) => `${prop}: ${value}`);
+};
 
-export function formatAttributes(attrs: HTMLAttributes): string {
-  if (!attrs || Object.keys(attrs).length === 0) return "";
+export function normalizeAttributes<A extends TemplateAttributes>(
+  attrs: A = {} as A,
+): NormalizeAttributes<A> {
+  const result = { ...attrs } as NormalizeAttributes<A>;
+  const newClassess: string[] = [];
+  const newStyles: string[] = [];
 
-  const formatted = Object.entries(attrs)
-    .map(([key, value]) => {
-      if (value === undefined || value === null) return "";
-      if (value === true) return escapeHTML(key);
-      if (value === false) return "";
+  // Обработка classes
+  if (attrs.class) {
+    newClassess.push(...normalizeClassAttribute(attrs.class));
+  }
 
-      let formatted: unknown;
-      if (key === "class") {
-        formatted = formatClassName(value as ClassValue);
-      } else if (key === "style") {
-        formatted = formatStyle(value as StyleValue);
-      } else {
-        formatted = Array.isArray(value) ? value[0] : value;
-      }
+  // Обработка styles
+  if (attrs.style) {
+    newStyles.push(...normalizeStyleAttribute(attrs.style));
+  }
 
-      if (!formatted) return "";
+  result.class = newClassess;
+  result.style = newStyles;
 
-      return `${escapeHTML(key)}="${escapeHTML(String(formatted))}"`;
-    })
-    .filter(Boolean);
-
-  return formatted.length ? ` ${formatted.join(" ")}` : "";
+  return result;
 }

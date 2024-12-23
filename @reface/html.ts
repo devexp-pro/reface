@@ -1,9 +1,7 @@
-import { RefaceTemplateHtml } from "@reface";
-
-import { getChildren } from "./utils/getChildren.ts";
+import { processChildren, template } from "./template/mod.ts";
 
 export const html = (strings: TemplateStringsArray, ...values: any[]) => {
-  return new RefaceTemplateHtml({
-    children: getChildren(strings, values),
+  return template({
+    children: processChildren(strings, values),
   });
 };

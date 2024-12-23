@@ -1,6 +1,6 @@
 import "@reface/jsx/global";
 import { html, component, elementFactory } from "@reface";
-import { ElementChildType } from "@reface/types";
+import type { ElementChildType } from "@reface/template";
 import { TestUtils } from "./testUtils.ts";
 
 

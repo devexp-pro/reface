@@ -1,8 +1,8 @@
-import { hx, type HxBuilder, type HxTrigger } from "@reface/htmx";
-import { TemplatePartial } from "./TemplatePartial.ts";
 import { REFACE_EVENT } from "@reface/constants";
-import type { RefaceComposer } from "../../RefaceComposer.ts";
 import type { IRefaceComposerPlugin } from "@reface/types";
+import type { RefaceComposer } from "../../RefaceComposer.ts";
+import type { Template } from "@reface/template";
+import type { PartialPayload } from "./types.ts";
 
 export class PartialsPlugin implements IRefaceComposerPlugin {
   readonly name = "partials";
@@ -19,18 +19,19 @@ export class PartialsPlugin implements IRefaceComposerPlugin {
     manager.on(
       REFACE_EVENT.RENDER.TEMPLATE.START,
       ({ template }) => {
-        if (template?.type === "partial") {
-          this.registerPartial(template);
+        const partialTemplate = template as Template<any, PartialPayload>;
+        if (partialTemplate.raw.type === "partial") {
+          this.registerPartial(partialTemplate);
         }
       },
     );
     return Promise.resolve();
   }
 
-  private registerPartial(partial: TemplatePartial<unknown>) {
-    const name = partial.payload.partial.name as string;
+  private registerPartial(template: Template<any, PartialPayload>) {
+    const name = template.raw.payload.partial.name;
     if (!this.partials.has(name)) {
-      this.partials.set(name, partial.payload.partial.handler);
+      this.partials.set(name, template.raw.payload.partial.handler);
     }
   }
 
@@ -44,12 +45,5 @@ export class PartialsPlugin implements IRefaceComposerPlugin {
 
   getPartialUrl(name: string): string {
     return `${this.apiPrefix}/${name}`;
-  }
-
-  getTrigger(name: string, trigger?: HxTrigger): HxBuilder {
-    return hx()
-      .get(this.getPartialUrl(name))
-      .target(`[data-partial='${name}']`)
-      .trigger(trigger || "click");
   }
 }

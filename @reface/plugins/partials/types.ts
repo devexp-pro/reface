@@ -1,26 +1,19 @@
-import type { ComponentWithProps } from "@reface/types";
-import type { TemplatePartial } from "./TemplatePartial.ts";
-import type { HxBuilder, HxTrigger } from "@reface/htmx";
+import type { Template } from "@reface/template";
+import type { HxBuilder } from "@reface/htmx";
 
-export interface IPartialComponent<T> extends ComponentWithProps {
-  tag: string;
-  handler: () => T;
-  execute: () => T;
-  trigger: (event?: string) => Record<string, string>;
-  payload: {
-    partial: {
-      id: string;
-      handler: () => T;
-    };
+export interface PartialPayload {
+  partial: {
+    name: string;
+    handler: () => Promise<unknown>;
   };
 }
 
-export interface PartialComponent<T>
-  extends ComponentWithProps<TemplatePartial<T>> {
-  trigger: (trigger?: HxTrigger) => HxBuilder;
-}
+export type PartialHandler<T> = (props: Record<string, unknown>) => Promise<T>;
 
-export type PartialHandler<T> = (props: Record<string, unknown>) => T;
+export type PartialComponent<T> = Template & {
+  execute: () => Promise<T>;
+  trigger: (trigger?: string) => HxBuilder;
+};
 
 export type PartialFn = {
   <T>(handler: PartialHandler<T>, name: string): PartialComponent<T>;

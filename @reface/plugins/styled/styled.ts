@@ -1,7 +1,46 @@
 import type { StyledComponent, StyledFn, StyledTagFn } from "./types.ts";
 import { generateClassName } from "./classGenerator.ts";
 import { parseCSS } from "./cssParser.ts";
-import { StyledTemplate } from "./StyledTemplate.ts";
+import {
+  createTemplateFactory,
+  type TemplateAttributes,
+  VOID_ELEMENTS,
+} from "@reface/template";
+
+interface StyledPayload {
+  styled: {
+    styles: string;
+    rootClass: string;
+    tag: string;
+  };
+}
+
+const styledTemplate = createTemplateFactory<TemplateAttributes, StyledPayload>(
+  {
+    type: "styled",
+    create: {
+      defaults: {
+        attributes: {},
+      },
+    },
+    process: {
+      attributes: ({ oldAttrs, newAttrs, template }) => {
+        const currentClasses = (oldAttrs.class || []) as string[];
+        const newClasses = (newAttrs.class || []) as string[];
+
+        return {
+          ...oldAttrs,
+          ...newAttrs,
+          class: [...currentClasses, ...newClasses].filter(Boolean),
+        };
+      },
+    },
+    methods: {
+      getRootClass: ({ template }: { template: RawTemplate }) =>
+        template.payload.styled.rootClass,
+    },
+  },
+);
 
 function createStyledElement(
   tagOrComponent: string | StyledComponent,
@@ -13,18 +52,22 @@ function createStyledElement(
   const rawCss = String.raw({ raw: css }, ...values);
   const styles = parseCSS(rawCss, rootClass);
 
-  const tag = typeof tagOrComponent === "string"
+  const tag: string = typeof tagOrComponent === "string"
     ? tagOrComponent
-    : tagOrComponent.tag;
+    : tagOrComponent.raw.tag;
 
   const combinedStyles = parentComponent
-    ? `${parentComponent.payload.styled.styles}\n${styles}`
+    ? `${parentComponent.raw.payload.styled.styles}\n${styles}`
     : styles;
 
-  return new StyledTemplate({
+  return styledTemplate({
     tag,
+    void: VOID_ELEMENTS.has(tag),
     attributes: {
-      class: [parentComponent?.payload?.styled?.rootClass].filter(Boolean),
+      class: [
+        parentComponent?.raw.payload.styled.rootClass,
+        rootClass,
+      ].filter(Boolean),
     },
     payload: {
       styled: { styles: combinedStyles, rootClass, tag },

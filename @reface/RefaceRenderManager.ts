@@ -1,22 +1,21 @@
-import type {
-  ClassValue,
-  ElementChildType,
-  HTMLAttributes,
-  IRefaceRenderManager,
-  IRefaceTemplate,
-  RefaceEventType,
-  RenderHandler,
-  StyleValue,
-} from "@reface/types";
-import { isEmptyValue, isTemplate } from "./utils/renderUtils.ts";
+import {
+  type ClassValue,
+  type ElementChildType,
+  type HTMLAttributes,
+  isTemplate,
+  type StyleValue,
+  type Template,
+  type TemplateAttributes,
+} from "./template/mod.ts";
+import { isEmptyValue } from "@reface/template";
 import { REFACE_EVENT } from "./constants.ts";
 import type { RefaceComposer } from "./RefaceComposer.ts";
-import { getChildren } from "./utils/getChildren.ts";
 
-export class RefaceRenderManager implements IRefaceRenderManager {
+export class RefaceRenderManager implements RenderManager {
   private handlers = new Map<RefaceEventType, Set<Function>>();
   private storage = new Map<string, unknown>();
   private composer: RefaceComposer;
+
   constructor({ composer }: { composer: RefaceComposer }) {
     this.composer = composer;
   }
@@ -41,7 +40,7 @@ export class RefaceRenderManager implements IRefaceRenderManager {
     }) || result) as R;
   }
 
-  render(template: IRefaceTemplate): string {
+  render(template: Template): string {
     return this.withPhase(
       REFACE_EVENT.RENDER.RENDER,
       this.renderImpl,
@@ -49,11 +48,14 @@ export class RefaceRenderManager implements IRefaceRenderManager {
     );
   }
 
-  private renderImpl(template: IRefaceTemplate): string {
-    return this.renderTemplate(template);
+  private renderImpl(template: Template): string {
+    if (isTemplate(template)) {
+      return this.renderTemplate(template);
+    }
+    throw new Error("Invalid template");
   }
 
-  renderTemplate(template: IRefaceTemplate): string {
+  renderTemplate(template: Template): string {
     return this.withPhase(
       REFACE_EVENT.RENDER.TEMPLATE,
       this.renderTemplateImpl,
@@ -61,8 +63,17 @@ export class RefaceRenderManager implements IRefaceRenderManager {
     );
   }
 
-  private renderTemplateImpl(template: IRefaceTemplate): string {
-    return template.toHtml(this);
+  private renderTemplateImpl(template: Template): string {
+    const content = this.renderChildren(template.raw.children);
+    if (!template.raw.tag) return content;
+
+    const attrs = this.renderAttributes(template.raw.attributes);
+    if (template.raw.void) {
+      return `<${template.raw.tag}${attrs ? ` ${attrs}` : ""}/>`;
+    }
+    return `<${template.raw.tag}${
+      attrs ? ` ${attrs}` : ""
+    }>${content}</${template.raw.tag}>`;
   }
 
   renderChild(child: ElementChildType): string {
@@ -86,7 +97,7 @@ export class RefaceRenderManager implements IRefaceRenderManager {
     return String(child);
   }
 
-  renderChildren(children: ElementChildType[]): string {
+  renderChildren(children: ElementChildType[] = []): string {
     return this.withPhase(
       REFACE_EVENT.RENDER.CHILDREN,
       this.renderChildrenImpl,
@@ -94,12 +105,12 @@ export class RefaceRenderManager implements IRefaceRenderManager {
     );
   }
 
-  private renderChildrenImpl(children: ElementChildType[]): string {
+  private renderChildrenImpl(children: ElementChildType[] = []): string {
     return children.map((child) => this.renderChild(child)).join("");
   }
 
   renderAttributes(attrs: HTMLAttributes): string {
-    return this.withPhase(REFACE_EVENT.RENDER.ATTRIBUTES, () => {
+    return this.withPhase(REFACE_EVENT.RENDER.ATTRIBUTES, ({ attrs }) => {
       const parts: string[] = [];
       for (const [key, value] of Object.entries(attrs)) {
         if (value == null) continue;
@@ -118,11 +129,11 @@ export class RefaceRenderManager implements IRefaceRenderManager {
         }
       }
       return parts.join(" ");
-    });
+    }, { attrs });
   }
 
   renderClassAttribute(value: ClassValue): string {
-    return this.withPhase(REFACE_EVENT.RENDER.CLASS, () => {
+    return this.withPhase(REFACE_EVENT.RENDER.CLASS, ({ classValue }) => {
       const classes = new Set<string>();
 
       const addClass = (val: ClassValue) => {
@@ -144,11 +155,11 @@ export class RefaceRenderManager implements IRefaceRenderManager {
 
       addClass(value);
       return Array.from(classes).join(" ");
-    });
+    }, { classValue: value });
   }
 
   renderStyleAttribute(value: StyleValue): string {
-    return this.withPhase(REFACE_EVENT.RENDER.STYLE, () => {
+    return this.withPhase(REFACE_EVENT.RENDER.STYLE, ({ styleValue }) => {
       const styles = new Map<string, string>();
 
       const addStyle = (val: StyleValue) => {
@@ -160,7 +171,6 @@ export class RefaceRenderManager implements IRefaceRenderManager {
           Object.entries(val)
             .filter(([, value]) => value !== false && value != null)
             .forEach(([prop, value]) => {
-              // Преобразуем camelCase в kebab-case
               const kebabProp = prop.replace(
                 /[A-Z]/g,
                 (m) => `-${m.toLowerCase()}`,
@@ -168,7 +178,6 @@ export class RefaceRenderManager implements IRefaceRenderManager {
               styles.set(kebabProp, String(value));
             });
         } else if (typeof val === "string") {
-          // Парсим строку стилей
           val.split(";")
             .map((style) => style.trim())
             .filter(Boolean)
@@ -186,7 +195,7 @@ export class RefaceRenderManager implements IRefaceRenderManager {
       return Array.from(styles.entries())
         .map(([prop, value]) => `${prop}: ${value}`)
         .join("; ");
-    });
+    }, { styleValue: value });
   }
 
   on(event: RefaceEventType, handler: RenderHandler): void {

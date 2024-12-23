@@ -1,33 +1,41 @@
 import { REFACE_EVENT } from "@reface/constants";
-import { TemplateIsland } from "./TemplateIsland.ts";
 import type { IRefaceComposerPlugin } from "@reface/types";
-import type { RpcToHtmx } from "./types.ts";
+import type { Template } from "@reface/template";
+import type { IslandPayload, RpcToHtmx } from "./types.ts";
 
 export class IslandPlugin implements IRefaceComposerPlugin {
   name = "island";
   private islands = new Map<string, unknown>();
 
   setup: IRefaceComposerPlugin["setup"] = (composer): void => {
-    composer.getRenderManager().on(
+    const manager = composer.getRenderManager();
+
+    // Собираем состояния островов
+    manager.on(
       REFACE_EVENT.RENDER.TEMPLATE.START,
       ({ template }) => {
-        if (template instanceof TemplateIsland) {
-          if (template.state) {
-            this.islands.set(template.name, template.state);
+        const islandTemplate = template as Template<any, IslandPayload>;
+        if (islandTemplate.raw.type === "island") {
+          const { name, state } = islandTemplate.raw.payload.island;
+          if (state) {
+            this.islands.set(name, state);
           }
         }
       },
     );
 
-    composer.getRenderManager().on(
+    // Добавляем состояния в конец документа
+    manager.on(
       REFACE_EVENT.RENDER.RENDER.END,
       ({ html }) => {
         const states = Object.fromEntries(this.islands.entries());
+        if (Object.keys(states).length === 0) return html;
+
         const script = `
-        <script>
-          window.__ISLAND_STATES__ = ${JSON.stringify(states)};
-        </script>
-      `;
+          <script>
+            window.__ISLAND_STATES__ = ${JSON.stringify(states)};
+          </script>
+        `;
         return html + script;
       },
     );

@@ -1,8 +1,6 @@
 import type { REFACE_EVENT } from "@reface/constants";
+import type { ElementChildType, Template } from "@reface/template";
 import type { RenderHandler } from "./render.types.ts";
-import type { IRefaceTemplate } from "./template.types.ts";
-import type { ElementChildType } from "./base.types.ts";
-import type { ClassValue, HTMLAttributes, StyleValue } from "./html.types.ts";
 
 type ExtractValues<T> = T extends object
   ? { [K in keyof T]: ExtractValues<T[K]> }[keyof T]
@@ -24,13 +22,13 @@ export interface IRefaceRenderManager {
   on(event: RefaceEventType, handler: RenderHandler): void;
   off(event: RefaceEventType, handler: RenderHandler): void;
 
-  render(template: IRefaceTemplate): string;
-  renderTemplate(template: IRefaceTemplate): string;
+  render(template: Template): string;
+  renderTemplate(template: Template): string;
   renderChild(child: ElementChildType): string;
   renderChildren(children: ElementChildType[]): string;
-  renderAttributes(attrs: HTMLAttributes): string;
-  renderClassAttribute(value: ClassValue): string;
-  renderStyleAttribute(value: StyleValue): string;
+  renderAttributes(attrs: Record<string, any>): string;
+  renderClassAttribute(value: string[] | Record<string, boolean>): string;
+  renderStyleAttribute(value: Record<string, string | number>): string;
 
   store: {
     get<T>(pluginName: string): T | undefined;

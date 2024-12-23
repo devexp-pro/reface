@@ -1,8 +1,16 @@
-import { getChildren } from "../utils/getChildren.ts";
-import { RefaceTemplate } from "../RefaceTemplate.ts";
+import { createTemplateFactory } from "../template/createTemplateFactory.ts";
+import type { ElementChildType, Template } from "../template/types.ts";
+const fragmentTemplate = createTemplateFactory({
+  type: "fragment",
+  create: {
+    defaults: {
+      attributes: {},
+    },
+  },
+});
 
-export function Fragment(_, children) {
-  return new RefaceTemplate({
-    children: getChildren(children),
+export function Fragment(_: any, children: ElementChildType[]): Template {
+  return fragmentTemplate({
+    children,
   });
 }
