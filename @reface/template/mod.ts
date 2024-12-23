@@ -1,5 +1,6 @@
 export type {
   ComponentFn,
+  ElementChildType,
   RawTemplate,
   RawTemplateAttributes,
   Template,
