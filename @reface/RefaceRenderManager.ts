@@ -7,7 +7,7 @@ import {
   type Template,
   type TemplateAttributes,
 } from "./template/mod.ts";
-import { isEmptyValue } from "./utils/renderUtils.ts";
+import { isEmptyValue } from "@reface/template";
 import { REFACE_EVENT } from "./constants.ts";
 import type { RefaceComposer } from "./RefaceComposer.ts";
 

@@ -1,3 +1,4 @@
+import { IRefaceRenderManager } from "../types/composer.types.ts";
 import type { REFACE_TEMPLATE } from "./constants.ts";
 
 export type NormalizeAttributes<T extends TemplateAttributes> =
@@ -134,18 +135,6 @@ export type HTMLTemplateConfig<
     | { void?: false; children?: ElementChildType[] }
   );
 
-// Менеджер рендеринга
-export interface RenderManager {
-  combineClasses(...classes: (string | undefined)[]): string;
-  renderChildren(children: ElementChildType[]): string;
-  renderAttributes(
-    attrs: Record<string, any>,
-    options?: { prefix?: string },
-  ): string;
-  renderStyles(styles: Record<string, string>): string;
-  renderClasses(classes: string[]): string;
-}
-
 // Полная конфигурация фабрики шаблонов
 
 export type TransformTemplate<
@@ -154,7 +143,7 @@ export type TransformTemplate<
 > = (params: {
   attrs: A;
   children: ElementChildType[];
-  manager: RenderManager;
+  manager: IRefaceRenderManager;
 }) => RawTemplate<NormalizeAttributes<A>, P>;
 
 export interface TemplateFactoryConfig<

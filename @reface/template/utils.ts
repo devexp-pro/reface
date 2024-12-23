@@ -43,3 +43,6 @@ export function escapeHTML(str: string): string {
 export function escapeAttribute(str: string): string {
   return str.replace(/["&]/g, (char) => HTML_ENTITIES[char]);
 }
+
+export const toKebabCase = (str: string) =>
+  str.replace(/([A-Z])/g, "-$1").toLowerCase();
