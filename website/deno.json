@@ -1,11 +1,34 @@
 {
-  "lock": false,
-  "imports": {
-    "$/": "./",
-    "@hono/hono": "jsr:@hono/hono@4.5.6",
-    "@vseplet/reface": "jsr:@vseplet/reface@0.0.24"
-  },
   "tasks": {
-    "dev": "deno run --watch=./main.ts --allow-all main.ts"
+    "start": "deno run -A --watch main.tsx"
+  },
+  "imports": {
+    "@hono/hono": "jsr:@hono/hono",
+    "@hono/hono/deno": "jsr:@hono/hono/deno",
+    "@reface": "../@reface/mod.ts",
+    "@reface/types": "../@reface/types.ts",
+    "@reface/template": "../@reface/template/mod.ts",
+    "@reface/htmx": "../@reface/htmx/mod.ts",
+    "@reface/constants": "../@reface/constants.ts",
+    "@reface/elements": "../@reface/elements.ts",
+    "@reface/plugins/styled": "../@reface/plugins/styled/mod.ts",
+    "@reface/plugins/partials": "../@reface/plugins/partials/mod.ts",
+    "@reface/components/LayoutSimple": "../@reface/components/LayoutSimple.ts",
+    "marked": "https://esm.sh/marked@9.1.5",
+    "unified": "npm:unified",
+    "remark-parse": "npm:remark-parse",
+    "remark-gfm": "npm:remark-gfm",
+    "mdast": "npm:@types/mdast",
+    "hono": "jsr:@hono/hono"
+  },
+  "compilerOptions": {
+    "jsx": "react",
+    "jsxFactory": "createElement",
+    "jsxFragmentFactory": "Fragment"
+  },
+  "deploy": {
+    "exclude": [],
+    "include": [],
+    "entrypoint": "main.tsx"
   }
 }
