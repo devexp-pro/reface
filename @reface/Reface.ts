@@ -99,7 +99,11 @@ export class Reface {
 
   // Создание острова
   island<State, Props, RPC>(islandConfig: Island<State, Props, RPC>) {
-    return createIslandComponent(islandConfig, this.islandPlugin);
+    const component = createIslandComponent(islandConfig, this.islandPlugin);
+
+    this.islands.set(islandConfig.name, islandConfig);
+
+    return component;
   }
 
   // Обработка RPC вызова

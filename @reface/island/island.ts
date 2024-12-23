@@ -38,6 +38,13 @@ const islandTemplate = createTemplateFactory<
   IslandPayload
 >({
   type: "island",
+  process: {
+    attributes: ({ template, newAttrs }) => ({
+      ...newAttrs,
+      "data-island": template.payload.island.name,
+      id: `island-${template.payload.island.name}`,
+    }),
+  },
   create: {
     defaults: {
       tag: "div",
@@ -53,6 +60,7 @@ export function createIsland(
   rpc?: Record<string, (args: unknown) => Promise<unknown>>,
 ) {
   return islandTemplate({
+    tag: "div",
     attributes: {
       "data-island": name,
       id: `island-${name}`,
