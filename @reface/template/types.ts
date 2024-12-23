@@ -1,15 +1,12 @@
 import type { IRefaceRenderManager } from "../types/composer.types.ts";
 import type { REFACE_TEMPLATE } from "./constants.ts";
 
-export type NormalizeAttributes<T extends TemplateAttributes> =
-  | (
-    & Omit<T, "class" | "style">
-    & {
-      class?: string[];
-      style?: string[];
-    }
-  )
-  | Record<string, never>;
+export type NormalizeAttributes<T extends BaseAttributes> = T extends
+  TemplateHtmlAttributes ? Omit<T, "class" | "style"> & {
+    class?: string[];
+    style?: string[];
+  }
+  : T;
 
 // Базовые типы для атрибутов
 export type ClassValue =
@@ -91,7 +88,7 @@ export type TransformedMethods<M extends TemplateMethods> = {
 
 // Callable интерфейс шаблона
 export type Template<
-  A extends TemplateAttributes = TemplateAttributes,
+  A extends BaseAttributes = BaseAttributes,
   P extends TemplatePayload = TemplatePayload,
   M extends TemplateMethods<any, P> = TemplateMethods<A, P>,
 > =
@@ -107,16 +104,18 @@ export type Template<
 
 // Фабрика шаблонов
 export type TemplateFactory<
-  A extends TemplateAttributes = TemplateAttributes,
+  A extends BaseAttributes = BaseAttributes,
   P extends TemplatePayload = TemplatePayload,
   M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
 > = {
   // Базовый вызов
   (config: BaseTemplateConfig<P>): Template<A, P, M>;
   // HTML элемент
-  (config: HTMLTemplateConfig<A, P>): Template<A, P, M>;
+  (
+    config: HTMLTemplateConfig<A & TemplateHtmlAttributes, P>,
+  ): Template<A & TemplateHtmlAttributes, P, M>;
   // Компонент с выводом типа атрибутов
-  <CA extends TemplateAttributes>(
+  <CA extends BaseAttributes>(
     component: ComponentFn<CA, P>,
   ): Template<CA, P, TemplateMethods<CA, P>>;
 };
@@ -128,7 +127,7 @@ export type BaseTemplateConfig<P extends TemplatePayload = TemplatePayload> = {
 
 // HTML конфигурация с условным типом для children
 export type HTMLTemplateConfig<
-  A extends TemplateAttributes = TemplateAttributes,
+  A extends TemplateHtmlAttributes = TemplateHtmlAttributes,
   P extends TemplatePayload = TemplatePayload,
 > =
   & BaseTemplateConfig<P>
@@ -227,3 +226,14 @@ export type CreateTemplateFactory = <
 >(
   config: TemplateFactoryConfig<A, P, M>,
 ) => TemplateFactory<A, P, M>;
+
+// Базовый интерфейс для всех атрибутов
+export interface BaseAttributes {
+  [key: string]: any;
+}
+
+// HTML-специфичные атрибуты
+export interface TemplateHtmlAttributes extends BaseAttributes {
+  class?: TemplateAttributesClass;
+  style?: TemplateAttributesStyle;
+}
