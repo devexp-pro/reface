@@ -1,7 +1,8 @@
 import { assertEquals } from "@std/assert";
-import type { Template, TemplateAttributes } from "../template/mod.ts";
+import type { Template } from "@reface/template";
 import { RefaceComposer } from "../RefaceComposer.ts";
-import { LoggerPlugin, type RenderLogEntry } from "../plugins/LoggerPlugin.ts";
+import type { IRefaceComposerPlugin } from "@reface/types";
+import { LoggerPlugin } from "../plugins/LoggerPlugin.ts";
 
 export interface TestUtilsOptions {
   plugins?: IRefaceComposerPlugin[];
