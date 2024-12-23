@@ -3,7 +3,6 @@ import type {
   NormalizeAttributes,
   RawTemplate,
   Template,
-  TemplateAttributes,
   TemplateFactoryConfig,
   TemplateMethods,
   TemplatePayload,
@@ -12,7 +11,6 @@ import { REFACE_TEMPLATE } from "./constants.ts";
 import { processChildren } from "./processChildren.ts";
 import { isComponentFn } from "./utils.ts";
 import { normalizeAttributes } from "./normalizeAttributes.ts";
-import { TemplateMethod } from "@reface/types";
 
 type ProxyTarget<
   A extends BaseAttributes,
@@ -80,7 +78,7 @@ export function createTemplateProxy<
 
       const attributes = normalizeAttributes(
         createTemplateFactoryConfig.process?.attributes?.({
-          oldAttrs: rawTemplate.attributes as A,
+          oldAttrs: rawTemplate.attributes,
           newAttrs: normalizeAttributes(first as A),
           template: rawTemplate,
         }) || {

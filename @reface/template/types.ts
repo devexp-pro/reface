@@ -193,10 +193,9 @@ export interface TemplateFactoryConfig<
 
   process?: {
     attributes?: (params: {
-      oldAttrs: A;
-      newAttrs: A;
+      oldAttrs: NormalizeAttributes<A>;
+      newAttrs: NormalizeAttributes<A>;
       template: RawTemplate<NormalizeAttributes<A>, P>;
-      manager: IRefaceRenderManager;
     }) => A;
 
     children?: (params: {
