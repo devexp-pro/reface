@@ -8,6 +8,7 @@ import { createTemplateFactory } from "../template/createTemplateFactory.ts";
 
 // Добавляем типы для компонентов из template/types
 type ComponentProps = TemplateAttributes;
+
 type ComponentWithProps = {
   (props: ComponentProps): Template;
   type?: string;
