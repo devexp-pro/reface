@@ -53,7 +53,8 @@
   },
   "fmt": {
     "exclude": [
-      "./versions.ts"
+      "./versions.ts",
+      "./deno.json"
     ]
   },
   "lint": {
