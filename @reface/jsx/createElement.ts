@@ -1,4 +1,5 @@
 import {
+  type BaseAttributes,
   type ComponentFn,
   type ElementChildType,
   isComponentFn,
@@ -19,7 +20,7 @@ const jsxTemplate = createTemplateFactory({
 });
 
 export function createElement<
-  P extends TemplateAttributes = TemplateAttributes,
+  P extends BaseAttributes = BaseAttributes,
 >(
   type: string | ComponentFn<P, TemplatePayload> | Template,
   props: P | null,

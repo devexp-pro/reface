@@ -14,9 +14,11 @@ export type ClassValue =
   | Record<string, boolean>
   | (string | Record<string, boolean>)[];
 export type StyleValue =
+  | null
+  | undefined
   | string
-  | Record<string, string | number>
-  | (string | Record<string, string | number>)[];
+  | Record<string, string | number | null | boolean>
+  | (string | Record<string, string | number | null | boolean>)[];
 
 // Базовый интерфейс для пользовательских данных
 export interface TemplatePayload {
@@ -196,13 +198,13 @@ export interface TemplateFactoryConfig<
     attributes?: (params: {
       oldAttrs: NormalizeAttributes<A>;
       newAttrs: NormalizeAttributes<A>;
-      template: RawTemplate<NormalizeAttributes<A>, P>;
+      template?: RawTemplate<NormalizeAttributes<A>, P>;
     }) => A;
 
     children?: (params: {
       oldChildren: ElementChildType[];
       newChildren: ElementChildType[];
-      template: RawTemplate<NormalizeAttributes<A>, P>;
+      template?: RawTemplate<NormalizeAttributes<A>, P>;
     }) => ElementChildType[];
   };
 

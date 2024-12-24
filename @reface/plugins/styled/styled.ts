@@ -3,12 +3,11 @@ import { generateClassName } from "./classGenerator.ts";
 import { parseCSS } from "./cssParser.ts";
 import {
   createTemplateFactory,
+  type NormalizeAttributes,
   type RawTemplate,
-  type Template,
   type TemplateAttributes,
   VOID_ELEMENTS,
 } from "@reface/template";
-import { NormalizeAttributes } from "@reface";
 
 interface StyledPayload {
   styled: {

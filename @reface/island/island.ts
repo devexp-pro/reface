@@ -1,6 +1,6 @@
 import { createTemplateFactory, type Template } from "@reface/template";
 import type { IslandPlugin } from "./IslandPlugin.ts";
-import type { Island, IslandPayload } from "./types.ts";
+import type { Island, IslandPayload, RpcResponse } from "./types.ts";
 
 const islandTemplate = createTemplateFactory<
   { "data-island": string; id: string },
@@ -8,11 +8,17 @@ const islandTemplate = createTemplateFactory<
 >({
   type: "island",
   process: {
-    attributes: ({ template, newAttrs }) => ({
-      ...newAttrs,
-      "data-island": template.payload.island.name,
-      id: `island-${template.payload.island.name}`,
-    }),
+    attributes: ({ template, newAttrs }) => {
+      if (!template) {
+        return newAttrs;
+      }
+
+      return {
+        ...newAttrs,
+        "data-island": template.payload.island.name,
+        id: `island-${template.payload.island.name}`,
+      };
+    },
   },
   create: {
     defaults: {
@@ -25,7 +31,7 @@ export function createIsland(
   name: string,
   content: Template,
   state?: unknown,
-  rpc?: Record<string, (args: unknown) => Promise<unknown>>,
+  rpc?: Record<string, (args: unknown) => Promise<RpcResponse<unknown>>>,
 ) {
   return islandTemplate({
     tag: "div",

@@ -1,5 +1,5 @@
 import type { Template } from "@reface/template";
-
+import type { IRefaceRenderManager } from "./composer.types.ts";
 export type RenderPhaseBase =
   | "render"
   | "renderTemplate"
@@ -17,7 +17,7 @@ export type RenderContext = {
   attributes?: Record<string, any>;
   class?: string[] | Record<string, boolean>;
   style?: Record<string, string | number>;
-  manager: RenderManager;
+  manager: IRefaceRenderManager;
 };
 
 export type RenderHandler = (

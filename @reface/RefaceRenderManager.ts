@@ -1,4 +1,10 @@
-import type { IRefaceComposer, IRefaceRenderManager } from "@reface/types";
+import type {
+  IRefaceComposer,
+  IRefaceRenderManager,
+  RefaceEventType,
+  RenderContext,
+  RenderHandler,
+} from "@reface/types";
 import {
   type ClassValue,
   type ElementChildType,
@@ -10,15 +16,8 @@ import {
 import { isEmptyValue } from "@reface/template";
 import { REFACE_EVENT } from "./constants.ts";
 
-export type RefaceEventType =
-  | keyof typeof REFACE_EVENT.RENDER
-  | `${keyof typeof REFACE_EVENT.RENDER}.START`
-  | `${keyof typeof REFACE_EVENT.RENDER}.END`;
-
-export type RenderHandler = (params: Record<string, unknown>) => unknown;
-
 export class RefaceRenderManager implements IRefaceRenderManager {
-  private handlers = new Map<RefaceEventType, Set<Function>>();
+  private handlers = new Map<RefaceEventType, Set<RenderHandler>>();
   private storage = new Map<string, unknown>();
   private composer: IRefaceComposer;
 
@@ -175,7 +174,7 @@ export class RefaceRenderManager implements IRefaceRenderManager {
           val.forEach((v) => addStyle(v));
         } else if (typeof val === "object") {
           Object.entries(val)
-            .filter(([, value]) => value !== false && value != null)
+            .filter(([, value]) => value !== null && value !== false)
             .forEach(([prop, value]) => {
               const kebabProp = prop.replace(
                 /[A-Z]/g,
@@ -196,7 +195,7 @@ export class RefaceRenderManager implements IRefaceRenderManager {
         }
       };
 
-      addStyle(value);
+      addStyle(styleValue);
 
       return Array.from(styles.entries())
         .map(([prop, value]) => `${prop}: ${value}`)
@@ -222,8 +221,13 @@ export class RefaceRenderManager implements IRefaceRenderManager {
     let result;
     const handlers = this.handlers.get(event) || new Set();
 
+    const context: RenderContext = {
+      ...params,
+      manager: this,
+    };
+
     for (const handler of handlers) {
-      const handlerResult = handler(params);
+      const handlerResult = handler(context);
       if (handlerResult !== undefined) {
         result = handlerResult;
       }
