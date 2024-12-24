@@ -26,7 +26,7 @@ const partialTemplate = createTemplateFactory<
   },
   methods: {
     execute: ({ template }) => {
-      return template.payload.partial.handler();
+      return template.payload.partial.handler({});
     },
     trigger: ({ template }) => {
       return hx()

@@ -1,4 +1,5 @@
 import type { Template, TemplatePayload } from "@reface/template";
+import { IslandPlugin } from "./IslandPlugin.ts";
 
 export interface IslandPayload extends TemplatePayload {
   island: {
@@ -11,15 +12,15 @@ export interface IslandPayload extends TemplatePayload {
 export interface Island<
   State = unknown,
   Props = unknown,
-  RPC extends Record<string, RpcMethod> = Record<string, RpcMethod>,
+  RPC extends Record<string, RpcMethod<State>> = Record<
+    string,
+    RpcMethod<State>
+  >,
 > {
   name?: string;
   template: (context: IslandContext<State, Props, RPC>) => Template;
   initialState?: State;
-  rpc?: Record<
-    string,
-    (args: { state: State; args: unknown }) => Promise<RpcResponse<State>>
-  >;
+  rpc?: RPC;
 }
 
 // Базовый интерфейс для RPC ответа
@@ -52,17 +53,20 @@ export interface IslandContext<S, P, R> {
   rpc: RpcToHtmx<R>;
 }
 
-export type RpcMethod<T = unknown> = (
-  context: RpcContext<T>,
-) => Promise<RpcResponse>;
+export type RpcMethod<State> = (
+  context: { state: State; args: unknown },
+) => Promise<RpcResponse<State>>;
 
-export type RPC = Record<string, RpcMethod>;
+export type RPC<State = unknown> = Record<string, RpcMethod<State>>;
 
 // Основной интерфейс острова
 export interface Island<
   State = unknown,
   Props = unknown,
-  RPC extends Record<string, RpcMethod> = Record<string, RpcMethod>,
+  RPC extends Record<string, RpcMethod<State>> = Record<
+    string,
+    RpcMethod<State>
+  >,
 > {
   // Имя острова (опционально)
   name?: string;
@@ -75,4 +79,15 @@ export interface Island<
 
   // Начальное состояние
   initialState?: State;
+}
+
+export function createIslandComponent<
+  State,
+  Props,
+  RPC extends Record<string, RpcMethod<State>>,
+>(
+  island: Island<State, Props, RPC>,
+  plugin: IslandPlugin,
+) {
+  // ...
 }

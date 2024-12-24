@@ -1,9 +1,13 @@
-import { createTemplateFactory, type Template } from "@reface/template";
+import {
+  createTemplateFactory,
+  type Template,
+  type TemplateAttributes,
+} from "@reface/template";
 import type { IslandPlugin } from "./IslandPlugin.ts";
-import type { Island, IslandPayload, RpcResponse } from "./types.ts";
+import type { Island, IslandPayload, RpcMethod, RpcResponse } from "./types.ts";
 
 const islandTemplate = createTemplateFactory<
-  { "data-island": string; id: string },
+  TemplateAttributes,
   IslandPayload
 >({
   type: "island",
@@ -50,17 +54,21 @@ export function createIsland(
   });
 }
 
-export function createIslandComponent<State, Props, RPC>(
+export function createIslandComponent<
+  State,
+  Props,
+  RPC extends Record<string, RpcMethod<State>>,
+>(
   island: Island<State, Props, RPC>,
   plugin: IslandPlugin,
-): (props: Props) => Template {
+): (props: Props) => Template<TemplateAttributes, IslandPayload> {
   const name = island.name || `island-${crypto.randomUUID()}`;
 
   if (island.initialState) {
     plugin.setIslandState(name, island.initialState);
   }
 
-  return (props: Props): Template => {
+  return (props: Props): Template<TemplateAttributes, IslandPayload> => {
     const state = plugin.getIslandState<State>(name) || island.initialState;
     const rpc = plugin.createRpcProxy<RPC>(name);
 
@@ -70,11 +78,16 @@ export function createIslandComponent<State, Props, RPC>(
       rpc,
     };
 
+    const content = island.template(context);
+
     return createIsland(
       name,
-      island.template(context),
+      content,
       state,
-      island.rpc,
+      island.rpc as Record<
+        string,
+        (args: unknown) => Promise<RpcResponse<unknown>>
+      >,
     );
   };
 }
