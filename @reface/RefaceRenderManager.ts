@@ -1,22 +1,26 @@
+import type { IRefaceComposer, IRefaceRenderManager } from "@reface/types";
 import {
-  type ClassValue,
   type ElementChildType,
-  type HTMLAttributes,
   isTemplate,
-  type StyleValue,
   type Template,
   type TemplateAttributes,
 } from "./template/mod.ts";
 import { isEmptyValue } from "@reface/template";
 import { REFACE_EVENT } from "./constants.ts";
-import type { RefaceComposer } from "./RefaceComposer.ts";
 
-export class RefaceRenderManager implements RenderManager {
+export type RefaceEventType =
+  | keyof typeof REFACE_EVENT.RENDER
+  | `${keyof typeof REFACE_EVENT.RENDER}.START`
+  | `${keyof typeof REFACE_EVENT.RENDER}.END`;
+
+export type RenderHandler = (params: Record<string, unknown>) => unknown;
+
+export class RefaceRenderManager implements IRefaceRenderManager {
   private handlers = new Map<RefaceEventType, Set<Function>>();
   private storage = new Map<string, unknown>();
-  private composer: RefaceComposer;
+  private composer: IRefaceComposer;
 
-  constructor({ composer }: { composer: RefaceComposer }) {
+  constructor({ composer }: { composer: IRefaceComposer }) {
     this.composer = composer;
   }
 
@@ -109,7 +113,7 @@ export class RefaceRenderManager implements RenderManager {
     return children.map((child) => this.renderChild(child)).join("");
   }
 
-  renderAttributes(attrs: HTMLAttributes): string {
+  renderAttributes(attrs: TemplateAttributes): string {
     return this.withPhase(REFACE_EVENT.RENDER.ATTRIBUTES, ({ attrs }) => {
       const parts: string[] = [];
       for (const [key, value] of Object.entries(attrs)) {

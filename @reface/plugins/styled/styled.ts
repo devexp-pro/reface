@@ -3,9 +3,12 @@ import { generateClassName } from "./classGenerator.ts";
 import { parseCSS } from "./cssParser.ts";
 import {
   createTemplateFactory,
+  type RawTemplate,
+  type Template,
   type TemplateAttributes,
   VOID_ELEMENTS,
 } from "@reface/template";
+import { NormalizeAttributes } from "@reface";
 
 interface StyledPayload {
   styled: {
@@ -24,7 +27,13 @@ const styledTemplate = createTemplateFactory<TemplateAttributes, StyledPayload>(
       },
     },
     process: {
-      attributes: ({ oldAttrs, newAttrs, template }) => {
+      attributes: ({
+        oldAttrs,
+        newAttrs,
+      }: {
+        oldAttrs: NormalizeAttributes<TemplateAttributes>;
+        newAttrs: NormalizeAttributes<TemplateAttributes>;
+      }) => {
         const currentClasses = (oldAttrs.class || []) as string[];
         const newClasses = (newAttrs.class || []) as string[];
 
