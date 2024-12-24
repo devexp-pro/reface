@@ -1,6 +1,6 @@
 import {
+  type ComponentFn,
   createTemplateFactory,
-  type ElementChildType,
   type Template,
   type TemplateAttributes,
   type TemplatePayload,
@@ -8,15 +8,11 @@ import {
 
 export type ComponentProps = TemplateAttributes;
 
-export type ComponentRenderFn<
-  P extends Record<string, any> = Record<string, any>,
-> = (attrs: P, children: ElementChildType[]) => Template;
-
 export const component = <
   P extends Record<string, any>,
   T extends TemplatePayload = TemplatePayload,
 >(
-  render: ComponentRenderFn<P>,
+  render: ComponentFn<P, T>,
 ): Template<P, T> => {
   const componentTemplate = createTemplateFactory({
     type: "component",
