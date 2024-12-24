@@ -98,11 +98,24 @@ export class Reface {
   }
 
   // Создание острова
-  island<State, Props, RPC>(islandConfig: Island<State, Props, RPC>) {
+  island<
+    State,
+    Props,
+    RPC extends Record<
+      string,
+      (args: { state: State; args: unknown }) => Promise<{
+        state?: Partial<State>;
+        html?: string;
+        status?: number;
+      }>
+    >,
+  >(islandConfig: Island<State, Props, RPC>) {
+    if (!islandConfig.name) {
+      throw new Error("Island must have a name");
+    }
+
     const component = createIslandComponent(islandConfig, this.islandPlugin);
-
     this.islands.set(islandConfig.name, islandConfig);
-
     return component;
   }
 

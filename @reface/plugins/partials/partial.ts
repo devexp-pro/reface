@@ -1,15 +1,15 @@
-import type { PartialComponent, PartialFn, PartialHandler } from "./types.ts";
 import {
   createTemplateFactory,
-  TemplateAttributes,
+  type TemplateAttributes,
   type TemplatePayload,
 } from "@reface/template";
 import { hx } from "@reface/htmx";
+import type { PartialFn, PartialHandler } from "./types.ts";
 
 interface PartialPayload extends TemplatePayload {
   partial: {
     name: string;
-    handler: (args?: unknown) => Promise<unknown>;
+    handler: PartialHandler<unknown>;
   };
 }
 
@@ -22,9 +22,6 @@ const partialTemplate = createTemplateFactory<
     defaults: {
       tag: "div",
       attributes: {},
-      payload: {
-        partial: {},
-      },
     },
   },
   methods: {
@@ -43,7 +40,7 @@ const partialTemplate = createTemplateFactory<
 function createPartial<T>(
   handler: PartialHandler<T>,
   name: string,
-): PartialComponent<T> {
+) {
   return partialTemplate({
     tag: "div",
     attributes: {

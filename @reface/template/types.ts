@@ -188,6 +188,7 @@ export interface TemplateFactoryConfig<
     defaults?: {
       attributes?: A;
       payload?: P;
+      tag?: string;
     };
   };
 
