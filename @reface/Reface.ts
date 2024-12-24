@@ -13,8 +13,6 @@ import type { Template } from "@reface/template";
 import { Hono } from "@hono/hono";
 import type { Context } from "@hono/hono";
 
-import "./jsx/jsx.global.d.ts";
-
 export interface RefaceOptions {
   plugins?: IRefaceComposerPlugin[];
   layout?: (props: unknown, content: Template) => Template;

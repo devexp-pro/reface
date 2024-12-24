@@ -1,4 +1,3 @@
-import "@reface/jsx/global";
 import { styled } from "@reface/plugins/styled";
 import { StyledPlugin } from "@reface/plugins/styled";
 import { TestUtils } from "./testUtils.ts";

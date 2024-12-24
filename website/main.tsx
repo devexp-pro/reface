@@ -11,8 +11,6 @@ import DocsPage from "./pages/DocsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import { component } from "../@reface/component.ts";
 
-import "../@reface/jsx/global.ts";
-
 const { sections, pages } = await loadDocs();
 
 if (!pages.size) {

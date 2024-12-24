@@ -1,4 +1,3 @@
-import "@reface/jsx/global";
 import { component } from "@reface";
 import { TestUtils } from "./testUtils.ts";
 

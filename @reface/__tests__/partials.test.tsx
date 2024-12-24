@@ -1,4 +1,3 @@
-import "@reface/jsx/global";
 import { assertEquals } from "@std/assert";
 import { TestUtils } from "./testUtils.ts";
 import { partial } from "@reface/plugins/partials";
