@@ -1,15 +1,4 @@
-export type {
-  ComponentFn,
-  ElementChildType,
-  RawTemplate,
-  RawTemplateAttributes,
-  Template,
-  TemplateAttributes,
-  TemplateFactory,
-  TemplateFactoryConfig,
-  TemplateMethods,
-  TemplatePayload,
-} from "./types.ts";
+export * from "./types.ts";
 export * from "./utils.ts";
 
 import { createTemplateFactory } from "./createTemplateFactory.ts";
