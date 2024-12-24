@@ -68,5 +68,13 @@
     "jsx": "react",
     "jsxFactory": "createElement",
     "jsxFragmentFactory": "Fragment"
+  },
+  "publish": {
+    "include": [
+      "./@reface/**"
+    ],
+    "exclude": [
+      "./@reface/__tests__"
+    ]
   }
 }
