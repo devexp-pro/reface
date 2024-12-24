@@ -17,10 +17,17 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Format Check
+        id: format
         run: deno fmt --check
 
       - name: Check types
+        id: types
         run: deno task check
 
       - name: Run tests
+        id: tests
         run: deno task test
+
+      - name: Check publish
+        if: steps.format.outcome == 'success' && steps.types.outcome == 'success' && steps.tests.outcome == 'success'
+        run: deno publish --dry-run
