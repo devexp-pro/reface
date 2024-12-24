@@ -13,7 +13,7 @@ export class PartialsPlugin implements IRefaceComposerPlugin {
     this.apiPrefix = options.apiPrefix || "/reface-partial";
   }
 
-  setup(composer: RefaceComposer) {
+  setup(composer: RefaceComposer): Promise<void> {
     const manager = composer.getRenderManager();
 
     manager.on(
@@ -35,11 +35,11 @@ export class PartialsPlugin implements IRefaceComposerPlugin {
     }
   }
 
-  getHandler(name: string) {
+  getHandler(name: string): (() => Promise<unknown>) | undefined {
     return this.partials.get(name);
   }
 
-  getPartials() {
+  getPartials(): Map<string, () => Promise<unknown>> {
     return new Map(this.partials);
   }
 

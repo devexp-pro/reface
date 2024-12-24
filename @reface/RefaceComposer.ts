@@ -7,7 +7,7 @@ import type {
 import type { Template } from "@reface/template";
 
 export class RefaceComposer implements IRefaceComposer {
-  plugins = new Map<string, IRefaceComposerPlugin>();
+  plugins: Map<string, IRefaceComposerPlugin> = new Map();
   private renderManager: RefaceRenderManager;
 
   constructor() {
