@@ -1,0 +1,26 @@
+name: PR Check
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "@reface/**"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    container:
+      image: denoland/deno:latest
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v3
+
+      - name: Format Check
+        run: deno fmt --check
+
+      - name: Check types
+        run: deno task check
+
+      - name: Run tests
+        run: deno task test
