@@ -61,13 +61,17 @@ function createStyledElement(
   const rawCss = String.raw({ raw: css }, ...values);
   const styles = parseCSS(rawCss, rootClass);
 
-  const tag: string = typeof tagOrComponent === "string"
+  const tag: string | undefined = typeof tagOrComponent === "string"
     ? tagOrComponent
     : tagOrComponent.raw.tag;
 
   const combinedStyles = parentComponent
     ? `${parentComponent.raw.payload.styled.styles}\n${styles}`
     : styles;
+
+  if (!tag) {
+    throw new Error("Tag is required");
+  }
 
   return styledTemplate({
     tag,
@@ -94,4 +98,4 @@ export const styled: StyledFn = new Proxy(styledFunction, {
     return (strings: TemplateStringsArray, ...values: unknown[]) =>
       createStyledElement(tag, strings, values);
   },
-});
+}) as StyledFn;

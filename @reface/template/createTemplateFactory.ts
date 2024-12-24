@@ -1,7 +1,6 @@
 import type {
   BaseTemplateConfig,
   ComponentFn,
-  CreateTemplateFactory,
   HTMLTemplateConfig,
   NormalizeAttributes,
   RawTemplate,
@@ -13,10 +12,10 @@ import type {
 } from "./types.ts";
 import { createTemplateProxy } from "./createTemplateProxy.ts";
 import { normalizeAttributes } from "./normalizeAttributes.ts";
-import { isHTMLTemplateConfig } from "./utils.ts";
+import { isComponentFn, isHTMLTemplateConfig } from "./utils.ts";
 import { VOID_ELEMENTS } from "./constants.ts";
 
-export const createTemplateFactory: CreateTemplateFactory = <
+export const createTemplateFactory = <
   A extends TemplateAttributes,
   P extends TemplatePayload,
   M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
@@ -30,7 +29,7 @@ export const createTemplateFactory: CreateTemplateFactory = <
       | HTMLTemplateConfig<A, P>,
   ) => {
     // Компонент
-    if (typeof templateFactoryConfig === "function") {
+    if (isComponentFn<A, P>(templateFactoryConfig)) {
       const rawTemplate: RawTemplate<NormalizeAttributes<A>, P> = {
         type: createTemplateFactoryConfig.type,
         attributes: {} as NormalizeAttributes<A>,
@@ -38,7 +37,7 @@ export const createTemplateFactory: CreateTemplateFactory = <
         payload: {} as P,
       };
 
-      return createTemplateProxy({
+      return createTemplateProxy<A, P, M>({
         rawTemplate,
         createTemplateFactoryConfig,
         templateFactoryConfig,
@@ -51,8 +50,12 @@ export const createTemplateFactory: CreateTemplateFactory = <
         createTemplateFactoryConfig.process?.attributes?.(
           {
             oldAttrs:
-              createTemplateFactoryConfig.create?.defaults?.attributes || {},
-            newAttrs: templateFactoryConfig.attributes || {},
+              (createTemplateFactoryConfig.create?.defaults?.attributes ||
+                {}) as NormalizeAttributes<A>,
+            newAttrs:
+              (templateFactoryConfig.attributes || {}) as NormalizeAttributes<
+                A
+              >,
             template: templateFactoryConfig,
           },
         ) || templateFactoryConfig.attributes || {},
@@ -62,7 +65,7 @@ export const createTemplateFactory: CreateTemplateFactory = <
         type: createTemplateFactoryConfig.type,
         tag: templateFactoryConfig.tag ||
           createTemplateFactoryConfig.create?.defaults?.tag,
-        attributes,
+        attributes: attributes as NormalizeAttributes<A>,
         children: templateFactoryConfig.children || [],
         void: typeof templateFactoryConfig.void === "boolean"
           ? templateFactoryConfig.void
@@ -82,6 +85,7 @@ export const createTemplateFactory: CreateTemplateFactory = <
     const rawTemplate: RawTemplate<NormalizeAttributes<A>, P> = {
       type: createTemplateFactoryConfig.type,
       children: templateFactoryConfig.children || [],
+      attributes: {} as NormalizeAttributes<A>,
       payload: {
         ...createTemplateFactoryConfig.create?.defaults?.payload,
         ...(templateFactoryConfig.payload || {}),

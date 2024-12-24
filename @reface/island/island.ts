@@ -1,37 +1,6 @@
-import {
-  createTemplateFactory,
-  type Template,
-  type TemplatePayload,
-} from "@reface/template";
+import { createTemplateFactory, type Template } from "@reface/template";
 import type { IslandPlugin } from "./IslandPlugin.ts";
-
-interface IslandPayload extends TemplatePayload {
-  island: {
-    name: string;
-    state?: unknown;
-    rpc?: Record<string, (args: unknown) => Promise<unknown>>;
-  };
-}
-
-interface IslandContext<State, Props, RPC> {
-  props: Props;
-  state: State;
-  rpc: RPC;
-}
-
-export interface Island<State = unknown, Props = unknown, RPC = unknown> {
-  name?: string;
-  template: (context: IslandContext<State, Props, RPC>) => Template;
-  initialState?: State;
-  rpc?: Record<
-    string,
-    (args: { state: State; args: unknown }) => Promise<{
-      state?: Partial<State>;
-      html?: string;
-      status?: number;
-    }>
-  >;
-}
+import type { Island, IslandPayload } from "./types.ts";
 
 const islandTemplate = createTemplateFactory<
   { "data-island": string; id: string },
@@ -48,7 +17,6 @@ const islandTemplate = createTemplateFactory<
   create: {
     defaults: {
       tag: "div",
-      attributes: {},
     },
   },
 });

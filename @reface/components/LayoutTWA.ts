@@ -20,17 +20,19 @@ export const LayoutTWA = component<LayoutTWAProps>((props, children) => {
   return html`
     <!DOCTYPE html>
     <html>
-      ${head()`
-        ${meta({ charset: "UTF-8" })``}
-        ${meta({
-    name: "viewport",
-    content:
-      "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no",
-  })``}
-        ${pageTitle && title()`${pageTitle}`}
+      ${head`
+        ${meta({ charset: "UTF-8" })}
+        ${
+    meta({
+      name: "viewport",
+      content:
+        "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no",
+    })
+  }
+        ${pageTitle && title`${pageTitle}`}
         ${script({ src: "https://telegram.org/js/telegram-web-app.js" })``}
         ${
-    themeParams && script()`
+    themeParams && script`
           const params = new URLSearchParams(window.location.search);
           if (params.has("tgWebAppThemeParams")) {
             document.documentElement.style.setProperty(
@@ -40,10 +42,10 @@ export const LayoutTWA = component<LayoutTWAProps>((props, children) => {
           }
         `
   }
-        ${pageScript && script()`${pageScript}`}
+        ${pageScript && script`${pageScript}`}
         ${pageHead}
       `}
-      ${body()`${children}`}
+      ${body`${children}`}
     </html>
   `;
 });

@@ -1,18 +1,13 @@
 import {
+  type ComponentFn,
   type ElementChildType,
-  REFACE_TEMPLATE,
+  isComponentFn,
+  isTemplate,
   type Template,
   type TemplateAttributes,
+  type TemplatePayload,
 } from "@reface/template";
 import { createTemplateFactory } from "../template/createTemplateFactory.ts";
-
-// Добавляем типы для компонентов из template/types
-type ComponentProps = TemplateAttributes;
-
-type ComponentWithProps = {
-  (props: ComponentProps): Template;
-  type?: string;
-};
 
 const jsxTemplate = createTemplateFactory({
   type: "jsx",
@@ -23,16 +18,18 @@ const jsxTemplate = createTemplateFactory({
   },
 });
 
-export function createElement<P extends ComponentProps = ComponentProps>(
-  type: string | ComponentWithProps,
+export function createElement<
+  P extends TemplateAttributes = TemplateAttributes,
+>(
+  type: string | ComponentFn<P, TemplatePayload> | Template,
   props: P | null,
   ...children: ElementChildType[]
 ): Template {
-  if (typeof type === "function" && type[REFACE_TEMPLATE] === true) {
-    return type(props ?? {})`${children}`;
+  if (isTemplate(type)) {
+    return type((props ?? {}) as P)`${children}`;
   }
-  if (typeof type === "function") {
-    return type(props ?? {}, children);
+  if (isComponentFn<P, TemplatePayload>(type)) {
+    return type((props ?? {}) as P, children);
   }
 
   return jsxTemplate({

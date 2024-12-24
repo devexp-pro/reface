@@ -101,7 +101,7 @@ export class LoggerPlugin implements IRefaceComposerPlugin {
   }
 
   private log(
-    entry: Omit<RenderLogStart, "level" | "type">,
+    entry: Omit<RenderLogStart, "level" | "type" | "children">,
     isStart: boolean,
   ): void {
     if (isStart) {
@@ -155,11 +155,11 @@ export class LoggerPlugin implements IRefaceComposerPlugin {
   }
 
   private formatParams(params: Record<string, unknown>, level: number): string {
+    const indent = this.getIndent(level);
     if (!params || Object.keys(params).length === 0) return "";
     try {
-      const indent = this.getIndent(level);
       return `${indent}${this.formatJSON(params, new Set(), level)}`;
-    } catch (error) {
+    } catch (_error) {
       return `${indent}${dim("[Unable to format params]")}`;
     }
   }
@@ -214,10 +214,13 @@ export class LoggerPlugin implements IRefaceComposerPlugin {
     const handlePhase =
       (phase: RefaceEventType, isStart: boolean) =>
       ({ manager, ...params }: Record<string, unknown>) => {
-        this.log({
-          phase,
-          params,
-        }, isStart);
+        this.log(
+          {
+            phase,
+            params,
+          },
+          isStart,
+        );
       };
 
     Object.entries(REFACE_EVENT.RENDER).forEach(([_, value]) => {

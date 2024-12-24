@@ -1,10 +1,12 @@
 import type { IRefaceComposer, IRefaceRenderManager } from "@reface/types";
 import {
+  type ClassValue,
   type ElementChildType,
   isTemplate,
+  type StyleValue,
   type Template,
   type TemplateAttributes,
-} from "./template/mod.ts";
+} from "@reface/template";
 import { isEmptyValue } from "@reface/template";
 import { REFACE_EVENT } from "./constants.ts";
 
