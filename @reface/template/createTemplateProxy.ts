@@ -1,6 +1,7 @@
 import type {
   BaseAttributes,
   BaseTemplateConfig,
+  HTMLTemplateConfig,
   NormalizeAttributes,
   RawTemplate,
   Template,
@@ -46,7 +47,9 @@ export function createTemplateProxy<
 }: {
   rawTemplate: RawTemplate<NormalizeAttributes<A>, P>;
   createTemplateFactoryConfig: TemplateFactoryConfig<A, P, M>;
-  templateFactoryConfig: BaseTemplateConfig<P>;
+  templateFactoryConfig:
+    | BaseTemplateConfig<P>
+    | HTMLTemplateConfig<A, P>;
 }): Template<A, P, M> {
   const handler: ProxyHandler<A, P, M> = {
     apply(_target, _thisArg, args) {
