@@ -18,11 +18,7 @@ export interface Island<
   initialState?: State;
   rpc?: Record<
     string,
-    (args: { state: State; args: unknown }) => Promise<{
-      state?: Partial<State>;
-      html?: string;
-      status?: number;
-    }>
+    (args: { state: State; args: unknown }) => Promise<RpcResponse<State>>
   >;
 }
 
@@ -31,7 +27,7 @@ export interface RpcResponse<S = unknown> {
   // Новое состояние (опционально)
   state?: Partial<S>;
   // HTML для обновления
-  html?: Template | string;
+  html?: string;
   // Статус ответа
   status?: number;
 }

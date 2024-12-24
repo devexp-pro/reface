@@ -56,7 +56,6 @@ export const createTemplateFactory = <
               (templateFactoryConfig.attributes || {}) as NormalizeAttributes<
                 A
               >,
-            template: templateFactoryConfig,
           },
         ) || templateFactoryConfig.attributes || {},
       );
