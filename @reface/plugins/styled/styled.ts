@@ -3,9 +3,12 @@ import { generateClassName } from "./classGenerator.ts";
 import { parseCSS } from "./cssParser.ts";
 import {
   createTemplateFactory,
+  type RawTemplate,
+  type Template,
   type TemplateAttributes,
   VOID_ELEMENTS,
 } from "@reface/template";
+import { NormalizeAttributes } from "@reface";
 
 interface StyledPayload {
   styled: {
@@ -24,7 +27,13 @@ const styledTemplate = createTemplateFactory<TemplateAttributes, StyledPayload>(
       },
     },
     process: {
-      attributes: ({ oldAttrs, newAttrs, template }) => {
+      attributes: ({
+        oldAttrs,
+        newAttrs,
+      }: {
+        oldAttrs: NormalizeAttributes<TemplateAttributes>;
+        newAttrs: NormalizeAttributes<TemplateAttributes>;
+      }) => {
         const currentClasses = (oldAttrs.class || []) as string[];
         const newClasses = (newAttrs.class || []) as string[];
 
@@ -52,13 +61,17 @@ function createStyledElement(
   const rawCss = String.raw({ raw: css }, ...values);
   const styles = parseCSS(rawCss, rootClass);
 
-  const tag: string = typeof tagOrComponent === "string"
+  const tag: string | undefined = typeof tagOrComponent === "string"
     ? tagOrComponent
     : tagOrComponent.raw.tag;
 
   const combinedStyles = parentComponent
     ? `${parentComponent.raw.payload.styled.styles}\n${styles}`
     : styles;
+
+  if (!tag) {
+    throw new Error("Tag is required");
+  }
 
   return styledTemplate({
     tag,
@@ -85,4 +98,4 @@ export const styled: StyledFn = new Proxy(styledFunction, {
     return (strings: TemplateStringsArray, ...values: unknown[]) =>
       createStyledElement(tag, strings, values);
   },
-});
+}) as StyledFn;

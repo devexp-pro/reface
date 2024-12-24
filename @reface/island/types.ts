@@ -1,12 +1,37 @@
-// @reface/island/types.ts
-import type { IRefaceTemplate } from "@reface/types";
+import type { Template, TemplatePayload } from "@reface/template";
+
+export interface IslandPayload extends TemplatePayload {
+  island: {
+    name: string;
+    state?: unknown;
+    rpc?: Record<string, (args: unknown) => Promise<unknown>>;
+  };
+}
+
+export interface Island<
+  State = unknown,
+  Props = unknown,
+  RPC extends Record<string, RpcMethod> = Record<string, RpcMethod>,
+> {
+  name?: string;
+  template: (context: IslandContext<State, Props, RPC>) => Template;
+  initialState?: State;
+  rpc?: Record<
+    string,
+    (args: { state: State; args: unknown }) => Promise<{
+      state?: Partial<State>;
+      html?: string;
+      status?: number;
+    }>
+  >;
+}
 
 // Базовый интерфейс для RPC ответа
 export interface RpcResponse<S = unknown> {
   // Новое состояние (опционально)
   state?: Partial<S>;
   // HTML для обновления
-  html?: IRefaceTemplate | string;
+  html?: Template | string;
   // Статус ответа
   status?: number;
 }
@@ -47,7 +72,7 @@ export interface Island<
   name?: string;
 
   // Шаблон острова
-  template: (ctx: IslandContext<State, Props, RPC>) => IRefaceTemplate;
+  template: (ctx: IslandContext<State, Props, RPC>) => Template;
 
   // RPC методы
   rpc?: RPC;

@@ -3,8 +3,8 @@ import type {
   IRefaceComposer,
   IRefaceComposerPlugin,
   IRefaceRenderManager,
-  IRefaceTemplate,
 } from "@reface/types";
+import type { Template } from "@reface/template";
 
 export class RefaceComposer implements IRefaceComposer {
   plugins = new Map<string, IRefaceComposerPlugin>();
@@ -40,7 +40,7 @@ export class RefaceComposer implements IRefaceComposer {
   }
 
   // Рендеринг шаблона
-  render(template: IRefaceTemplate): string {
+  render(template: Template): string {
     return this.renderManager.render(template);
   }
 

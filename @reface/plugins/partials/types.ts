@@ -1,5 +1,4 @@
 import type { Template } from "@reface/template";
-import type { HxBuilder } from "@reface/htmx";
 
 export interface PartialPayload {
   partial: {
@@ -10,11 +9,6 @@ export interface PartialPayload {
 
 export type PartialHandler<T> = (props: Record<string, unknown>) => Promise<T>;
 
-export type PartialComponent<T> = Template & {
-  execute: () => Promise<T>;
-  trigger: (trigger?: string) => HxBuilder;
-};
-
 export type PartialFn = {
-  <T>(handler: PartialHandler<T>, name: string): PartialComponent<T>;
+  <T>(handler: PartialHandler<T>, name: string): Template;
 };
