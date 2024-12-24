@@ -16,6 +16,9 @@ jobs:
       - name: Clone repository
         uses: actions/checkout@v3
 
+      - name: Format Check
+        run: deno fmt --check
+
       - name: Check types
         run: deno task check
 
