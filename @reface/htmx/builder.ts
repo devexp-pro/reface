@@ -74,16 +74,10 @@ export class HxBuilder implements IHxBuilder {
 
     const { event, polling, modifiers = {} } = trigger;
     const parts: string[] = [];
-
-    // Базовое событие или polling
     parts.push(polling || event);
-
-    // Фильтр события
     if (modifiers.filter) {
       parts.push(`[${modifiers.filter}]`);
     }
-
-    // Модификаторы
     const mods: string[] = [];
 
     if (modifiers.once) mods.push("once");

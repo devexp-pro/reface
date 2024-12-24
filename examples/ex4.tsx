@@ -81,7 +81,6 @@ const Button = styled.button`
   }
 `;
 
-// Компонент для вывода результата команды
 function OutputBlock({ out, err, code, command }: {
   out: string;
   err: string;
@@ -96,7 +95,6 @@ function OutputBlock({ out, err, code, command }: {
   );
 }
 
-// Island для выполнения команд
 const CommandRunner = island(
   async (c: Context) => {
     const command = c.req.query("command");
@@ -122,7 +120,7 @@ function WebTerminal() {
       <Terminal>
         <CommandRunner>
           <OutputBlock
-            out={"Тут будет вывод команды"}
+            out={"Command output will appear here"}
             err={""}
             code={0}
             command={"ls ./examples"}

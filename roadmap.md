@@ -1,5 +1,6 @@
-- [ ] добавить поддержку подсветки для вскода
-- [ ] React dev tools
-- [ ] Hot reload для hono
-- [ ] Website: исправить ссылки добавить футер с авторами
-- [ ] Адаптив, документации гамбургер
+- [ ] VScode: add syntax highlighting for jsx
+- [ ] Plugin: React dev tools
+- [ ] Plugin: Hot reload for hono
+- [ ] Render: add render manager to CLI UI
+- [ ] Website: fix links, add footer with authors
+- [ ] Website: Adaptive, documentation hamburger menu

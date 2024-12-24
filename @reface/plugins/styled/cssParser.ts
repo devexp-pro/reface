@@ -1,6 +1,3 @@
-/**
- * Обрабатывает CSS строку, заменяя & на селектор класса
- */
 export function parseCSS(css: string, className: string): string {
   return css
     .trim()

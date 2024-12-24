@@ -45,7 +45,6 @@ export class Reface {
     options.plugins?.forEach((plugin) => this.composer.use(plugin));
   }
 
-  // Обработка partial запроса
   private async handlePartial(c: Context): Promise<Response> {
     const partialName = c.req.param("partial");
 
@@ -65,21 +64,16 @@ export class Reface {
     }
   }
 
-  // Получение Hono роутера
   hono(): Hono {
     const router = new Hono();
 
-    // Роут для partial
     router.get(
       `${this.PARTIAL_API_PREFIX}/:partial`,
       (c) => this.handlePartial(c),
     );
 
-    // Роут для RPC
     router.post("/rpc/:island/:method", async (c) => {
       const { island, method } = c.req.param();
-
-      // Получаем данные из формы или JSON
       let args;
       const contentType = c.req.header("content-type");
 
@@ -96,8 +90,6 @@ export class Reface {
 
     return router;
   }
-
-  // Создание острова
   island<
     State,
     Props,
@@ -118,8 +110,6 @@ export class Reface {
     this.islands.set(islandConfig.name, islandConfig);
     return component;
   }
-
-  // Обработка RPC вызова
   async handleRpc(
     islandName: string,
     method: string,
@@ -144,16 +134,12 @@ export class Reface {
       }
 
       const response = await rpcMethod({ state, args });
-
-      // Обновляем состояние и HTML только если есть изменения в состоянии
       if (response.state) {
         const newState = {
           ...state,
           ...response.state,
         };
         this.islandPlugin.setIslandState(islandName, newState);
-
-        // Создаем новый контекст
         const rpc = this.islandPlugin.createRpcProxy(islandName);
         const props = this.islandProps.get(islandName) || {};
         const context = {
@@ -161,8 +147,6 @@ export class Reface {
           state: newState,
           rpc,
         };
-
-        // Рендерим новый HTML
         const template = createIsland(
           islandName,
           island.template(context),
@@ -185,24 +169,16 @@ export class Reface {
       };
     }
   }
-
-  // Очистка ресурсов острова
   cleanup(islandName: string): void {
     this.islands.delete(islandName);
     this.islandProps.delete(islandName);
     this.islandPlugin.clearIslandState(islandName);
   }
-
-  // Рендеринг шаблона
   render(template: Template): string {
     let content = template;
-
-    // Если есть layout - оборачиваем контент
     if (this.layout) {
       content = this.layout`${content}`;
     }
-
-    // Рендерим финальный шаблон через композер
     try {
       return this.composer.render(content);
     } catch (e) {
@@ -213,8 +189,6 @@ export class Reface {
       }</div>`;
     }
   }
-
-  // Получение композера (для плагинов)
   getComposer(): RefaceComposer {
     return this.composer;
   }

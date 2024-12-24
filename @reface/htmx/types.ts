@@ -1,4 +1,3 @@
-// Основные типы для методов
 export type HxMethod = "get" | "post" | "put" | "delete" | "patch";
 export type HxSwapMode =
   | "innerHTML"
@@ -61,8 +60,6 @@ export type HxTrigger =
   | HxTriggerEvent
   | HxTriggerConfig
   | (HxTriggerEvent | HxTriggerConfig)[];
-
-// Типы для конфигурации
 export interface IHxConfig {
   method?: HxMethod;
   url?: string;
@@ -74,16 +71,11 @@ export interface IHxConfig {
   headers?: Record<string, string>;
   params?: string[];
   sync?: string;
-  // ... другие опции
 }
-
-// Тип для всех возможных hx-атрибутов
 export interface IHxAttributes {
   [key: `hx-${string}`]: string;
   [key: `hx-on:${string}`]: string;
 }
-
-// Тип для самого билдера, теперь включает все возможные атрибуты
 export interface IHxBuilder {
   get(url: string): this;
   post(url: string): this;

@@ -14,7 +14,6 @@ export class LiveReload {
     this.startWatching();
   }
 
-  // WebSocket endpoint для клиентов
   handleSocket(socket: WebSocket) {
     const client = { socket };
     this.clients.add(client);
@@ -24,7 +23,6 @@ export class LiveReload {
     };
   }
 
-  // Добавляем скрипт для клиента
   getScript() {
     return `
       <script>
@@ -48,13 +46,11 @@ export class LiveReload {
   }
 
   private startWatching() {
-    // Наблюдаем за изменениями в директориях
     const watcher = Deno.watchFs(this.watchDirs);
 
     (async () => {
       for await (const event of watcher) {
         if (event.kind === "modify" || event.kind === "create") {
-          // Дебаунсим обновления
           if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
           }
