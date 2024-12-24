@@ -1,6 +1,5 @@
 import { styled } from "@reface/plugins/styled";
 
-// Утилиты для токенизации
 function hashColor(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -17,7 +16,6 @@ interface Token {
 }
 
 function tokenize(code: string): Token[] {
-  // Обрабатываем только строки, начинающиеся с пробелов
   const processedCode = code.replace(/^([ ]{2,})/gm, (match) => {
     const tabCount = Math.floor(match.length / 2);
     return "→\u200B".repeat(tabCount);
@@ -95,7 +93,6 @@ function hashString(str: string): number {
   return hash;
 }
 
-// Стилизованные компоненты
 const CodeContainer = styled.div`
   & {
     margin: 1.5rem 0;

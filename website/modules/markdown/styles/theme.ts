@@ -1,5 +1,4 @@
 export const theme = {
-  // Цвета
   colors: {
     text: {
       primary: "var(--color-text)",
@@ -15,7 +14,6 @@ export const theme = {
     border: "var(--color-border)",
   },
 
-  // Типографика
   typography: {
     fonts: {
       base: "var(--font-sans)",
@@ -42,7 +40,6 @@ export const theme = {
     },
   },
 
-  // Отступы
   spacing: {
     0: "0",
     1: "0.25rem",
@@ -56,7 +53,6 @@ export const theme = {
     12: "3rem",
   },
 
-  // Границы
   borders: {
     default: "1px solid var(--color-border)",
     radius: {
@@ -66,7 +62,6 @@ export const theme = {
     },
   },
 
-  // Медиа-запросы
   breakpoints: {
     sm: "@media (min-width: 640px)",
     md: "@media (min-width: 768px)",

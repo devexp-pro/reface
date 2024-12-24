@@ -1,6 +1,7 @@
 import type {
   BaseAttributes,
   BaseTemplateConfig,
+  ComponentFn,
   HTMLTemplateConfig,
   NormalizeAttributes,
   RawTemplate,
@@ -48,6 +49,7 @@ export function createTemplateProxy<
   rawTemplate: RawTemplate<NormalizeAttributes<A>, P>;
   createTemplateFactoryConfig: TemplateFactoryConfig<A, P, M>;
   templateFactoryConfig:
+    | ComponentFn<A, P>
     | BaseTemplateConfig<P>
     | HTMLTemplateConfig<A, P>;
 }): Template<A, P, M> {

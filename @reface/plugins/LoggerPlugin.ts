@@ -2,7 +2,7 @@ import { REFACE_EVENT } from "@reface/constants";
 import type { RefaceEventType } from "@reface/types";
 import type { IRefaceComposerPlugin } from "@reface/types";
 import type { RefaceComposer } from "@reface";
-import { blue, dim, green, yellow } from "jsr:@std/fmt/colors";
+import { blue, dim, green, yellow } from "jsr:@std/fmt@1.0.3/colors";
 import { isTemplate } from "@reface/template";
 
 interface RenderLogBase {

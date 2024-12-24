@@ -94,13 +94,9 @@ export function normalizeAttributes<A extends BaseAttributes>(
   const result = { ...attrs } as NormalizeAttributes<A>;
   const newClassess: string[] = [];
   const newStyles: string[] = [];
-
-  // Обработка classes
   if (attrs.class) {
     newClassess.push(...normalizeClassAttribute(attrs.class));
   }
-
-  // Обработка styles
   if (attrs.style) {
     newStyles.push(...normalizeStyleAttribute(attrs.style));
   }

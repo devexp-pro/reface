@@ -208,7 +208,7 @@ export default function DocsPage(
             }
           });
 
-          // Закрываем меню при клике на ссылку
+
           mobileNav.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', () => {
               mobileNav.classList.remove('is-open');

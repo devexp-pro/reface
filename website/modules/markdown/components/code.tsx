@@ -7,7 +7,6 @@ export interface CodeProps {
   filename?: string;
 }
 
-// Инлайн код
 export const InlineCode = styled.code`
   & {
     font-family: var(--font-mono);
@@ -18,7 +17,6 @@ export const InlineCode = styled.code`
   }
 `;
 
-// Блок кода
 export function Code({ content, language, filename }: CodeProps) {
   return (
     <BaseCode

@@ -7,12 +7,10 @@ import type { Template } from "../../../@reface/mod.ts";
 import { components } from "./components/mod.ts";
 import { component } from "@reface";
 
-// Создаем парсер markdown
 const parser = unified()
   .use(remarkParse)
   .use(remarkGfm);
 
-// Обработчик AST узлов
 function processNode(node: MdNode): Template {
   switch (node.type) {
     case "text":
@@ -194,9 +192,6 @@ export function parseMarkdown(content: string): ParsedMarkdown {
   };
 }
 
-/**
- * Создает оглавление из заголовков
- */
 export const TableOfContents = component(({ headings }) => {
   return (
     <components.TableOfContents>
@@ -216,9 +211,6 @@ export const TableOfContents = component(({ headings }) => {
   );
 });
 
-/**
- * Контейнер для markdown контента
- */
 export const MarkdownContent = component((_, children) => {
   return (
     <components.Content>

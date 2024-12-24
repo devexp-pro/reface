@@ -28,7 +28,6 @@ export const createTemplateFactory = <
       | BaseTemplateConfig<P>
       | HTMLTemplateConfig<A, P>,
   ) => {
-    // Компонент
     if (isComponentFn<A, P>(templateFactoryConfig)) {
       const rawTemplate: RawTemplate<NormalizeAttributes<A>, P> = {
         type: createTemplateFactoryConfig.type,
@@ -44,7 +43,6 @@ export const createTemplateFactory = <
       });
     }
 
-    // HTML элемент или базовый вызов
     if (isHTMLTemplateConfig<A, P>(templateFactoryConfig)) {
       const attributes = normalizeAttributes(
         createTemplateFactoryConfig.process?.attributes?.(

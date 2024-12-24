@@ -9,8 +9,6 @@ export class IslandPlugin implements IRefaceComposerPlugin {
 
   setup: IRefaceComposerPlugin["setup"] = (composer): void => {
     const manager = composer.getRenderManager();
-
-    // Собираем состояния островов
     manager.on(
       REFACE_EVENT.RENDER.TEMPLATE.START,
       ({ template }) => {
@@ -23,8 +21,6 @@ export class IslandPlugin implements IRefaceComposerPlugin {
         }
       },
     );
-
-    // Добавляем состояния в конец документа
     manager.on(
       REFACE_EVENT.RENDER.RENDER.END,
       ({ html }) => {
