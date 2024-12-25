@@ -2,7 +2,6 @@ export * from "./base.tsx";
 export * from "./code.tsx";
 export * from "./content.tsx";
 
-// Объединяем все компоненты в один объект для удобства
 import * as base from "./base.tsx";
 import { Code, InlineCode } from "./code.tsx";
 import * as content from "./content.tsx";

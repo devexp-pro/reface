@@ -1,6 +1,6 @@
 export const REFACE_TEMPLATE = Symbol("REFACE_TEMPLATE");
 
-export const VOID_ELEMENTS = new Set([
+export const VOID_ELEMENTS: Set<string> = new Set([
   "area",
   "base",
   "br",

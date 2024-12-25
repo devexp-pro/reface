@@ -1,4 +1,3 @@
-// Типы для TodoApp
 export interface Todo {
   id: string;
   text: string;

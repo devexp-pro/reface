@@ -26,13 +26,10 @@ const reface = new Reface({
   layout: Layout,
 });
 
-// Добавляем роуты Reface
 app.route("/", reface.hono());
 
-// Создаем экземпляр TodoApp
 const Todo = reface.island(TodoApp);
 
-// Рендерим приложение
 function App() {
   return (
     <div>

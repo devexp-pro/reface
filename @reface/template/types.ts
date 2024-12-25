@@ -8,7 +8,6 @@ export type NormalizeAttributes<T extends BaseAttributes> = T extends
   }
   : T;
 
-// Базовые типы для атрибутов
 export type ClassValue =
   | string
   | Record<string, boolean>
@@ -20,17 +19,14 @@ export type StyleValue =
   | Record<string, string | number | null | boolean>
   | (string | Record<string, string | number | null | boolean>)[];
 
-// Базовый интерфейс для пользовательских данных
 export interface TemplatePayload {
   [key: string]: any;
 }
 
-// Типы для children
 export type PrimitiveChild = string | number | boolean | null | undefined;
 export type ComplexChild = Template<any, any, any>;
 export type ElementChildType = Arrayable<PrimitiveChild | ComplexChild>;
 
-// Функция-компонент
 export type ComponentFn<
   A extends TemplateAttributes = TemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
@@ -45,7 +41,6 @@ export type RawTemplateAttributes = {
   styles?: Record<string, string>;
 };
 
-// Базовая структура шаблона
 export interface RawTemplate<
   A extends RawTemplateAttributes = RawTemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
@@ -83,7 +78,6 @@ export type TemplateAttributes = {
   [key: string]: any;
 };
 
-// Базовый тип для одного метода шаблона
 export type TemplateMethod<
   A extends TemplateAttributes,
   P extends TemplatePayload,
@@ -94,12 +88,10 @@ export type TemplateMethod<
   ...args: Args
 ) => R;
 
-// Трансформированный метод (без первого аргумента)
 export type TransformedMethod<M> = M extends
   TemplateMethod<any, any, infer Args, infer R> ? (...args: Args) => R
   : never;
 
-// Коллекция методов шаблона
 export type TemplateMethods<
   A extends TemplateAttributes,
   P extends TemplatePayload,
@@ -107,14 +99,12 @@ export type TemplateMethods<
   [key: string]: TemplateMethod<A, P>;
 };
 
-// Трансформированные методы (публичный API)
 export type TransformedMethods<
   M extends TemplateMethods<any, any>,
 > = {
   [K in keyof M]: TransformedMethod<M[K]>;
 };
 
-// Уточним тип для Template
 export type Template<
   A extends BaseAttributes = BaseAttributes,
   P extends TemplatePayload = TemplatePayload,
@@ -130,19 +120,17 @@ export type Template<
     raw: RawTemplate<NormalizeAttributes<A>, P>;
   };
 
-// Фабрика шаблонов
 export type TemplateFactory<
   A extends TemplateAttributes = TemplateAttributes,
   P extends TemplatePayload = TemplatePayload,
   M extends TemplateMethods<A, P> = TemplateMethods<A, P>,
 > = {
-  // Базовый вызов
   (config: BaseTemplateConfig<P>): Template<A, P, M>;
-  // HTML элемент
+
   (
     config: HTMLTemplateConfig<A & TemplateHtmlAttributes, P>,
   ): Template<A & TemplateHtmlAttributes, P, M>;
-  // Компонент с выводом типа атрибутов
+
   <CA extends BaseAttributes>(
     component: ComponentFn<CA, P>,
   ): Template<CA, P, TemplateMethods<CA, P>>;
@@ -153,7 +141,6 @@ export type BaseTemplateConfig<P extends TemplatePayload = TemplatePayload> = {
   children?: ElementChildType[];
 };
 
-// HTML конфигурация с условным типом для children
 export type HTMLTemplateConfig<
   A extends TemplateHtmlAttributes = TemplateHtmlAttributes,
   P extends TemplatePayload = TemplatePayload,
@@ -167,8 +154,6 @@ export type HTMLTemplateConfig<
     | { void: true; children?: never }
     | { void?: false; children?: ElementChildType[] }
   );
-
-// Полная конфигурация фабрики шаблонов
 
 export type TransformTemplate<
   A extends TemplateAttributes = TemplateAttributes,
@@ -236,12 +221,10 @@ export interface TemplateFactoryConfig<
   };
 }
 
-// Базовый интерфейс для всех атрибутов
 export interface BaseAttributes {
   [key: string]: any;
 }
 
-// HTML-специфичные атрибуты
 export interface TemplateHtmlAttributes extends BaseAttributes {
   class?: TemplateAttributesClass;
   style?: TemplateAttributesStyle;

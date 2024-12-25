@@ -15,11 +15,7 @@ export class TestUtils {
   constructor(options: TestUtilsOptions = {}) {
     this.reface = new RefaceComposer();
     this.logger = new LoggerPlugin();
-
-    // Добавляем логгер первым
     this.reface.use(this.logger);
-
-    // Добавляем остальные плагины
     options.plugins?.forEach((plugin) => this.reface.use(plugin));
   }
 

@@ -20,17 +20,24 @@ const jsxTemplate = createTemplateFactory({
 });
 
 export function createElement<
-  P extends BaseAttributes = BaseAttributes,
+  P extends BaseAttributes,
+  T extends TemplatePayload = TemplatePayload,
 >(
-  type: string | ComponentFn<P, TemplatePayload> | Template,
+  type: string | ComponentFn<P, T> | Template<P, T>,
   props: P | null,
   ...children: ElementChildType[]
-): Template {
+): Template<BaseAttributes, TemplatePayload> {
   if (isTemplate(type)) {
-    return type((props ?? {}) as P)`${children}`;
+    return (type((props ?? {}) as P)`${children}`) as unknown as Template<
+      BaseAttributes,
+      TemplatePayload
+    >;
   }
-  if (isComponentFn<P, TemplatePayload>(type)) {
-    return type((props ?? {}) as P, children);
+  if (isComponentFn<P, T>(type)) {
+    return (type((props ?? {}) as P, children)) as unknown as Template<
+      BaseAttributes,
+      TemplatePayload
+    >;
   }
 
   return jsxTemplate({

@@ -51,5 +51,5 @@ export function escapeAttribute(str: string): string {
   return str.replace(/["&]/g, (char) => HTML_ENTITIES[char]);
 }
 
-export const toKebabCase = (str: string) =>
+export const toKebabCase = (str: string): string =>
   str.replace(/([A-Z])/g, "-$1").toLowerCase();

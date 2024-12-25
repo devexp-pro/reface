@@ -2,7 +2,6 @@ import { styled } from "@reface/plugins/styled";
 import { theme } from "../styles/theme.ts";
 import { textStyles } from "../styles/utils.ts";
 
-// Основной контейнер для markdown контента
 export const Content = styled.main`
   & {
     flex: 1;
@@ -21,14 +20,12 @@ export const Content = styled.main`
   }
 `;
 
-// Контейнер для документации
 export const DocContent = styled.div`
   & {
     margin-bottom: ${theme.spacing[12]};
   }
 `;
 
-// Оглавление
 export const TableOfContents = styled.nav`
   & {
     display: none;
@@ -71,7 +68,6 @@ export const TableOfContents = styled.nav`
   }
 `;
 
-// Элементы оглавления
 export const TocItem = styled.li`
   & {
     margin: ${theme.spacing[1]} 0;

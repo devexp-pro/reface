@@ -1,4 +1,3 @@
-import "@reface/jsx/global";
 import { TestUtils } from "./testUtils.ts";
 
 Deno.test("JSX - basic element rendering", () => {

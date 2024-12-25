@@ -3,6 +3,8 @@
   "specifiers": {
     "jsr:@hono/hono@*": "4.6.12",
     "jsr:@std/fmt@*": "1.0.3",
+    "jsr:@std/fmt@1.0.3": "1.0.3",
+    "npm:@types/mdast@*": "4.0.4",
     "npm:remark-gfm@*": "4.0.0",
     "npm:remark-parse@*": "11.0.0",
     "npm:unified@*": "11.0.5"

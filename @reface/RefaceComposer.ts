@@ -7,14 +7,12 @@ import type {
 import type { Template } from "@reface/template";
 
 export class RefaceComposer implements IRefaceComposer {
-  plugins = new Map<string, IRefaceComposerPlugin>();
+  plugins: Map<string, IRefaceComposerPlugin> = new Map();
   private renderManager: RefaceRenderManager;
 
   constructor() {
     this.renderManager = new RefaceRenderManager({ composer: this });
   }
-
-  // Регистрация плагина
   async use(plugin: IRefaceComposerPlugin): Promise<void> {
     if (this.plugins.has(plugin.name)) {
       throw new Error(`Plugin "${plugin.name}" is already registered`);
@@ -22,8 +20,6 @@ export class RefaceComposer implements IRefaceComposer {
     this.plugins.set(plugin.name, plugin);
     await plugin.setup(this);
   }
-
-  // Получение плагина по имени
   getPlugin<T extends IRefaceComposerPlugin>(name: string): T | undefined;
   getPlugin<T extends IRefaceComposerPlugin>(
     plugin: { new (...args: any[]): T },
@@ -38,13 +34,9 @@ export class RefaceComposer implements IRefaceComposer {
       return instances.find((plugin) => plugin instanceof nameOrPlugin) as T;
     }
   }
-
-  // Рендеринг шаблона
   render(template: Template<any, any, any>): string {
     return this.renderManager.render(template);
   }
-
-  // Доступ к менеджеру рендеринга для плагинов
   getRenderManager(): IRefaceRenderManager {
     return this.renderManager;
   }

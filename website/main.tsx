@@ -11,9 +11,6 @@ import DocsPage from "./pages/DocsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import { component } from "../@reface/component.ts";
 
-import "../@reface/jsx/global.ts";
-
-// Загружаем документацию
 const { sections, pages } = await loadDocs();
 
 if (!pages.size) {
@@ -23,7 +20,6 @@ if (!pages.size) {
 
 const PARTIAL_API_PREFIX = "/reface-partial";
 
-// Инициализируем Reface с плагинами
 const refaceComposer = new RefaceComposer();
 refaceComposer.use(new StyledPlugin());
 refaceComposer.use(new PartialsPlugin({ apiPrefix: PARTIAL_API_PREFIX }));
@@ -45,10 +41,8 @@ const Layout = component((_, children) => (
   </LayoutSimple>
 ));
 
-// Создаем Hono приложение
 const app = new Hono();
 
-// Статические файлы
 app.use(
   "/assets/*",
   serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
@@ -58,7 +52,6 @@ app.use(
   serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
 );
 
-// Регистрируем страницы
 app.get("/", (c) => {
   const content = refaceComposer.render(
     <Layout>
@@ -93,7 +86,6 @@ app.get("/docs/:page", (c) => {
   return c.html(content);
 });
 
-// Добавляем обработчик островов
 app.get(`${PARTIAL_API_PREFIX}/:partial`, async (c) => {
   const partialName = c.req.param("partial");
 
@@ -112,5 +104,4 @@ app.get(`${PARTIAL_API_PREFIX}/:partial`, async (c) => {
   }
 });
 
-// Запускаем сервер
 await Deno.serve(app.fetch);

@@ -1,6 +1,5 @@
 import { theme } from "./theme.ts";
 
-// Базовые стили для текста
 export const textStyles = `
   color: ${theme.colors.text.primary};
   font-family: ${theme.typography.fonts.base};
@@ -8,7 +7,6 @@ export const textStyles = `
   line-height: ${theme.typography.lineHeight.normal};
 `;
 
-// Стили для заголовков
 export const headingStyles = `
   color: ${theme.colors.text.primary};
   font-weight: var(--font-semibold);
@@ -17,7 +15,6 @@ export const headingStyles = `
   margin-bottom: ${theme.spacing[4]};
 `;
 
-// Стили для ссылок
 export const linkStyles = `
   color: ${theme.colors.text.link};
   text-decoration: none;
@@ -27,7 +24,6 @@ export const linkStyles = `
   }
 `;
 
-// Стили для кода
 export const codeStyles = `
   font-family: ${theme.typography.fonts.mono};
   font-size: ${theme.typography.sizes.sm};
@@ -36,7 +32,6 @@ export const codeStyles = `
   border-radius: ${theme.borders.radius.sm};
 `;
 
-// Стили для блоков
 export const blockStyles = `
   margin: ${theme.spacing[4]} 0;
   padding: ${theme.spacing[4]};

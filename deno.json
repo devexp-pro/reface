@@ -11,17 +11,19 @@
     ".": "./@reface/mod.ts",
     "./htmx": "./@reface/htmx/mod.ts",
     "./elements": "./@reface/elements.ts",
+    "./jsx": "./@reface/jsx/mod.ts",
+    "./jsx/jsx-runtime": "./@reface/jsx/jsx-runtime.ts",
     "./template": "./@reface/template/mod.ts",
     "./plugins/styled": "./@reface/plugins/styled/mod.ts",
     "./plugins/partials": "./@reface/plugins/partials/mod.ts",
     "./plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
     "./components/LayoutSimple": "./@reface/components/LayoutSimple.ts",
-    "./components/LayoutTWA": "./@reface/components/LayoutTWA.ts",
-    "./jsx.global.d.ts": "./@reface/jsx/jsx.global.d.ts"
+    "./components/LayoutTWA": "./@reface/components/LayoutTWA.ts"
   },
   "imports": {
-    "@reface/jsx/global": "./@reface/jsx/global.ts",
     "@reface": "./@reface/mod.ts",
+    "@reface/jsx": "./@reface/jsx/mod.ts",
+    "@reface/jsx/jsx-runtime": "./@reface/jsx/jsx-runtime.ts",
     "@reface/types": "./@reface/types/mod.ts",
     "@reface/constants": "./@reface/constants.ts",
     "@reface/island": "./@reface/island/mod.ts",
@@ -53,7 +55,8 @@
   },
   "fmt": {
     "exclude": [
-      "./versions.ts"
+      "./versions.ts",
+      "./deno.json"
     ]
   },
   "lint": {
@@ -64,8 +67,15 @@
     }
   },
   "compilerOptions": {
-    "jsx": "react",
-    "jsxFactory": "createElement",
-    "jsxFragmentFactory": "Fragment"
+    "jsx": "react-jsx",
+    "jsxImportSource": "@reface/jsx"
+  },
+  "publish": {
+    "include": [
+      "./@reface/**"
+    ],
+    "exclude": [
+      "./**/__tests__"
+    ]
   }
 }
