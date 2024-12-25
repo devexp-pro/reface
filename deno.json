@@ -75,7 +75,7 @@
       "./@reface/**"
     ],
     "exclude": [
-      "./@reface/__tests__"
+      "./**/__tests__"
     ]
   }
 }
