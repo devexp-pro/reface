@@ -6,7 +6,7 @@
     "@hono/hono": "jsr:@hono/hono",
     "@hono/hono/deno": "jsr:@hono/hono/deno",
     "@reface": "../@reface/mod.ts",
-    "@reface/types": "../@reface/types.ts",
+    "@reface/types": "../@reface/types/mod.ts",
     "@reface/template": "../@reface/template/mod.ts",
     "@reface/htmx": "../@reface/htmx/mod.ts",
     "@reface/constants": "../@reface/constants.ts",

@@ -5,7 +5,7 @@ on:
       - main
     paths:
       - "@reface/**"
-
+      - "website/**"
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -23,6 +23,10 @@ jobs:
       - name: Check types
         id: types
         run: deno task check
+
+      - name: Website – Check types
+        id: website-types
+        run: cd website && deno check ./
 
       - name: Run tests
         id: tests
