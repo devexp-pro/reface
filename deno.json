@@ -72,7 +72,9 @@
   },
   "publish": {
     "include": [
-      "./@reface/**"
+      "./@reface/**",
+      "./README.md",
+      "./LICENSE"
     ],
     "exclude": [
       "./**/__tests__"
