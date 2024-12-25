@@ -237,9 +237,9 @@ export class RefaceRenderManager implements IRefaceRenderManager {
   }
 
   store = {
-    get: <T>(pluginName: string) =>
+    get: <T>(pluginName: string): T | undefined =>
       this.storage.get(pluginName) as T | undefined,
-    set: <T>(pluginName: string, value: T) =>
+    set: <T>(pluginName: string, value: T): Map<string, unknown> =>
       this.storage.set(pluginName, value),
   };
 }

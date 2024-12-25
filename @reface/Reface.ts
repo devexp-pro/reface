@@ -9,9 +9,10 @@ import {
   type RpcResponse,
 } from "./island/mod.ts";
 import type { IRefaceComposerPlugin } from "@reface/types";
-import type { Template } from "@reface/template";
+import type { Template, TemplateAttributes } from "@reface/template";
 import { Hono } from "@hono/hono";
 import type { Context } from "@hono/hono";
+import { IslandPayload } from "./island/types.ts";
 
 export interface RefaceOptions {
   plugins?: IRefaceComposerPlugin[];
@@ -99,7 +100,9 @@ export class Reface {
         status?: number;
       }>
     >,
-  >(islandConfig: Island<State, Props, RPC>) {
+  >(
+    islandConfig: Island<State, Props, RPC>,
+  ): (props: Props) => Template<TemplateAttributes, IslandPayload> {
     if (!islandConfig.name) {
       throw new Error("Island must have a name");
     }

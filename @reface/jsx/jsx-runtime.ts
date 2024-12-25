@@ -3,29 +3,39 @@ import type {
   ComponentFn,
   ElementChildType,
   Template,
-  TemplateAttributes,
-  TemplateMethods,
   TemplatePayload,
 } from "@reface/template";
 import { createElement } from "./createElement.ts";
 
-export const jsx = function <
+type JsxFn = <
+  P extends BaseAttributes,
+  T extends TemplatePayload = TemplatePayload,
+>(
+  tag: string | ComponentFn<P, T> | Template<P, T>,
+  props: (P & { children?: ElementChildType }) | null,
+  _key?: string,
+) => Template<Omit<P, "children">, T>; // FIXME: find a way to fix this
+
+export const jsx: JsxFn = function <
   P extends BaseAttributes,
   T extends TemplatePayload,
 >(
   tag: string | ComponentFn<P, T> | Template<P, T>,
   props: (P & { children?: ElementChildType }) | null,
   _key?: string,
-) {
+): Template<Omit<P, "children">, T> {
   if (!props || !("children" in props)) {
-    return createElement(tag, props, []);
+    return createElement(tag, props, []) as unknown as Template<
+      Omit<P, "children">,
+      T
+    >;
   }
   const { children, ...rest } = props;
   return createElement(
     tag,
-    rest as P, // Явно указываем тип
+    rest as P,
     Array.isArray(children) ? children : [children],
-  );
+  ) as unknown as Template<Omit<P, "children">, T>;
 };
 
 export const jsxs = jsx;
