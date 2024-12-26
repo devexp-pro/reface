@@ -6,12 +6,7 @@ import {
   Header,
   HeaderLinks,
 } from "../components/Layout.tsx";
-import {
-  BrandName,
-  BrandTagline,
-  Logo,
-  LogoText,
-} from "../components/Logo.tsx";
+import { Logo } from "../components/Logo.tsx";
 import { DemoReface } from "../components/DemoReface.tsx";
 
 const Hero = styled.div`

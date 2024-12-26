@@ -115,7 +115,7 @@ const Button = styled.button`
 `;
 
 const JokePartial = partial(
-  async (data) => {
+  async () => {
     const joke = await (await fetch(
       "https://icanhazdadjoke.com/",
       { headers: { "Accept": "text/plain" } },

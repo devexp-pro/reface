@@ -1,14 +1,5 @@
 import { styled } from "@reface/plugins/styled";
 
-function hashColor(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const hue = Math.abs(hash % 360);
-  return `hsl(${hue}, 70%, 65%)`;
-}
-
 interface Token {
   type: "tab" | "number" | "string" | "whitespace" | "punctuation" | "word";
   value: string;
@@ -181,15 +172,15 @@ const LineNumber = styled.span`
   }
 `;
 
-const Token = styled.span<TokenProps>`
+const Token = styled.span`
   & {
-    color: ${(props) => props.color || "#e2e8f0"};
+    color: #e2e8f0;
   }
 `;
 
 interface CodeProps {
   content: string;
-  language: string;
+  language?: string;
   filename?: string;
 }
 

@@ -7,8 +7,11 @@ export interface PartialPayload {
   };
 }
 
-export type PartialHandler<T> = (props: Record<string, unknown>) => Promise<T>;
+export type PartialHandler<C, T extends Template = Template> = (
+  context: C,
+) => Promise<T>;
 
-export type PartialFn = {
-  <T>(handler: PartialHandler<T>, name: string): Template;
-};
+export type PartialFn<C, T extends Template = Template> = (
+  handler: PartialHandler<C, T>,
+  name: string,
+) => T;

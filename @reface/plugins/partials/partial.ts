@@ -37,8 +37,8 @@ const partialTemplate = createTemplateFactory<
   },
 });
 
-function createPartial<T>(
-  handler: PartialHandler<T>,
+function createPartial<C, T>(
+  handler: PartialHandler<C, T>,
   name: string,
 ) {
   return partialTemplate({
@@ -55,6 +55,6 @@ function createPartial<T>(
   });
 }
 
-export const partial: PartialFn = (handler, name) => {
+export const partial: PartialFn<unknown> = (handler, name) => {
   return createPartial(handler, name);
 };
