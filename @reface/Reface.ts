@@ -4,7 +4,7 @@ import type { Template, TemplateAttributes } from "@reface/template";
 
 import { RefaceComposer } from "./RefaceComposer.ts";
 import {
-  createPartial,
+  partial,
   type PartialHandler,
   PartialsPlugin,
 } from "./plugins/partials/mod.ts";
@@ -34,11 +34,14 @@ export class Reface {
   private islands = new Map<string, Island<any, any, any>>();
   private islandProps = new Map<string, unknown>();
 
-  static partial<T extends Template = Template>(
-    handler: PartialHandler<HonoRequest, T>,
+  static partial(
+    handler: PartialHandler<HonoRequest>,
     name: string,
-  ): T {
-    return createPartial(handler, name, PARTIAL_API_PREFIX) as T;
+  ): Template<any, any> {
+    return partial(handler, name) as Template<
+      any,
+      any
+    >;
   }
 
   constructor(options: RefaceOptions = {}) {
@@ -66,7 +69,7 @@ export class Reface {
         return c.text("Partial not found", 404);
       }
 
-      const template = await handler();
+      const template = await handler(c);
       const content = this.composer.render(template as Template);
 
       return c.html(content);

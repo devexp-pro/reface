@@ -1,6 +1,6 @@
 import { Hono } from "@hono/hono";
 import { serveStatic } from "@hono/hono/deno";
-import { RefaceComposer, Reface } from "@reface";
+import { Reface, RefaceComposer } from "@reface";
 import { StyledPlugin } from "@reface/plugins/styled";
 import { PartialsPlugin } from "@reface/plugins/partials";
 import { LayoutSimple } from "@reface/components/LayoutSimple";

@@ -41,7 +41,7 @@ const partialTemplate = createTemplateFactory<
   },
 });
 
-export function createPartial<T>(
+function createPartial<T>(
   handler: PartialHandler<T>,
   name: string,
   apiPrefix: string = "/reface/partial", // TODO: setup on plugin handler, for can dunamic api prefix

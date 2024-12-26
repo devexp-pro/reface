@@ -62,15 +62,17 @@ Deno.test("JSX - all HTML elements", () => {
 
   // Document Metadata
   utils.assertRender(
-    <head><title>Title</title></head>,
-    "<head><title>Title</title></head>"
+    <head>
+      <title>Title</title>
+    </head>,
+    "<head><title>Title</title></head>",
   );
   utils.assertRender(<base href="/" />, '<base href="/"/>');
   utils.assertRender(<link rel="stylesheet" />, '<link rel="stylesheet"/>');
   utils.assertRender(<meta charset="utf-8" />, '<meta charset="utf-8"/>');
   utils.assertRender(
     <style>body {"{"} color: red; {"}"}</style>,
-    "<style>body { color: red; }</style>"
+    "<style>body { color: red; }</style>",
   );
   utils.assertRender(<body>Content</body>, "<body>Content</body>");
 
@@ -86,16 +88,34 @@ Deno.test("JSX - all HTML elements", () => {
   // Text Content
   utils.assertRender(<p>Paragraph</p>, "<p>Paragraph</p>");
   utils.assertRender(<pre>Preformatted</pre>, "<pre>Preformatted</pre>");
-  utils.assertRender(<blockquote>Quote</blockquote>, "<blockquote>Quote</blockquote>");
-  utils.assertRender(<ol><li>Item</li></ol>, "<ol><li>Item</li></ol>");
-  utils.assertRender(<ul><li>Item</li></ul>, "<ul><li>Item</li></ul>");
   utils.assertRender(
-    <dl><dt>Term</dt><dd>Description</dd></dl>,
-    "<dl><dt>Term</dt><dd>Description</dd></dl>"
+    <blockquote>Quote</blockquote>,
+    "<blockquote>Quote</blockquote>",
   );
   utils.assertRender(
-    <figure><figcaption>Caption</figcaption></figure>,
-    "<figure><figcaption>Caption</figcaption></figure>"
+    <ol>
+      <li>Item</li>
+    </ol>,
+    "<ol><li>Item</li></ol>",
+  );
+  utils.assertRender(
+    <ul>
+      <li>Item</li>
+    </ul>,
+    "<ul><li>Item</li></ul>",
+  );
+  utils.assertRender(
+    <dl>
+      <dt>Term</dt>
+      <dd>Description</dd>
+    </dl>,
+    "<dl><dt>Term</dt><dd>Description</dd></dl>",
+  );
+  utils.assertRender(
+    <figure>
+      <figcaption>Caption</figcaption>
+    </figure>,
+    "<figure><figcaption>Caption</figcaption></figure>",
   );
 
   // Forms
@@ -114,18 +134,30 @@ Deno.test("JSX - all HTML elements", () => {
         <legend>Legend</legend>
       </fieldset>
     </form>,
-    '<form action="/submit"><label for="name">Name</label><input id="name" type="text"/><select><optgroup><option>Option</option></optgroup></select><textarea></textarea><button>Submit</button><fieldset><legend>Legend</legend></fieldset></form>'
+    '<form action="/submit"><label for="name">Name</label><input id="name" type="text"/><select><optgroup><option>Option</option></optgroup></select><textarea></textarea><button>Submit</button><fieldset><legend>Legend</legend></fieldset></form>',
   );
 
   // Tables
   utils.assertRender(
     <table>
       <caption>Caption</caption>
-      <thead><tr><th>Header</th></tr></thead>
-      <tbody><tr><td>Cell</td></tr></tbody>
-      <tfoot><tr><td>Footer</td></tr></tfoot>
+      <thead>
+        <tr>
+          <th>Header</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Cell</td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Footer</td>
+        </tr>
+      </tfoot>
     </table>,
-    "<table><caption>Caption</caption><thead><tr><th>Header</th></tr></thead><tbody><tr><td>Cell</td></tr></tbody><tfoot><tr><td>Footer</td></tr></tfoot></table>"
+    "<table><caption>Caption</caption><thead><tr><th>Header</th></tr></thead><tbody><tr><td>Cell</td></tr></tbody><tfoot><tr><td>Footer</td></tr></tfoot></table>",
   );
 
   // Inline Text
@@ -139,62 +171,67 @@ Deno.test("JSX - all HTML elements", () => {
   utils.assertRender(<q>Quote</q>, "<q>Quote</q>");
   utils.assertRender(
     <time datetime="2024">2024</time>,
-    '<time datetime="2024">2024</time>'
+    '<time datetime="2024">2024</time>',
   );
 
   // Embedded Content
   utils.assertRender(
     <img src="img.jpg" alt="Image" />,
-    '<img src="img.jpg" alt="Image"/>'
+    '<img src="img.jpg" alt="Image"/>',
   );
   utils.assertRender(
     <iframe src="page.html" />,
-    '<iframe src="page.html"></iframe>'
+    '<iframe src="page.html"></iframe>',
   );
   utils.assertRender(<embed src="file.swf" />, '<embed src="file.swf"/>');
   utils.assertRender(
     <object data="file.pdf" />,
-    '<object data="file.pdf"></object>'
+    '<object data="file.pdf"></object>',
   );
   utils.assertRender(<source src="video.mp4" />, '<source src="video.mp4"/>');
 
   // Media
   utils.assertRender(
     <video src="video.mp4" />,
-    '<video src="video.mp4"></video>'
+    '<video src="video.mp4"></video>',
   );
   utils.assertRender(
     <audio src="audio.mp3" />,
-    '<audio src="audio.mp3"></audio>'
+    '<audio src="audio.mp3"></audio>',
   );
 
   // Interactive Elements
   utils.assertRender(
-    <details><summary>Summary</summary></details>,
-    "<details><summary>Summary</summary></details>"
+    <details>
+      <summary>Summary</summary>
+    </details>,
+    "<details><summary>Summary</summary></details>",
   );
   utils.assertRender(<dialog>Dialog</dialog>, "<dialog>Dialog</dialog>");
 
   // Progress
   utils.assertRender(
     <progress value={50} max={100} />,
-    '<progress value="50" max="100"></progress>'
+    '<progress value="50" max="100"></progress>',
   );
 
   // Technical
   utils.assertRender(<canvas />, "<canvas></canvas>");
   utils.assertRender(
     <script src="script.js" />,
-    '<script src="script.js"></script>'
+    '<script src="script.js"></script>',
   );
-  utils.assertRender(<template>Template</template>, "<template>Template</template>");
+  utils.assertRender(
+    <template>Template</template>,
+    "<template>Template</template>",
+  );
 
   // SVG
   utils.assertRender(
     <svg viewBox="0 0 100 100">
       <path d="M0 0h100v100H0z" />
     </svg>,
-    '<svg viewBox="0 0 100 100"><path d="M0 0h100v100H0z"></path></svg>'
+    '<svg viewBox="0 0 100 100"><path d="M0 0h100v100H0z"></path></svg>',
   );
 
   // Generic
