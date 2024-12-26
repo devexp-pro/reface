@@ -24,11 +24,11 @@ export const createTemplateFactory = <
 ): TemplateFactory<A, P, M> => {
   const factory: TemplateFactory<A, P, M> = ((
     templateFactoryConfig:
-      | ComponentFn<A, P>
+      | ComponentFn<A>
       | BaseTemplateConfig<P>
       | HTMLTemplateConfig<A, P>,
   ) => {
-    if (isComponentFn<A, P>(templateFactoryConfig)) {
+    if (isComponentFn<A>(templateFactoryConfig)) {
       const rawTemplate: RawTemplate<NormalizeAttributes<A>, P> = {
         type: createTemplateFactoryConfig.type,
         attributes: {} as NormalizeAttributes<A>,
