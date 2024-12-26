@@ -2,7 +2,11 @@ import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
 import type { Heading, Root } from "mdast";
-import type { MdNode, ParsedMarkdown } from "./types.ts";
+import type {
+  MdNode,
+  ParsedMarkdown,
+  TableOfContentsHeading,
+} from "./types.ts";
 import type { Template } from "../../../@reface/mod.ts";
 import { components } from "./components/mod.ts";
 import { component } from "@reface";
@@ -106,9 +110,9 @@ function processNode(node: MdNode): Template {
 
     case "delete":
       return (
-        <components.del>
+        <components.span>
           {node.children.map(processNode)}
-        </components.del>
+        </components.span>
       );
 
     case "table":
@@ -192,24 +196,28 @@ export function parseMarkdown(content: string): ParsedMarkdown {
   };
 }
 
-export const TableOfContents = component(({ headings }) => {
-  return (
-    <components.TableOfContents>
-      <components.h4>On this page</components.h4>
-      <components.ul>
-        {headings.map((heading) => (
-          <components.TocItem
-            style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}
-          >
-            <components.TocLink href={`#${heading.slug}`}>
-              {heading.text}
-            </components.TocLink>
-          </components.TocItem>
-        ))}
-      </components.ul>
-    </components.TableOfContents>
-  );
-});
+export const TableOfContents = component<
+  { headings: TableOfContentsHeading[]; className?: string }
+>(
+  ({ headings, className }) => {
+    return (
+      <components.TableOfContents class={className}>
+        <components.h4>On this page</components.h4>
+        <components.ul>
+          {headings.map((heading) => (
+            <components.TocItem
+              style={{ paddingLeft: `${(heading.level - 1) * 0.75}rem` }}
+            >
+              <components.TocLink href={`#${heading.slug}`}>
+                {heading.text}
+              </components.TocLink>
+            </components.TocItem>
+          ))}
+        </components.ul>
+      </components.TableOfContents>
+    );
+  },
+);
 
 export const MarkdownContent = component((_, children) => {
   return (

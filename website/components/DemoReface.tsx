@@ -1,4 +1,4 @@
-import { partial } from "../partial.ts";
+import { Reface } from "@reface";
 import { styled } from "@reface/plugins/styled";
 
 const DemoContainer = styled.div`
@@ -114,8 +114,8 @@ const Button = styled.button`
   }
 `;
 
-const JokePartial = partial(
-  async (data) => {
+const JokePartial = Reface.partial(
+  async (_context) => {
     const joke = await (await fetch(
       "https://icanhazdadjoke.com/",
       { headers: { "Accept": "text/plain" } },
