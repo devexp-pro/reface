@@ -252,3 +252,6 @@ export const div: Template<HTML.HTMLAttributes, Record<string, any>> =
 
 export const span: Template<HTML.HTMLAttributes, Record<string, any>> =
   createElementTemplate({ tag: "span" });
+
+export const summary: Template<HTML.HTMLAttributes, Record<string, any>> =
+  createElementTemplate({ tag: "summary" });

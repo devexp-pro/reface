@@ -61,7 +61,7 @@ Deno.test("Parital - HTMX integration", () => {
       Click me
     </button>,
     `<button 
-      hx-get="/reface-partial/test-htmx"
+      hx-get="/reface/partial/test-htmx"
       hx-target="[data-partial='test-htmx']"
       hx-trigger="click">Click me</button>`,
   );
