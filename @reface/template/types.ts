@@ -29,11 +29,10 @@ export type ElementChildType = Arrayable<PrimitiveChild | ComplexChild>;
 
 export type ComponentFn<
   A extends TemplateAttributes = TemplateAttributes,
-  P extends TemplatePayload = TemplatePayload,
 > = (
   attrs: A,
   children: ElementChildType[],
-) => Template<A, P>;
+) => Template<any, any, any>;
 
 export type RawTemplateAttributes = {
   [key: string]: any;
@@ -132,7 +131,7 @@ export type TemplateFactory<
   ): Template<A & TemplateHtmlAttributes, P, M>;
 
   <CA extends BaseAttributes>(
-    component: ComponentFn<CA, P>,
+    component: ComponentFn<CA>,
   ): Template<CA, P, TemplateMethods<CA, P>>;
 };
 

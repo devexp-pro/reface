@@ -5,6 +5,7 @@ import type {
   RawTemplate,
   Template,
   TemplateAttributes,
+  TemplateMethods,
   TemplatePayload,
 } from "./types.ts";
 import { HTML_ENTITIES, REFACE_TEMPLATE } from "./constants.ts";
@@ -24,12 +25,15 @@ export function isHTMLTemplateConfig<
 
 export function isComponentFn<
   A extends TemplateAttributes,
-  P extends TemplatePayload,
->(input: any): input is ComponentFn<A, P> {
+>(input: any): input is ComponentFn<A> {
   return typeof input === "function";
 }
 
-export function isTemplate(value: unknown): value is Template {
+export function isTemplate<
+  A extends TemplateAttributes,
+  P extends TemplatePayload,
+  M extends TemplateMethods<A, P>,
+>(value: unknown): value is Template<A, P, M> {
   return typeof value === "function" &&
     (value as any)[REFACE_TEMPLATE] === true;
 }
