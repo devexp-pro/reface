@@ -166,7 +166,7 @@ export default function DocsPage(
             <MobileToc>
               <TableOfContents
                 headings={currentPage.content.headings}
-                class="mobile"
+                className="mobile"
               />
             </MobileToc>
           )}
@@ -185,7 +185,7 @@ export default function DocsPage(
         {currentPage && currentPage.content.headings.length > 0 && (
           <TableOfContents
             headings={currentPage.content.headings}
-            class="desktop"
+            className="desktop"
           />
         )}
       </Layout>

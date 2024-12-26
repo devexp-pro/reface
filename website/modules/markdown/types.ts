@@ -22,14 +22,16 @@ import type {
 } from "mdast";
 import type { Template } from "../../../@reface/mod.ts";
 
-export interface ParsedMarkdown {
+export type TableOfContentsHeading = {
+  level: number;
+  text: string;
+  slug: string;
+};
+
+export type ParsedMarkdown = {
   content: Template;
-  headings: Array<{
-    level: number;
-    text: string;
-    slug: string;
-  }>;
-}
+  headings: TableOfContentsHeading[];
+};
 
 export type MdNode =
   | Root

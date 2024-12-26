@@ -1,41 +1,57 @@
+import { type Context, Hono, type HonoRequest } from "@hono/hono";
+import type { IRefaceComposerPlugin } from "@reface/types";
+import type { Template, TemplateAttributes } from "@reface/template";
+
 import { RefaceComposer } from "./RefaceComposer.ts";
-import { PartialsPlugin } from "./plugins/partials/mod.ts";
+import {
+  partial,
+  type PartialHandler,
+  PartialsPlugin,
+} from "./plugins/partials/mod.ts";
 import { StyledPlugin } from "./plugins/styled/mod.ts";
 import {
   createIsland,
   createIslandComponent,
   type Island,
+  type IslandPayload,
   IslandPlugin,
   type RpcResponse,
 } from "./island/mod.ts";
-import type { IRefaceComposerPlugin } from "@reface/types";
-import type { Template, TemplateAttributes } from "@reface/template";
-import { Hono } from "@hono/hono";
-import type { Context } from "@hono/hono";
-import { IslandPayload } from "./island/types.ts";
 
 export interface RefaceOptions {
   plugins?: IRefaceComposerPlugin[];
-  layout?: (props: unknown, content: Template) => Template;
+  layout?: Template;
   partialApiPrefix?: string;
 }
+
+const PARTIAL_API_PREFIX = "/reface/partial";
 
 export class Reface {
   private composer: RefaceComposer;
   private islandPlugin: IslandPlugin;
   private partialsPlugin: PartialsPlugin;
-  private layout?: (props: unknown, content: Template) => Template;
+  private layout?: Template;
   private islands = new Map<string, Island<any, any, any>>();
   private islandProps = new Map<string, unknown>();
-  private PARTIAL_API_PREFIX: string;
+
+  static partial(
+    handler: PartialHandler<HonoRequest>,
+    name: string,
+  ): Template<any, any> {
+    return partial(handler, name) as Template<
+      any,
+      any
+    >;
+  }
 
   constructor(options: RefaceOptions = {}) {
     this.composer = new RefaceComposer();
     this.layout = options.layout;
-    this.PARTIAL_API_PREFIX = options.partialApiPrefix || "/_partial";
 
     this.islandPlugin = new IslandPlugin();
-    this.partialsPlugin = new PartialsPlugin();
+    this.partialsPlugin = new PartialsPlugin({
+      apiPrefix: PARTIAL_API_PREFIX,
+    });
 
     this.composer.use(this.islandPlugin);
     this.composer.use(this.partialsPlugin);
@@ -53,7 +69,7 @@ export class Reface {
         return c.text("Partial not found", 404);
       }
 
-      const template = await handler();
+      const template = await handler(c);
       const content = this.composer.render(template as Template);
 
       return c.html(content);
@@ -66,10 +82,7 @@ export class Reface {
   hono(): Hono {
     const router = new Hono();
 
-    router.get(
-      `${this.PARTIAL_API_PREFIX}/:partial`,
-      (c) => this.handlePartial(c),
-    );
+    router.get(`${PARTIAL_API_PREFIX}/:partial`, (c) => this.handlePartial(c));
 
     router.post("/rpc/:island/:method", async (c) => {
       const { island, method } = c.req.param();

@@ -2,11 +2,14 @@ import { REFACE_EVENT } from "@reface/constants";
 import type { IRefaceComposerPlugin } from "@reface/types";
 import type { RefaceComposer } from "../../RefaceComposer.ts";
 import type { Template } from "@reface/template";
-import type { PartialPayload } from "./types.ts";
+import type { PartialHandler, PartialPayload } from "./types.ts";
 
 export class PartialsPlugin implements IRefaceComposerPlugin {
   readonly name = "partials";
-  private partials = new Map<string, () => Promise<unknown>>();
+  private partials = new Map<
+    string,
+    PartialHandler<any, Template<any, any, any>>
+  >();
   private apiPrefix: string;
 
   constructor(options: { apiPrefix?: string } = {}) {
@@ -35,11 +38,13 @@ export class PartialsPlugin implements IRefaceComposerPlugin {
     }
   }
 
-  getHandler(name: string): (() => Promise<unknown>) | undefined {
+  getHandler<C = any>(
+    name: string,
+  ): PartialHandler<C, Template<any, any, any>> | undefined {
     return this.partials.get(name);
   }
 
-  getPartials(): Map<string, () => Promise<unknown>> {
+  getPartials(): Map<string, PartialHandler<any, Template<any, any, any>>> {
     return new Map(this.partials);
   }
 

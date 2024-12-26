@@ -186,3 +186,29 @@ Deno.test("attributes - handles duplicates and empty values", () => {
     '<div class="btn" style="color: green">Content</div>',
   );
 });
+
+Deno.test("jsx children handling", () => {
+  const utils = new TestUtils();
+
+  const TestComponent = component<{ title: string }>((props, children) => (
+    <div>
+      <h1>{props.title}</h1>
+      <div>{children}</div>
+    </div>
+  ));
+
+  utils.assertRender(
+    <TestComponent title="Hello">
+      <span>Single child</span>
+    </TestComponent>,
+    "<div><h1>Hello</h1><div><span>Single child</span></div></div>",
+  );
+
+  utils.assertRender(
+    <TestComponent title="Hello">
+      <span>First child</span>
+      <span>Second child</span>
+    </TestComponent>,
+    "<div><h1>Hello</h1><div><span>First child</span><span>Second child</span></div></div>",
+  );
+});
