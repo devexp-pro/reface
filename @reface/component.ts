@@ -12,7 +12,7 @@ export const component = <
   P extends Record<string, any>,
   T extends TemplatePayload = TemplatePayload,
 >(
-  render: ComponentFn<P, T>,
+  render: ComponentFn<P>,
 ): Template<P, T> => {
   const componentTemplate = createTemplateFactory({
     type: "component",
