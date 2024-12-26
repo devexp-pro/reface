@@ -12,7 +12,7 @@ type JsxFn = <
   P extends BaseAttributes,
   T extends TemplatePayload = TemplatePayload,
 >(
-  tag: string | ComponentFn<P, T> | Template<P, T>,
+  tag: string | ComponentFn<P> | Template<P, T>,
   props: P | null,
   _key?: string,
 ) => Template<P, T>;
@@ -21,7 +21,7 @@ export const jsx: JsxFn = function <
   P extends BaseAttributes,
   T extends TemplatePayload,
 >(
-  tag: string | ComponentFn<P, T> | Template<P, T>,
+  tag: string | ComponentFn<P> | Template<P, T>,
   props: P | null,
   _key?: string,
 ): Template<P, T> {

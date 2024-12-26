@@ -161,6 +161,9 @@ export const a: Template<HTML.HTMLAnchorAttributes, Record<string, any>> =
 export const code: Template<HTML.HTMLAttributes, Record<string, any>> =
   createElementTemplate({ tag: "code" });
 
+export const i: Template<HTML.HTMLAttributes, Record<string, any>> =
+  createElementTemplate({ tag: "i" });
+
 export const em: Template<HTML.HTMLAttributes, Record<string, any>> =
   createElementTemplate({ tag: "em" });
 
