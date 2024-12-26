@@ -42,6 +42,8 @@ export const jsx: JsxFn = function <
 export const jsxs = jsx;
 export const jsxDEV = jsx;
 
+export { Fragment } from "./Fragment.ts";
+
 export namespace JSX {
   export type Element = Template<any, TemplatePayload>;
 

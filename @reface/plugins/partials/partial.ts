@@ -1,5 +1,6 @@
 import {
   createTemplateFactory,
+  type Template,
   type TemplateAttributes,
   type TemplatePayload,
 } from "@reface/template";
@@ -9,7 +10,8 @@ import type { PartialFn, PartialHandler } from "./types.ts";
 interface PartialPayload extends TemplatePayload {
   partial: {
     name: string;
-    handler: PartialHandler<unknown>;
+    handler: PartialHandler<any>;
+    apiPrefix: string;
   };
 }
 
@@ -30,16 +32,19 @@ const partialTemplate = createTemplateFactory<
     },
     trigger: ({ template }) => {
       return hx()
-        .get(`/reface-partial/${template.payload.partial.name}`)
+        .get(
+          `${template.payload.partial.apiPrefix}/${template.payload.partial.name}`,
+        )
         .target(`[data-partial='${template.payload.partial.name}']`)
         .trigger("click");
     },
   },
 });
 
-function createPartial<C, T>(
-  handler: PartialHandler<C, T>,
+export function createPartial<T>(
+  handler: PartialHandler<T>,
   name: string,
+  apiPrefix: string = "/reface/partial", // TODO: setup on plugin handler, for can dunamic api prefix
 ) {
   return partialTemplate({
     tag: "div",
@@ -50,11 +55,12 @@ function createPartial<C, T>(
       partial: {
         name,
         handler,
+        apiPrefix,
       },
     },
   });
 }
 
-export const partial: PartialFn<unknown> = (handler, name) => {
+export const partial: PartialFn<any, Template> = (handler, name) => {
   return createPartial(handler, name);
 };

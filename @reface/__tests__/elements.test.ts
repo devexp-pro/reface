@@ -1,20 +1,16 @@
-import { elementFactory } from "@reface";
+import { button, div, form, img, input, span } from "@reface/elements";
 import { TestUtils } from "./testUtils.ts";
 
-Deno.test("elementFactory - basic usage", () => {
+Deno.test("elements - basic usage", () => {
   const utils = new TestUtils();
-  const div = elementFactory("div");
   utils.assertRender(
     div({ class: "container" })`Hello World`,
     '<div class="container">Hello World</div>',
   );
 });
 
-Deno.test("elementFactory - nested elements", () => {
+Deno.test("elements - nested elements", () => {
   const utils = new TestUtils();
-  const div = elementFactory("div");
-  const span = elementFactory("span");
-
   utils.assertRender(
     div({ class: "container" })`
       ${span({ class: "text" })`Hello`}
@@ -24,10 +20,8 @@ Deno.test("elementFactory - nested elements", () => {
   );
 });
 
-Deno.test("elementFactory - handles primitives", () => {
+Deno.test("elements - handles primitives", () => {
   const utils = new TestUtils();
-  const div = elementFactory("div");
-
   utils.assertRender(
     div({ class: "container" })`
       ${false}
@@ -38,5 +32,24 @@ Deno.test("elementFactory - handles primitives", () => {
       ${""}
     `,
     '<div class="container"> 0 </div>',
+  );
+});
+
+Deno.test("elements - form elements", () => {
+  const utils = new TestUtils();
+  utils.assertRender(
+    form({ action: "/submit", method: "post" })`
+      ${input({ type: "text", name: "username" })}
+      ${button({ type: "submit" })`Submit`}
+    `,
+    '<form action="/submit" method="post"><input type="text" name="username"/><button type="submit">Submit</button></form>',
+  );
+});
+
+Deno.test("elements - void elements", () => {
+  const utils = new TestUtils();
+  utils.assertRender(
+    img({ src: "image.jpg", alt: "Test image" }),
+    '<img src="image.jpg" alt="Test image"/>',
   );
 });

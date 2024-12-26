@@ -3,6 +3,7 @@ export { createIsland, createIslandComponent } from "./island.ts";
 export type {
   Island,
   IslandContext,
+  IslandPayload,
   RpcContext,
   RpcResponse,
   RpcToHtmx,

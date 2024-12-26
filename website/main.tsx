@@ -1,6 +1,6 @@
 import { Hono } from "@hono/hono";
 import { serveStatic } from "@hono/hono/deno";
-import { RefaceComposer } from "@reface";
+import { RefaceComposer, Reface } from "@reface";
 import { StyledPlugin } from "@reface/plugins/styled";
 import { PartialsPlugin } from "@reface/plugins/partials";
 import { LayoutSimple } from "@reface/components/LayoutSimple";
@@ -41,7 +41,12 @@ const Layout = component((_, children) => (
   </LayoutSimple>
 ));
 
+const reface = new Reface({
+  layout: Layout,
+});
+
 const app = new Hono();
+app.route("/", reface.hono());
 
 app.use(
   "/assets/*",
@@ -53,55 +58,26 @@ app.use(
 );
 
 app.get("/", (c) => {
-  const content = refaceComposer.render(
-    <Layout>
-      <HomePage />
-    </Layout>,
-  );
-  return c.html(content);
+  return c.html(reface.render(<HomePage />));
 });
 
 app.get("/docs", (c) => {
-  const content = refaceComposer.render(
-    <Layout>
-      <DocsPage
-        sections={sections}
-        pages={pages}
-      />
-    </Layout>,
-  );
-  return c.html(content);
+  return c.html(reface.render(
+    <DocsPage
+      sections={sections}
+      pages={pages}
+    />,
+  ));
 });
 
 app.get("/docs/:page", (c) => {
-  const content = refaceComposer.render(
-    <Layout>
-      <DocsPage
-        sections={sections}
-        pages={pages}
-        currentPath={c.req.param("page")}
-      />
-    </Layout>,
-  );
-  return c.html(content);
-});
-
-app.get(`${PARTIAL_API_PREFIX}/:partial`, async (c) => {
-  const partialName = c.req.param("partial");
-
-  try {
-    const partialFn = await refaceComposer.getPlugin(PartialsPlugin)
-      ?.getHandler(partialName);
-    const content = refaceComposer.render(await partialFn?.(c));
-    if (!content) {
-      return c.text("Partial not found", 404);
-    }
-
-    return c.html(content);
-  } catch (error) {
-    console.error(`Error rendering partial ${partialName}:`, error);
-    return c.text("Internal server error", 500);
-  }
+  return c.html(reface.render(
+    <DocsPage
+      sections={sections}
+      pages={pages}
+      currentPath={c.req.param("page")}
+    />,
+  ));
 });
 
 await Deno.serve(app.fetch);
