@@ -6,6 +6,7 @@ import type { Template } from "@reface/template";
 export type LayoutSimpleProps = {
   htmx?: boolean;
   bootstrap?: boolean;
+  normalizeCss?: boolean;
   head?: ElementChildType;
   title?: string;
   description?: string;
@@ -20,6 +21,7 @@ export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
       favicon,
       htmx,
       bootstrap,
+      normalizeCss,
       head: pageHead,
     } = props;
 
@@ -38,6 +40,13 @@ export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
         ${description && meta({ name: "description", content: description })}
         ${favicon && link({ rel: "icon", href: favicon })}
         ${htmx && script({ src: "https://unpkg.com/htmx.org@1.9.6" })}
+        ${
+      normalizeCss && link({
+        href:
+          "https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css",
+        rel: "stylesheet",
+      })
+    }
         ${
       bootstrap && link({
         href:

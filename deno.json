@@ -17,6 +17,7 @@
     "./plugins/styled": "./@reface/plugins/styled/mod.ts",
     "./plugins/partials": "./@reface/plugins/partials/mod.ts",
     "./plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
+    "./plugins/liveReload": "./@reface/plugins/liveReload/mod.ts",
     "./components/LayoutSimple": "./@reface/components/LayoutSimple.ts",
     "./components/LayoutTWA": "./@reface/components/LayoutTWA.ts"
   },
@@ -33,10 +34,11 @@
     "@reface/plugins/styled": "./@reface/plugins/styled/mod.ts",
     "@reface/plugins/partials": "./@reface/plugins/partials/mod.ts",
     "@reface/plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
+    "@reface/plugins/liveReload": "./@reface/plugins/liveReload/mod.ts",
     "@reface/components/LayoutSimple": "./@reface/components/LayoutSimple.ts",
     "@std/assert": "jsr:@std/assert@^1.0.1",
     "@std/crypto": "jsr:@std/crypto@^1.0.2",
-    "@hono/hono": "jsr:@hono/hono@^4.0.0"
+    "@hono/hono": "jsr:@hono/hono@^4.6.15"
   },
   "tasks": {
     "ex1": "deno run --allow-all --unstable-ffi --watch=./examples/ex1.ts ./examples/ex1.ts",
@@ -50,7 +52,7 @@
     "test:watch": "deno test -A --watch --no-check @reface/",
     "test:coverage": "deno test -A --coverage=coverage && deno coverage coverage",
     "test:ci": "deno test -A --coverage=coverage --junit-path=junit.xml",
-    "website:dev": "deno run -A --watch website/main.tsx",
+    "website:dev": "DEV=true deno run -A --watch website/main.tsx",
     "check": "deno check ./@reface/"
   },
   "fmt": {
