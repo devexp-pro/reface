@@ -1,4 +1,4 @@
-import { type Context, Hono, type HonoRequest } from "@hono/hono";
+import type { Context, Hono, HonoRequest } from "@hono/hono";
 import type { IRefaceComposerPlugin } from "@reface/types";
 import type { Template, TemplateAttributes } from "@reface/template";
 
@@ -17,6 +17,7 @@ import {
   IslandPlugin,
   type RpcResponse,
 } from "./island/mod.ts";
+import { createErrorView } from "./errorScreen/mod.ts";
 
 export interface RefaceOptions {
   plugins?: IRefaceComposerPlugin[];
@@ -79,12 +80,37 @@ export class Reface {
     }
   }
 
-  hono(): Hono {
-    const router = new Hono();
+  hono(hono: Hono<any, any, any>): Hono<any, any, any> {
+    hono.onError((err, c) => {
+      console.error("Hono Error Handler:", err);
+      const title = err instanceof TypeError
+        ? "Type Error"
+        : err instanceof SyntaxError
+        ? "Syntax Error"
+        : err instanceof ReferenceError
+        ? "Reference Error"
+        : "Runtime Error";
 
-    router.get(`${PARTIAL_API_PREFIX}/:partial`, (c) => this.handlePartial(c));
+      const errorHtml = createErrorView({
+        error: err,
+        title: title,
+      });
+      return c.html(errorHtml, 500);
+    });
 
-    router.post("/rpc/:island/:method", async (c) => {
+    hono.use("*", async (c, next) => {
+      try {
+        return await next();
+      } catch (e) {
+        const error = e as Error;
+        console.error("Middleware Error Handler:", error);
+        throw error;
+      }
+    });
+
+    hono.get(`${PARTIAL_API_PREFIX}/:partial`, (c) => this.handlePartial(c));
+
+    hono.post("/rpc/:island/:method", async (c) => {
       const { island, method } = c.req.param();
       let args;
       const contentType = c.req.header("content-type");
@@ -100,7 +126,7 @@ export class Reface {
       return c.html(response.html || "", { status: response.status });
     });
 
-    return router;
+    return hono;
   }
   island<
     State,
@@ -198,9 +224,15 @@ export class Reface {
     } catch (e) {
       const error = e as Error;
       console.error(`Render Error:`, error);
-      return `<div class="error">Render Error: ${
-        error?.message || "Unknown error"
-      }</div>`;
+      try {
+        return createErrorView({
+          error,
+          title: "Template Render Error",
+        });
+      } catch (errorViewError) {
+        console.error("Error in error view:", errorViewError);
+        throw error;
+      }
     }
   }
   getComposer(): RefaceComposer {

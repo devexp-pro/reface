@@ -374,7 +374,6 @@ export default function HomePage() {
             </GitHubButton>
           </HeaderLinks>
         </Header>
-
         <Hero>
           <HeroLogo>
             <LogoSquare>R</LogoSquare>

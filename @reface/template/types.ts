@@ -65,7 +65,7 @@ export type TemplateAttributesClass = Arrayable<
 export type TemplateAttributesStyle = Arrayable<
   | string
   | string[]
-  | { [key: string]: boolean | string | number }
+  | { [key: string]: boolean | string | number | null | undefined }
   | null
   | undefined
   | boolean

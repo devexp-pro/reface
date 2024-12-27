@@ -231,6 +231,9 @@ export class RefaceRenderManager implements IRefaceRenderManager {
       if (handlerResult !== undefined) {
         result = handlerResult;
       }
+      if (event.endsWith(".end")) {
+        context.html = result as string;
+      }
     }
 
     return result;
