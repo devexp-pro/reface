@@ -2,6 +2,7 @@ import { Hono } from "@hono/hono";
 import { serveStatic } from "@hono/hono/deno";
 import { Reface } from "@reface";
 import { LiveReloadPlugin } from "@reface/plugins/liveReload";
+import { DevToolsPlugin } from "@reface/plugins/devtools";
 import { LayoutSimple } from "@reface/components/LayoutSimple";
 import { loadDocs } from "./utils/docs.tsx";
 import { resolveFromFile } from "./utils/resolveFromFile.ts";
@@ -43,6 +44,7 @@ const reface = new Reface({
 
 if (IS_DEV) {
   reface.composer.use(new LiveReloadPlugin({ watchPaths: ["./"] }));
+  reface.composer.use(new DevToolsPlugin());
 }
 
 const app = new Hono();
