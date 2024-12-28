@@ -1,4 +1,5 @@
-import { type Context, Hono, type HonoRequest } from "@hono/hono";
+import type { Context, Hono, HonoRequest } from "@hono/hono";
+import type { ContentfulStatusCode } from "@hono/hono/utils/http-status";
 import type { IRefaceComposerPlugin } from "@reface/types";
 import type { Template, TemplateAttributes } from "@reface/template";
 
@@ -17,6 +18,7 @@ import {
   IslandPlugin,
   type RpcResponse,
 } from "./island/mod.ts";
+import { createErrorView } from "./errorScreen/mod.ts";
 
 export interface RefaceOptions {
   plugins?: IRefaceComposerPlugin[];
@@ -27,7 +29,7 @@ export interface RefaceOptions {
 const PARTIAL_API_PREFIX = "/reface/partial";
 
 export class Reface {
-  private composer: RefaceComposer;
+  public composer: RefaceComposer;
   private islandPlugin: IslandPlugin;
   private partialsPlugin: PartialsPlugin;
   private layout?: Template;
@@ -79,12 +81,37 @@ export class Reface {
     }
   }
 
-  hono(): Hono {
-    const router = new Hono();
+  hono(hono: Hono): Hono<any, any, any> {
+    hono.onError((err, c) => {
+      console.error("Hono Error Handler:", err);
+      const title = err instanceof TypeError
+        ? "Type Error"
+        : err instanceof SyntaxError
+        ? "Syntax Error"
+        : err instanceof ReferenceError
+        ? "Reference Error"
+        : "Runtime Error";
 
-    router.get(`${PARTIAL_API_PREFIX}/:partial`, (c) => this.handlePartial(c));
+      const errorHtml = createErrorView({
+        error: err,
+        title: title,
+      });
+      return c.html(errorHtml, 500);
+    });
 
-    router.post("/rpc/:island/:method", async (c) => {
+    hono.use("*", async (c, next) => {
+      try {
+        return await next();
+      } catch (e) {
+        const error = e as Error;
+        console.error("Middleware Error Handler:", error);
+        throw error;
+      }
+    });
+
+    hono.get(`${PARTIAL_API_PREFIX}/:partial`, (c) => this.handlePartial(c));
+
+    hono.post("/rpc/:island/:method", async (c) => {
       const { island, method } = c.req.param();
       let args;
       const contentType = c.req.header("content-type");
@@ -97,10 +124,12 @@ export class Reface {
       }
 
       const response = await this.handleRpc(island, method, args);
-      return c.html(response.html || "", { status: response.status });
+      return c.html(response.html || "", {
+        status: response.status as ContentfulStatusCode,
+      });
     });
 
-    return router;
+    return hono;
   }
   island<
     State,
@@ -198,9 +227,15 @@ export class Reface {
     } catch (e) {
       const error = e as Error;
       console.error(`Render Error:`, error);
-      return `<div class="error">Render Error: ${
-        error?.message || "Unknown error"
-      }</div>`;
+      try {
+        return createErrorView({
+          error,
+          title: "Template Render Error",
+        });
+      } catch (errorViewError) {
+        console.error("Error in error view:", errorViewError);
+        throw error;
+      }
     }
   }
   getComposer(): RefaceComposer {

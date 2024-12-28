@@ -18,11 +18,15 @@ export class StyledPlugin implements IRefaceComposerPlugin {
         this.collectedStyles.add(styledTemplate.raw.payload.styled.styles);
       }
     });
-    manager.on(REFACE_EVENT.RENDER.RENDER.END, ({ html }) => {
+    manager.on(REFACE_EVENT.RENDER.RENDER.END, ({ html = "" }) => {
       if (this.collectedStyles.size === 0) return html;
 
       const styles = Array.from(this.collectedStyles).join("\n");
-      return `${html}<style>\n${styles}\n</style>`;
+      const styleTag = `<style>\n${styles}\n</style>`;
+      if (html.includes("</head>")) {
+        return html.replace("</head>", `${styleTag}</head>`);
+      }
+      return `${html}${styleTag}`;
     });
   };
 }

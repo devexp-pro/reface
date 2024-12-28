@@ -218,7 +218,7 @@ export class RefaceRenderManager implements IRefaceRenderManager {
     event: RefaceEventType,
     params: Record<string, unknown>,
   ): unknown {
-    let result;
+    let result = params.html ? params.html : undefined;
     const handlers = this.handlers.get(event) || new Set();
 
     const context: RenderContext = {
@@ -230,6 +230,9 @@ export class RefaceRenderManager implements IRefaceRenderManager {
       const handlerResult = handler(context);
       if (handlerResult !== undefined) {
         result = handlerResult;
+      }
+      if (context.html) {
+        context.html = result as string;
       }
     }
 

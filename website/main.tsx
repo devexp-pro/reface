@@ -1,8 +1,7 @@
 import { Hono } from "@hono/hono";
 import { serveStatic } from "@hono/hono/deno";
-import { Reface, RefaceComposer } from "@reface";
-import { StyledPlugin } from "@reface/plugins/styled";
-import { PartialsPlugin } from "@reface/plugins/partials";
+import { Reface } from "@reface";
+import { LiveReloadPlugin } from "@reface/plugins/liveReload";
 import { LayoutSimple } from "@reface/components/LayoutSimple";
 import { loadDocs } from "./utils/docs.tsx";
 import { resolveFromFile } from "./utils/resolveFromFile.ts";
@@ -11,6 +10,8 @@ import DocsPage from "./pages/DocsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import { component } from "../@reface/component.ts";
 
+const IS_DEV = Deno.env.get("DEV") === "true";
+
 const { sections, pages } = await loadDocs();
 
 if (!pages.size) {
@@ -18,18 +19,13 @@ if (!pages.size) {
   console.log("Make sure you have documentation files in ./docs directory");
 }
 
-const PARTIAL_API_PREFIX = "/reface-partial";
-
-const refaceComposer = new RefaceComposer();
-refaceComposer.use(new StyledPlugin());
-refaceComposer.use(new PartialsPlugin({ apiPrefix: PARTIAL_API_PREFIX }));
-
 const Layout = component((_, children) => (
   <LayoutSimple
     title="Reface - Modern Template Engine"
     description="Type-safe template engine for HTML with JSX support"
     favicon="/assets/logo.png"
-    htmx={true}
+    normalizeCss
+    htmx
     head={
       <>
         <link rel="stylesheet" href="/styles/fonts.css" />
@@ -45,8 +41,12 @@ const reface = new Reface({
   layout: Layout,
 });
 
+if (IS_DEV) {
+  reface.composer.use(new LiveReloadPlugin({ watchPaths: ["./"] }));
+}
+
 const app = new Hono();
-app.route("/", reface.hono());
+reface.hono(app);
 
 app.use(
   "/assets/*",
