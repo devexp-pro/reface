@@ -7,7 +7,7 @@ import type {
   ParsedMarkdown,
   TableOfContentsHeading,
 } from "./types.ts";
-import type { Template } from "../../../@reface/mod.ts";
+import type { Template } from "../../../"@mod.ts";
 import { components } from "./components/mod.ts";
 import { component } from "@reface";
 

@@ -1,4 +1,4 @@
-import { styled } from "@reface/plugins/styled";
+import { styled } from "@reface";
 
 interface Token {
   type: "tab" | "number" | "string" | "whitespace" | "punctuation" | "word";

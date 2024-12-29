@@ -2,89 +2,104 @@
   <img src="./website/public/assets/logo.png" alt="Reface Logo" width="200" />
 </div>
 
-# [Reface](https://reface.deno.dev/)
+# Reface
 
 [![JSR](https://jsr.io/badges/@vseplet/reface)](https://jsr.io/@vseplet/reface)
 [![JSR Score](https://jsr.io/badges/@vseplet/reface/score)](https://jsr.io/@vseplet/reface)
 [![Discord](https://img.shields.io/badge/join-chat-blue?logo=discord&logoColor=white)](https://discord.gg/gT4gvVwqb8)
 
-Modern web framework for building interactive applications with Islands
-Architecture.
+> ⚠️ **Active Development**: Reface is currently in active development and not recommended for production use. We're using it in our projects and would appreciate your feedback and contributions.
 
-## Features
+Zero-build meta-framework for modern web applications with HTMX integration and Islands Architecture.
 
-- 🎯 **Type-safe Templates** - Full TypeScript support with JSX
-- 🧩 **Template Composition** - Mix JSX and template literals
-- 🔌 **Plugin System** - Extensible composition pipeline
-- 🎨 **Styled Components** - CSS-in-JS with type safety
-- 🏝️ **Partial System** - Interactive components with HTMX
-- 🚀 **Framework Agnostic** - Core composition engine
+## Core Features
+
+- Type-safe templates with JSX and template literals
+- CSS-in-JS with styled components
+- HTMX integration for interactivity
+- Plugin system for extensibility
+- Server-side rendering
+- No build step required
+
+## Ecosystem
+
+| Package   | Status   | Description & API                                                                   |
+| --------- | -------- | ----------------------------------------------------------------------------------- |
+| ReCast    | Beta     | Core templating engine<br>`component`, `element`, `html`, `styled`                  |
+| Reface    | Beta     | Meta-framework for modern web applications<br>`hono`, `partila`, `island`           |
+| Reface UI | Planning | UI component library for web applications<br>`Panel`, `Grid`, `Button`, `Icon`, etc |
+| ReStory   | Planning | Component development tools<br>`cli`, `*.story.tsx`                                 |
+| ReDocs    | Planning | Documentation system                                                                |
 
 ## Quick Start
 
 ```typescript
-import { RefaceComposer } from "@reface/core";
-import { StyledPlugin } from "@reface/plugins/styled";
-import { PartialsPlugin } from "@reface/plugins/partials";
+import { Hono } from "hono";
+import { Reface, styled, html } from "reface";
 
-// Create composer instance
-const composer = new RefaceComposer();
-composer.use(new StyledPlugin());
-composer.use(new PartialsPlugin());
-
-// Create styled component
-const Button = styled.button`
+// Styled components
+const Button = styled.button/*css*/ `
   & {
-    background: var(--primary-color, #3182ce);
+    background: var(--color-primary);
     color: white;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+  }
+  &:hover {
+    background: var(--color-primary-dark);
   }
 `;
 
-// Create interactive component
-const Counter = partial(async () => {
-  const count = 0;
-  return (
-    <div>
-      <span>{count}</span>
-      <Button {...Counter.trigger()}>Increment</Button>
-    </div>
-  );
-}, "counter");
+const JokeText = styled.p/*css*/ `
+  & {
+    font-size: var(--text-xl);
+    margin: 2rem 0;
+    font-style: italic;
+    min-height: 4rem;
+  }
+`;
 
-// Create page template
-function HomePage() {
-  return (
-    <div>
-      <h1>Welcome to Reface</h1>
-      <Counter />
-    </div>
-  );
-}
+// Interactive component with HTMX
+const JokePartial = Reface.partial(async () => {
+  const joke = await (
+    await fetch("https://icanhazdadjoke.com/", {
+      headers: { Accept: "text/plain" },
+    })
+  ).text();
 
-// Compose HTML
-const html = composer.render(<HomePage />);
+  return <JokeText>${joke}</JokeText>;
+}, "joke");
+
+// Page component
+const HomePage = component(() => (
+  <div>
+    <h1>Dad Jokes</h1>
+    <div>
+      <JokePartial>
+        <JokeText>Click the button to load a joke!</JokeText>
+      </JokePartial>
+      <Button {...JokePartial.trigger("click")}>Get New Joke</Button>
+    </div>
+  </div>
+));
+
+// Setup application
+const app = new Hono();
+const reface = new Reface();
+reface.hono(app);
+
+app.get("/", (c) => c.html(reface.render(<HomePage />)));
+await Deno.serve(app.fetch);
 ```
-
-## Examples
-
-- [📚 Basic Components](./examples/basic) - Component composition
-- [🧩 Styled Components](./examples/styled) - CSS-in-JS examples
-- [🏝️ Partial Components](./examples/partials) - Interactive components
-- [🔌 Custom Plugin](./examples/plugin) - Plugin development
 
 ## Documentation
 
-- [Architecture](./docs/architecture.md) - Core concepts and composition design
-- [Components](./docs/components.md) - Component composition system
-- [Styling](./docs/styling.md) - CSS-in-JS styling
-- [Partials](./docs/partials.md) - Interactive components
-- [Plugins](./docs/plugins.md) - Plugin system
+- [We can found here](./docs/)
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
-for details.
+Issues and PRs are welcome! Join our [Discord](https://discord.gg/gT4gvVwqb8) for discussions.
 
 ## License
 

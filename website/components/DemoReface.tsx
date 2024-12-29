@@ -1,5 +1,5 @@
 import { Reface } from "@reface";
-import { styled } from "@reface/plugins/styled";
+import { styled } from "@reface";
 
 const DemoContainer = styled.div`
   & {

@@ -1,4 +1,4 @@
-import { styled } from "@reface/plugins/styled";
+import { styled } from "@reface";
 import { theme } from "../styles/theme.ts";
 import { textStyles } from "../styles/utils.ts";
 

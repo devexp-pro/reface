@@ -1,4 +1,4 @@
-import { styled } from "@reface/plugins/styled";
+import { styled } from "@reface";
 
 export const Container = styled.div`
   & {

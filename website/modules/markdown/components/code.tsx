@@ -1,4 +1,4 @@
-import { styled } from "@reface/plugins/styled";
+import { styled } from "@reface";
 import { Code as BaseCode } from "../../../components/Code.tsx";
 
 export interface CodeProps {
