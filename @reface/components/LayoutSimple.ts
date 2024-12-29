@@ -5,6 +5,7 @@ import type { Template } from "@reface/template";
 
 export type LayoutSimpleProps = {
   htmx?: boolean;
+  alpine?: boolean;
   bootstrap?: boolean;
   normalizeCss?: boolean;
   head?: ElementChildType;
@@ -22,6 +23,7 @@ export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
       htmx,
       bootstrap,
       normalizeCss,
+      alpine,
       head: pageHead,
     } = props;
 
@@ -52,6 +54,12 @@ export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
         href:
           "https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css",
         rel: "stylesheet",
+      })
+    }
+      ${
+      alpine &&
+      script({
+        src: "https://cdn.jsdelivr.net/npm/alpinejs@3.15.2/dist/cdn.min.js",
       })
     }
         ${pageHead}

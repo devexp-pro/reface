@@ -1,91 +1,159 @@
 import { component } from "@reface";
 import { styled } from "@reface/plugins/styled";
-import { Reface } from "@reface";
-import { LayoutSimple } from "@reface/components/LayoutSimple";
-import { LiveReloadPlugin } from "@reface/plugins/liveReload";
-import { Hono } from "@hono/hono";
+import { theme } from "./theme.ts";
+import { Select } from "./forms/Select.tsx";
+import { Radio } from "./forms/Radio.tsx";
+import { Checkbox } from "./forms/Checkbox.tsx";
+import { NumberInput } from "./forms/NumberInput.tsx";
+import { ColorPicker } from "./forms/ColorPicker.tsx";
+import { FieldLabel } from "./forms/FieldLabel.tsx";
 
-const IS_DEV = true;
+import { Button } from "./controls/Button.tsx";
+import { Icon } from "./ui/Icon.tsx";
 
-// Новая тема для инструментального интерфейса
-const theme = {
-  colors: {
-    bg: {
-      base: "#2c2c2c",
-      panel: "#1c1c1c",
-      input: "#3c3c3c",
-      hover: "#4c4c4c",
-    },
-    text: {
-      base: "#ebebeb",
-      dimmed: "#9ca3af",
-      label: "#d1d5db",
-    },
-    border: {
-      base: "#404040",
-      hover: "#525252",
-    },
-    accent: {
-      base: "#60a5fa",
-      hover: "#3b82f6",
-    },
-  },
-  spacing: {
-    xs: "0.25rem",
-    sm: "0.5rem",
-    md: "0.75rem",
-    lg: "1rem",
-  },
-  typography: {
-    fonts: {
-      mono: "'JetBrains Mono', monospace",
-      ui: "Inter, system-ui, -apple-system, sans-serif",
-    },
-    sizes: {
-      xs: "11px",
-      sm: "12px",
-      md: "13px",
-      lg: "14px",
-    },
-    weights: {
-      normal: 400,
-      medium: 500,
-      semibold: 600,
-    },
-  },
-};
-
-// Базовый лейаут приложения
-const AppLayout = styled.div`
+// Добавляем базовые компоненты
+const Box = styled.div`
   & {
-    display: grid;
-    grid-template-columns: 280px 1fr 280px;
-    height: 100vh;
-    background: ${theme.colors.bg.base};
-    color: ${theme.colors.text.base};
-    font-family: Inter, system-ui, -apple-system, sans-serif;
+    box-sizing: border-box;
   }
 `;
 
-// Боковая панель
-const Sidebar = styled.div`
+const Container = styled.div`
+  & {
+    display: flex;
+  }
+  
+  &.vertical {
+    flex-direction: column;
+  }
+  
+  &.horizontal {
+    flex-direction: row;
+  }
+
+  /* Добавляем фон для основного контейнера */
+  &.main-content {
+    background: ${theme.colors.bg.base};
+  }
+`;
+
+const Panel = styled.div`
   & {
     background: ${theme.colors.bg.panel};
-    border-right: 1px solid ${theme.colors.border.base};
+    border: 1px solid ${theme.colors.border.base};
     overflow: auto;
-  }
-
-  &.right {
-    border-right: none;
-    border-left: 1px solid ${theme.colors.border.base};
   }
 `;
 
-// Основная область
-const MainArea = styled.div`
+// Обновляем AppLayout
+const AppLayout = styled.div`
   & {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100%;
     overflow: hidden;
+    font-family: ${theme.typography.fonts.ui};
+    background: ${theme.colors.bg.base};
+  }
+
+  & .content-wrapper {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+`;
+
+// Логотип
+const Logo = styled.div`
+  & {
+    padding: ${theme.spacing.md};
+    border-bottom: 1px solid ${theme.colors.border.base};
+    font-family: ${theme.typography.fonts.mono};
+    font-size: ${theme.typography.sizes.md};
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing.xs};
+  }
+
+  & .bracket {
+    color: ${theme.colors.text.dimmed};
+  }
+
+  & .letter {
+    color: ${theme.colors.accent.base};
+    font-weight: ${theme.typography.weights.semibold};
+  }
+
+  & .name {
+    color: ${theme.colors.text.base};
+    font-weight: ${theme.typography.weights.medium};
+  }
+
+  & .type {
+    color: ${theme.colors.text.dimmed};
+    font-weight: ${theme.typography.weights.normal};
+  }
+`;
+
+// Навигационное меню
+const NavMenu = styled.div`
+  & {
+    padding: ${theme.spacing.sm};
+  }
+`;
+
+const NavGroup = styled.div`
+  & {
+    margin-bottom: ${theme.spacing.md};
+  }
+
+  & .nav-header {
+    padding: ${theme.spacing.xs} ${theme.spacing.sm};
+    font-size: ${theme.typography.sizes.xs};
+    color: ${theme.colors.text.dimmed};
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+`;
+
+const NavItem = styled.div`
+  & {
+    padding: ${theme.spacing.xs} ${theme.spacing.sm};
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing.sm};
+    color: ${theme.colors.text.base};
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  &:hover {
+    background: ${theme.colors.bg.hover};
+  }
+
+  &.active {
+    background: ${theme.colors.accent.base}20;
+    color: ${theme.colors.accent.base};
+  }
+
+  & .nav-icon {
+    width: 16px;
+    color: ${theme.colors.text.dimmed};
+  }
+
+  & .nav-label {
+    flex: 1;
+    font-size: ${theme.typography.sizes.sm};
+  }
+
+  & .nav-meta {
+    font-size: ${theme.typography.sizes.xs};
+    color: ${theme.colors.text.dimmed};
   }
 `;
 
@@ -141,246 +209,6 @@ const ToolButton = styled.button`
   &.active {
     background: ${theme.colors.accent.base};
     color: white;
-  }
-`;
-
-// Базовая панель настроек
-const ControlPanel = styled.div`
-  & {
-    background: ${theme.colors.bg.panel};
-    border-radius: 6px;
-    width: 280px;
-    color: ${theme.colors.text.base};
-    font-family: Inter, system-ui, -apple-system, sans-serif;
-    font-size: 12px;
-    overflow: hidden;
-  }
-`;
-
-// Группа контролов
-const ControlGroup = styled.div`
-  & {
-    border-bottom: 1px solid ${theme.colors.border.base};
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-`;
-
-// Строка с контролом
-const ControlRow = styled.div`
-  & {
-    display: grid;
-    grid-template-columns: minmax(80px, 120px) 1fr;
-    gap: ${theme.spacing.md};
-    align-items: center;
-    padding: ${theme.spacing.sm} ${theme.spacing.md};
-    min-height: 32px;
-  }
-
-  &:hover {
-    background: ${theme.colors.bg.hover};
-  }
-
-  /* Для случаев, когда нужно растянуть контрол на всю ширину */
-  &.full-width {
-    grid-template-columns: 1fr;
-  }
-
-  /* Для случаев с дополнительными кнопками справа */
-  &.with-tools {
-    grid-template-columns: minmax(80px, 120px) 1fr auto;
-  }
-`;
-
-// Числовой ввод с драгом
-const NumberInput = styled.div`
-  & {
-    position: relative;
-    width: 100%;
-    height: 24px;
-    background: ${theme.colors.bg.input};
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    cursor: ew-resize;
-  }
-
-  & input {
-    width: 100%;
-    height: 100%;
-    border: none;
-    background: none;
-    color: ${theme.colors.text.base};
-    padding: 0 ${theme.spacing.sm};
-    text-align: right;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-  }
-
-  & input:focus {
-    outline: 1px solid ${theme.colors.accent.base};
-  }
-`;
-
-// Цветовой пикер
-const ColorPicker = styled.div`
-  & {
-    width: 100%;
-    height: 24px;
-    display: flex;
-    gap: ${theme.spacing.xs};
-    align-items: center;
-  }
-
-  & .color-preview {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    border: 1px solid ${theme.colors.border.base};
-  }
-
-  & input {
-    flex: 1;
-    height: 24px;
-    background: ${theme.colors.bg.input};
-    border: none;
-    border-radius: 4px;
-    color: ${theme.colors.text.base};
-    padding: 0 ${theme.spacing.sm};
-    font-family: ${theme.typography.fonts.mono};
-    font-size: 11px;
-  }
-`;
-
-// Селект
-const Select = styled.select`
-  & {
-    width: 100%;
-    height: 24px;
-    background: ${theme.colors.bg.input};
-    border: none;
-    border-radius: 4px;
-    color: ${theme.colors.text.base};
-    padding: 0 ${theme.spacing.sm};
-    font-size: 11px;
-    cursor: pointer;
-  }
-
-  &:focus {
-    outline: 1px solid ${theme.colors.accent.base};
-  }
-`;
-
-// Vector3 input
-const Vector3Input = styled.div`
-  & {
-    display: flex;
-    gap: 2px;
-  }
-
-  & .vector-component {
-    width: 32px;
-    height: 24px;
-    background: ${theme.colors.bg.input};
-    border: none;
-    border-radius: 4px;
-    color: ${theme.colors.text.base};
-    padding: 0 4px;
-    text-align: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-  }
-
-  & .vector-label {
-    width: 12px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: ${theme.colors.text.dimmed};
-    font-size: 10px;
-  }
-`;
-
-// Заголовок секции
-const SectionTitle = styled.div`
-  & {
-    font-family: ${theme.typography.fonts.ui};
-    font-size: ${theme.typography.sizes.sm};
-    font-weight: ${theme.typography.weights.medium};
-    color: ${theme.colors.text.dimmed};
-    padding: ${theme.spacing.sm} ${theme.spacing.md};
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    user-select: none;
-  }
-`;
-
-// Метка поля
-const FieldLabel = styled.span`
-  & {
-    font-family: ${theme.typography.fonts.ui};
-    font-size: ${theme.typography.sizes.sm};
-    color: ${theme.colors.text.label};
-    user-select: none;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-`;
-
-// Значение
-const Value = styled.span`
-  & {
-    font-family: ${theme.typography.fonts.mono};
-    font-size: ${theme.typography.sizes.xs};
-    color: ${theme.colors.text.base};
-  }
-
-  &.dimmed {
-    color: ${theme.colors.text.dimmed};
-  }
-`;
-
-// Подсказка
-const Hint = styled.div`
-  & {
-    font-family: ${theme.typography.fonts.ui};
-    font-size: ${theme.typography.sizes.xs};
-    color: ${theme.colors.text.dimmed};
-    padding: ${theme.spacing.xs} ${theme.spacing.md};
-  }
-`;
-
-// Ошибка
-const Error = styled.div`
-  & {
-    font-family: ${theme.typography.fonts.ui};
-    font-size: ${theme.typography.sizes.xs};
-    color: #ef4444;
-    padding: ${theme.spacing.xs} ${theme.spacing.md};
-  }
-`;
-
-// Путь к файлу/объекту
-const Path = styled.div`
-  & {
-    font-family: ${theme.typography.fonts.mono};
-    font-size: ${theme.typography.sizes.xs};
-    color: ${theme.colors.text.dimmed};
-    padding: ${theme.spacing.xs} ${theme.spacing.md};
-  }
-
-  & .separator {
-    color: ${theme.colors.text.dimmed};
-    opacity: 0.5;
-    margin: 0 ${theme.spacing.xs};
-  }
-
-  & .current {
-    color: ${theme.colors.text.base};
   }
 `;
 
@@ -541,162 +369,244 @@ const Content = styled.div`
   }
 `;
 
-// Логотип
-const Logo = styled.div`
+// Базовая панель настроек
+const ControlPanel = styled.div`
   & {
-    padding: ${theme.spacing.md};
+    background: ${theme.colors.bg.panel};
+    border-radius: 6px;
+    width: 280px;
+    color: ${theme.colors.text.base};
+    font-family: ${theme.typography.fonts.ui};
+    font-size: 12px;
+    overflow: hidden;
+  }
+`;
+
+// Группа контролов
+const ControlGroup = styled.div`
+  & {
     border-bottom: 1px solid ${theme.colors.border.base};
-    font-family: ${theme.typography.fonts.mono};
-    font-size: ${theme.typography.sizes.md};
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+// Строка с контролом
+const ControlRow = styled.div`
+  & {
+    display: grid;
+    grid-template-columns: minmax(80px, 120px) 1fr;
+    gap: ${theme.spacing.md};
+    align-items: center;
+    padding: ${theme.spacing.sm} ${theme.spacing.md};
+    min-height: 32px;
+  }
+
+  &:hover {
+    background: ${theme.colors.bg.hover};
+  }
+
+  /* Для случаев, когда нужно растянуть контрол на всю ширину */
+  &.full-width {
+    grid-template-columns: 1fr;
+  }
+
+  /* Для случаев с дополнительными кнопками справа */
+  &.with-tools {
+    grid-template-columns: minmax(80px, 120px) 1fr auto;
+  }
+`;
+
+// Заголовок секции
+const SectionTitle = styled.div`
+  & {
+    font-family: ${theme.typography.fonts.ui};
+    font-size: ${theme.typography.sizes.sm};
+    font-weight: ${theme.typography.weights.medium};
+    color: ${theme.colors.text.dimmed};
+    padding: ${theme.spacing.sm} ${theme.spacing.md};
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     user-select: none;
+  }
+`;
+
+// Статус бар
+const StatusBar = styled.div`
+  & {
+    height: 24px;
+    background: ${theme.colors.bg.panel};
+    border-top: 1px solid ${theme.colors.border.base};
+    display: flex;
+    align-items: center;
+    padding: 0 ${theme.spacing.md};
+    gap: ${theme.spacing.md};
+    font-size: ${theme.typography.sizes.xs};
+    color: ${theme.colors.text.dimmed};
+    user-select: none;
+  }
+
+  & .status-item {
     display: flex;
     align-items: center;
     gap: ${theme.spacing.xs};
   }
 
-  & .bracket {
-    color: ${theme.colors.text.dimmed};
-  }
-
-  & .letter {
-    color: ${theme.colors.accent.base};
-    font-weight: ${theme.typography.weights.semibold};
-  }
-
-  & .name {
+  & .status-item:hover {
     color: ${theme.colors.text.base};
-    font-weight: ${theme.typography.weights.medium};
   }
 
-  & .type {
-    color: ${theme.colors.text.dimmed};
-    font-weight: ${theme.typography.weights.normal};
+  & .divider {
+    width: 1px;
+    height: 14px;
+    background: ${theme.colors.border.base};
   }
 `;
 
-// Обновленная демо страница
+// Путь к файлу/объекту
+const Path = styled.div`
+  & {
+    font-family: ${theme.typography.fonts.mono};
+    font-size: ${theme.typography.sizes.xs};
+    color: ${theme.colors.text.dimmed};
+    padding: ${theme.spacing.xs} ${theme.spacing.md};
+  }
+
+  & .separator {
+    color: ${theme.colors.text.dimmed};
+    opacity: 0.5;
+    margin: 0 ${theme.spacing.xs};
+  }
+
+  & .current {
+    color: ${theme.colors.text.base};
+  }
+`;
+
+// Обновляем содержимое правой панели
 export const RefaceUIPage = component(() => (
   <AppLayout>
-    <Sidebar>
-      <Logo>
-        <span class="bracket">[</span>
-        <span class="letter">R</span>
-        <span class="bracket">]</span>
-        <span class="name">eface</span>
-        <span class="type">UI</span>
-      </Logo>
+    <Container class="content-wrapper">
+      <Panel style="width: 280px">
+        <Logo>
+          <span class="bracket">[</span>
+          <span class="letter">R</span>
+          <span class="bracket">]</span>
+          <span class="name">eface</span>
+          <span class="type">UI</span>
+        </Logo>
+        <NavMenu>
+          <NavGroup>
+            <div class="nav-header">Project</div>
+            <NavItem class="active">
+              <span class="nav-icon">📄</span>
+              <span class="nav-label">Documentation</span>
+            </NavItem>
+            <NavItem>
+              <span class="nav-icon">⚙️</span>
+              <span class="nav-label">Settings</span>
+            </NavItem>
+          </NavGroup>
 
-      <ControlPanel>
-        <SectionTitle>Transform</SectionTitle>
-        <ControlGroup>
-          <ControlRow>
-            <FieldLabel>Scale</FieldLabel>
-            <NumberInput>
-              <input type="number" value="1.0" step="0.1" />
-            </NumberInput>
-          </ControlRow>
+          <NavGroup>
+            <div class="nav-header">Files</div>
+            <NavItem>
+              <span class="nav-icon">📁</span>
+              <span class="nav-label">src</span>
+              <span class="nav-meta">12 files</span>
+            </NavItem>
+            <NavItem>
+              <span class="nav-icon">📁</span>
+              <span class="nav-label">assets</span>
+              <span class="nav-meta">4 files</span>
+            </NavItem>
+          </NavGroup>
 
-          <ControlRow>
-            <FieldLabel>Position</FieldLabel>
-            <Vector3Input>
-              <input class="vector-component" value="0" />
-              <span class="vector-label">X</span>
-              <input class="vector-component" value="2" />
-              <span class="vector-label">Y</span>
-              <input class="vector-component" value="0" />
-              <span class="vector-label">Z</span>
-            </Vector3Input>
-          </ControlRow>
-        </ControlGroup>
+          <NavGroup>
+            <div class="nav-header">Team</div>
+            <NavItem>
+              <span class="nav-icon">👤</span>
+              <span class="nav-label">Alex Morgan</span>
+              <span class="nav-meta">online</span>
+            </NavItem>
+            <NavItem>
+              <span class="nav-icon">👤</span>
+              <span class="nav-label">Sarah Chen</span>
+              <span class="nav-meta">away</span>
+            </NavItem>
+            <NavItem>
+              <span class="nav-icon">👥</span>
+              <span class="nav-label">Invite People</span>
+            </NavItem>
+          </NavGroup>
+        </NavMenu>
+      </Panel>
 
-        <SectionTitle>Appearance</SectionTitle>
-        <ControlGroup>
-          <ControlRow>
-            <FieldLabel>Color</FieldLabel>
-            <ColorPicker>
-              <div class="color-preview" style="background: #ff005b" />
-              <input value="#ff005b" />
-            </ColorPicker>
-          </ControlRow>
+      <Container class="vertical main-content" style="flex: 1">
+        <Toolbar>
+          <Path>
+            <span>docs</span>
+            <span class="separator">/</span>
+            <span class="current">getting-started.md</span>
+          </Path>
+        </Toolbar>
+        <div style="padding: 2rem; height: calc(100% - 40px); overflow: auto;">
+          <Content>
+            <h1>Getting Started</h1>
+            <p>
+              Welcome to our application! Here's a quick guide to get you
+              started.
+            </p>
 
-          <ControlRow>
-            <FieldLabel>Type</FieldLabel>
-            <Select>
-              <option>Normal</option>
-              <option>Outline</option>
-              <option>Wireframe</option>
-            </Select>
-          </ControlRow>
-        </ControlGroup>
+            <h2>Installation</h2>
+            <p>You can install the package using npm:</p>
+            <pre><code>npm install @reface/ui</code></pre>
 
-        <Hint>Changes are saved automatically</Hint>
-        <Error>Unable to connect to server</Error>
-      </ControlPanel>
-    </Sidebar>
+            <h2>Basic Usage</h2>
+            <p>Here are the main components you'll be working with:</p>
 
-    <MainArea>
-      <Toolbar>
-        <Path>
-          <span>docs</span>
-          <span class="separator">/</span>
-          <span class="current">getting-started.md</span>
-        </Path>
-      </Toolbar>
+            <h3>Controls</h3>
+            <ul>
+              <li>
+                Use <code>NumberInput</code> for numeric values
+              </li>
+              <li>
+                Use <code>ColorPicker</code> for color selection
+              </li>
+              <li>
+                Use <code>Vector3Input</code> for 3D coordinates
+              </li>
+            </ul>
 
-      <div style="padding: 2rem; height: calc(100% - 40px); overflow: auto;">
-        <Content>
-          <h1>Getting Started</h1>
-          <p>
-            Welcome to our application! Here's a quick guide to get you started.
-          </p>
+            <h3>Keyboard Shortcuts</h3>
+            <table>
+              <tr>
+                <th>Action</th>
+                <th>Shortcut</th>
+              </tr>
+              <tr>
+                <td>Save</td>
+                <td>
+                  <kbd>Ctrl</kbd> + <kbd>S</kbd>
+                </td>
+              </tr>
+              <tr>
+                <td>Undo</td>
+                <td>
+                  <kbd>Ctrl</kbd> + <kbd>Z</kbd>
+                </td>
+              </tr>
+            </table>
 
-          <h2>Installation</h2>
-          <p>You can install the package using npm:</p>
-          <pre><code>npm install @reface/ui</code></pre>
+            <blockquote>
+              <strong>Note:</strong> Make sure to save your changes regularly.
+            </blockquote>
 
-          <h2>Basic Usage</h2>
-          <p>Here are the main components you'll be working with:</p>
-
-          <h3>Controls</h3>
-          <ul>
-            <li>
-              Use <code>NumberInput</code> for numeric values
-            </li>
-            <li>
-              Use <code>ColorPicker</code> for color selection
-            </li>
-            <li>
-              Use <code>Vector3Input</code> for 3D coordinates
-            </li>
-          </ul>
-
-          <h3>Keyboard Shortcuts</h3>
-          <table>
-            <tr>
-              <th>Action</th>
-              <th>Shortcut</th>
-            </tr>
-            <tr>
-              <td>Save</td>
-              <td>
-                <kbd>Ctrl</kbd> + <kbd>S</kbd>
-              </td>
-            </tr>
-            <tr>
-              <td>Undo</td>
-              <td>
-                <kbd>Ctrl</kbd> + <kbd>Z</kbd>
-              </td>
-            </tr>
-          </table>
-
-          <blockquote>
-            <strong>Note:</strong> Make sure to save your changes regularly.
-          </blockquote>
-
-          <h2>Examples</h2>
-          <p>Here's a sample configuration:</p>
-          <pre><code>{`{
+            <h2>Examples</h2>
+            <p>Here's a sample configuration:</p>
+            <pre><code>{`{
   "theme": "dark",
   "autoSave": true,
   "shortcuts": {
@@ -705,208 +615,165 @@ export const RefaceUIPage = component(() => (
   }
 }`}</code></pre>
 
-          <hr />
+            <hr />
 
-          <p>
-            For more information, check out our <a href="#">documentation</a>.
-          </p>
-        </Content>
+            <p>
+              For more information, check out our <a href="#">documentation</a>.
+            </p>
+          </Content>
+        </div>
+      </Container>
+
+      <Panel style="width: 280px">
+        <ControlPanel>
+          <SectionTitle>Buttons</SectionTitle>
+          <div style="display: flex; gap: 1rem; margin-bottom: 2rem">
+            <Button>Default Button</Button>
+            <Button variant="primary">Primary Button</Button>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem">
+            <Button block>Full Width Button</Button>
+            <Button block variant="primary">Full Width Primary Button</Button>
+          </div>
+          <SectionTitle>Buttons with Icons</SectionTitle>
+          <div style="padding: 1rem">
+            <div style="display: flex; gap: 1rem; margin-bottom: 2rem">
+              <Button slots={{ start: <Icon>🔍</Icon> }}>
+                Search
+              </Button>
+
+              <Button
+                variant="primary"
+                slots={{
+                  start: <Icon>💾</Icon>,
+                  end: <Icon>↓</Icon>,
+                }}
+              >
+                Save File
+              </Button>
+
+              <Button slots={{ end: <Icon>→</Icon> }}>
+                Next
+              </Button>
+            </div>
+          </div>
+        </ControlPanel>
+        <ControlPanel>
+          <SectionTitle>Form Controls</SectionTitle>
+
+          {/* Select с простым выбором */}
+          <ControlGroup>
+            <ControlRow>
+              <FieldLabel>Language</FieldLabel>
+              <Select data-sync="language">
+                <option value="en">English</option>
+                <option value="es">Español</option>
+                <option value="fr">Français</option>
+                <option value="de">Deutsch</option>
+                <option value="ru">Русский</option>
+              </Select>
+            </ControlRow>
+          </ControlGroup>
+
+          {/* Select с группами */}
+          <ControlGroup>
+            <ControlRow>
+              <FieldLabel>Theme</FieldLabel>
+              <Select data-sync="theme">
+                <optgroup label="Light">
+                  <option value="light">Default Light</option>
+                  <option value="light-high-contrast">
+                    High Contrast Light
+                  </option>
+                  <option value="light-soft">Soft Light</option>
+                </optgroup>
+                <optgroup label="Dark">
+                  <option value="dark">Default Dark</option>
+                  <option value="dark-high-contrast">
+                    High Contrast Dark
+                  </option>
+                  <option value="dark-soft">Soft Dark</option>
+                </optgroup>
+              </Select>
+            </ControlRow>
+          </ControlGroup>
+
+          {/* Radio группа */}
+          <ControlGroup>
+            <ControlRow>
+              <FieldLabel>View Mode</FieldLabel>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <Radio name="viewMode" value="grid" checked>Grid View</Radio>
+                <Radio name="viewMode" value="list">List View</Radio>
+                <Radio name="viewMode" value="compact">Compact View</Radio>
+              </div>
+            </ControlRow>
+          </ControlGroup>
+
+          {/* Disabled Select */}
+          <ControlGroup>
+            <ControlRow>
+              <FieldLabel>Status</FieldLabel>
+              <Select disabled>
+                <option>Locked</option>
+              </Select>
+            </ControlRow>
+          </ControlGroup>
+
+          {/* Checkbox группа */}
+          <ControlGroup>
+            <ControlRow>
+              <FieldLabel>Options</FieldLabel>
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <Checkbox data-sync="enabled">Enabled</Checkbox>
+                <Checkbox data-sync="visible" checked>Visible</Checkbox>
+                <Checkbox data-sync="locked">Locked</Checkbox>
+              </div>
+            </ControlRow>
+          </ControlGroup>
+
+          <SectionTitle>Other Controls</SectionTitle>
+
+          {/* Остальные контролы без изменений */}
+          <ControlGroup>
+            <ControlRow>
+              <FieldLabel>Number</FieldLabel>
+              <NumberInput
+                value="1.0"
+                step="0.1"
+                min="0"
+                max="10"
+                data-drag="number"
+              />
+            </ControlRow>
+          </ControlGroup>
+
+          <ControlGroup>
+            <ControlRow>
+              <FieldLabel>Color</FieldLabel>
+              <ColorPicker
+                value="#ff005b"
+                data-sync="color"
+                data-color-picker
+              />
+            </ControlRow>
+          </ControlGroup>
+        </ControlPanel>
+      </Panel>
+    </Container>
+    <StatusBar>
+      <div class="status-item">
+        <span>Ready</span>
       </div>
-    </MainArea>
-
-    <Sidebar class="right">
-      <ControlPanel>
-        <SectionTitle>Basic Section</SectionTitle>
-        <ControlGroup>
-          <ControlRow>
-            <FieldLabel>Simple Field</FieldLabel>
-            <Value>100</Value>
-          </ControlRow>
-          <ControlRow>
-            <FieldLabel>With Input</FieldLabel>
-            <NumberInput>
-              <input type="number" value="1.0" step="0.1" />
-            </NumberInput>
-          </ControlRow>
-        </ControlGroup>
-
-        <SectionTitle>Nested Groups</SectionTitle>
-        <ControlGroup>
-          <ControlRow>
-            <FieldLabel>Parent Group</FieldLabel>
-            <Value>▼</Value>
-          </ControlRow>
-          <div style="padding-left: ${theme.spacing.md}">
-            <ControlRow>
-              <FieldLabel>Child Item 1</FieldLabel>
-              <Value>On</Value>
-            </ControlRow>
-            <ControlRow>
-              <FieldLabel>Child Item 2</FieldLabel>
-              <Value>Off</Value>
-            </ControlRow>
-          </div>
-        </ControlGroup>
-
-        <SectionTitle>With Description</SectionTitle>
-        <ControlGroup>
-          <ControlRow>
-            <FieldLabel>Complex Setting</FieldLabel>
-            <Select>
-              <option>Option 1</option>
-              <option>Option 2</option>
-            </Select>
-          </ControlRow>
-          <Hint>This is a helpful description of what this setting does</Hint>
-        </ControlGroup>
-
-        <SectionTitle>Validation States</SectionTitle>
-        <ControlGroup>
-          <ControlRow>
-            <FieldLabel>Valid Input</FieldLabel>
-            <NumberInput>
-              <input type="number" value="42" />
-            </NumberInput>
-          </ControlRow>
-          <ControlRow>
-            <FieldLabel>Invalid Input</FieldLabel>
-            <NumberInput>
-              <input type="number" value="-1" />
-            </NumberInput>
-          </ControlRow>
-          <Error>Value must be positive</Error>
-        </ControlGroup>
-
-        <SectionTitle>Collapsible Group</SectionTitle>
-        <ControlGroup>
-          <ControlRow style="cursor: pointer;">
-            <FieldLabel>Advanced Settings</FieldLabel>
-            <Value>▼</Value>
-          </ControlRow>
-          <div style="padding-left: ${theme.spacing.md}">
-            <ControlRow>
-              <FieldLabel>Debug Mode</FieldLabel>
-              <Value>Enabled</Value>
-            </ControlRow>
-            <ControlRow>
-              <FieldLabel>Verbose Logging</FieldLabel>
-              <Value>Disabled</Value>
-            </ControlRow>
-            <ControlGroup>
-              <ControlRow>
-                <FieldLabel>Sub-Setting</FieldLabel>
-                <NumberInput>
-                  <input type="number" value="1" />
-                </NumberInput>
-              </ControlRow>
-              <Hint>Nested group with its own hint</Hint>
-            </ControlGroup>
-          </div>
-        </ControlGroup>
-
-        <SectionTitle>Array Items</SectionTitle>
-        <ControlGroup>
-          <ControlRow>
-            <FieldLabel>Items</FieldLabel>
-            <ToolButton>+</ToolButton>
-          </ControlRow>
-          <div style="padding-left: ${theme.spacing.md}">
-            <ControlRow>
-              <FieldLabel>Item [0]</FieldLabel>
-              <ToolButton>×</ToolButton>
-            </ControlRow>
-            <ControlRow>
-              <FieldLabel>Item [1]</FieldLabel>
-              <ToolButton>×</ToolButton>
-            </ControlRow>
-          </div>
-        </ControlGroup>
-
-        <SectionTitle>Custom Styling</SectionTitle>
-        <ControlGroup>
-          <ControlRow style="background: ${theme.colors.bg.input};">
-            <FieldLabel>Highlighted Row</FieldLabel>
-            <Value>Special</Value>
-          </ControlRow>
-          <ControlRow>
-            <FieldLabel style="color: ${theme.colors.accent.base};">
-              Accent Label
-            </FieldLabel>
-            <Value>Custom</Value>
-          </ControlRow>
-        </ControlGroup>
-
-        <SectionTitle>Grid Layout Examples</SectionTitle>
-
-        {/* Стандартный вариант */}
-        <ControlGroup>
-          <ControlRow>
-            <FieldLabel>Standard</FieldLabel>
-            <NumberInput>
-              <input type="number" value="1.0" step="0.1" />
-            </NumberInput>
-          </ControlRow>
-        </ControlGroup>
-
-        {/* С дополнительными кнопками */}
-        <ControlGroup>
-          <ControlRow class="with-tools">
-            <FieldLabel>With Tools</FieldLabel>
-            <NumberInput>
-              <input type="number" value="1.0" step="0.1" />
-            </NumberInput>
-            <ToolButton>⚙️</ToolButton>
-          </ControlRow>
-        </ControlGroup>
-
-        {/* На всю ширину */}
-        <ControlGroup>
-          <ControlRow class="full-width">
-            <Select>
-              <option>Full Width Control</option>
-            </Select>
-          </ControlRow>
-        </ControlGroup>
-
-        {/* Длинный label */}
-        <ControlGroup>
-          <ControlRow>
-            <FieldLabel>Very Long Label That Should Truncate</FieldLabel>
-            <NumberInput>
-              <input type="number" value="1.0" step="0.1" />
-            </NumberInput>
-          </ControlRow>
-        </ControlGroup>
-      </ControlPanel>
-    </Sidebar>
+      <div class="divider"></div>
+      <div class="status-item">
+        <span>Line: 42, Column: 10</span>
+      </div>
+      <div class="divider"></div>
+      <div class="status-item">
+        <span>UTF-8</span>
+      </div>
+    </StatusBar>
   </AppLayout>
 ));
-
-const Layout = component((_, children) => (
-  <LayoutSimple
-    title="Reface UI - Controls Demo"
-    description="UI Controls for desktop applications"
-    favicon="/assets/logo.png"
-    normalizeCss
-    htmx
-  >
-    {children}
-  </LayoutSimple>
-));
-
-const reface = new Reface({
-  layout: Layout,
-});
-
-if (IS_DEV) {
-  reface.composer.use(new LiveReloadPlugin({ watchPaths: ["./"] }));
-}
-
-const app = new Hono();
-reface.hono(app);
-
-app.get("/", (c) => {
-  return c.html(reface.render(<RefaceUIPage />));
-});
-
-export default app;
