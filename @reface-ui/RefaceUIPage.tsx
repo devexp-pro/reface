@@ -171,20 +171,26 @@ const ControlGroup = styled.div`
 // Строка с контролом
 const ControlRow = styled.div`
   & {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(80px, 120px) 1fr;
+    gap: ${theme.spacing.md};
     align-items: center;
     padding: ${theme.spacing.sm} ${theme.spacing.md};
     min-height: 32px;
   }
 
-  & .label {
-    flex: 1;
-    color: ${theme.colors.text.label};
-    user-select: none;
-  }
-
   &:hover {
     background: ${theme.colors.bg.hover};
+  }
+
+  /* Для случаев, когда нужно растянуть контрол на всю ширину */
+  &.full-width {
+    grid-template-columns: 1fr;
+  }
+
+  /* Для случаев с дополнительными кнопками справа */
+  &.with-tools {
+    grid-template-columns: minmax(80px, 120px) 1fr auto;
   }
 `;
 
@@ -192,7 +198,7 @@ const ControlRow = styled.div`
 const NumberInput = styled.div`
   & {
     position: relative;
-    width: 100px;
+    width: 100%;
     height: 24px;
     background: ${theme.colors.bg.input};
     border-radius: 4px;
@@ -221,27 +227,29 @@ const NumberInput = styled.div`
 // Цветовой пикер
 const ColorPicker = styled.div`
   & {
+    width: 100%;
+    height: 24px;
     display: flex;
+    gap: ${theme.spacing.xs};
     align-items: center;
-    gap: ${theme.spacing.sm};
   }
 
   & .color-preview {
     width: 24px;
     height: 24px;
     border-radius: 4px;
-    border: 2px solid ${theme.colors.border.base};
+    border: 1px solid ${theme.colors.border.base};
   }
 
   & input {
-    width: 76px;
+    flex: 1;
     height: 24px;
     background: ${theme.colors.bg.input};
     border: none;
     border-radius: 4px;
     color: ${theme.colors.text.base};
     padding: 0 ${theme.spacing.sm};
-    font-family: 'JetBrains Mono', monospace;
+    font-family: ${theme.typography.fonts.mono};
     font-size: 11px;
   }
 `;
@@ -249,7 +257,7 @@ const ColorPicker = styled.div`
 // Селект
 const Select = styled.select`
   & {
-    width: 100px;
+    width: 100%;
     height: 24px;
     background: ${theme.colors.bg.input};
     border: none;
@@ -317,6 +325,9 @@ const FieldLabel = styled.span`
     font-size: ${theme.typography.sizes.sm};
     color: ${theme.colors.text.label};
     user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 `;
 
@@ -705,15 +716,165 @@ export const RefaceUIPage = component(() => (
 
     <Sidebar class="right">
       <ControlPanel>
-        <SectionTitle>Layers</SectionTitle>
+        <SectionTitle>Basic Section</SectionTitle>
         <ControlGroup>
           <ControlRow>
-            <FieldLabel>Layer 1</FieldLabel>
-            <ToolButton>👁️</ToolButton>
+            <FieldLabel>Simple Field</FieldLabel>
+            <Value>100</Value>
           </ControlRow>
           <ControlRow>
-            <FieldLabel>Layer 2</FieldLabel>
-            <ToolButton>👁️</ToolButton>
+            <FieldLabel>With Input</FieldLabel>
+            <NumberInput>
+              <input type="number" value="1.0" step="0.1" />
+            </NumberInput>
+          </ControlRow>
+        </ControlGroup>
+
+        <SectionTitle>Nested Groups</SectionTitle>
+        <ControlGroup>
+          <ControlRow>
+            <FieldLabel>Parent Group</FieldLabel>
+            <Value>▼</Value>
+          </ControlRow>
+          <div style="padding-left: ${theme.spacing.md}">
+            <ControlRow>
+              <FieldLabel>Child Item 1</FieldLabel>
+              <Value>On</Value>
+            </ControlRow>
+            <ControlRow>
+              <FieldLabel>Child Item 2</FieldLabel>
+              <Value>Off</Value>
+            </ControlRow>
+          </div>
+        </ControlGroup>
+
+        <SectionTitle>With Description</SectionTitle>
+        <ControlGroup>
+          <ControlRow>
+            <FieldLabel>Complex Setting</FieldLabel>
+            <Select>
+              <option>Option 1</option>
+              <option>Option 2</option>
+            </Select>
+          </ControlRow>
+          <Hint>This is a helpful description of what this setting does</Hint>
+        </ControlGroup>
+
+        <SectionTitle>Validation States</SectionTitle>
+        <ControlGroup>
+          <ControlRow>
+            <FieldLabel>Valid Input</FieldLabel>
+            <NumberInput>
+              <input type="number" value="42" />
+            </NumberInput>
+          </ControlRow>
+          <ControlRow>
+            <FieldLabel>Invalid Input</FieldLabel>
+            <NumberInput>
+              <input type="number" value="-1" />
+            </NumberInput>
+          </ControlRow>
+          <Error>Value must be positive</Error>
+        </ControlGroup>
+
+        <SectionTitle>Collapsible Group</SectionTitle>
+        <ControlGroup>
+          <ControlRow style="cursor: pointer;">
+            <FieldLabel>Advanced Settings</FieldLabel>
+            <Value>▼</Value>
+          </ControlRow>
+          <div style="padding-left: ${theme.spacing.md}">
+            <ControlRow>
+              <FieldLabel>Debug Mode</FieldLabel>
+              <Value>Enabled</Value>
+            </ControlRow>
+            <ControlRow>
+              <FieldLabel>Verbose Logging</FieldLabel>
+              <Value>Disabled</Value>
+            </ControlRow>
+            <ControlGroup>
+              <ControlRow>
+                <FieldLabel>Sub-Setting</FieldLabel>
+                <NumberInput>
+                  <input type="number" value="1" />
+                </NumberInput>
+              </ControlRow>
+              <Hint>Nested group with its own hint</Hint>
+            </ControlGroup>
+          </div>
+        </ControlGroup>
+
+        <SectionTitle>Array Items</SectionTitle>
+        <ControlGroup>
+          <ControlRow>
+            <FieldLabel>Items</FieldLabel>
+            <ToolButton>+</ToolButton>
+          </ControlRow>
+          <div style="padding-left: ${theme.spacing.md}">
+            <ControlRow>
+              <FieldLabel>Item [0]</FieldLabel>
+              <ToolButton>×</ToolButton>
+            </ControlRow>
+            <ControlRow>
+              <FieldLabel>Item [1]</FieldLabel>
+              <ToolButton>×</ToolButton>
+            </ControlRow>
+          </div>
+        </ControlGroup>
+
+        <SectionTitle>Custom Styling</SectionTitle>
+        <ControlGroup>
+          <ControlRow style="background: ${theme.colors.bg.input};">
+            <FieldLabel>Highlighted Row</FieldLabel>
+            <Value>Special</Value>
+          </ControlRow>
+          <ControlRow>
+            <FieldLabel style="color: ${theme.colors.accent.base};">
+              Accent Label
+            </FieldLabel>
+            <Value>Custom</Value>
+          </ControlRow>
+        </ControlGroup>
+
+        <SectionTitle>Grid Layout Examples</SectionTitle>
+
+        {/* Стандартный вариант */}
+        <ControlGroup>
+          <ControlRow>
+            <FieldLabel>Standard</FieldLabel>
+            <NumberInput>
+              <input type="number" value="1.0" step="0.1" />
+            </NumberInput>
+          </ControlRow>
+        </ControlGroup>
+
+        {/* С дополнительными кнопками */}
+        <ControlGroup>
+          <ControlRow class="with-tools">
+            <FieldLabel>With Tools</FieldLabel>
+            <NumberInput>
+              <input type="number" value="1.0" step="0.1" />
+            </NumberInput>
+            <ToolButton>⚙️</ToolButton>
+          </ControlRow>
+        </ControlGroup>
+
+        {/* На всю ширину */}
+        <ControlGroup>
+          <ControlRow class="full-width">
+            <Select>
+              <option>Full Width Control</option>
+            </Select>
+          </ControlRow>
+        </ControlGroup>
+
+        {/* Длинный label */}
+        <ControlGroup>
+          <ControlRow>
+            <FieldLabel>Very Long Label That Should Truncate</FieldLabel>
+            <NumberInput>
+              <input type="number" value="1.0" step="0.1" />
+            </NumberInput>
           </ControlRow>
         </ControlGroup>
       </ControlPanel>
