@@ -18,6 +18,7 @@
     "./plugins/partials": "./@reface/plugins/partials/mod.ts",
     "./plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
     "./plugins/liveReload": "./@reface/plugins/liveReload/mod.ts",
+    "./plugins/devtools": "./@reface/plugins/devtools/mod.ts",
     "./components/LayoutSimple": "./@reface/components/LayoutSimple.ts",
     "./components/LayoutTWA": "./@reface/components/LayoutTWA.ts"
   },
@@ -35,6 +36,7 @@
     "@reface/plugins/partials": "./@reface/plugins/partials/mod.ts",
     "@reface/plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
     "@reface/plugins/liveReload": "./@reface/plugins/liveReload/mod.ts",
+    "@reface/plugins/devtools": "./@reface/plugins/devtools/mod.ts",
     "@reface/components/LayoutSimple": "./@reface/components/LayoutSimple.ts",
     "@std/assert": "jsr:@std/assert@^1.0.1",
     "@std/crypto": "jsr:@std/crypto@^1.0.2",
