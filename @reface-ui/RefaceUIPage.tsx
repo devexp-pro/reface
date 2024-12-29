@@ -530,10 +530,51 @@ const Content = styled.div`
   }
 `;
 
+// Логотип
+const Logo = styled.div`
+  & {
+    padding: ${theme.spacing.md};
+    border-bottom: 1px solid ${theme.colors.border.base};
+    font-family: ${theme.typography.fonts.mono};
+    font-size: ${theme.typography.sizes.md};
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing.xs};
+  }
+
+  & .bracket {
+    color: ${theme.colors.text.dimmed};
+  }
+
+  & .letter {
+    color: ${theme.colors.accent.base};
+    font-weight: ${theme.typography.weights.semibold};
+  }
+
+  & .name {
+    color: ${theme.colors.text.base};
+    font-weight: ${theme.typography.weights.medium};
+  }
+
+  & .type {
+    color: ${theme.colors.text.dimmed};
+    font-weight: ${theme.typography.weights.normal};
+  }
+`;
+
 // Обновленная демо страница
 export const RefaceUIPage = component(() => (
   <AppLayout>
     <Sidebar>
+      <Logo>
+        <span class="bracket">[</span>
+        <span class="letter">R</span>
+        <span class="bracket">]</span>
+        <span class="name">eface</span>
+        <span class="type">UI</span>
+      </Logo>
+
       <ControlPanel>
         <SectionTitle>Transform</SectionTitle>
         <ControlGroup>
