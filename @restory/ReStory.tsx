@@ -1,6 +1,6 @@
 import { component } from "@reface";
 import { styled } from "@reface/plugins/styled";
-import { theme } from "../@reface-ui/theme.ts";
+import { Panel, Stack, theme } from "@reface-ui";
 
 // Типы для историй и метаданных
 export type StoryMeta = {
@@ -129,9 +129,42 @@ const StoryContent = styled.div`
   }
 `;
 
+const Logo = styled.div`
+  & {
+    padding: ${theme.spacing.md};
+    border-bottom: 1px solid ${theme.colors.border.base};
+    font-family: ${theme.typography.fonts.mono};
+    font-size: ${theme.typography.sizes.md};
+    user-select: none;
+  }
+
+  & .bracket {
+    color: ${theme.colors.text.dimmed};
+  }
+
+  & .name {
+    color: ${theme.colors.text.base};
+    font-weight: ${theme.typography.weights.medium};
+  }
+
+  & .type {
+    color: ${theme.colors.accent.base};
+  }
+`;
+
+const DefaultLogo = () => (
+  <Logo>
+    <span class="bracket">{`{`}</span>
+    <span class="name">Re</span>
+    <span class="type">Story</span>
+    <span class="bracket">{`}`}</span>
+  </Logo>
+);
+
 type ReStoryProps = {
   stories: StoryGroup[];
   currentPath: string;
+  logo?: JSX.Element;
 };
 
 export const ReStory = component((props: ReStoryProps) => {
@@ -174,31 +207,34 @@ export const ReStory = component((props: ReStoryProps) => {
   return (
     <StoryLayout>
       <Sidebar>
-        <StoryNav>
-          {groupedStories.map((group) => (
-            <StoryGroup>
-              <div class="group-header">{group.name}</div>
-              {group.components.map((component) => (
-                <ComponentGroup>
-                  <div class="component-name">{component.name}</div>
-                  {component.stories.map((story) => (
-                    <StoryLink
-                      href={story.path}
-                      class={story.path === props.currentPath ? "active" : ""}
-                    >
-                      {story.name}
-                    </StoryLink>
-                  ))}
-                </ComponentGroup>
-              ))}
-            </StoryGroup>
-          ))}
-        </StoryNav>
+        <Stack direction="vertical" gap="0">
+          {props.logo || <DefaultLogo />}
+          <StoryNav>
+            {groupedStories.map((group) => (
+              <StoryGroup>
+                <div class="group-header">{group.name}</div>
+                {group.components.map((component) => (
+                  <ComponentGroup>
+                    <div class="component-name">{component.name}</div>
+                    {component.stories.map((story) => (
+                      <StoryLink
+                        href={story.path}
+                        class={story.path === props.currentPath ? "active" : ""}
+                      >
+                        {story.name}
+                      </StoryLink>
+                    ))}
+                  </ComponentGroup>
+                ))}
+              </StoryGroup>
+            ))}
+          </StoryNav>
+        </Stack>
       </Sidebar>
       <Content>
         {currentStory
           ? (
-            <>
+            <Stack direction="vertical" gap={theme.spacing.lg}>
               {componentMeta && (
                 <StoryHeader>
                   <h1>{componentMeta.title || currentComponent?.name}</h1>
@@ -207,10 +243,12 @@ export const ReStory = component((props: ReStoryProps) => {
                   )}
                 </StoryHeader>
               )}
-              <StoryContent>
-                {currentStory.component()}
-              </StoryContent>
-            </>
+              <Panel>
+                <StoryContent>
+                  {currentStory.component()}
+                </StoryContent>
+              </Panel>
+            </Stack>
           )
           : <div>Select a story from the sidebar</div>}
       </Content>
