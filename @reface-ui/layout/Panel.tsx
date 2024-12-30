@@ -43,10 +43,10 @@ type PanelProps = {
   };
 };
 
-export const Panel = component((props: PanelProps, children) => (
-  <StyledPanel>
-    {props.slots?.header && <PanelHeader>{props.slots.header}</PanelHeader>}
+export const Panel = component(({ slots, ...attrs }: PanelProps, children) => (
+  <StyledPanel {...attrs}>
+    {slots?.header && <PanelHeader>{slots.header}</PanelHeader>}
     <PanelContent>{children}</PanelContent>
-    {props.slots?.footer && <PanelFooter>{props.slots.footer}</PanelFooter>}
+    {slots?.footer && <PanelFooter>{slots.footer}</PanelFooter>}
   </StyledPanel>
 ));

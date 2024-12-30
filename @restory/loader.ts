@@ -94,3 +94,40 @@ export async function loadStories(rootDir: string): Promise<StoryGroup[]> {
 
   return Array.from(groups.values());
 }
+
+export async function loadStory(
+  path: string,
+  rootDir: string,
+): Promise<Story | null> {
+  try {
+    // Убираем лишние слэши и приводим к нижнему регистру
+    const normalizedPath = path.toLowerCase().replace(/^\/+|\/+$/g, "");
+
+    // Строим путь к файлу истории
+    const storyFile = `${rootDir}/${
+      normalizedPath.replace(/\/[^/]+$/, "")
+    }.story.tsx`;
+    const storyName = normalizedPath.split("/").pop();
+
+    // Импортируем модуль истории
+    const storyModule: StoryModule = await import(`file://${storyFile}`);
+
+    // Ищем компонент истории по имени
+    const storyComponent = Object.entries(storyModule)
+      .find(([key]) => key.toLowerCase() === storyName)?.[1];
+
+    if (!storyComponent || typeof storyComponent !== "function") {
+      return null;
+    }
+
+    return {
+      name: storyName,
+      component: storyComponent as () => JSX.Element,
+      path: path,
+      meta: storyModule.meta,
+    };
+  } catch (error) {
+    console.error(`Failed to load story: ${path}`, error);
+    return null;
+  }
+}

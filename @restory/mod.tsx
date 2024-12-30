@@ -1,2 +1,3 @@
-export { loadStories } from "./loader.ts";
+export { loadStories, loadStory } from "./loader.ts";
 export { ReStory } from "./ReStory.tsx";
+export { StoryViewer } from "./StoryViewer.tsx";

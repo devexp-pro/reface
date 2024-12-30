@@ -66,6 +66,7 @@ export const theme = {
     sm: "var(--space-sm)",
     md: "var(--space-md)",
     lg: "var(--space-lg)",
+    xl: "var(--space-xl)",
   },
   typography: {
     fonts: {
@@ -77,6 +78,7 @@ export const theme = {
       sm: "var(--font-size-sm)",
       md: "var(--font-size-md)",
       lg: "var(--font-size-lg)",
+      xl: "var(--font-size-xl)",
     },
     weights: {
       normal: "var(--font-weight-normal)",

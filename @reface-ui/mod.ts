@@ -1,4 +1,5 @@
 export { theme } from "./theme.ts";
+export { RefaceUI } from "./RefaceUI.tsx";
 
 // controls
 export { Button } from "./controls/Button.tsx";
@@ -24,3 +25,7 @@ export { Tabs } from "./layout/Tabs.tsx";
 export { Box } from "./layout/Box.tsx";
 export { Splitter } from "./layout/Splitter.tsx";
 export { Join } from "./layout/Join.tsx";
+
+// data
+export { Content } from "./data/Content.tsx";
+export { TreeItem, type TreeNode, TreeView } from "./data/TreeView.tsx";

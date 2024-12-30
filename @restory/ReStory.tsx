@@ -1,6 +1,7 @@
 import { component } from "@reface";
 import { styled } from "@reface/plugins/styled";
-import { Panel, Stack, theme } from "@reface-ui";
+import { RefaceUI, Stack, theme, TreeItem, TreeView } from "@reface-ui";
+import { StoryViewer } from "./StoryViewer.tsx";
 
 // Типы для историй и метаданных
 export type StoryMeta = {
@@ -19,6 +20,13 @@ export type Story = {
 export type StoryGroup = {
   name: string;
   stories: Story[];
+};
+
+// В начале файла обновим иконки
+const Icons = {
+  folder: "📁",
+  file: "📄",
+  story: "📖",
 };
 
 // Styled компоненты для UI
@@ -52,22 +60,42 @@ const StoryGroup = styled.div`
 
   & .group-header {
     padding: ${theme.spacing.xs} ${theme.spacing.sm};
+    margin-bottom: ${theme.spacing.xs};
     font-size: ${theme.typography.sizes.xs};
     color: ${theme.colors.text.dimmed};
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-weight: ${theme.typography.weights.semibold};
+    background: ${theme.colors.bg.base}40;
+    border-radius: 4px;
   }
 `;
 
 const ComponentGroup = styled.div`
   & {
     margin-left: ${theme.spacing.md};
+    margin-bottom: ${theme.spacing.sm};
   }
 
   & .component-name {
     padding: ${theme.spacing.xs} ${theme.spacing.sm};
     color: ${theme.colors.text.base};
-    font-size: ${theme.typography.sizes.xs};
+    font-size: ${theme.typography.sizes.sm};
+    font-weight: ${theme.typography.weights.medium};
+    position: relative;
+  }
+
+  & .component-name::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 4px;
+    background: ${theme.colors.accent.base};
+    border-radius: 50%;
+    opacity: 0.7;
   }
 `;
 
@@ -76,56 +104,59 @@ const StoryLink = styled.a`
     display: block;
     padding: ${theme.spacing.xs} ${theme.spacing.sm};
     padding-left: ${theme.spacing.xl};
-    color: ${theme.colors.text.base};
+    color: ${theme.colors.text.dimmed};
     text-decoration: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: ${theme.typography.sizes.xs};
+    transition: all 0.2s ease;
   }
 
   &:hover {
     background: ${theme.colors.bg.hover};
+    color: ${theme.colors.text.base};
   }
 
   &.active {
-    background: ${theme.colors.accent.base}20;
+    background: ${theme.colors.accent.base};
     color: ${theme.colors.accent.base};
   }
 `;
 
 const Content = styled.div`
   & {
-    padding: ${theme.spacing.md};
+    padding: ${theme.spacing.lg};
     overflow: auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Растягиваем Stack на всю доступную высоту */
+  & > div {
+    flex: 1;
+    min-height: 0; /* Важно для корректной работы flex в Firefox */
+    display: flex;
+    flex-direction: column;
   }
 `;
 
 const StoryHeader = styled.div`
   & {
     margin-bottom: ${theme.spacing.lg};
-    border-bottom: 1px solid ${theme.colors.border.base};
-    padding-bottom: ${theme.spacing.md};
   }
 
   & h1 {
     font-size: ${theme.typography.sizes.xl};
     color: ${theme.colors.text.base};
-    margin: 0 0 ${theme.spacing.xs};
+    margin: 0 0 ${theme.spacing.sm};
+    font-weight: ${theme.typography.weights.semibold};
   }
 
   & .description {
     color: ${theme.colors.text.dimmed};
     font-size: ${theme.typography.sizes.sm};
-  }
-`;
-
-const StoryContent = styled.div`
-  & {
-    padding: ${theme.spacing.md};
-  }
-
-  & > * + * {
-    margin-top: ${theme.spacing.lg};
+    line-height: 1.6;
   }
 `;
 
@@ -136,10 +167,14 @@ const Logo = styled.div`
     font-family: ${theme.typography.fonts.mono};
     font-size: ${theme.typography.sizes.md};
     user-select: none;
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing.xs};
   }
 
   & .bracket {
     color: ${theme.colors.text.dimmed};
+    opacity: 0.7;
   }
 
   & .name {
@@ -149,6 +184,7 @@ const Logo = styled.div`
 
   & .type {
     color: ${theme.colors.accent.base};
+    font-weight: ${theme.typography.weights.medium};
   }
 `;
 
@@ -167,91 +203,123 @@ type ReStoryProps = {
   logo?: JSX.Element;
 };
 
+type TreeNode = {
+  id: string;
+  label: string;
+  type: "folder" | "file" | "story";
+  children?: TreeNode[];
+  story?: Story;
+};
+
 export const ReStory = component((props: ReStoryProps) => {
-  // Группируем истории по компонентам
-  const groupedStories = props.stories.map((group) => {
-    const componentStories = new Map<string, Story[]>();
-
-    group.stories.forEach((story) => {
-      const [, componentName] = story.path.split("/").filter(Boolean);
-      if (!componentStories.has(componentName)) {
-        componentStories.set(componentName, []);
-      }
-      componentStories.get(componentName)!.push(story);
-    });
-
-    return {
-      name: group.name,
-      components: Array.from(componentStories.entries()).map((
-        [name, stories],
-      ) => ({
-        name,
-        stories,
-      })),
-    };
-  });
-
-  // Находим текущую историю
   const currentStory = props.stories
     .flatMap((group) => group.stories)
     .find((story) => story.path === props.currentPath);
 
-  // Находим метаданные компонента (берем из первой истории в группе)
-  const currentComponent = currentStory &&
-    groupedStories
-      .flatMap((g) => g.components)
-      .find((c) => c.stories.includes(currentStory));
+  const componentMeta = currentStory?.meta;
 
-  const componentMeta = currentComponent?.stories[0].meta;
+  // Функция для построения дерева
+  const buildTree = (stories: Story[]): TreeNode[] => {
+    const root: Record<string, TreeNode> = {};
+
+    stories.forEach((story) => {
+      const parts = story.path.split("/");
+
+      // Создаем узлы для каждой части пути
+      parts.reduce((parent, part, index) => {
+        const id = parts.slice(0, index + 1).join("/");
+
+        if (!root[id]) {
+          const isLast = index === parts.length - 1;
+          root[id] = {
+            id,
+            label: part,
+            type: isLast ? "story" : "folder",
+            children: [],
+          };
+
+          if (parent) {
+            parent.children?.push(root[id]);
+          }
+
+          if (isLast) {
+            root[id].story = story;
+          }
+        }
+
+        return root[id];
+      }, null as TreeNode | null);
+    });
+
+    // Возвращаем только корневые узлы
+    return Object.values(root).filter((node) =>
+      !node.id.includes("/") || node.id.split("/").length === 1
+    );
+  };
+
+  // Определяем развернутые узлы на основе текущего пути
+  const expandedIds = currentStory
+    ? currentStory.path.split("/").slice(0, -1)
+      .reduce((acc: string[], _, index, parts) => {
+        acc.push(parts.slice(0, index + 1).join("/"));
+        return acc;
+      }, [])
+    : [];
+
+  // Рекурсивный рендер узла
+  const renderNode = (node: TreeNode) => (
+    <TreeItem
+      key={node.id}
+      id={node.id}
+      label={node.label}
+      icon={Icons[node.type]}
+      expanded={expandedIds.includes(node.id)}
+      selected={node.story?.path === props.currentPath}
+      href={node.story && node.story.path !== props.currentPath
+        ? node.story.path
+        : undefined}
+    >
+      {node.children?.map(renderNode)}
+    </TreeItem>
+  );
+
+  // Строим дерево из всех историй
+  const tree = buildTree(props.stories.flatMap((group) => group.stories));
 
   return (
-    <StoryLayout>
-      <Sidebar>
-        <Stack direction="vertical" gap="0">
-          {props.logo || <DefaultLogo />}
-          <StoryNav>
-            {groupedStories.map((group) => (
-              <StoryGroup>
-                <div class="group-header">{group.name}</div>
-                {group.components.map((component) => (
-                  <ComponentGroup>
-                    <div class="component-name">{component.name}</div>
-                    {component.stories.map((story) => (
-                      <StoryLink
-                        href={story.path}
-                        class={story.path === props.currentPath ? "active" : ""}
-                      >
-                        {story.name}
-                      </StoryLink>
-                    ))}
-                  </ComponentGroup>
-                ))}
-              </StoryGroup>
-            ))}
-          </StoryNav>
-        </Stack>
-      </Sidebar>
-      <Content>
-        {currentStory
-          ? (
-            <Stack direction="vertical" gap={theme.spacing.lg}>
-              {componentMeta && (
-                <StoryHeader>
-                  <h1>{componentMeta.title || currentComponent?.name}</h1>
-                  {componentMeta.description && (
-                    <div class="description">{componentMeta.description}</div>
-                  )}
-                </StoryHeader>
-              )}
-              <Panel>
-                <StoryContent>
-                  {currentStory.component()}
-                </StoryContent>
-              </Panel>
-            </Stack>
-          )
-          : <div>Select a story from the sidebar</div>}
-      </Content>
-    </StoryLayout>
+    <RefaceUI>
+      <StoryLayout>
+        <Sidebar>
+          <Stack direction="vertical" gap="0">
+            {props.logo || <DefaultLogo />}
+            <StoryNav>
+              <TreeView>
+                {tree.map(renderNode)}
+              </TreeView>
+            </StoryNav>
+          </Stack>
+        </Sidebar>
+        <Content>
+          {currentStory
+            ? (
+              <Stack direction="vertical" gap={theme.spacing.lg}>
+                {componentMeta && (
+                  <StoryHeader>
+                    <h1>{componentMeta.title}: {currentStory.name}</h1>
+                    {componentMeta.description && (
+                      <div class="description">{componentMeta.description}</div>
+                    )}
+                  </StoryHeader>
+                )}
+                <StoryViewer
+                  component={currentStory.component}
+                  path={currentStory.path}
+                />
+              </Stack>
+            )
+            : <div>Select a story from the sidebar</div>}
+        </Content>
+      </StoryLayout>
+    </RefaceUI>
   );
 });
