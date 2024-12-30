@@ -20,8 +20,9 @@ function generateDocsStructure(pages: Map<string, DocPage>): DocSection[] {
   const gettingStarted: DocSection = {
     title: "Getting Started",
     items: [
-      { path: "readme", title: "Introduction" },
-      { path: "architecture", title: "Architecture" },
+      { path: "readme", title: "Reface" },
+      { path: "getting-started", title: "Getting Started" },
+      { path: "concepts", title: "Main Concepts" },
     ],
   };
 
@@ -31,7 +32,7 @@ function generateDocsStructure(pages: Map<string, DocPage>): DocSection[] {
   };
 
   for (const [path, page] of pages.entries()) {
-    if (path === "readme" || path === "architecture") continue;
+    if (gettingStarted.items.some((item) => item.path === path)) continue;
 
     core.items.push({
       path,

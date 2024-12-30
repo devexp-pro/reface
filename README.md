@@ -20,72 +20,47 @@ Architecture.
 - 🏝️ **Partial System** - Interactive components with HTMX
 - 🚀 **Framework Agnostic** - Core composition engine
 
-## Quick Start
+## What is Reface?
+
+Reface is a modern web framework built on two key components:
+
+1. **Core Library** (RefaceComposer) - Template engine for HTML generation
+2. **Framework** (Reface) - Full-featured web framework with plugins and Islands
+   Architecture
+
+- [Getting Started](./docs/getting-started.md) - Quick introduction and basic
+  setup
+- [Main Concepts](./docs/concepts.md) - Core ideas and architecture
+- [API Reference](./docs/api.md) - Detailed API documentation
+
+### Quick Example
 
 ```typescript
+// Core API (Template Engine)
 import { RefaceComposer } from "@reface/core";
-import { StyledPlugin } from "@reface/plugins/styled";
-import { PartialsPlugin } from "@reface/plugins/partials";
 
-// Create composer instance
 const composer = new RefaceComposer();
-composer.use(new StyledPlugin());
-composer.use(new PartialsPlugin());
+const template = div({ class: "greeting" })`Hello ${name}!`;
+const html = composer.render(template);
 
-// Create styled component
-const Button = styled.button`
-  & {
-    background: var(--primary-color, #3182ce);
-    color: white;
-    padding: 0.5rem 1rem;
-  }
-`;
+// Framework API (Full Features)
+import { Reface } from "@reface";
 
-// Create interactive component
-const Counter = partial(async () => {
-  const count = 0;
-  return (
-    <div>
-      <span>{count}</span>
-      <Button {...Counter.trigger()}>Increment</Button>
-    </div>
-  );
-}, "counter");
+const app = new Reface({
+  layout: Layout,
+}).page("/", Home);
 
-// Create page template
-function HomePage() {
-  return (
-    <div>
-      <h1>Welcome to Reface</h1>
-      <Counter />
-    </div>
-  );
-}
-
-// Compose HTML
-const html = composer.render(<HomePage />);
+Deno.serve(app.fetch);
 ```
 
-## Examples
+## Installation
 
-- [📚 Basic Components](./examples/basic) - Component composition
-- [🧩 Styled Components](./examples/styled) - CSS-in-JS examples
-- [🏝️ Partial Components](./examples/partials) - Interactive components
-- [🔌 Custom Plugin](./examples/plugin) - Plugin development
+```typescript
+// Using Deno
+import { Reface } from "jsr:@vseplet/reface";
 
-## Documentation
-
-- [Architecture](./docs/architecture.md) - Core concepts and composition design
-- [Components](./docs/components.md) - Component composition system
-- [Styling](./docs/styling.md) - CSS-in-JS styling
-- [Partials](./docs/partials.md) - Interactive components
-- [Plugins](./docs/plugins.md) - Plugin system
-
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](./CONTRIBUTING.md)
-for details.
-
-## License
+// Using NPM (coming soon)
+npm install @reface/core
+```
 
 MIT © [Reface](./LICENSE)
