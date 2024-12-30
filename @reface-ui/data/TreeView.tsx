@@ -122,45 +122,46 @@ const TreeLink = styled.a`
 `;
 
 // Компонент для отдельного узла
-export const TreeItem = component((props: {
-  id: string;
-  label: string;
-  icon?: JSX.Element;
-  selected?: boolean;
-  expanded?: boolean;
-  href?: string;
-}, children: JSX.Element) => {
-  const { id, label, icon, selected, expanded, href } = props;
-  const hasChildren = !!children.flat().length;
-  const content = (
-    <TreeItemStyled class={selected ? "selected" : ""}>
-      <TreeItemContent>
-        {hasChildren && (
-          <ToggleIcon
-            data-tree-toggle
-            data-expanded={expanded}
-          />
-        )}
-        {icon && <span class="icon">{icon}</span>}
-        <span class="label">{label}</span>
-      </TreeItemContent>
-    </TreeItemStyled>
-  );
+export const TreeItem = component(
+  ({ id, label, icon, selected, expanded, href }: {
+    id: string;
+    label: string;
+    icon?: JSX.Element;
+    selected?: boolean;
+    expanded?: boolean;
+    href?: string;
+  }, children: JSX.Element) => {
+    const hasChildren = !!children.flat().filter(Boolean).length;
+    const content = (
+      <TreeItemStyled class={selected ? "selected" : ""}>
+        <TreeItemContent>
+          {hasChildren && (
+            <ToggleIcon
+              data-tree-toggle
+              data-expanded={expanded}
+            />
+          )}
+          {icon && <span class="icon">{icon}</span>}
+          <span class="label">{label}</span>
+        </TreeItemContent>
+      </TreeItemStyled>
+    );
 
-  return (
-    <div data-tree-node>
-      {href ? <TreeLink href={href}>{content}</TreeLink> : content}
-      {hasChildren && (
-        <TreeChildren
-          data-tree-children
-          data-hidden={!expanded}
-        >
-          {children}
-        </TreeChildren>
-      )}
-    </div>
-  );
-});
+    return (
+      <div data-tree-node>
+        {href ? <TreeLink href={href}>{content}</TreeLink> : content}
+        {hasChildren && (
+          <TreeChildren
+            data-tree-children
+            data-hidden={!expanded}
+          >
+            {children}
+          </TreeChildren>
+        )}
+      </div>
+    );
+  },
+);
 
 // Основной компонент TreeView
 export const TreeView = component((props: {

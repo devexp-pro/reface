@@ -59,7 +59,7 @@ export const Stack = component((props: StackProps, children) => (
       props.align,
       props.justify,
     ].filter(Boolean).join(" ")}
-    style={`gap: ${props.gap || theme.spacing.md}`}
+    style={`gap: ${theme.spacing[props.gap] || theme.spacing.md}`}
   >
     {children}
   </StyledStack>

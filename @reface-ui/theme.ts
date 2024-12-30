@@ -17,6 +17,9 @@ const cssVariables = `
     --accent-base: #60a5fa;
     --accent-hover: #3b82f6;
 
+    --success-base: #4ade80;
+    --success-hover: #22c55e;
+
     /* Spacing */
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
@@ -59,6 +62,10 @@ export const theme = {
     accent: {
       base: "var(--accent-base)",
       hover: "var(--accent-hover)",
+    },
+    success: {
+      base: "var(--success-base)",
+      hover: "var(--success-hover)",
     },
   },
   spacing: {

@@ -3,24 +3,7 @@ import { styled } from "@reface/plugins/styled";
 import { RefaceUI, Stack, theme, TreeItem, TreeView } from "@reface-ui";
 import { StoryViewer } from "./StoryViewer.tsx";
 
-// Типы для историй и метаданных
-export type StoryMeta = {
-  title?: string;
-  description?: string;
-  component?: any;
-};
-
-export type Story = {
-  name: string;
-  component: () => JSX.Element;
-  path: string;
-  meta?: StoryMeta;
-};
-
-export type StoryGroup = {
-  name: string;
-  stories: Story[];
-};
+import type { Story, StoryFile } from "./loader.ts";
 
 // В начале файла обновим иконки
 const Icons = {
@@ -198,7 +181,7 @@ const DefaultLogo = () => (
 );
 
 type ReStoryProps = {
-  stories: StoryGroup[];
+  stories: StoryFile[];
   currentPath: string;
   logo?: JSX.Element;
 };
@@ -207,64 +190,73 @@ type TreeNode = {
   id: string;
   label: string;
   type: "folder" | "file" | "story";
+  expanded: boolean;
   children?: TreeNode[];
   story?: Story;
 };
 
 export const ReStory = component((props: ReStoryProps) => {
+  console.log(props.stories);
   const currentStory = props.stories
     .flatMap((group) => group.stories)
     .find((story) => story.path === props.currentPath);
+  const currentFile = props.stories.find((file) =>
+    file.filePath === currentStory?.filePath
+  );
 
-  const componentMeta = currentStory?.meta;
+  const componentMeta = currentFile?.meta;
 
-  // Функция для построения дерева
-  const buildTree = (stories: Story[]): TreeNode[] => {
+  // Новая функция построения дерева
+  const buildTree = (storyFiles: StoryFile[]): TreeNode[] => {
     const root: Record<string, TreeNode> = {};
 
-    stories.forEach((story) => {
-      const parts = story.path.split("/");
+    // Сначала создаем структуру папок из filePath
+    storyFiles.forEach((group) => {
+      group.stories.forEach((story) => {
+        const filePath = story.filePath.replace(".story.tsx", "");
+        const parts = filePath.split("/").filter(Boolean);
 
-      // Создаем узлы для каждой части пути
-      parts.reduce((parent, part, index) => {
-        const id = parts.slice(0, index + 1).join("/");
+        // Создаем узлы для каждой части пути
+        parts.reduce((parent, part, index) => {
+          const fullPath = parts.slice(0, index + 1).join("/");
 
-        if (!root[id]) {
-          const isLast = index === parts.length - 1;
-          root[id] = {
-            id,
-            label: part,
-            type: isLast ? "story" : "folder",
-            children: [],
+          if (!root[fullPath]) {
+            const isLast = index === parts.length - 1;
+            root[fullPath] = {
+              id: fullPath,
+              label: part,
+              type: isLast ? "file" : "folder",
+              children: [],
+              expanded: true,
+            };
+
+            if (parent) {
+              parent.children?.push(root[fullPath]);
+            }
+          }
+
+          return root[fullPath];
+        }, null as TreeNode | null);
+
+        // Добавляем историю как дочерний узел к файлу
+        const fileNode = root[filePath];
+        if (fileNode) {
+          const storyNode: TreeNode = {
+            id: story.path,
+            label: story.name,
+            type: "story",
+            story: story,
+            expanded: story === currentStory,
           };
-
-          if (parent) {
-            parent.children?.push(root[id]);
-          }
-
-          if (isLast) {
-            root[id].story = story;
-          }
+          fileNode.children = fileNode.children || [];
+          fileNode.children.push(storyNode);
         }
-
-        return root[id];
-      }, null as TreeNode | null);
+      });
     });
 
     // Возвращаем только корневые узлы
-    return Object.values(root).filter((node) =>
-      !node.id.includes("/") || node.id.split("/").length === 1
-    );
+    return Object.values(root).filter((node) => !node.id.includes("/"));
   };
-
-  // Определяем развернутые узлы на основе текущего пути
-  const expandedIds = currentStory
-    ? currentStory.path.split("/").slice(0, -1)
-      .reduce((acc: string[], _, index, parts) => {
-        acc.push(parts.slice(0, index + 1).join("/"));
-        return acc;
-      }, [])
-    : [];
 
   // Рекурсивный рендер узла
   const renderNode = (node: TreeNode) => (
@@ -273,7 +265,7 @@ export const ReStory = component((props: ReStoryProps) => {
       id={node.id}
       label={node.label}
       icon={Icons[node.type]}
-      expanded={expandedIds.includes(node.id)}
+      expanded={node.expanded}
       selected={node.story?.path === props.currentPath}
       href={node.story && node.story.path !== props.currentPath
         ? node.story.path
@@ -284,7 +276,7 @@ export const ReStory = component((props: ReStoryProps) => {
   );
 
   // Строим дерево из всех историй
-  const tree = buildTree(props.stories.flatMap((group) => group.stories));
+  const tree = buildTree(props.stories);
 
   return (
     <RefaceUI>

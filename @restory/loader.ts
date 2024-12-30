@@ -7,33 +7,45 @@ function dirname(path: string): string {
   return path.split("/").slice(0, -1).join("/");
 }
 
-type StoryMeta = {
+function relative(from: string, to: string): string {
+  const fromParts = from.split("/");
+  const toParts = to.split("/");
+
+  while (fromParts.length && toParts.length && fromParts[0] === toParts[0]) {
+    fromParts.shift();
+    toParts.shift();
+  }
+
+  return toParts.join("/");
+}
+
+export type StoryMeta = {
   title?: string;
   description?: string;
   component?: any;
 };
 
-type StoryModule = {
+export type StoryModule = {
   meta?: StoryMeta;
   [key: string]: any;
 };
 
-type Story = {
+export type Story = {
   name: string;
   component: () => JSX.Element;
   path: string;
+  filePath: string;
+};
+
+export type StoryFile = {
+  name: string;
+  stories: Story[];
+  filePath: string;
   meta?: StoryMeta;
 };
 
-type StoryGroup = {
-  name: string;
-  stories: Story[];
-};
-
-export async function loadStories(rootDir: string): Promise<StoryGroup[]> {
-  // Преобразуем относительный путь в абсолютный
+export async function loadStories(rootDir: string): Promise<StoryFile[]> {
   const absolutePath = new URL(rootDir, import.meta.url).pathname;
-
   const storyFiles: string[] = [];
 
   async function scanDir(dir: string) {
@@ -49,24 +61,29 @@ export async function loadStories(rootDir: string): Promise<StoryGroup[]> {
 
   await scanDir(absolutePath);
 
-  const groups: Map<string, StoryGroup> = new Map();
+  const groups: Map<string, StoryFile> = new Map();
 
   for (const file of storyFiles) {
-    // Используем file:// протокол для импорта
     const fileUrl = `file://${file}`;
     const storyModule: StoryModule = await import(fileUrl);
+    const relativePath = relative(absolutePath, file);
 
     // Получаем метаданные из модуля
     const meta = storyModule.meta;
 
     // Определяем имя группы из meta.title или из структуры папок
     const groupName = meta?.title?.split("/")[0] ||
-      file.substring(absolutePath.length).split("/")[1] ||
+      relativePath.split("/")[1] ||
       "Other";
 
     let group = groups.get(groupName);
     if (!group) {
-      group = { name: groupName, stories: [] };
+      group = {
+        name: groupName,
+        stories: [],
+        filePath: relativePath,
+        meta: storyModule.meta,
+      };
       groups.set(groupName, group);
     }
 
@@ -87,7 +104,7 @@ export async function loadStories(rootDir: string): Promise<StoryGroup[]> {
           name: storyName,
           component: component as () => JSX.Element,
           path: storyPath,
-          meta: storyModule.meta, // Добавляем метаданные к каждой истории
+          filePath: relativePath,
         });
       });
   }
@@ -124,7 +141,7 @@ export async function loadStory(
       name: storyName,
       component: storyComponent as () => JSX.Element,
       path: path,
-      meta: storyModule.meta,
+      filePath: storyFile,
     };
   } catch (error) {
     console.error(`Failed to load story: ${path}`, error);

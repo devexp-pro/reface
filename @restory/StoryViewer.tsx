@@ -12,7 +12,7 @@ const ViewerFrame = styled.iframe`
   }
 `;
 
-const ViewerWrapper = styled.div`
+const ViewerWrapper = styled.div /*css*/`
   & {
     position: relative;
     height: 100%;
@@ -23,32 +23,6 @@ const ViewerWrapper = styled.div`
       linear-gradient(rgba(130, 130, 130, 0.1) 1px, transparent 1px),
       linear-gradient(90deg, rgba(130, 130, 130, 0.1) 1px, transparent 1px);
     background-size: 20px 20px;
-  }
-
-  &:before,
-  &:after {
-    content: '';
-    position: absolute;
-    width: 32px;
-    height: 32px;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  /* Верхний левый уголок */
-  &:before {
-    top: 0;
-    left: 0;
-    border-top: 2px solid ${theme.colors.accent.base};
-    border-left: 2px solid ${theme.colors.accent.base};
-  }
-
-  /* Нижний правый уголок */
-  &:after {
-    bottom: 0;
-    right: 0;
-    border-bottom: 2px solid ${theme.colors.accent.base};
-    border-right: 2px solid ${theme.colors.accent.base};
   }
 `;
 

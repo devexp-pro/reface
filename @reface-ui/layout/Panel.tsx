@@ -2,7 +2,7 @@ import { component } from "@reface";
 import { styled } from "@reface/plugins/styled";
 import { theme } from "../theme.ts";
 
-const StyledPanel = styled.div`
+const StyledPanel = styled.div /*css*/`
   & {
     background: ${theme.colors.bg.panel};
     border: 1px solid ${theme.colors.border.base};
@@ -11,7 +11,7 @@ const StyledPanel = styled.div`
   }
 `;
 
-const PanelHeader = styled.div`
+const PanelHeader = styled.div /*css*/`
   & {
     padding: ${theme.spacing.md};
     border-bottom: 1px solid ${theme.colors.border.base};
@@ -21,13 +21,13 @@ const PanelHeader = styled.div`
   }
 `;
 
-const PanelContent = styled.div`
+const PanelContent = styled.div /*css*/`
   & {
     padding: ${theme.spacing.md};
   }
 `;
 
-const PanelFooter = styled.div`
+const PanelFooter = styled.div /*css*/`
   & {
     padding: ${theme.spacing.md};
     border-top: 1px solid ${theme.colors.border.base};

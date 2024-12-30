@@ -2,7 +2,7 @@ import { component } from "@reface";
 import { styled } from "@reface/plugins/styled";
 import { theme } from "../theme.ts";
 
-const StyledCard = styled.div`
+const StyledCard = styled.div /*css*/`
   & {
     background: ${theme.colors.bg.panel};
     border: 1px solid ${theme.colors.border.base};
@@ -11,7 +11,7 @@ const StyledCard = styled.div`
   }
 `;
 
-const CardHeader = styled.div`
+const CardHeader = styled.div /*css*/`
   & {
     padding: ${theme.spacing.md};
     border-bottom: 1px solid ${theme.colors.border.base};
@@ -28,7 +28,7 @@ const CardHeader = styled.div`
   }
 `;
 
-const CardContent = styled.div`
+const CardContent = styled.div /*css*/`
   & {
     padding: ${theme.spacing.md};
   }
