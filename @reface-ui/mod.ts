@@ -29,3 +29,4 @@ export { Join } from "./layout/Join.tsx";
 // data
 export { Content } from "./data/Content.tsx";
 export { TreeItem, type TreeNode, TreeView } from "./data/TreeView.tsx";
+export { Code } from "./data/Code.tsx";

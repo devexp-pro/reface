@@ -7,9 +7,9 @@ import type { Story, StoryFile } from "./loader.ts";
 
 // В начале файла обновим иконки
 const Icons = {
-  folder: "📁",
-  file: "📄",
-  story: "📖",
+  folder: "🗂️",
+  file: "🧩",
+  story: "📚",
 };
 
 // Styled компоненты для UI
@@ -36,12 +36,8 @@ const StoryNav = styled.div`
   }
 `;
 
-const StoryGroup = styled.div`
+const StyledGroupHeader = styled.div /*css*/`
   & {
-    margin-bottom: ${theme.spacing.md};
-  }
-
-  & .group-header {
     padding: ${theme.spacing.xs} ${theme.spacing.sm};
     margin-bottom: ${theme.spacing.xs};
     font-size: ${theme.typography.sizes.xs};
@@ -49,62 +45,14 @@ const StoryGroup = styled.div`
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-weight: ${theme.typography.weights.semibold};
-    background: ${theme.colors.bg.base}40;
+    background: ${theme.colors.bg.base};
     border-radius: 4px;
   }
 `;
 
-const ComponentGroup = styled.div`
-  & {
-    margin-left: ${theme.spacing.md};
-    margin-bottom: ${theme.spacing.sm};
-  }
-
-  & .component-name {
-    padding: ${theme.spacing.xs} ${theme.spacing.sm};
-    color: ${theme.colors.text.base};
-    font-size: ${theme.typography.sizes.sm};
-    font-weight: ${theme.typography.weights.medium};
-    position: relative;
-  }
-
-  & .component-name::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 4px;
-    height: 4px;
-    background: ${theme.colors.accent.base};
-    border-radius: 50%;
-    opacity: 0.7;
-  }
-`;
-
-const StoryLink = styled.a`
-  & {
-    display: block;
-    padding: ${theme.spacing.xs} ${theme.spacing.sm};
-    padding-left: ${theme.spacing.xl};
-    color: ${theme.colors.text.dimmed};
-    text-decoration: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: ${theme.typography.sizes.xs};
-    transition: all 0.2s ease;
-  }
-
-  &:hover {
-    background: ${theme.colors.bg.hover};
-    color: ${theme.colors.text.base};
-  }
-
-  &.active {
-    background: ${theme.colors.accent.base};
-    color: ${theme.colors.accent.base};
-  }
-`;
+export const GroupHeader = component((props: { class?: string }, children) => (
+  <StyledGroupHeader class={props.class}>{children}</StyledGroupHeader>
+));
 
 const Content = styled.div`
   & {
@@ -196,7 +144,6 @@ type TreeNode = {
 };
 
 export const ReStory = component((props: ReStoryProps) => {
-  console.log(props.stories);
   const currentStory = props.stories
     .flatMap((group) => group.stories)
     .find((story) => story.path === props.currentPath);
@@ -204,39 +151,53 @@ export const ReStory = component((props: ReStoryProps) => {
     file.filePath === currentStory?.filePath
   );
 
+  // Получаем части пути текущего файла
+  const currentParts =
+    currentStory?.filePath.replace(".story.tsx", "").split("/").filter(
+      Boolean,
+    ) || [];
+
   const componentMeta = currentFile?.meta;
 
-  // Новая функция построения дерева
+  // Обновленная функция построения дерева
   const buildTree = (storyFiles: StoryFile[]): TreeNode[] => {
     const root: Record<string, TreeNode> = {};
 
-    // Сначала создаем структуру папок из filePath
+    // Сначала создаем все узлы дерева
     storyFiles.forEach((group) => {
       group.stories.forEach((story) => {
         const filePath = story.filePath.replace(".story.tsx", "");
         const parts = filePath.split("/").filter(Boolean);
 
-        // Создаем узлы для каждой части пути
-        parts.reduce((parent, part, index) => {
-          const fullPath = parts.slice(0, index + 1).join("/");
+        // Создаем каждый уровень пути
+        for (let i = 0; i < parts.length; i++) {
+          const part = parts[i];
+          const fullPath = parts.slice(0, i + 1).join("/");
+          const parentPath = parts.slice(0, i).join("/");
 
+          const isInCurrentPath = currentParts[i] === part;
+
+          // Если узел еще не создан - создаем его
           if (!root[fullPath]) {
-            const isLast = index === parts.length - 1;
+            const isLast = i === parts.length - 1;
             root[fullPath] = {
               id: fullPath,
               label: part,
               type: isLast ? "file" : "folder",
               children: [],
-              expanded: true,
+              expanded: isInCurrentPath,
             };
-
-            if (parent) {
-              parent.children?.push(root[fullPath]);
-            }
           }
 
-          return root[fullPath];
-        }, null as TreeNode | null);
+          // Добавляем узел к родителю
+          if (parentPath && root[parentPath]) {
+            if (
+              !root[parentPath].children?.find((child) => child.id === fullPath)
+            ) {
+              root[parentPath].children?.push(root[fullPath]);
+            }
+          }
+        }
 
         // Добавляем историю как дочерний узел к файлу
         const fileNode = root[filePath];
@@ -246,10 +207,13 @@ export const ReStory = component((props: ReStoryProps) => {
             label: story.name,
             type: "story",
             story: story,
-            expanded: story === currentStory,
+            expanded: story.path === props.currentPath,
           };
-          fileNode.children = fileNode.children || [];
-          fileNode.children.push(storyNode);
+
+          if (!fileNode.children?.find((child) => child.id === story.path)) {
+            fileNode.children = fileNode.children || [];
+            fileNode.children.push(storyNode);
+          }
         }
       });
     });
@@ -259,25 +223,35 @@ export const ReStory = component((props: ReStoryProps) => {
   };
 
   // Рекурсивный рендер узла
-  const renderNode = (node: TreeNode) => (
-    <TreeItem
-      key={node.id}
-      id={node.id}
-      label={node.label}
-      icon={Icons[node.type]}
-      expanded={node.expanded}
-      selected={node.story?.path === props.currentPath}
-      href={node.story && node.story.path !== props.currentPath
-        ? node.story.path
-        : undefined}
-    >
-      {node.children?.map(renderNode)}
-    </TreeItem>
-  );
+  const renderNode = (node: TreeNode, index: number, level = 0) => {
+    if (level === 0) {
+      return (
+        <div key={node.id || index}>
+          <GroupHeader>{node.label}</GroupHeader>
+          {node.children?.map((child, childIndex) =>
+            renderNode(child, childIndex, level + 1)
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <TreeItem
+        label={node.label}
+        icon={Icons[node.type]}
+        selected={node.id === props.currentPath}
+        expanded={node.expanded}
+        href={node.type === "story" ? node.id : undefined}
+      >
+        {node.children?.map((child, childIndex) =>
+          renderNode(child, childIndex, level + 1)
+        )}
+      </TreeItem>
+    );
+  };
 
   // Строим дерево из всех историй
   const tree = buildTree(props.stories);
-
   return (
     <RefaceUI>
       <StoryLayout>
@@ -286,7 +260,7 @@ export const ReStory = component((props: ReStoryProps) => {
             {props.logo || <DefaultLogo />}
             <StoryNav>
               <TreeView>
-                {tree.map(renderNode)}
+                {tree.map((node, index) => renderNode(node, index))}
               </TreeView>
             </StoryNav>
           </Stack>
