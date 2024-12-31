@@ -55,7 +55,8 @@
     "test:coverage": "deno test -A --coverage=coverage && deno coverage coverage",
     "test:ci": "deno test -A --coverage=coverage --junit-path=junit.xml",
     "website:dev": "DEV=true deno run -A --watch website/main.tsx",
-    "check": "deno check ./@reface/"
+    "check": "deno check ./@reface/",
+    "ui:story": "deno run --allow-net --allow-read ./@restory/cli.ts ./@reface-ui"
   },
   "fmt": {
     "exclude": [

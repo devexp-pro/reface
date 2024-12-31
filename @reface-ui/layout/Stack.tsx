@@ -6,6 +6,7 @@ const StyledStack = styled.div`
   & {
     display: flex;
     width: 100%;
+    min-height: 0;
   }
 
   &.vertical {
@@ -14,7 +15,6 @@ const StyledStack = styled.div`
 
   &.horizontal {
     flex-direction: row;
-    align-items: center;
   }
 
   &.wrap {
@@ -40,11 +40,17 @@ const StyledStack = styled.div`
   &.space-between {
     justify-content: space-between;
   }
+
+  & > * {
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+  }
 `;
 
 type StackProps = {
   direction?: "vertical" | "horizontal";
-  gap?: string;
+  gap?: "none" | "xs" | "sm" | "md" | "lg";
   wrap?: boolean;
   align?: "stretch" | "start" | "end" | "center";
   justify?: "start" | "end" | "center" | "space-between";
@@ -54,12 +60,16 @@ type StackProps = {
 export const Stack = component((props: StackProps, children) => (
   <StyledStack
     class={[
+      `stack-${props.direction || "horizontal"}`,
       props.direction || "horizontal",
       props.wrap && "wrap",
-      props.align,
+      props.align || "stretch",
       props.justify,
+      props.gap === "none" && "no-gap",
     ].filter(Boolean).join(" ")}
-    style={`gap: ${theme.spacing[props.gap] || theme.spacing.md}`}
+    style={props.gap !== "none"
+      ? `gap: ${theme.spacing[props.gap || "md"]}`
+      : ""}
   >
     {children}
   </StyledStack>

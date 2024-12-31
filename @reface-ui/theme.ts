@@ -4,15 +4,23 @@ const cssVariables = `
     /* Colors */
     --bg-base: #2c2c2c;
     --bg-panel: #1c1c1c;
+    --bg-panel-light: #2c2c2c;
+    --bg-panel-dark: #161616;
     --bg-input: #3c3c3c;
     --bg-hover: #4c4c4c;
 
+    --surface-base: var(--bg-panel);
+    --surface-light: var(--bg-panel-light);
+    --surface-dark: var(--bg-panel-dark);
+    
     --text-base: #ebebeb;
     --text-dimmed: #9ca3af;
     --text-label: #d1d5db;
 
     --border-base: #404040;
     --border-hover: #525252;
+    --border-light: rgba(255, 255, 255, 0.1);
+    --border-dark: rgba(0, 0, 0, 0.2);
 
     --accent-base: #60a5fa;
     --accent-hover: #3b82f6;
@@ -38,6 +46,7 @@ const cssVariables = `
     --font-weight-normal: 400;
     --font-weight-medium: 500;
     --font-weight-semibold: 600;
+    --font-weight-bold: 700;
   }
 `;
 
@@ -55,9 +64,16 @@ export const theme = {
       dimmed: "var(--text-dimmed)",
       label: "var(--text-label)",
     },
+    surface: {
+      base: "var(--surface-base)",
+      light: "var(--surface-light)",
+      dark: "var(--surface-dark)",
+    },
     border: {
       base: "var(--border-base)",
       hover: "var(--border-hover)",
+      light: "var(--border-light)",
+      dark: "var(--border-dark)",
     },
     accent: {
       base: "var(--accent-base)",
@@ -91,6 +107,7 @@ export const theme = {
       normal: "var(--font-weight-normal)",
       medium: "var(--font-weight-medium)",
       semibold: "var(--font-weight-semibold)",
+      bold: "var(--font-weight-bold)",
     },
   },
   cssVariables, // Экспортируем CSS переменные для использования в глобальных стилях

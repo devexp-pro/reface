@@ -1,6 +1,14 @@
 import { component } from "@reface";
 import { styled } from "@reface/plugins/styled";
-import { RefaceUI, Stack, theme, TreeItem, TreeView } from "@reface-ui";
+import {
+  Code,
+  Panel,
+  RefaceUI,
+  Stack,
+  theme,
+  TreeItem,
+  TreeView,
+} from "@reface-ui";
 import { StoryViewer } from "./StoryViewer.tsx";
 
 import type { Story, StoryFile } from "./loader.ts";
@@ -13,7 +21,7 @@ const Icons = {
 };
 
 // Styled компоненты для UI
-const StoryLayout = styled.div`
+const StoryLayout = styled.div /*css*/`
   & {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -54,7 +62,7 @@ export const GroupHeader = component((props: { class?: string }, children) => (
   <StyledGroupHeader class={props.class}>{children}</StyledGroupHeader>
 ));
 
-const Content = styled.div`
+const Content = styled.div /*css*/`
   & {
     padding: ${theme.spacing.lg};
     overflow: auto;
@@ -63,16 +71,15 @@ const Content = styled.div`
     flex-direction: column;
   }
 
-  /* Растягиваем Stack на всю доступную высоту */
   & > div {
     flex: 1;
-    min-height: 0; /* Важно для корректной работы flex в Firefox */
+    min-height: 0;
     display: flex;
     flex-direction: column;
   }
 `;
 
-const StoryHeader = styled.div`
+const StoryHeader = styled.div /*css*/`
   & {
     margin-bottom: ${theme.spacing.lg};
   }
@@ -129,8 +136,8 @@ const DefaultLogo = () => (
 );
 
 type ReStoryProps = {
-  stories: StoryFile[];
-  currentPath: string;
+  stories?: StoryFile[];
+  currentPath?: string;
   logo?: JSX.Element;
 };
 
@@ -255,35 +262,74 @@ export const ReStory = component((props: ReStoryProps) => {
   return (
     <RefaceUI>
       <StoryLayout>
-        <Sidebar>
-          <Stack direction="vertical" gap="0">
+        <Panel variant="dark">
+          <Stack direction="vertical" gap="none">
             {props.logo || <DefaultLogo />}
-            <StoryNav>
-              <TreeView>
-                {tree.map((node, index) => renderNode(node, index))}
-              </TreeView>
-            </StoryNav>
+            <Panel
+              slots={{
+                header: <GroupHeader>Navigation</GroupHeader>,
+              }}
+            >
+              <StoryNav>
+                <TreeView>
+                  {tree.map((node, index) => renderNode(node, index))}
+                </TreeView>
+              </StoryNav>
+            </Panel>
           </Stack>
-        </Sidebar>
+        </Panel>
+
         <Content>
           {currentStory
             ? (
               <Stack direction="vertical" gap={theme.spacing.lg}>
-                {componentMeta && (
-                  <StoryHeader>
-                    <h1>{componentMeta.title}: {currentStory.name}</h1>
-                    {componentMeta.description && (
-                      <div class="description">{componentMeta.description}</div>
-                    )}
-                  </StoryHeader>
-                )}
-                <StoryViewer
-                  component={currentStory.component}
-                  path={currentStory.path}
-                />
+                <>
+                  <Panel
+                    variant="light"
+                    slots={{
+                      header: (
+                        <StoryHeader>
+                          <h1>
+                            {[componentMeta?.title, currentStory.name].filter(
+                              Boolean,
+                            ).join(": ")}
+                          </h1>
+                          {componentMeta?.description && (
+                            <div class="description">
+                              {componentMeta.description}
+                            </div>
+                          )}
+                        </StoryHeader>
+                      ),
+                    }}
+                  >
+                    <StoryViewer
+                      component={currentStory.component}
+                      path={currentStory.path}
+                    />
+                  </Panel>
+
+                  <Panel
+                    variant="dark"
+                    style="max-height: 400px;"
+                    slots={{
+                      header: <GroupHeader>Source Code</GroupHeader>,
+                    }}
+                  >
+                    <Code
+                      language="tsx"
+                      showLineNumbers
+                      code={currentStory.source}
+                    />
+                  </Panel>
+                </>
               </Stack>
             )
-            : <div>Select a story from the sidebar</div>}
+            : (
+              <Panel>
+                <div>Select a story from the sidebar</div>
+              </Panel>
+            )}
         </Content>
       </StoryLayout>
     </RefaceUI>

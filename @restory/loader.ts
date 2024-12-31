@@ -35,6 +35,7 @@ export type Story = {
   component: () => JSX.Element;
   path: string;
   filePath: string;
+  source: string;
 };
 
 export type StoryFile = {
@@ -67,6 +68,7 @@ export async function loadStories(rootDir: string): Promise<StoryFile[]> {
     const fileUrl = `file://${file}`;
     const storyModule: StoryModule = await import(fileUrl);
     const relativePath = relative(absolutePath, file);
+    const sourceCode = await Deno.readTextFile(file);
 
     // Получаем метаданные из модуля
     const meta = storyModule.meta;
@@ -100,11 +102,15 @@ export async function loadStories(rootDir: string): Promise<StoryFile[]> {
         const storyPath =
           `/${groupName.toLowerCase()}/${fileName}/${key.toLowerCase()}`;
 
+        // Извлекаем исходный код компонента с помощью регулярного выражения
+        const componentSource = extractComponentSource(sourceCode, key);
+
         group!.stories.push({
           name: storyName,
           component: component as () => JSX.Element,
           path: storyPath,
           filePath: relativePath,
+          source: componentSource || sourceCode,
         });
       });
   }
@@ -112,24 +118,37 @@ export async function loadStories(rootDir: string): Promise<StoryFile[]> {
   return Array.from(groups.values());
 }
 
+// Функция для извлечения исходного кода конкретного компонента
+function extractComponentSource(source: string, componentName: string): string {
+  // Ищем экспортируемый компонент, учитывая возможные пробелы и переносы строк
+  const regex = new RegExp(
+    `export\\s+const\\s+${componentName}\\s*=\\s*component\\s*\\([\\s\\S]*?\\);`,
+    "m",
+  );
+
+  const match = source.match(regex);
+
+  if (match) {
+    return match[0];
+  }
+
+  // Если не нашли компонент, возвращаем весь исходный код
+  return source;
+}
+
 export async function loadStory(
   path: string,
   rootDir: string,
 ): Promise<Story | null> {
   try {
-    // Убираем лишние слэши и приводим к нижнему регистру
     const normalizedPath = path.toLowerCase().replace(/^\/+|\/+$/g, "");
-
-    // Строим путь к файлу истории
     const storyFile = `${rootDir}/${
       normalizedPath.replace(/\/[^/]+$/, "")
     }.story.tsx`;
     const storyName = normalizedPath.split("/").pop();
-
-    // Импортируем модуль истории
+    const sourceCode = await Deno.readTextFile(storyFile);
     const storyModule: StoryModule = await import(`file://${storyFile}`);
 
-    // Ищем компонент истории по имени
     const storyComponent = Object.entries(storyModule)
       .find(([key]) => key.toLowerCase() === storyName)?.[1];
 
@@ -137,11 +156,15 @@ export async function loadStory(
       return null;
     }
 
+    // Извлекаем исходный код компонента
+    const componentSource = extractComponentSource(sourceCode, storyName);
+
     return {
       name: storyName,
       component: storyComponent as () => JSX.Element,
       path: path,
       filePath: storyFile,
+      source: componentSource || sourceCode,
     };
   } catch (error) {
     console.error(`Failed to load story: ${path}`, error);

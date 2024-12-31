@@ -13,19 +13,61 @@ const globalStyles = `
     padding: 0;
   }
 
+  /* Base styles */
+  :root {
+    color-scheme: light dark;
+  }
+
   body {
     font-family: var(--font-ui);
     font-size: var(--font-size-sm);
+    line-height: 1.5;
     color: var(--color-text-base);
     background: var(--color-bg-base);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text-label);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.2;
+  }
+
+  p {
+    color: var(--color-text-base);
+    margin-bottom: var(--spacing-md);
+  }
+
+  a {
+    color: var(--color-accent-base);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    color: var(--color-text-code);
+    background: var(--color-bg-input);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+  }
+
   /* Basic focus styles */
   :focus-visible {
     outline: 2px solid var(--color-accent-base);
     outline-offset: 2px;
+  }
+
+  /* Selection */
+  ::selection {
+    background: var(--color-accent-base);
+    color: var(--color-text-inverse);
   }
 `;
 
