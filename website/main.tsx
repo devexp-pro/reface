@@ -38,7 +38,7 @@ const Layout = component((_, children) => (
 ));
 
 const reface = new Reface({
-  layout: Layout,
+  // layout: Layout,
 });
 
 if (IS_DEV) {

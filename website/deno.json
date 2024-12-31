@@ -21,7 +21,8 @@
     "remark-parse": "npm:remark-parse",
     "remark-gfm": "npm:remark-gfm",
     "mdast": "npm:@types/mdast",
-    "hono": "jsr:@hono/hono@^4.6.15"
+    "hono": "jsr:@hono/hono@^4.6.15",
+    "@reface-ui": "../@reface-ui/mod.ts"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
