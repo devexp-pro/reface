@@ -200,6 +200,125 @@ const RefaceHeroText = styled.div /*css*/`
   }
 `;
 
+const DevExpContainer = styled.div /*css*/`
+  & {
+    position: relative;
+    display: inline-flex;
+    width: fit-content;
+    padding: ${theme.spacing.md};
+    font-family: ${theme.typography.fonts.mono};
+  }
+
+  & .corner {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid ${theme.colors.accent.base};
+    opacity: 0.5;
+    transition: all 0.3s ease;
+  }
+
+  & .corner-tl {
+    top: 0;
+    left: 0;
+    border-right: 0;
+    border-bottom: 0;
+  }
+
+  & .corner-tr {
+    top: 0;
+    right: 0;
+    border-left: 0;
+    border-bottom: 0;
+  }
+
+  & .corner-bl {
+    bottom: 0;
+    left: 0;
+    border-right: 0;
+    border-top: 0;
+  }
+
+  & .corner-br {
+    bottom: 0;
+    right: 0;
+    border-left: 0;
+    border-top: 0;
+  }
+
+  & .text {
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing.xs};
+    font-size: ${theme.typography.sizes.md};
+  }
+
+  & .dev {
+    color: ${theme.colors.text.base};
+    font-weight: ${theme.typography.weights.medium};
+  }
+
+  & .exp {
+    color: ${theme.colors.accent.base};
+    font-weight: ${theme.typography.weights.medium};
+  }
+`;
+
+const DevExpHeroContainer = styled.div /*css*/`
+  & {
+    position: relative;
+    display: inline-flex;
+    width: fit-content;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    font-family: ${theme.typography.fonts.mono};
+  }
+
+  & .corner {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 2px solid ${theme.colors.accent.base};
+    opacity: 0.5;
+    transition: all 0.3s ease;
+  }
+
+  & .corner-tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+  & .corner-tr { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+  & .corner-bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+  & .corner-br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+  & .text {
+    display: flex;
+    font-size: 5rem;
+    font-weight: ${theme.typography.weights.bold};
+  }
+
+  & .dev {
+    background: linear-gradient(45deg, ${theme.colors.text.base}, ${theme.colors.text.dimmed});
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  & .exp {
+    color: ${theme.colors.accent.base};
+    opacity: 0.9;
+  }
+
+  @media (max-width: 1024px) {
+    & .text {
+      font-size: 4rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    & .text {
+      font-size: 3rem;
+    }
+  }
+`;
+
 export const RefaceIcon = component((props: { size?: "default" | "large" }) => (
   <RefaceIconContainer class={`size-${props.size || "default"}`}>
     R
@@ -253,4 +372,30 @@ export const ReTemplateLogo = component(() => (
     <span class="type">template</span>
     <span class="bracket">/&gt;</span>
   </ReTemplateContainer>
+));
+
+export const DevExpLogo = component(() => (
+  <DevExpContainer>
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="text">
+      <span class="dev">Dev</span>
+      <span class="exp">Exp</span>
+    </div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+  </DevExpContainer>
+));
+
+export const DevExpHeroLogo = component(() => (
+  <DevExpHeroContainer>
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="text">
+      <span class="dev">Dev</span>
+      <span class="exp">Exp</span>
+    </div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+  </DevExpHeroContainer>
 ));

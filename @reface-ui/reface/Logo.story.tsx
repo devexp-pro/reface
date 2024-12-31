@@ -2,6 +2,8 @@ import { component } from "@reface";
 import { Stack } from "../layout/Stack.tsx";
 import { styled } from "@reface/plugins/styled";
 import {
+  DevExpHeroLogo,
+  DevExpLogo,
   RefaceGroup,
   RefaceHero,
   RefaceIcon,
@@ -63,6 +65,18 @@ export const All = component(() => (
         ReTemplateLogo - &lt;Re template/&gt; branding
       </div>
     </LogoWrapper>
+
+    <LogoWrapper>
+      <DevExpLogo />
+      <div class="description">DevExpLogo - Developer Experience branding</div>
+    </LogoWrapper>
+
+    <LogoWrapper>
+      <DevExpHeroLogo />
+      <div class="description">
+        DevExpHeroLogo - Large hero version with corners
+      </div>
+    </LogoWrapper>
   </Stack>
 ));
 
@@ -91,6 +105,20 @@ export const RefaceVariants = component(() => (
     <LogoWrapper>
       <RefaceHero />
       <div class="description">Hero version with animation</div>
+    </LogoWrapper>
+  </Stack>
+));
+
+export const DevExpVariants = component(() => (
+  <Stack direction="vertical" gap="lg">
+    <LogoWrapper>
+      <DevExpLogo />
+      <div class="description">Default size with corners</div>
+    </LogoWrapper>
+
+    <LogoWrapper>
+      <DevExpHeroLogo />
+      <div class="description">Hero version with large corners</div>
     </LogoWrapper>
   </Stack>
 ));
