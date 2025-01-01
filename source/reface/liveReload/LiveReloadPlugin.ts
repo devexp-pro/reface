@@ -34,7 +34,6 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
     manager.on(
       REFACE_EVENT.RENDER.RENDER.END,
       function liveReloadPluginInjectScript({ html }) {
-        console.log("[LiveReload] Injecting client script");
         return self.injectScript(html as string);
       },
     );
@@ -57,16 +56,10 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
 
         socket.onopen = () => {
           this.clients.add(socket);
-          console.log(
-            `[LiveReload] Client connected (total: ${this.clients.size})`,
-          );
         };
 
         socket.onclose = () => {
           this.clients.delete(socket);
-          console.log(
-            `[LiveReload] Client disconnected (total: ${this.clients.size})`,
-          );
         };
 
         return response;
@@ -74,11 +67,8 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
       return new Response("Not found", { status: 404 });
     });
 
-    console.log("[LiveReload] Server started successfully");
-
     // Watch for file changes
     if (this.options.watchPaths?.length) {
-      console.log("[LiveReload] Starting file watchers...");
       for (const path of this.options.watchPaths) {
         console.log(`[LiveReload] Watching path: ${path}`);
         await this.watchPath(path);
@@ -103,11 +93,6 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
   }
 
   private reload() {
-    const clientCount = this.clients.size;
-    console.log(
-      `[LiveReload] Sending reload signal to ${clientCount} client(s)`,
-    );
-
     for (const client of this.clients) {
       try {
         client.send("reload");
@@ -119,7 +104,6 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
   }
 
   private injectScript(html: string): string {
-    console.log("[LiveReload] Injecting client script");
     const script = `
       <script>
         const REFACE_LIVE_RELOAD_PORT = ${this.options.port};
@@ -133,12 +117,9 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
 
   // Cleanup method
   async destroy() {
-    console.log("[LiveReload] Shutting down...");
-
     this.abortController?.abort();
 
     // Close all watchers
-    console.log("[LiveReload] Closing file watchers...");
     for (const watcher of this.watchers) {
       try {
         await watcher.close();
@@ -148,10 +129,6 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
     }
     this.watchers = [];
 
-    // Close all WebSocket connections
-    console.log(
-      `[LiveReload] Closing ${this.clients.size} client connection(s)...`,
-    );
     for (const client of this.clients) {
       try {
         client.close();
@@ -160,7 +137,5 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
       }
     }
     this.clients.clear();
-
-    console.log("[LiveReload] Shutdown complete");
   }
 }

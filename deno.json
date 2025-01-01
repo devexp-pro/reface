@@ -25,6 +25,7 @@
     "@reface": "./source/reface/mod.ts",
     "@reface/ui": "./source/reface-ui/mod.ts",
     "@reface/restory": "./source/restory/mod.tsx",
+    "@reface/restory/cli": "./source/restory/cli.ts",
     "@reface/recast": "./source/recast/mod.ts",
     "@reface/recast/jsx-runtime": "./source/recast/jsx/jsx-runtime.ts",
     "@reface/recast/elements": "./source/recast/elements.ts",
@@ -47,7 +48,7 @@
     "test:ci": "deno test -A --coverage=coverage --junit-path=junit.xml",
     "website:dev": "DEV=true deno run -A --watch website/main.tsx",
     "check": "deno check ./@reface/",
-    "reface-ui:story": "deno run --allow-net --allow-read ./source/restory/cli.ts ./source/reface-ui"
+    "reface-ui:story": "deno run --allow-net --allow-read --allow-env --allow-run ./source/restory/cli.ts ./source/reface-ui"
   },
   "fmt": {
     "exclude": [

@@ -45,7 +45,10 @@ export type StoryFile = {
   meta?: StoryMeta;
 };
 
-export async function loadStories(rootDir: string): Promise<StoryFile[]> {
+export async function loadStories(
+  rootDir: string,
+  version?: string | number,
+): Promise<StoryFile[]> {
   const absolutePath = new URL(rootDir, import.meta.url).pathname;
   const storyFiles: string[] = [];
 
@@ -65,7 +68,7 @@ export async function loadStories(rootDir: string): Promise<StoryFile[]> {
   const groups: Map<string, StoryFile> = new Map();
 
   for (const file of storyFiles) {
-    const fileUrl = `file://${file}`;
+    const fileUrl = `file://${file}${version ? "#" + version : ""}`;
     const storyModule: StoryModule = await import(fileUrl);
     const relativePath = relative(absolutePath, file);
     const sourceCode = await Deno.readTextFile(file);
@@ -139,6 +142,7 @@ function extractComponentSource(source: string, componentName: string): string {
 export async function loadStory(
   path: string,
   rootDir: string,
+  version: string | number,
 ): Promise<Story | null> {
   try {
     const normalizedPath = path.toLowerCase().replace(/^\/+|\/+$/g, "");
@@ -147,7 +151,10 @@ export async function loadStory(
     }.story.tsx`;
     const storyName = normalizedPath.split("/").pop();
     const sourceCode = await Deno.readTextFile(storyFile);
-    const storyModule: StoryModule = await import(`file://${storyFile}`);
+    // Обычный импорт
+    const storyModule: StoryModule = await import(
+      `file://${storyFile}${version ? "#" + version : ""}`
+    );
 
     const storyComponent = Object.entries(storyModule)
       .find(([key]) => key.toLowerCase() === storyName)?.[1];

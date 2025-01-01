@@ -5,6 +5,7 @@ import { Button } from "../controls/Button.tsx";
 import { styled } from "@reface/recast";
 import { theme } from "../theme.ts";
 import { StorySlot } from "@reface/restory";
+import { Grid, GridCol } from "./Grid.tsx";
 
 export const meta = {
   title: "Layout/Panel",
@@ -195,11 +196,12 @@ export const ComplexExample = component(() => (
 
 // Пример редактора
 export const EditorLayout = component(() => (
-  <Stack direction="vertical" gap="none" style="height: 800px;">
-    <Stack direction="horizontal" gap="none" style="flex: 1;">
+  <Grid columns={12} gap="none" style="height: 800px;">
+    {/* Левая панель - Explorer */}
+    <GridCol span={2}>
       <Panel
         variant="dark"
-        style="width: 240px;"
+        style="height: 100%;"
         slots={{
           header: (
             <DemoHeader>
@@ -223,9 +225,12 @@ export const EditorLayout = component(() => (
 └── theme.ts`}
         </PreformattedBlock>
       </Panel>
+    </GridCol>
 
+    {/* Центральная панель - Редактор */}
+    <GridCol span={7}>
       <Panel
-        style="flex: 2;"
+        style="height: 100%;"
         slots={{
           header: (
             <DemoHeader>
@@ -281,10 +286,13 @@ export const App = component(() => (
 ));`}
         </PreformattedBlock>
       </Panel>
+    </GridCol>
 
+    {/* Правая панель - Properties */}
+    <GridCol span={3}>
       <Panel
         variant="light"
-        style="width: 300px;"
+        style="height: 100%;"
         slots={{
           header: (
             <DemoHeader>
@@ -304,20 +312,23 @@ slots:
 children: JSX.Element`}
         </PreformattedBlock>
       </Panel>
-    </Stack>
+    </GridCol>
 
-    <Panel
-      variant="dark"
-      slots={{
-        header: (
-          <Stack direction="horizontal" gap="lg" justify="space-between">
-            <DemoBlock>Git: main • TypeScript • Spaces: 2 • UTF-8</DemoBlock>
-            <DemoBlock>Ln 42, Col 80</DemoBlock>
-          </Stack>
-        ),
-      }}
-    />
-  </Stack>
+    {/* Нижняя панель - Статус бар */}
+    <GridCol span={12}>
+      <Panel
+        variant="dark"
+        slots={{
+          header: (
+            <Stack direction="horizontal" gap="lg" justify="space-between">
+              <DemoBlock>Git: main • TypeScript • Spaces: 2 • UTF-8</DemoBlock>
+              <DemoBlock>Ln 42, Col 80</DemoBlock>
+            </Stack>
+          ),
+        }}
+      />
+    </GridCol>
+  </Grid>
 ));
 
 export const Slots = component(() => (
