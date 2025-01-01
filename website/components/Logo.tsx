@@ -1,5 +1,5 @@
-import type { Template } from "@reface/template";
-import { styled } from "@reface/plugins/styled";
+import type { Template } from "@reface/recast";
+import { styled } from "@reface/recast";
 
 const LogoIcon = styled.div`
   & {

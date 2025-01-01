@@ -22,25 +22,16 @@
     "./components/LayoutTWA": "./@reface/components/LayoutTWA.ts"
   },
   "imports": {
-    "@reface": "./@reface/mod.ts",
-    "@reface/jsx": "./@reface/jsx/mod.ts",
-    "@reface/jsx/jsx-runtime": "./@reface/jsx/jsx-runtime.ts",
-    "@reface/types": "./@reface/types/mod.ts",
-    "@reface/constants": "./@reface/constants.ts",
-    "@reface/island": "./@reface/island/mod.ts",
-    "@reface/htmx": "./@reface/htmx/mod.ts",
-    "@reface/elements": "./@reface/elements.ts",
-    "@reface/template": "./@reface/template/mod.ts",
-    "@reface/plugins/styled": "./@reface/plugins/styled/mod.ts",
-    "@reface/plugins/partials": "./@reface/plugins/partials/mod.ts",
-    "@reface/plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
-    "@reface/plugins/liveReload": "./@reface/plugins/liveReload/mod.ts",
-    "@reface/components/LayoutSimple": "./@reface/components/LayoutSimple.ts",
+    "@reface": "./source/reface/mod.ts",
+    "@reface/ui": "./source/reface-ui/mod.ts",
+    "@reface/restory": "./source/restory/mod.tsx",
+    "@reface/recast": "./source/recast/mod.ts",
+    "@reface/recast/jsx-runtime": "./source/recast/jsx/jsx-runtime.ts",
+    "@reface/recast/elements": "./source/recast/elements.ts",
+    "@reface/recast/htmx": "./source/recast/htmx/mod.ts",
     "@std/assert": "jsr:@std/assert@^1.0.1",
     "@std/crypto": "jsr:@std/crypto@^1.0.2",
-    "@hono/hono": "jsr:@hono/hono@^4.6.15",
-    "@restory": "./@restory/mod.tsx",
-    "@reface-ui": "./@reface-ui/mod.ts"
+    "@hono/hono": "jsr:@hono/hono@^4.6.15"
   },
   "tasks": {
     "ex1": "deno run --allow-all --unstable-ffi --watch=./examples/ex1.ts ./examples/ex1.ts",
@@ -56,7 +47,7 @@
     "test:ci": "deno test -A --coverage=coverage --junit-path=junit.xml",
     "website:dev": "DEV=true deno run -A --watch website/main.tsx",
     "check": "deno check ./@reface/",
-    "ui:story": "deno run --allow-net --allow-read ./@restory/cli.ts ./@reface-ui"
+    "reface-ui:story": "deno run --allow-net --allow-read ./source/restory/cli.ts ./source/reface-ui"
   },
   "fmt": {
     "exclude": [
@@ -73,7 +64,7 @@
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@reface/jsx"
+    "jsxImportSource": "@reface/recast"
   },
   "publish": {
     "include": [
