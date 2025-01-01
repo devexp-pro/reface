@@ -1,6 +1,9 @@
 import { component, styled } from "@reface/recast";
 import {
+  Button,
   Code,
+  Grid,
+  GridCol,
   Panel,
   RefaceUI,
   Stack,
@@ -17,23 +20,23 @@ const Icons = {
   folder: "🗂️",
   file: "🧩",
   story: "📚",
+  external: "↗️",
 };
 
-// Styled компоненты для UI
-const StoryLayout = styled.div /*css*/`
+// Добавим стили для ссылки
+const ExternalLink = styled.a /*css*/`
   & {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    height: 100vh;
-    background: ${theme.colors.bg.base};
+    color: ${theme.colors.text.dimmed};
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing.xs};
+    font-size: ${theme.typography.sizes.sm};
+    justify-content: end;
   }
-`;
 
-const Sidebar = styled.div`
-  & {
-    background: ${theme.colors.bg.panel};
-    border-right: 1px solid ${theme.colors.border.base};
-    overflow: auto;
+  &:hover {
+    color: ${theme.colors.text.base};
   }
 `;
 
@@ -149,188 +152,210 @@ type TreeNode = {
   story?: Story;
 };
 
-export const ReStory = component((props: ReStoryProps) => {
-  const currentStory = props.stories
-    .flatMap((group) => group.stories)
-    .find((story) => story.path === props.currentPath);
-  const currentFile = props.stories.find((file) =>
-    file.filePath === currentStory?.filePath
-  );
+export const ReStory = component(
+  ({ stories, currentPath, logo }: ReStoryProps) => {
+    const currentStory = stories
+      .flatMap((group) => group.stories)
+      .find((story) => story.path === currentPath);
+    const currentFile = stories.find((file) =>
+      file.filePath === currentStory?.filePath
+    );
 
-  // Получаем части пути текущего файла
-  const currentParts =
-    currentStory?.filePath.replace(".story.tsx", "").split("/").filter(
-      Boolean,
-    ) || [];
+    // Получаем части пути текущего файла
+    const currentParts =
+      currentStory?.filePath.replace(".story.tsx", "").split("/").filter(
+        Boolean,
+      ) || [];
 
-  const componentMeta = currentFile?.meta;
+    const componentMeta = currentFile?.meta;
 
-  // Обновленная функция построения дерева
-  const buildTree = (storyFiles: StoryFile[]): TreeNode[] => {
-    const root: Record<string, TreeNode> = {};
+    // Обновленная функция построения дерева
+    const buildTree = (storyFiles: StoryFile[]): TreeNode[] => {
+      const root: Record<string, TreeNode> = {};
 
-    // Сначала создаем все узлы дерева
-    storyFiles.forEach((group) => {
-      group.stories.forEach((story) => {
-        const filePath = story.filePath.replace(".story.tsx", "");
-        const parts = filePath.split("/").filter(Boolean);
+      // Сначала создаем все узлы дерева
+      storyFiles.forEach((group) => {
+        group.stories.forEach((story) => {
+          const filePath = story.filePath.replace(".story.tsx", "");
+          const parts = filePath.split("/").filter(Boolean);
 
-        // Создаем каждый уровень пути
-        for (let i = 0; i < parts.length; i++) {
-          const part = parts[i];
-          const fullPath = parts.slice(0, i + 1).join("/");
-          const parentPath = parts.slice(0, i).join("/");
+          // Создаем каждый уровень пути
+          for (let i = 0; i < parts.length; i++) {
+            const part = parts[i];
+            const fullPath = parts.slice(0, i + 1).join("/");
+            const parentPath = parts.slice(0, i).join("/");
 
-          const isInCurrentPath = currentParts[i] === part;
+            const isInCurrentPath = currentParts[i] === part;
 
-          // Если узел еще не создан - создаем его
-          if (!root[fullPath]) {
-            const isLast = i === parts.length - 1;
-            root[fullPath] = {
-              id: fullPath,
-              label: part,
-              type: isLast ? "file" : "folder",
-              children: [],
-              expanded: isInCurrentPath,
-            };
-          }
+            // Если узел еще не создан - создаем его
+            if (!root[fullPath]) {
+              const isLast = i === parts.length - 1;
+              root[fullPath] = {
+                id: fullPath,
+                label: part,
+                type: isLast ? "file" : "folder",
+                children: [],
+                expanded: isInCurrentPath,
+              };
+            }
 
-          // Добавляем узел к родителю
-          if (parentPath && root[parentPath]) {
-            if (
-              !root[parentPath].children?.find((child) => child.id === fullPath)
-            ) {
-              root[parentPath].children?.push(root[fullPath]);
+            // Добавляем узел к родителю
+            if (parentPath && root[parentPath]) {
+              if (
+                !root[parentPath].children?.find((child) =>
+                  child.id === fullPath
+                )
+              ) {
+                root[parentPath].children?.push(root[fullPath]);
+              }
             }
           }
-        }
 
-        // Добавляем историю как дочерний узел к файлу
-        const fileNode = root[filePath];
-        if (fileNode) {
-          const storyNode: TreeNode = {
-            id: story.path,
-            label: story.name,
-            type: "story",
-            story: story,
-            expanded: story.path === props.currentPath,
-          };
+          // Добавляем историю как дочерний узел к файлу
+          const fileNode = root[filePath];
+          if (fileNode) {
+            const storyNode: TreeNode = {
+              id: story.path,
+              label: story.name,
+              type: "story",
+              story: story,
+              expanded: story.path === currentPath,
+            };
 
-          if (!fileNode.children?.find((child) => child.id === story.path)) {
-            fileNode.children = fileNode.children || [];
-            fileNode.children.push(storyNode);
+            if (!fileNode.children?.find((child) => child.id === story.path)) {
+              fileNode.children = fileNode.children || [];
+              fileNode.children.push(storyNode);
+            }
           }
-        }
+        });
       });
-    });
 
-    // Возвращаем только корневые узлы
-    return Object.values(root).filter((node) => !node.id.includes("/"));
-  };
+      // Возвращаем только корневые узлы
+      return Object.values(root).filter((node) => !node.id.includes("/"));
+    };
 
-  // Рекурсивный рендер узла
-  const renderNode = (node: TreeNode, index: number, level = 0) => {
-    if (level === 0) {
+    // Рекурсивный рендер узла
+    const renderNode = (node: TreeNode, index: number, level = 0) => {
+      if (level === 0) {
+        return (
+          <div key={node.id || index}>
+            <GroupHeader>{node.label}</GroupHeader>
+            {node.children?.map((child, childIndex) =>
+              renderNode(child, childIndex, level + 1)
+            )}
+          </div>
+        );
+      }
+
       return (
-        <div key={node.id || index}>
-          <GroupHeader>{node.label}</GroupHeader>
+        <TreeItem
+          label={node.label}
+          icon={Icons[node.type]}
+          selected={node.id === currentPath}
+          expanded={node.expanded}
+          href={node.type === "story" ? node.id : undefined}
+        >
           {node.children?.map((child, childIndex) =>
             renderNode(child, childIndex, level + 1)
           )}
-        </div>
+        </TreeItem>
       );
-    }
+    };
 
+    // Строим дерево из всех историй
+    const tree = buildTree(stories);
     return (
-      <TreeItem
-        label={node.label}
-        icon={Icons[node.type]}
-        selected={node.id === props.currentPath}
-        expanded={node.expanded}
-        href={node.type === "story" ? node.id : undefined}
-      >
-        {node.children?.map((child, childIndex) =>
-          renderNode(child, childIndex, level + 1)
-        )}
-      </TreeItem>
-    );
-  };
-
-  // Строим дерево из всех историй
-  const tree = buildTree(props.stories);
-  return (
-    <RefaceUI>
-      <StoryLayout>
-        <Panel variant="dark">
-          <Stack direction="vertical" gap="none">
-            {props.logo || <DefaultLogo />}
-            <Panel
-              slots={{
-                header: <GroupHeader>Navigation</GroupHeader>,
-              }}
-            >
-              <StoryNav>
-                <TreeView>
-                  {tree.map((node, index) => renderNode(node, index))}
-                </TreeView>
-              </StoryNav>
-            </Panel>
-          </Stack>
-        </Panel>
-
-        <Content>
-          {currentStory
-            ? (
-              <Stack direction="vertical" gap={theme.spacing.lg}>
-                <>
-                  <Panel
-                    variant="light"
-                    slots={{
-                      header: (
-                        <StoryHeader>
-                          <h1>
-                            {[componentMeta?.title, currentStory.name].filter(
-                              Boolean,
-                            ).join(": ")}
-                          </h1>
-                          {componentMeta?.description && (
-                            <div class="description">
-                              {componentMeta.description}
-                            </div>
-                          )}
-                        </StoryHeader>
-                      ),
-                    }}
-                  >
-                    <StoryViewer
-                      component={currentStory.component}
-                      path={currentStory.path}
-                    />
-                  </Panel>
-
-                  <Panel
-                    variant="dark"
-                    style="max-height: 400px;"
-                    slots={{
-                      header: <GroupHeader>Source Code</GroupHeader>,
-                    }}
-                  >
-                    <Code
-                      language="tsx"
-                      showLineNumbers
-                      code={currentStory.source}
-                    />
-                  </Panel>
-                </>
+      <RefaceUI>
+        <Grid columns={12} gap="none" style="height: 100vh;">
+          {/* Сайдбар */}
+          <GridCol span={2}>
+            <Panel variant="dark">
+              <Stack direction="vertical" gap="none">
+                {logo || <DefaultLogo />}
+                <Panel
+                  slots={{
+                    header: <GroupHeader>Navigation</GroupHeader>,
+                  }}
+                >
+                  <StoryNav>
+                    <TreeView>
+                      {tree.map((node, index) => renderNode(node, index))}
+                    </TreeView>
+                  </StoryNav>
+                </Panel>
               </Stack>
-            )
-            : (
-              <Panel>
-                <div>Select a story from the sidebar</div>
-              </Panel>
-            )}
-        </Content>
-      </StoryLayout>
-    </RefaceUI>
-  );
-});
+            </Panel>
+          </GridCol>
+
+          {/* Основной контент */}
+          <GridCol span={10}>
+            <Content>
+              {currentStory
+                ? (
+                  <Stack direction="vertical" gap={theme.spacing.lg}>
+                    <Panel
+                      variant="light"
+                      slots={{
+                        header: (
+                          <Stack
+                            direction="horizontal"
+                            gap="lg"
+                            justify="space-between"
+                            align="start"
+                          >
+                            <StoryHeader>
+                              <h1>
+                                {[componentMeta?.title, currentStory.name]
+                                  .filter(Boolean)
+                                  .join(": ")}
+                              </h1>
+                              {componentMeta?.description && (
+                                <div class="description">
+                                  {componentMeta.description}
+                                </div>
+                              )}
+                            </StoryHeader>
+                            <ExternalLink
+                              href={`/iframe${currentPath}`}
+                              target="_blank"
+                            >
+                              <span>View fullscreen</span>
+                              {Icons.external}
+                            </ExternalLink>
+                          </Stack>
+                        ),
+                      }}
+                    >
+                      <StoryViewer
+                        component={currentStory.component}
+                        path={currentStory.path}
+                      />
+                    </Panel>
+
+                    <Panel
+                      variant="dark"
+                      style="max-height: 400px;"
+                      slots={{
+                        header: <GroupHeader>Source Code</GroupHeader>,
+                      }}
+                    >
+                      <Code
+                        language="tsx"
+                        showLineNumbers
+                        code={currentStory.source}
+                      />
+                    </Panel>
+                  </Stack>
+                )
+                : (
+                  <Panel>
+                    <p>Select a story from the sidebar to view it here.</p>
+                  </Panel>
+                )}
+            </Content>
+          </GridCol>
+        </Grid>
+      </RefaceUI>
+    );
+  },
+);

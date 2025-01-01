@@ -20,6 +20,7 @@ export { Stack } from "./layout/Stack.tsx";
 export { Panel } from "./layout/Panel.tsx";
 export { Card } from "./layout/Card.tsx";
 export { Tabs } from "./layout/Tabs.tsx";
+export { Grid, GridCol } from "./layout/Grid.tsx";
 
 // layout primitives
 export { Box } from "./layout/Box.tsx";
