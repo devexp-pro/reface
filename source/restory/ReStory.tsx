@@ -12,15 +12,16 @@ import {
   TreeView,
 } from "@reface/ui";
 import { StoryViewer } from "./StoryViewer.tsx";
+import { Icon } from "@reface/ui";
 
 import type { Story, StoryFile } from "./loader.ts";
 
 // В начале файла обновим иконки
 const Icons = {
-  folder: "🗂️",
-  file: "🧩",
-  story: "📚",
-  external: "↗️",
+  folder: "folder",
+  file: "file-code",
+  story: "storybook",
+  external: "arrow-square-out",
 };
 
 // Добавим стили для ссылки
@@ -250,7 +251,7 @@ export const ReStory = component(
       return (
         <TreeItem
           label={node.label}
-          icon={Icons[node.type]}
+          icon={<Icon name={Icons[node.type]} size="sm" />}
           selected={node.id === currentPath}
           expanded={node.expanded}
           href={node.type === "story" ? node.id : undefined}
@@ -320,7 +321,7 @@ export const ReStory = component(
                               target="_blank"
                             >
                               <span>View fullscreen</span>
-                              {Icons.external}
+                              <Icon name={Icons.external} size="sm" />
                             </ExternalLink>
                           </Stack>
                         ),

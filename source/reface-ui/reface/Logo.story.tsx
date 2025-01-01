@@ -1,8 +1,11 @@
 import { component, styled } from "@reface/recast";
+import { theme } from "../theme.ts";
 import { Stack } from "../layout/Stack.tsx";
+import { Grid, GridCol } from "../layout/Grid.tsx";
 import {
   DevExpHeroLogo,
   DevExpLogo,
+  ReDocsLogo,
   RefaceGroup,
   RefaceHero,
   RefaceIcon,
@@ -16,108 +19,89 @@ export const meta = {
   description: "Logo components for Reface ecosystem",
 };
 
-const LogoWrapper = styled.div /*css*/`
+const LogoGrid = styled.div /*css*/`
   & {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: ${theme.spacing.lg};
+    align-items: center;
+    padding: ${theme.spacing.lg};
+    border: 1px solid ${theme.colors.border.base};
+    border-radius: 4px;
   }
 
-  & .description {
-    font-size: 0.875rem;
-    color: var(--text-dimmed);
+  & .title {
+    color: ${theme.colors.text.dimmed};
+    font-size: ${theme.typography.sizes.sm};
+    font-family: ${theme.typography.fonts.mono};
   }
 `;
 
-export const All = component(() => (
-  <Stack direction="vertical" gap="lg">
-    <LogoWrapper>
-      <RefaceIcon />
-      <div class="description">RefaceIcon - Square icon with "R"</div>
-    </LogoWrapper>
+const SectionTitle = styled.h2 /*css*/`
+  & {
+    font-size: ${theme.typography.sizes.lg};
+    color: ${theme.colors.text.base};
+    margin-bottom: ${theme.spacing.lg};
+    font-weight: ${theme.typography.weights.medium};
+  }
+`;
 
-    <LogoWrapper>
-      <RefaceGroup />
-      <div class="description">
-        RefaceGroup - Icon with full brand name and tagline
-      </div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <RefaceHero />
-      <div class="description">RefaceHero - Large animated hero version</div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <RefaceUILogo />
-      <div class="description">RefaceUILogo - [R]eface UI branding</div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <ReStoryLogo />
-      <div class="description">ReStoryLogo - {"{Re}"}Story branding</div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <ReForgeLogo />
-      <div class="description">
-        ReForgeLogo - &lt;Re forge/&gt; branding
-      </div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <DevExpLogo />
-      <div class="description">DevExpLogo - Developer Experience branding</div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <DevExpHeroLogo />
-      <div class="description">
-        DevExpHeroLogo - Large hero version with corners
-      </div>
-    </LogoWrapper>
+export const RefaceBranding = component(() => (
+  <Stack direction="vertical" gap="xl">
+    <SectionTitle>Reface Brand</SectionTitle>
+    <Stack direction="vertical" gap="lg">
+      <LogoGrid>
+        <RefaceIcon size="large" />
+        <div class="title">Default Square Icon</div>
+      </LogoGrid>
+      <LogoGrid>
+        <RefaceGroup />
+        <div class="title">Full Brand Logo with Tagline</div>
+      </LogoGrid>
+      <LogoGrid>
+        <RefaceHero />
+        <div class="title">Hero Version with Animation</div>
+      </LogoGrid>
+    </Stack>
   </Stack>
 ));
 
-export const RefaceVariants = component(() => (
-  <Stack direction="vertical" gap="lg">
-    <LogoWrapper>
-      <RefaceIcon size="default" />
-      <div class="description">Default size icon</div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <RefaceIcon size="large" />
-      <div class="description">Large size icon</div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <RefaceGroup size="default" />
-      <div class="description">Default size group</div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <RefaceGroup size="large" />
-      <div class="description">Large size group</div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <RefaceHero />
-      <div class="description">Hero version with animation</div>
-    </LogoWrapper>
+export const DevExpBranding = component(() => (
+  <Stack direction="vertical" gap="xl">
+    <SectionTitle>DevExp Brand</SectionTitle>
+    <Stack direction="vertical" gap="lg">
+      <LogoGrid>
+        <DevExpLogo />
+        <div class="title">Default DevExp Logo</div>
+      </LogoGrid>
+      <LogoGrid>
+        <DevExpHeroLogo />
+        <div class="title">Hero Version with Animated Corners</div>
+      </LogoGrid>
+    </Stack>
   </Stack>
 ));
 
-export const DevExpVariants = component(() => (
-  <Stack direction="vertical" gap="lg">
-    <LogoWrapper>
-      <DevExpLogo />
-      <div class="description">Default size with corners</div>
-    </LogoWrapper>
-
-    <LogoWrapper>
-      <DevExpHeroLogo />
-      <div class="description">Hero version with large corners</div>
-    </LogoWrapper>
+export const RefacePackages = component(() => (
+  <Stack direction="vertical" gap="xl">
+    <SectionTitle>Reface Packages</SectionTitle>
+    <Stack direction="vertical" gap="lg">
+      <LogoGrid>
+        <RefaceUILogo />
+        <div class="title">Reface UI - Core Component Library</div>
+      </LogoGrid>
+      <LogoGrid>
+        <ReStoryLogo />
+        <div class="title">ReStory - Component Development Environment</div>
+      </LogoGrid>
+      <LogoGrid>
+        <ReForgeLogo />
+        <div class="title">ReForge - Build System</div>
+      </LogoGrid>
+      <LogoGrid>
+        <ReDocsLogo />
+        <div class="title">ReDocs - Documentation System</div>
+      </LogoGrid>
+    </Stack>
   </Stack>
 ));

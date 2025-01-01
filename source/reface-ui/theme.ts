@@ -28,6 +28,9 @@ const cssVariables = `
     --success-base: #4ade80;
     --success-hover: #22c55e;
 
+    --info-base: #38bdf8;
+    --info-hover: #0ea5e9;
+
     /* Spacing */
     --space-xs: 0.25rem;
     --space-sm: 0.5rem;
@@ -82,6 +85,10 @@ export const theme = {
     success: {
       base: "var(--success-base)",
       hover: "var(--success-hover)",
+    },
+    info: {
+      base: "var(--info-base)",
+      hover: "var(--info-hover)",
     },
   },
   spacing: {

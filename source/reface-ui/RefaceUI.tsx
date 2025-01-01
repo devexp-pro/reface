@@ -144,6 +144,7 @@ export const RefaceUI = component((props: RefaceUIProps, children) => {
     <LayoutSimple
       normalizeCss
       htmx
+      phosphorIcons
       head={
         <>
           <style>{globalStyles}</style>

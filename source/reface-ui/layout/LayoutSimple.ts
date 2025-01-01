@@ -12,6 +12,7 @@ export type LayoutSimpleProps = {
   title?: string;
   description?: string;
   favicon?: string;
+  phosphorIcons?: boolean;
 };
 
 export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
@@ -24,6 +25,7 @@ export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
       bootstrap,
       normalizeCss,
       alpine,
+      phosphorIcons,
       head: pageHead,
     } = props;
 
@@ -42,6 +44,12 @@ export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
         ${description && meta({ name: "description", content: description })}
         ${favicon && link({ rel: "icon", href: favicon })}
         ${htmx && script({ src: "https://unpkg.com/htmx.org@1.9.6" })}
+        ${
+      phosphorIcons &&
+      script({
+        src: "https://unpkg.com/@phosphor-icons/web@2.1.1",
+      })
+    }
         ${
       normalizeCss && link({
         href:

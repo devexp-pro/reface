@@ -319,6 +319,34 @@ const DevExpHeroContainer = styled.div /*css*/`
   }
 `;
 
+const ReDocsContainer = styled.div /*css*/`
+  & {
+    padding: ${theme.spacing.md};
+    border-bottom: 1px solid ${theme.colors.border.base};
+    font-family: ${theme.typography.fonts.mono};
+    font-size: ${theme.typography.sizes.md};
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: ${theme.spacing.xs};
+  }
+
+  & .bracket {
+    color: ${theme.colors.info.base};
+    opacity: 0.9;
+  }
+
+  & .name {
+    color: ${theme.colors.text.base};
+    font-weight: ${theme.typography.weights.medium};
+  }
+
+  & .type {
+    color: ${theme.colors.accent.base};
+    font-weight: ${theme.typography.weights.medium};
+  }
+`;
+
 export const RefaceIcon = component((props: { size?: "default" | "large" }) => (
   <RefaceIconContainer class={`size-${props.size || "default"}`}>
     R
@@ -398,4 +426,12 @@ export const DevExpHeroLogo = component(() => (
     <div class="corner corner-bl"></div>
     <div class="corner corner-br"></div>
   </DevExpHeroContainer>
+));
+
+export const ReDocsLogo = component(() => (
+  <ReDocsContainer>
+    <span class="bracket">📚</span>
+    <span class="name">Re</span>
+    <span class="type">Docs</span>
+  </ReDocsContainer>
 ));
