@@ -1,16 +1,15 @@
 import { component, styled } from "@reface/recast";
 import { theme } from "../theme.ts";
 import { Stack } from "../layout/Stack.tsx";
-import { Grid, GridCol } from "../layout/Grid.tsx";
 import {
   DevExpHeroLogo,
   DevExpLogo,
+  ReCastLogo,
   ReDocsLogo,
   RefaceGroup,
   RefaceHero,
   RefaceIcon,
   RefaceUILogo,
-  ReForgeLogo,
   ReStoryLogo,
 } from "./Logo.tsx";
 
@@ -95,8 +94,8 @@ export const RefacePackages = component(() => (
         <div class="title">ReStory - Component Development Environment</div>
       </LogoGrid>
       <LogoGrid>
-        <ReForgeLogo />
-        <div class="title">ReForge - Build System</div>
+        <ReCastLogo />
+        <div class="title">ReCast - Template Engine</div>
       </LogoGrid>
       <LogoGrid>
         <ReDocsLogo />
