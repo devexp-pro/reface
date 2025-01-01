@@ -62,7 +62,7 @@ const ReStoryContainer = styled.div /*css*/`
   }
 `;
 
-const ReTemplateContainer = styled.div /*css*/`
+const ReForgeContainer = styled.div /*css*/`
   & {
     padding: ${theme.spacing.md};
     border-bottom: 1px solid ${theme.colors.border.base};
@@ -365,13 +365,13 @@ export const ReStoryLogo = component(() => (
   </ReStoryContainer>
 ));
 
-export const ReTemplateLogo = component(() => (
-  <ReTemplateContainer>
+export const ReForgeLogo = component(() => (
+  <ReForgeContainer>
     <span class="bracket">&lt;</span>
     <span class="name">Re</span>
-    <span class="type">template</span>
+    <span class="type">forge</span>
     <span class="bracket">/&gt;</span>
-  </ReTemplateContainer>
+  </ReForgeContainer>
 ));
 
 export const DevExpLogo = component(() => (

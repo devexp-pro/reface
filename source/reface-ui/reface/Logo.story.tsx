@@ -7,8 +7,8 @@ import {
   RefaceHero,
   RefaceIcon,
   RefaceUILogo,
+  ReForgeLogo,
   ReStoryLogo,
-  ReTemplateLogo,
 } from "./Logo.tsx";
 
 export const meta = {
@@ -59,9 +59,9 @@ export const All = component(() => (
     </LogoWrapper>
 
     <LogoWrapper>
-      <ReTemplateLogo />
+      <ReForgeLogo />
       <div class="description">
-        ReTemplateLogo - &lt;Re template/&gt; branding
+        ReForgeLogo - &lt;Re forge/&gt; branding
       </div>
     </LogoWrapper>
 
