@@ -1,7 +1,7 @@
 import { component } from "@reface/recast";
 import { styled } from "@reface/recast";
 import { Grid, GridCol } from "./Grid.tsx";
-
+import { theme } from "../theme.ts";
 export const meta = {
   title: "Layout/Grid",
   description: "Grid layout component with column control",
@@ -10,7 +10,7 @@ export const meta = {
 const Box = styled.div /*css*/`
   & {
     padding: 1rem;
-    background: var(--accent-base);
+    background: ${theme.colors.accent.base};
     color: white;
     text-align: center;
     border-radius: 4px;

@@ -1,121 +1,203 @@
-// Определяем базовые CSS переменные
-const cssVariables = `
-  :root {
-    /* Colors */
-    --bg-base: #2c2c2c;
-    --bg-panel: #1c1c1c;
-    --bg-panel-light: #2c2c2c;
-    --bg-panel-dark: #161616;
-    --bg-input: #3c3c3c;
-    --bg-hover: #4c4c4c;
+const toCSSVar = (path: string) =>
+  `var(--${
+    path.replace(/\./g, "-").replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)
+  })`;
+const toCSSVarName = (path: string) =>
+  `--${
+    path.replace(/\./g, "-").replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)
+  }`;
 
-    --surface-base: var(--bg-panel);
-    --surface-light: var(--bg-panel-light);
-    --surface-dark: var(--bg-panel-dark);
-    
-    --text-base: #ebebeb;
-    --text-dimmed: #9ca3af;
-    --text-label: #d1d5db;
-
-    --border-base: #404040;
-    --border-hover: #525252;
-    --border-light: rgba(255, 255, 255, 0.1);
-    --border-dark: rgba(0, 0, 0, 0.2);
-
-    --accent-base: #60a5fa;
-    --accent-hover: #3b82f6;
-
-    --success-base: #4ade80;
-    --success-hover: #22c55e;
-
-    --info-base: #38bdf8;
-    --info-hover: #0ea5e9;
-
-    /* Spacing */
-    --space-xs: 0.25rem;
-    --space-sm: 0.5rem;
-    --space-md: 0.75rem;
-    --space-lg: 1rem;
-
-    /* Typography */
-    --font-mono: 'JetBrains Mono', monospace;
-    --font-ui: Inter, system-ui, -apple-system, sans-serif;
-
-    --font-size-xs: 11px;
-    --font-size-sm: 12px;
-    --font-size-md: 13px;
-    --font-size-lg: 14px;
-
-    --font-weight-normal: 400;
-    --font-weight-medium: 500;
-    --font-weight-semibold: 600;
-    --font-weight-bold: 700;
-  }
-`;
-
-// Экспортируем тему с использованием CSS переменных
-export const theme = {
+// Base theme configuration
+const themeConfig = {
   colors: {
     bg: {
-      base: "var(--bg-base)",
-      panel: "var(--bg-panel)",
-      input: "var(--bg-input)",
-      hover: "var(--bg-hover)",
-    },
-    text: {
-      base: "var(--text-base)",
-      dimmed: "var(--text-dimmed)",
-      label: "var(--text-label)",
+      base: "#2c2c2c",
+      panel: "#1c1c1c",
+      panelLight: "#2c2c2c",
+      panelDark: "#161616",
+      input: "#3c3c3c",
+      hover: "#4c4c4c",
     },
     surface: {
-      base: "var(--surface-base)",
-      light: "var(--surface-light)",
-      dark: "var(--surface-dark)",
+      base: "var(--bg-panel)",
+      light: "var(--bg-panel-light)",
+      dark: "var(--bg-panel-dark)",
+    },
+    text: {
+      base: "#ebebeb",
+      dimmed: "#9ca3af",
+      label: "#d1d5db",
     },
     border: {
-      base: "var(--border-base)",
-      hover: "var(--border-hover)",
-      light: "var(--border-light)",
-      dark: "var(--border-dark)",
+      base: "#404040",
+      hover: "#525252",
+      light: "rgba(255, 255, 255, 0.1)",
+      dark: "rgba(0, 0, 0, 0.2)",
     },
     accent: {
-      base: "var(--accent-base)",
-      hover: "var(--accent-hover)",
+      base: "#60a5fa",
+      hover: "#3b82f6",
+    },
+    primary: {
+      base: "#ec4899", // Pink
+      hover: "#db2777",
+    },
+    secondary: {
+      base: "#8b5cf6", // Purple
+      hover: "#7c3aed",
     },
     success: {
-      base: "var(--success-base)",
-      hover: "var(--success-hover)",
+      base: "#4ade80",
+      hover: "#22c55e",
     },
     info: {
-      base: "var(--info-base)",
-      hover: "var(--info-hover)",
+      base: "#38bdf8",
+      hover: "#0ea5e9",
+    },
+    warning: {
+      base: "#eab308", // Yellow
+      hover: "#ca8a04",
+    },
+    error: {
+      base: "#ef4444", // Red
+      hover: "#dc2626",
     },
   },
   spacing: {
-    xs: "var(--space-xs)",
-    sm: "var(--space-sm)",
-    md: "var(--space-md)",
-    lg: "var(--space-lg)",
-    xl: "var(--space-xl)",
+    xs: "0.25rem",
+    sm: "0.5rem",
+    md: "0.75rem",
+    lg: "1rem",
+  },
+  sizes: {
+    xs: "16px",
+    sm: "24px",
+    md: "32px",
+    lg: "40px",
   },
   typography: {
     fonts: {
-      mono: "var(--font-mono)",
-      ui: "var(--font-ui)",
+      mono: "'JetBrains Mono', monospace",
+      ui: "Inter, system-ui, -apple-system, sans-serif",
     },
     sizes: {
-      xs: "var(--font-size-xs)",
-      sm: "var(--font-size-sm)",
-      md: "var(--font-size-md)",
-      lg: "var(--font-size-lg)",
-      xl: "var(--font-size-xl)",
+      xs: "11px",
+      sm: "12px",
+      md: "13px",
+      lg: "14px",
     },
     weights: {
-      normal: "var(--font-weight-normal)",
-      medium: "var(--font-weight-medium)",
-      semibold: "var(--font-weight-semibold)",
-      bold: "var(--font-weight-bold)",
+      normal: "400",
+      medium: "500",
+      semibold: "600",
+      bold: "700",
     },
   },
-  cssVariables, // Экспортируем CSS переменные для использования в глобальных стилях
 };
+
+// Рекурсивно создаем CSS переменные и theme объект
+const generateThemeAndVars = (
+  obj: any,
+  path: string[] = [],
+): [string[], any] => {
+  const vars: string[] = [];
+  const theme: any = {};
+
+  for (const [key, value] of Object.entries(obj)) {
+    const newPath = [...path, key];
+    const cssPath = newPath.join("-");
+
+    if (typeof value === "object") {
+      const [childVars, childTheme] = generateThemeAndVars(value, newPath);
+      vars.push(...childVars);
+      theme[key] = childTheme;
+    } else {
+      vars.push(`${toCSSVarName(cssPath)}: ${value};`);
+      theme[key] = toCSSVar(cssPath);
+    }
+  }
+
+  return [vars, theme];
+};
+
+// Сначала генерируем переменные и theme
+const [cssVars, themeVars] = generateThemeAndVars(themeConfig);
+
+// Теперь используем themeVars в базовых стилях
+const baseStyles = `
+  /* Reset */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Root */
+  :root {
+    color-scheme: light dark;
+  }
+
+  /* Body */
+  body {
+    font-family: ${themeVars.typography.fonts.ui};
+    font-size: ${themeVars.typography.sizes.sm};
+    line-height: 1.5;
+    color: ${themeVars.colors.text.base};
+    background: ${themeVars.colors.bg.base};
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Typography */
+  h1, h2, h3, h4, h5, h6 {
+    color: ${themeVars.colors.text.label};
+    font-weight: ${themeVars.typography.weights.semibold};
+    line-height: 1.2;
+  }
+
+  p {
+    color: ${themeVars.colors.text.base};
+    margin-bottom: ${themeVars.spacing.md};
+  }
+
+  a {
+    color: ${themeVars.colors.accent.base};
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  code {
+    font-family: ${themeVars.typography.fonts.mono};
+    font-size: 0.9em;
+    color: ${themeVars.colors.text.base};
+    background: ${themeVars.colors.bg.input};
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+  }
+
+  /* Focus */
+  :focus-visible {
+    outline: 2px solid ${themeVars.colors.accent.base};
+    outline-offset: 2px;
+  }
+
+  /* Selection */
+  ::selection {
+    background: ${themeVars.colors.accent.base};
+    color: #ffffff;
+  }
+`;
+
+// Объединяем CSS переменные и базовые стили
+export const globalStyles = `
+:root {
+  ${cssVars.join("\n  ")}
+}
+
+${baseStyles}
+`;
+
+export const theme = themeVars;

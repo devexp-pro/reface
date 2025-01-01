@@ -146,33 +146,54 @@ export async function loadStory(
 ): Promise<Story | null> {
   try {
     const normalizedPath = path.toLowerCase().replace(/^\/+|\/+$/g, "");
-    const storyFile = `${rootDir}/${
-      normalizedPath.replace(/\/[^/]+$/, "")
-    }.story.tsx`;
-    const storyName = normalizedPath.split("/").pop();
-    const sourceCode = await Deno.readTextFile(storyFile);
-    // Обычный импорт
-    const storyModule: StoryModule = await import(
-      `file://${storyFile}${version ? "#" + version : ""}`
-    );
+    const pathParts = normalizedPath.split("/");
+    const storyName = pathParts[pathParts.length - 1]; // Последний сегмент - имя story
 
-    const storyComponent = Object.entries(storyModule)
-      .find(([key]) => key.toLowerCase() === storyName)?.[1];
+    // Ищем .story.tsx файл рекурсивно
+    const storyFiles: string[] = [];
 
-    if (!storyComponent || typeof storyComponent !== "function") {
-      return null;
+    async function scanDir(dir: string) {
+      for await (const entry of Deno.readDir(dir)) {
+        const entryPath = `${dir}/${entry.name}`;
+        if (entry.isDirectory) {
+          await scanDir(entryPath);
+        } else if (entry.isFile && entry.name.endsWith(".story.tsx")) {
+          storyFiles.push(entryPath);
+        }
+      }
     }
 
-    // Извлекаем исходный код компонента
-    const componentSource = extractComponentSource(sourceCode, storyName);
+    await scanDir(rootDir);
 
-    return {
-      name: storyName,
-      component: storyComponent as () => JSX.Element,
-      path: path,
-      filePath: storyFile,
-      source: componentSource || sourceCode,
-    };
+    // Пробуем найти компонент в каждом story файле
+    for (const storyFile of storyFiles) {
+      try {
+        const sourceCode = await Deno.readTextFile(storyFile);
+        const storyModule: StoryModule = await import(
+          `file://${storyFile}${version ? "#" + version : ""}`
+        );
+
+        // Ищем компонент по имени без учета регистра
+        const storyComponent = Object.entries(storyModule)
+          .find(([key]) => key.toLowerCase() === storyName)?.[1];
+
+        if (storyComponent && typeof storyComponent === "function") {
+          const componentSource = extractComponentSource(sourceCode, storyName);
+
+          return {
+            name: storyName,
+            component: storyComponent as () => JSX.Element,
+            path: path,
+            filePath: storyFile,
+            source: componentSource || sourceCode,
+          };
+        }
+      } catch (error) {
+        console.error(`Error loading story from ${storyFile}:`, error);
+      }
+    }
+
+    return null;
   } catch (error) {
     console.error(`Failed to load story: ${path}`, error);
     return null;
