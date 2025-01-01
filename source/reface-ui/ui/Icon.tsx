@@ -1,4 +1,5 @@
 import { component, styled } from "@reface/recast";
+import { HeadSlot, Template } from "@reface/recast/slots";
 
 type IconWeight = "regular" | "thin" | "light" | "bold" | "fill" | "duotone";
 
@@ -30,8 +31,13 @@ export const Icon = component(({
   const weightClass = weight === "regular" ? "ph" : `ph-${weight}`;
 
   return (
-    <StyledIcon
-      class={`${weightClass} ph-${name} size-${size} ${className || ""}`}
-    />
+    <>
+      <StyledIcon
+        class={`${weightClass} ph-${name} size-${size} ${className || ""}`}
+      />
+      <Template slot={HeadSlot.getSlot()}>
+        <script src="https://unpkg.com/@phosphor-icons/web@2.1.1" />
+      </Template>
+    </>
   );
 });

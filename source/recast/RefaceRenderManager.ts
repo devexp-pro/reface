@@ -30,17 +30,24 @@ export class RefaceRenderManager implements IRefaceRenderManager {
     method: (...args: T) => R,
     ...args: T
   ): R {
+    let [template, ...rest] = args;
+
     const startResult = this.runHandlers(phase.START, {
       manager: this,
-      template: args[0],
+      template,
     });
-    if (startResult) return startResult as R;
+    if (startResult && typeof startResult === "string") {
+      return startResult as R;
+    }
+    if (isTemplate(startResult)) {
+      template = startResult;
+    }
 
-    const result = method.apply(this, args);
+    const result = method.apply(this, [template, ...rest]);
 
     return (this.runHandlers(phase.END, {
       manager: this,
-      template: args[0],
+      template,
       html: result,
     }) || result) as R;
   }

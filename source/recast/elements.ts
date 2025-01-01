@@ -231,7 +231,7 @@ export const script: Template<HTML.HTMLScriptAttributes, Record<string, any>> =
 export const template: Template<
   HTML.HTMLTemplateAttributes,
   Record<string, any>
-> = createElementTemplate({ tag: "template" });
+> = createElementTemplate({ tag: "element" });
 
 // SVG Elements
 export const svg: Template<HTML.HTMLSVGAttributes, Record<string, any>> =

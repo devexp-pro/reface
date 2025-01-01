@@ -58,10 +58,21 @@ export function createTemplateProxy<
       const [first, ...rest] = args;
 
       if (first?.raw) {
+        const processedChildren =
+          createTemplateFactoryConfig.process?.children?.({
+            oldChildren: rawTemplate.children,
+            newChildren: processChildren(first as TemplateStringsArray, rest),
+            template: rawTemplate,
+          }) ||
+          [
+            ...rawTemplate.children,
+            ...processChildren(first as TemplateStringsArray, rest),
+          ];
+
         return createTemplateProxy({
           rawTemplate: {
             ...rawTemplate,
-            children: processChildren(first as TemplateStringsArray, rest),
+            children: processedChildren,
           },
           createTemplateFactoryConfig,
           templateFactoryConfig,

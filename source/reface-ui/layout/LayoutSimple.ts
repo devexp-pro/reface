@@ -2,6 +2,7 @@ import { component, html } from "@reface/recast";
 import type { ElementChildType } from "@reface/recast";
 import { body, head, link, meta, script, title } from "@reface/recast/elements";
 import type { Template } from "@reface/recast";
+import { HeadSlot } from "@reface/recast/slots";
 
 export type LayoutSimpleProps = {
   htmx?: boolean;
@@ -12,7 +13,6 @@ export type LayoutSimpleProps = {
   title?: string;
   description?: string;
   favicon?: string;
-  phosphorIcons?: boolean;
 };
 
 export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
@@ -25,7 +25,6 @@ export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
       bootstrap,
       normalizeCss,
       alpine,
-      phosphorIcons,
       head: pageHead,
     } = props;
 
@@ -44,12 +43,6 @@ export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
         ${description && meta({ name: "description", content: description })}
         ${favicon && link({ rel: "icon", href: favicon })}
         ${htmx && script({ src: "https://unpkg.com/htmx.org@1.9.6" })}
-        ${
-      phosphorIcons &&
-      script({
-        src: "https://unpkg.com/@phosphor-icons/web@2.1.1",
-      })
-    }
         ${
       normalizeCss && link({
         href:
@@ -71,6 +64,7 @@ export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
       })
     }
         ${pageHead}
+        ${HeadSlot}
       `}
       ${body`${children}`}
     </html>

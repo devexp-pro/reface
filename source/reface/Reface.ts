@@ -7,6 +7,7 @@ import {
   type Template,
   type TemplateAttributes,
 } from "@reface/recast";
+import { SlotsPlugin } from "@reface/recast/slots";
 
 import {
   partial,
@@ -61,6 +62,7 @@ export class Reface {
     this.composer.use(this.islandPlugin);
     this.composer.use(this.partialsPlugin);
     this.composer.use(new StyledPlugin());
+    this.composer.use(new SlotsPlugin());
 
     options.plugins?.forEach((plugin) => this.composer.use(plugin));
   }
