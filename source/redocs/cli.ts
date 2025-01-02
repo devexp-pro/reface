@@ -1,5 +1,5 @@
 import * as path from "jsr:@std/path";
-import { cyan, dim, red, yellow } from "jsr:@std/fmt/colors";
+import { blue, cyan, dim, red, white, yellow } from "jsr:@std/fmt/colors";
 import { LiveReloadPlugin, Reface } from "@reface";
 import { Hono } from "@hono/hono";
 import { ReDocs } from "./ReDocs.tsx";
@@ -16,7 +16,7 @@ interface ReDocsConfig {
 
 function printInfo(...messages: string[]) {
   console.log("");
-  console.log(cyan("ReDocs"), dim("-"), ...messages);
+  console.log("📚", white("Re"), blue("Docs"), dim("-"), ...messages);
   console.log("");
 }
 

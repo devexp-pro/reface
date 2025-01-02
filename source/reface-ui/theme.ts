@@ -109,12 +109,14 @@ const themeConfig = {
     sm: sizeUtils.linear(2), // 4px
     md: sizeUtils.linear(3), // 6px
     lg: sizeUtils.linear(4), // 8px
+    xl: sizeUtils.linear(5), // 10px
   },
   sizes: {
     xs: sizeUtils.golden(2), // ≈ 5px
     sm: sizeUtils.golden(3), // ≈ 8px
     md: sizeUtils.golden(4), // ≈ 13px
     lg: sizeUtils.golden(5), // ≈ 21px
+    xl: sizeUtils.golden(6), // ≈ 34px
   },
   typography: {
     fonts: {

@@ -55,7 +55,7 @@
     "test:ci": "deno test -A --coverage=coverage --junit-path=junit.xml",
     "website:dev": "DEV=true deno run -A --watch website/main.tsx",
     "check": "deno check ./@reface/",
-    "reface-ui:story": "deno run --allow-net --allow-read --allow-env --allow-run ./source/restory/cli.ts ./source/reface-ui",
+    "reface-ui:story": "deno run -A ./source/restory/cli.ts ./source/reface-ui",
     "redocs:serve": "deno run -A ./source/redocs/cli.ts ./docs"
   },
   "fmt": {

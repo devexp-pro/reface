@@ -322,7 +322,6 @@ const DevExpHeroContainer = styled.div /*css*/`
 const ReDocsContainer = styled.div /*css*/`
   & {
     padding: ${theme.spacing.md};
-    border-bottom: 1px solid ${theme.colors.border.base};
     font-family: ${theme.typography.fonts.mono};
     font-size: ${theme.typography.sizes.md};
     user-select: none;
