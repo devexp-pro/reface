@@ -18,6 +18,11 @@ export type SlotMethods = {
   getSlot: () => symbol | string;
 };
 
+export type TemplateAttributes = {
+  slot?: symbol | string;
+  key?: string;
+};
+
 export type TemplatePayload = {
   template: {
     slot: symbol | string;

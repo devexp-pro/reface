@@ -14,7 +14,8 @@ const slotTemplate = createTemplateFactory<
     },
   },
   methods: {
-    getSlot: ({ template }: { template: SlotPayload }) => template.payload.slot,
+    getSlot: ({ template }: { template: SlotPayload }) =>
+      template.payload.slot.name,
   },
 });
 

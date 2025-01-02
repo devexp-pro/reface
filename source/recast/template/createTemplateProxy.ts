@@ -80,17 +80,22 @@ export function createTemplateProxy<
         defaultProcessAttributes;
 
       if (first?.raw) {
+        // processChildren can modify the rawTemplate
+        const children = processChildren({
+          oldChildren: rawTemplate.children,
+          newChildren: processTemplateTagChildren(
+            first as TemplateStringsArray,
+            rest,
+          ),
+          template: rawTemplate,
+        });
         return createTemplateProxy({
           rawTemplate: {
             ...rawTemplate,
-            children: processChildren({
-              oldChildren: rawTemplate.children,
-              newChildren: processTemplateTagChildren(
-                first as TemplateStringsArray,
-                rest,
-              ),
-              template: rawTemplate,
-            }),
+            payload: {
+              ...rawTemplate.payload,
+            },
+            children,
           },
           createTemplateFactoryConfig,
           templateFactoryConfig,

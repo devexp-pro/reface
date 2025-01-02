@@ -1,32 +1,31 @@
 import { createTemplateFactory } from "@reface/recast";
-import type { TemplatePayload } from "./types.ts";
+import type { TemplateAttributes, TemplatePayload } from "./types.ts";
 import { TEMPLATE_TEMPLATE_NAME } from "./constants.ts";
 
-export const createTemplate = createTemplateFactory<TemplatePayload>({
+export const createTemplate = createTemplateFactory<
+  TemplateAttributes,
+  TemplatePayload
+>({
   type: TEMPLATE_TEMPLATE_NAME,
   create: {
     defaults: {
       payload: {
-        template: {
-          slot: "",
-          children: "",
-          scope: "global",
-          priority: 0,
-        },
+        template: {},
       },
     },
   },
   process: {
     children: ({ newChildren, template }) => {
       if (template) {
-        template.payload.template.children = newChildren;
+        template.payload = {
+          ...template.payload,
+          template: {
+            children: newChildren,
+          },
+        };
       }
       return [];
     },
-  },
-  methods: {
-    getScope: ({ template }) => template.payload.scope,
-    getPriority: ({ template }) => template.payload.priority,
   },
 });
 

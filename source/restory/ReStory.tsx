@@ -341,7 +341,8 @@ export const ReStory = component(
 
                     <Panel
                       variant="dark"
-                      style="max-height: 400px;"
+                      style="max-height: 400px; flex: none;"
+                      collapsible
                       slots={{
                         header: <GroupHeader>Source Code</GroupHeader>,
                       }}

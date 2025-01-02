@@ -35,7 +35,7 @@ export const Icon = component(({
       <StyledIcon
         class={`${weightClass} ph-${name} size-${size} ${className || ""}`}
       />
-      <Template slot={HeadSlot.getSlot()}>
+      <Template slot={HeadSlot.getSlot()} key="icon-phosphor">
         <script src="https://unpkg.com/@phosphor-icons/web@2.1.1" />
       </Template>
     </>

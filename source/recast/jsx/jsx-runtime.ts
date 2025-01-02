@@ -21,8 +21,12 @@ export const jsx: JsxFn = function <
 >(
   tag: string | ComponentFn<P> | Template<P, T>,
   { children = [], ...attrs }: P,
-  _key?: string,
+  key?: string,
 ): Template<P, T> {
+  if (key) {
+    attrs.key = key;
+  }
+
   return createElement(
     tag,
     attrs as P,

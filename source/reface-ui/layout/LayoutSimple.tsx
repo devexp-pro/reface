@@ -61,7 +61,6 @@ export const LayoutSimple: Template<LayoutSimpleProps, Record<string, any>> =
           {pageHead}
           <HeadSlot />
         </head>
-
         <body>
           {children}
           <BodyEndSlot />
