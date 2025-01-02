@@ -1,8 +1,9 @@
 import { REFACE_EVENT } from "@reface/recast";
 import type { IRefaceComposer, IRefaceComposerPlugin } from "@reface/recast";
 import type { LiveReloadOptions } from "./types.ts";
+import { findAvailablePort } from "../../common/port.ts";
 
-const DEFAULT_PORT = 35729;
+const DEFAULT_PORT = await findAvailablePort(35729);
 const DEFAULT_HOST = "localhost";
 
 export class LiveReloadPlugin implements IRefaceComposerPlugin {
@@ -13,7 +14,7 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
   private watchers: Deno.FsWatcher[] = [];
 
   constructor(private options: LiveReloadOptions = {}) {
-    this.options.port = options.port || DEFAULT_PORT;
+    this.options.port = DEFAULT_PORT;
     this.options.host = options.host || DEFAULT_HOST;
 
     console.log(
@@ -40,7 +41,7 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
 
     this.abortController = new AbortController();
 
-    console.log("[LiveReload] Starting server...");
+    console.log("[LiveReload] Starting server...", this.options.port);
 
     Deno.serve({
       port: this.options.port,

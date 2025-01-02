@@ -14,7 +14,7 @@ import {
 import { StoryViewer } from "./StoryViewer.tsx";
 import { Icon } from "@reface/ui";
 
-import type { Story, StoryFile } from "./loader.ts";
+import type { Story, StoryFile } from "./types.ts";
 
 // В начале файла обновим иконки
 const Icons = {
@@ -142,6 +142,7 @@ const DefaultLogo = () => (
 type ReStoryProps = {
   stories?: StoryFile[];
   currentPath?: string;
+  currentStory?: string;
   logo?: JSX.Element;
 };
 
@@ -155,17 +156,15 @@ type TreeNode = {
 };
 
 export const ReStory = component(
-  ({ stories, currentPath, logo }: ReStoryProps) => {
-    const currentStory = stories
-      .flatMap((group) => group.stories)
-      .find((story) => story.path === currentPath);
-    const currentFile = stories.find((file) =>
-      file.filePath === currentStory?.filePath
+  ({ stories, currentPath, currentStory: storyName, logo }: ReStoryProps) => {
+    const currentFile = stories?.find((file) => file.filePath === currentPath);
+    const currentStory = currentFile?.stories.find((story) =>
+      story.name === storyName
     );
 
     // Получаем части пути текущего файла
     const currentParts =
-      currentStory?.filePath.replace(".story.tsx", "").split("/").filter(
+      currentFile?.filePath.replace(".story.tsx", "").split("/").filter(
         Boolean,
       ) || [];
 
@@ -178,9 +177,6 @@ export const ReStory = component(
         // Определяем тип узла на основе meta
         const getNodeType = () => {
           if (!group.meta?.component) return "file";
-          if (group.meta.description?.includes("Grid")) {
-            console.log("group.meta.component", group.meta);
-          }
           // Если компонент это шаблон (isTemplate)
           if (isTemplate(group.meta.component)) {
             return "component";
@@ -195,7 +191,7 @@ export const ReStory = component(
         };
 
         group.stories.forEach((story) => {
-          const filePath = story.filePath.replace(".story.tsx", "");
+          const filePath = group.filePath.replace(".story.tsx", "");
           const parts = filePath.split("/").filter(Boolean);
 
           for (let i = 0; i < parts.length; i++) {
@@ -231,11 +227,12 @@ export const ReStory = component(
           const fileNode = root[filePath];
           if (fileNode) {
             const storyNode: TreeNode = {
-              id: story.path,
+              id: `/${group.filePath}?story=${story.name}`,
               label: story.name,
               type: "story",
               story: story,
-              expanded: story.path === currentPath,
+              expanded: `?file=${group.filePath}&story=${story.name}` ===
+                `?file=${currentFile?.filePath}&story=${currentStory?.name}`,
             };
 
             if (!fileNode.children?.find((child) => child.id === story.path)) {
@@ -325,7 +322,7 @@ export const ReStory = component(
                               )}
                             </StoryHeader>
                             <ExternalLink
-                              href={`/iframe${currentPath}`}
+                              href={`/iframe?file=${currentFile?.filePath}&story=${currentStory?.name}`}
                               target="_blank"
                             >
                               <span>View fullscreen</span>
@@ -337,7 +334,8 @@ export const ReStory = component(
                     >
                       <StoryViewer
                         component={currentStory.component}
-                        path={currentStory.path}
+                        name={currentStory.name}
+                        path={currentFile.filePath}
                       />
                     </Panel>
 

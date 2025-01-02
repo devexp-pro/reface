@@ -1,122 +1,43 @@
-import * as path from "jsr:@std/path";
-import { blue, cyan, dim, red, white, yellow } from "jsr:@std/fmt/colors";
+import { blue, dim, white, yellow } from "jsr:@std/fmt/colors";
 import { LiveReloadPlugin, Reface } from "@reface";
 import { Hono } from "@hono/hono";
+import { createCLI } from "../common/cli.ts";
 import { ReDocs } from "./ReDocs.tsx";
 import { loadDocs } from "./loader/mod.ts";
 
-const IS_CHILD = Deno.env.get("REDOCS_CHILD") === "true";
-const IS_DEV = Deno.env.get("REDOCS_ENV") !== "production";
+const cli = createCLI({
+  name: "📚 Re Docs",
+  childEnvKey: "REDOCS_CHILD",
+  port: 3000,
+  rootPath: Deno.args[0] || ".",
+  watchPaths: [Deno.args[0] || "."],
+  watchExtensions: [".md", ".mdx"],
+});
 
-interface ReDocsConfig {
-  port?: number;
-  watch?: boolean;
-  docsPath: string;
-}
+async function startServer() {
+  const rootPath = cli.validateRootPath();
 
-function printInfo(...messages: string[]) {
-  console.log("");
-  console.log("📚", white("Re"), blue("Docs"), dim("-"), ...messages);
-  console.log("");
-}
-
-async function watchAndRestart(config: ReDocsConfig) {
-  if (IS_CHILD) {
-    await startServer(config);
-    return;
-  }
-
-  let process: Deno.Process | null = null;
-  let restarting = false;
-
-  const restart = async () => {
-    if (restarting) return;
-    restarting = true;
-
-    console.clear();
-    console.log("Restarting documentation server...");
-
-    if (process) {
-      try {
-        process.kill("SIGTERM");
-        await process.status();
-      } catch (e) {
-        // Игнорируем ошибки при убийстве процесса
-      }
-    }
-
-    process = new Deno.Command("deno", {
-      args: ["run", "-A", Deno.mainModule, ...Deno.args],
-      stdout: "inherit",
-      stderr: "inherit",
-      env: {
-        REDOCS_CHILD: "true",
-        REDOCS_ENV: IS_DEV ? "development" : "production",
-      },
-    }).spawn();
-
-    restarting = false;
-  };
-
-  await restart();
-
-  if (config.watch) {
-    let timeout: number | null = null;
-    const watcher = Deno.watchFs(config.docsPath, { recursive: true });
-
-    for await (const event of watcher) {
-      if (event.kind === "modify") {
-        const isRelevant = event.paths.some((path) =>
-          path.endsWith(".md") ||
-          path.endsWith(".mdx")
-        );
-
-        if (isRelevant) {
-          if (timeout) clearTimeout(timeout);
-          timeout = setTimeout(() => restart(), 100);
-        }
-      }
-    }
-  }
-}
-
-async function startServer(config: ReDocsConfig) {
-  const PORT = config.port || 3000;
-  const DOCS_PATH = path.resolve(Deno.cwd(), config.docsPath);
-
-  // Проверяем существование директории
-  try {
-    const stat = await Deno.stat(DOCS_PATH);
-    if (!stat.isDirectory) {
-      throw new Error("Not a directory");
-    }
-  } catch (e) {
-    console.error(red(`Error: Directory '${config.docsPath}' does not exist`));
-    Deno.exit(1);
-  }
-
-  printInfo(
-    `Serving docs from ${yellow(config.docsPath)}`,
-    `at ${yellow(`http://localhost:${PORT}`)}`,
-    config.watch ? dim("(watching for changes)") : "",
-  );
+  cli.printInfo([
+    `Serving docs from ${yellow(rootPath)}`,
+    `at ${yellow(`http://localhost:${cli.port}`)}`,
+    cli.IS_DEV ? dim("(watching for changes)") : "",
+  ]);
 
   const app = new Hono();
   const reface = new Reface({});
 
-  if (IS_DEV && config.watch) {
+  if (cli.IS_DEV) {
     reface.composer.use(
       new LiveReloadPlugin({
-        watchPaths: [DOCS_PATH],
+        watchPaths: [rootPath],
       }),
     );
   }
 
-  const docs = await loadDocs(DOCS_PATH);
+  const docs = await loadDocs(rootPath);
 
   app.get("/*", async (c) => {
     const currentPath = c.req.path.replace(/^\//, "");
-
     return c.html(
       reface.render(
         ReDocs({
@@ -128,35 +49,9 @@ async function startServer(config: ReDocsConfig) {
     );
   });
 
-  await Deno.serve({
-    port: PORT,
-  }, app.fetch);
+  await Deno.serve({ port: cli.port }, app.fetch);
 }
 
 if (import.meta.main) {
-  const args = Deno.args;
-  const config: ReDocsConfig = {
-    port: 3000,
-    watch: true,
-    docsPath: args[0] || ".", // Первый аргумент - путь до документации
-  };
-
-  // Дополнительные опции через флаги
-  for (let i = 1; i < args.length; i++) {
-    const arg = args[i];
-    const nextArg = args[i + 1];
-
-    switch (arg) {
-      case "--port":
-      case "-p":
-        config.port = parseInt(nextArg);
-        i++;
-        break;
-      case "--no-watch":
-        config.watch = false;
-        break;
-    }
-  }
-
-  await watchAndRestart(config);
+  await cli.watchAndRestart(startServer);
 }

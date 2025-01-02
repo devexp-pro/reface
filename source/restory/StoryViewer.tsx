@@ -26,15 +26,16 @@ const ViewerWrapper = styled.div /*css*/`
 `;
 
 type StoryViewerProps = {
-  component: () => JSX.Element;
-  path: string;
+  component?: () => JSX.Element;
+  name?: string;
+  path?: string;
 };
 
 export const StoryViewer = component((props: StoryViewerProps) => {
   return (
     <ViewerWrapper>
       <ViewerFrame
-        src={`/iframe${props.path}`}
+        src={`/iframe/${props.path}?story=${props.name}`}
       />
     </ViewerWrapper>
   );
