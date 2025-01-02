@@ -12,6 +12,8 @@ todo:
 
 - styled: seporate `css` as template tag function from `styled`
 - styled: allow customization any of tag Template
+- template: always normalize raw children
+- jsx: fix escape issue for unsafe html
 
 ## Reface
 
@@ -20,6 +22,8 @@ todo:
 - **ErrorScreen**: strip ansi code from error message
 
 ## Recast
+
+- added `test-utils` for testing `recast` templates
 
 **fixed**
 

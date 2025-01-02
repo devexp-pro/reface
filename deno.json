@@ -76,7 +76,8 @@
       "./LICENSE"
     ],
     "exclude": [
-      "./**/__tests__"
+      "./**/__tests__",
+      "./**/*.{test,story}.{ts,tsx}"
     ]
   }
 }

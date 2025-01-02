@@ -67,7 +67,6 @@ export const GroupHeader = component((props: { class?: string }, children) => (
 
 const Content = styled.div /*css*/`
   & {
-    padding: ${theme.spacing.lg};
     overflow: auto;
     height: 100vh;
     display: flex;
@@ -270,21 +269,14 @@ export const ReStory = component(
         <Grid columns={12} gap="none" style="height: 100vh;">
           {/* Сайдбар */}
           <GridCol span={2}>
-            <Panel variant="dark">
-              <Stack direction="vertical" gap="none">
-                {logo || <DefaultLogo />}
-                <Panel
-                  slots={{
-                    header: <GroupHeader>Navigation</GroupHeader>,
-                  }}
-                >
-                  <StoryNav>
-                    <TreeView>
-                      {tree.map((node, index) => renderNode(node, index))}
-                    </TreeView>
-                  </StoryNav>
-                </Panel>
-              </Stack>
+            <Panel
+              slots={{
+                header: logo || <DefaultLogo />,
+              }}
+            >
+              <TreeView>
+                {tree.map((node, index) => renderNode(node, index))}
+              </TreeView>
             </Panel>
           </GridCol>
 
