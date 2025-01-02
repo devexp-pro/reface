@@ -34,7 +34,12 @@
     "@reface/recast/test-utils": "./source/recast/test-utils/mod.ts",
     "@std/assert": "jsr:@std/assert@^1.0.1",
     "@std/crypto": "jsr:@std/crypto@^1.0.2",
-    "@hono/hono": "jsr:@hono/hono@^4.6.15"
+    "@hono/hono": "jsr:@hono/hono@^4.6.15",
+    "marked": "https://esm.sh/marked@9.1.5",
+    "unified": "npm:unified",
+    "remark-parse": "npm:remark-parse",
+    "remark-gfm": "npm:remark-gfm",
+    "mdast": "npm:@types/mdast"
   },
   "tasks": {
     "ex1": "deno run --allow-all --unstable-ffi --watch=./examples/ex1.ts ./examples/ex1.ts",
@@ -50,7 +55,8 @@
     "test:ci": "deno test -A --coverage=coverage --junit-path=junit.xml",
     "website:dev": "DEV=true deno run -A --watch website/main.tsx",
     "check": "deno check ./@reface/",
-    "reface-ui:story": "deno run --allow-net --allow-read --allow-env --allow-run ./source/restory/cli.ts ./source/reface-ui"
+    "reface-ui:story": "deno run --allow-net --allow-read --allow-env --allow-run ./source/restory/cli.ts ./source/reface-ui",
+    "redocs:serve": "deno run -A ./source/redocs/cli.ts ./docs"
   },
   "fmt": {
     "exclude": [
