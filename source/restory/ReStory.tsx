@@ -1,4 +1,4 @@
-import { component, styled } from "@reface/recast";
+import { component, isTemplate, styled } from "@reface/recast";
 import {
   Button,
   Code,
@@ -20,7 +20,9 @@ import type { Story, StoryFile } from "./loader.ts";
 const Icons = {
   folder: "folder",
   file: "file-code",
-  story: "storybook",
+  story: "dot-outline",
+  component: "puzzle-piece",
+  components: "diamonds-four",
   external: "arrow-square-out",
 };
 
@@ -169,31 +171,45 @@ export const ReStory = component(
 
     const componentMeta = currentFile?.meta;
 
-    // Обновленная функция построения дерева
     const buildTree = (storyFiles: StoryFile[]): TreeNode[] => {
       const root: Record<string, TreeNode> = {};
 
-      // Сначала создаем все узлы дерева
       storyFiles.forEach((group) => {
+        // Определяем тип узла на основе meta
+        const getNodeType = () => {
+          if (!group.meta?.component) return "file";
+          if (group.meta.description?.includes("Grid")) {
+            console.log("group.meta.component", group.meta);
+          }
+          // Если компонент это шаблон (isTemplate)
+          if (isTemplate(group.meta.component)) {
+            return "component";
+          }
+
+          // Если компонент это объект (группа компонентов)
+          if (typeof group.meta.component === "object") {
+            return "components";
+          }
+
+          return "file";
+        };
+
         group.stories.forEach((story) => {
           const filePath = story.filePath.replace(".story.tsx", "");
           const parts = filePath.split("/").filter(Boolean);
 
-          // Создаем каждый уровень пути
           for (let i = 0; i < parts.length; i++) {
             const part = parts[i];
             const fullPath = parts.slice(0, i + 1).join("/");
             const parentPath = parts.slice(0, i).join("/");
-
             const isInCurrentPath = currentParts[i] === part;
 
-            // Если узел еще не создан - создаем его
             if (!root[fullPath]) {
               const isLast = i === parts.length - 1;
               root[fullPath] = {
                 id: fullPath,
                 label: part,
-                type: isLast ? "file" : "folder",
+                type: isLast ? getNodeType() : "folder",
                 children: [],
                 expanded: isInCurrentPath,
               };

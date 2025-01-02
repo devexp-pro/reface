@@ -12,8 +12,9 @@ Reface UI is a comprehensive component library for building modern web interface
 - 🚀 **Composition System** - Flexible slots and predictable nesting
 - ♿️ **Accessible by Default** - Semantic HTML with ARIA support
 - 📐 **Unified Sizing** - Consistent 2px base step system
+- 🔍 **Opacity** - Opacity is a number between 0 and 1
 
-Built on top of ReCast template engine.
+Built on top of `ReCast` template engine.
 
 ## Reference
 

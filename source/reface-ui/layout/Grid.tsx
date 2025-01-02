@@ -15,6 +15,8 @@ type GridColProps = {
   offset?: number;
   start?: number;
   end?: number;
+  align?: "start" | "center" | "end" | "stretch";
+  justify?: "start" | "center" | "end" | "stretch";
   class?: string;
 };
 
@@ -49,7 +51,22 @@ const GridContainer = styled.div /*css*/`
 const GridColContainer = styled.div /*css*/`
   & {
     min-width: 0;
+    display: flex;
+    flex-direction: column;
   }
+
+  &.align-start { justify-content: flex-start; }
+  &.align-center { justify-content: center; }
+  &.align-end { justify-content: flex-end; }
+  &.align-stretch { 
+    justify-content: stretch;
+    & > * { flex-grow: 1; }
+  }
+
+  &.justify-start { align-items: flex-start; }
+  &.justify-center { align-items: center; }
+  &.justify-end { align-items: flex-end; }
+  &.justify-stretch { align-items: stretch; }
 `;
 
 export const Grid = component(
@@ -82,10 +99,16 @@ export const Grid = component(
 );
 
 export const GridCol = component(
-  (
-    { span = 1, offset, start, end, class: className, ...props },
-    children: JSX.Element,
-  ) => {
+  ({
+    span = 1,
+    offset,
+    start,
+    end,
+    align,
+    justify,
+    class: className,
+    ...props
+  }, children) => {
     let gridColumn = "";
 
     if (start) {
@@ -100,9 +123,15 @@ export const GridCol = component(
       gridColumn += gridColumn ? ` / span ${span}` : `span ${span}`;
     }
 
+    const classes = [
+      align && `align-${align}`,
+      justify && `justify-${justify}`,
+      className,
+    ].filter(Boolean).join(" ");
+
     return GridColContainer({
       ...props,
-      class: className,
+      class: classes,
       style: gridColumn ? `grid-column: ${gridColumn};` : undefined,
     })`${children}`;
   },

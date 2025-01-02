@@ -1,182 +1,82 @@
-# Architecture
+# Reface Ecosystem
+
+Server-side rendering framework built on Deno runtime. Focused on simplicity, performance and developer experience.
+
+## Core Modules
+
+| Module           | Description                             |
+| ---------------- | --------------------------------------- |
+| Reface Framework | Web framework with Islands and Partials |
+| ReCast           | Template engine                         |
+| Reface UI        | Core component library                  |
+| ReStory          | Component development environment       |
+| ReDocs           | Built-in documentation system           |
 
 ## System Architecture
 
-```ts
-┌─────────────────────────────────────────┐
-│               Reface                    │
-│                                         │
-│  ┌─────────────┐       ┌────────────┐   │
-│  │    Deno     │       │   Router   │   │
-│  │   Server    │─────▶ │   System   │   │
-│  └─────────────┘       └────────────┘   │
-│         │                    │          │
-│         ▼                    ▼          │
-│  ┌─────────────┐       ┌────────────┐   │
-│  │   Static    │       │  Layouts   │   │
-│  │   Files     │       │            │   │
-│  └─────────────┘       └────────────┘   │
-│                             │           │
-│                             ▼           │
-│  ┌─────────────────────────────────┐    │
-│  │         RefaceComposer          │    │
-│  │                                 │    │
-│  │    ┌──────────┐  ┌──────────┐   │    │
-│  │    │  Plugin  │  │ Template │   │    │
-│  │    │  System  │  │ Process  │   │    │
-│  │    └──────────┘  └──────────┘   │    │
-│  └─────────────────────────────────┘    │
-│                                         │
-│  ┌─────────────────────────────────┐    │
-│  │      Interactive System         │    │
-│  │                                 │    │
-│  │  ┌──────────┐      ┌────────┐   │    │
-│  │  │ Partials │      │Islands │   │    │
-│  │  │  (HTMX)  │      │ (RPC)  │   │    │
-│  │  └──────────┘      └────────┘   │    │
-│  └─────────────────────────────────┘    │
-└─────────────────────────────────────────┘
+```
+┌───────────────────────────────────────────────────────┐
+│                  Development Tools                    │
+├───────────────────────────┬───────────────────────────┤
+│         ReStory           │          ReDocs           │
+├───────────────────────────┴───────────────────────────┤
+│                        Reface UI                      │
+├───────────────────┬───────────────────┬───────────────┤
+│    Components     │     Layout        │    Theme      │
+├───────────────────┴───────────────────┴───────────────┤
+│                  Reface Framework                     │
+├───────────────────┬───────────────────┬───────────────┤
+│      Islands      │     Partials      │    Router     │
+├───────────────────┴───────────────────┴───────────────┤
+│                      ReCast                           │
+├───────────────────────────────────────────────────────┤
+│                       Deno                            │
+└───────────────────────────────────────────────────────┘
 ```
 
-## Core Components
+## Module Details
 
-### 1. Reface Framework
+### ReCast
 
-High-level framework providing:
+Template engine for server-side rendering:
 
-- Deno server integration
-- Static file handling
-- Routing system
-- Layout management
-- Plugin configuration
-- Interactive architecture
-
-### 2. RefaceComposer
-
-Template composition engine:
-
-- Plugin management
-- Template processing
-- HTML generation
 - Component system
+- Template composition
+- Plugin architecture
+- HTML generation
 
-### 3. Interactive System
+### Reface Framework
 
-#### Partials (HTMX)
+Web framework built on ReCast:
 
-- Live components
-- REST-based updates
-- HTMX integration
-- State management
+- Server integration (Hono)
+- Routing system
+- Islands architecture
+- Partials (HTMX-based components)
 
-#### Islands (RPC)
+### Reface UI
 
-- Micro-applications
-- RPC protocol support
-- Rich interactions
-- Isolated state
+Core component library:
 
-## Implementation Details
+- Base components
+- Layout system
+- Theming
+- Utilities
 
-### Server Layer
+### ReStory
 
-```typescript
-class Reface {
-  constructor(options: { layout: Layout }) {
-    this.layout = options.layout;
-  }
+Component development environment:
 
-  // Page routing
-  page(route: string, generator: TemplateGenerator<PageProps>) {
-    // Page registration
-  }
+- Component preview
+- Documentation
+- Visual testing
+- Theme editor
 
-  // Server adapters
-  hono() {
-    /* Hono integration */
-  }
-  oak() {
-    /* Oak integration */
-  }
-  express() {
-    /* Express integration */
-  }
-}
-```
+### ReDocs
 
-### Interactive Components
+Documentation system:
 
-```typescript
-// Partial Component (HTMX-based)
-const Counter = partial(async () => {
-  return (
-    <div>
-      <button {...Counter.trigger()}>Increment</button>
-    </div>
-  );
-}, "counter");
-
-// Island Component (RPC-based)
-const TodoApp = Reface.addIsland({
-  name: "todo",
-  template: ({ rpc, rest }) => (
-    <div>
-      <button {...rpc.hx.addTodo()}>Add</button>
-      <button {...rest.hx("self", "get", "/list")}>Refresh</button>
-    </div>
-  ),
-  rpc: {
-    addTodo: async ({ args }) => {
-      /* RPC handler */
-    },
-  },
-  rest: {
-    "get|/list": async (req) => {
-      /* REST handler */
-    },
-  },
-});
-```
-
-## Module Structure
-
-```
-@reface/
-├── core/                  # Core composition engine
-│   └── RefaceComposer    # Template composition
-│
-├── framework/            # Reface framework
-│   ├── server/          # Deno server
-│   ├── router/          # Routing system
-│   └── static/          # Static files
-│
-├── interactive/         # Interactive components
-│   ├── partials/       # HTMX components
-│   └── islands/        # RPC components
-│
-└── plugins/            # Official plugins
-```
-
-## Development Plans
-
-### Near Future
-
-1. **Framework Layer**
-
-   - Full server integration
-   - Advanced routing
-   - Middleware system
-   - Static optimization
-
-2. **Islands Architecture**
-
-   - Enhanced RPC system
-   - State management
-   - TypeScript integration
-   - Development tools
-
-3. **Build System**
-   - Asset optimization
-   - Code splitting
-   - Tree shaking
-   - Bundle analysis
+- MDX support
+- Code examples
+- Live previews
+- API references

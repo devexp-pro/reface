@@ -2,10 +2,6 @@ import { component } from "@reface/recast";
 import { styled } from "@reface/recast";
 import { Grid, GridCol } from "./Grid.tsx";
 import { theme } from "../theme.ts";
-export const meta = {
-  title: "Layout/Grid",
-  description: "Grid layout component with column control",
-};
 
 const Box = styled.div /*css*/`
   & {
@@ -13,6 +9,26 @@ const Box = styled.div /*css*/`
     background: ${theme.colors.accent.base};
     color: white;
     text-align: center;
+    border-radius: 4px;
+  }
+`;
+
+const TallBox = styled.div /*css*/`
+  & {
+    height: 100px;
+    padding: 1rem;
+    background: ${theme.colors.accent.base};
+    color: white;
+    text-align: center;
+    border-radius: 4px;
+  }
+`;
+
+const TallGrid = styled.div /*css*/`
+  & {
+    height: 200px;
+    display: flex;
+    background: ${theme.colors.bg.panel};
     border-radius: 4px;
   }
 `;
@@ -116,3 +132,89 @@ export const Nested = component(() => (
     </GridCol>
   </Grid>
 ));
+
+export const Alignment = component(() => (
+  <TallGrid>
+    <Grid columns={4} gap="md">
+      <GridCol align="start">
+        <Box>Align Start</Box>
+      </GridCol>
+
+      <GridCol align="center">
+        <Box>Align Center</Box>
+      </GridCol>
+
+      <GridCol align="end">
+        <Box>Align End</Box>
+      </GridCol>
+
+      <GridCol align="stretch">
+        <Box>Align Stretch</Box>
+      </GridCol>
+    </Grid>
+  </TallGrid>
+));
+
+export const Justify = component(() => (
+  <Grid columns={4} gap="md">
+    <GridCol justify="start">
+      <Box>Justify Start</Box>
+    </GridCol>
+
+    <GridCol justify="center">
+      <Box>Justify Center</Box>
+    </GridCol>
+
+    <GridCol justify="end">
+      <Box>Justify End</Box>
+    </GridCol>
+
+    <GridCol justify="stretch">
+      <Box>Justify Stretch</Box>
+    </GridCol>
+  </Grid>
+));
+
+export const AlignAndJustify = component(() => (
+  <Grid columns={3} gap="md">
+    <GridCol align="center" justify="center">
+      <Box>Center All</Box>
+    </GridCol>
+
+    <GridCol align="start" justify="end">
+      <Box>Top Right</Box>
+    </GridCol>
+
+    <GridCol align="end" justify="start">
+      <Box>Bottom Left</Box>
+    </GridCol>
+  </Grid>
+));
+
+export const StretchContent = component(() => (
+  <Grid columns={3} gap="md">
+    <GridCol align="stretch">
+      <TallBox>
+        Stretched Content
+      </TallBox>
+    </GridCol>
+
+    <GridCol>
+      <TallBox>
+        Normal Height
+      </TallBox>
+    </GridCol>
+
+    <GridCol align="stretch" justify="center">
+      <TallBox>
+        Stretched & Centered
+      </TallBox>
+    </GridCol>
+  </Grid>
+));
+
+export const meta = {
+  title: "Layout/Grid",
+  description: "Grid layout component with column control and alignment",
+  component: { Grid, GridCol },
+};

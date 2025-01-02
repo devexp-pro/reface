@@ -14,6 +14,19 @@ export const BASE_SIZE = 2;
 const roundToBase = (value: number) =>
   Math.round(value / BASE_SIZE) * BASE_SIZE;
 
+// Функция для добавления прозрачности к HEX цвету
+const opacity = (hex: string, alpha: number): string => {
+  // Убираем # если есть
+  const cleanHex = hex.replace("#", "");
+
+  // Конвертируем alpha (0-1) в hex (00-FF)
+  const alphaHex = Math.round(alpha * 255)
+    .toString(16)
+    .padStart(2, "0");
+
+  return `#${cleanHex}${alphaHex}`;
+};
+
 // Функции для разных типов прогрессий
 const sizeUtils = {
   // Линейная прогрессия (n * BASE_SIZE)
@@ -59,8 +72,8 @@ const themeConfig = {
     border: {
       base: "#404040",
       hover: "#525252",
-      light: "rgba(255, 255, 255, 0.1)",
-      dark: "rgba(0, 0, 0, 0.2)",
+      light: opacity("#FFFFFF", 0.1),
+      dark: opacity("#000000", 0.2),
     },
     accent: {
       base: "#60a5fa",
@@ -109,10 +122,10 @@ const themeConfig = {
       ui: "Inter, system-ui, -apple-system, sans-serif",
     },
     sizes: {
-      xs: "11px",
-      sm: "12px",
-      md: "13px",
-      lg: "14px",
+      xs: sizeUtils.linear(5.5), // 11px
+      sm: sizeUtils.linear(6), // 12px
+      md: sizeUtils.linear(6.5), // 13px
+      lg: sizeUtils.linear(7), // 14px
     },
     weights: {
       normal: "400",
