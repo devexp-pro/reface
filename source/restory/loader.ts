@@ -31,6 +31,7 @@ export type StoryModule = {
 };
 
 export type Story = {
+  id: string;
   name: string;
   component: () => JSX.Element;
   path: string;
@@ -64,7 +65,6 @@ export async function loadStories(
   }
 
   await scanDir(absolutePath);
-
   const groups: Map<string, StoryFile> = new Map();
 
   for (const file of storyFiles) {
@@ -73,11 +73,10 @@ export async function loadStories(
     const relativePath = relative(absolutePath, file);
     const sourceCode = await Deno.readTextFile(file);
 
-    // Получаем метаданные из модуля
-    const meta = storyModule.meta;
+    // Получаем базовый путь для ID (без .story.tsx)
+    const baseId = relativePath.replace(/\.story\.tsx$/, "");
 
-    // Определяем имя группы из meta.title или из структуры папок
-    const groupName = meta?.title?.split("/")[0] ||
+    const groupName = storyModule.meta?.title?.split("/")[0] ||
       relativePath.split("/")[1] ||
       "Other";
 
@@ -92,7 +91,6 @@ export async function loadStories(
       groups.set(groupName, group);
     }
 
-    // Собираем все экспортированные истории из модуля
     Object.entries(storyModule)
       .filter(([key, value]) =>
         key !== "meta" &&
@@ -100,16 +98,17 @@ export async function loadStories(
         key !== "default"
       )
       .forEach(([key, component]) => {
-        const storyName = key;
-        const fileName = basename(file).replace(".story.tsx", "");
-        const storyPath =
-          `/${groupName.toLowerCase()}/${fileName}/${key.toLowerCase()}`;
+        // Формируем ID в формате "path/to/component---storyName"
+        const id = `${baseId}---${key.toLowerCase()}`;
+        const storyPath = `/${groupName.toLowerCase()}/${
+          basename(file).replace(".story.tsx", "")
+        }/${key.toLowerCase()}`;
 
-        // Извлекаем исходный код компонента с помощью регулярного выражения
         const componentSource = extractComponentSource(sourceCode, key);
 
         group!.stories.push({
-          name: storyName,
+          id,
+          name: key,
           component: component as () => JSX.Element,
           path: storyPath,
           filePath: relativePath,
@@ -145,52 +144,20 @@ export async function loadStory(
   version: string | number,
 ): Promise<Story | null> {
   try {
+    // Нормализуем путь и разбиваем на части
     const normalizedPath = path.toLowerCase().replace(/^\/+|\/+$/g, "");
-    const pathParts = normalizedPath.split("/");
-    const storyName = pathParts[pathParts.length - 1]; // Последний сегмент - имя story
+    const [groupName, componentName, storyName] = normalizedPath.split("/");
 
-    // Ищем .story.tsx файл рекурсивно
-    const storyFiles: string[] = [];
+    // Формируем ID истории
+    const storyId = `${groupName}/${componentName}---${storyName}`;
 
-    async function scanDir(dir: string) {
-      for await (const entry of Deno.readDir(dir)) {
-        const entryPath = `${dir}/${entry.name}`;
-        if (entry.isDirectory) {
-          await scanDir(entryPath);
-        } else if (entry.isFile && entry.name.endsWith(".story.tsx")) {
-          storyFiles.push(entryPath);
-        }
-      }
-    }
+    // Загружаем все истории
+    const groups = await loadStories(rootDir, version);
 
-    await scanDir(rootDir);
-
-    // Пробуем найти компонент в каждом story файле
-    for (const storyFile of storyFiles) {
-      try {
-        const sourceCode = await Deno.readTextFile(storyFile);
-        const storyModule: StoryModule = await import(
-          `file://${storyFile}${version ? "#" + version : ""}`
-        );
-
-        // Ищем компонент по имени без учета регистра
-        const storyComponent = Object.entries(storyModule)
-          .find(([key]) => key.toLowerCase() === storyName)?.[1];
-
-        if (storyComponent && typeof storyComponent === "function") {
-          const componentSource = extractComponentSource(sourceCode, storyName);
-
-          return {
-            name: storyName,
-            component: storyComponent as () => JSX.Element,
-            path: path,
-            filePath: storyFile,
-            source: componentSource || sourceCode,
-          };
-        }
-      } catch (error) {
-        console.error(`Error loading story from ${storyFile}:`, error);
-      }
+    // Ищем историю по ID
+    for (const group of groups) {
+      const story = group.stories.find((s) => s.id.toLowerCase() === storyId);
+      if (story) return story;
     }
 
     return null;
