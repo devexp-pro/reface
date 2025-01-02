@@ -4,7 +4,7 @@ export * from "./utils.ts";
 
 import { createTemplateFactory } from "./createTemplateFactory.ts";
 
-export { processChildren } from "./processChildren.ts";
+export { processTemplateTagChildren } from "./processTemplateTagChildren.ts";
 
 export { createTemplateFactory };
 export const template: TemplateFactory = createTemplateFactory({

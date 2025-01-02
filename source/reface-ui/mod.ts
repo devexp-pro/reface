@@ -32,4 +32,4 @@ export { Content } from "./data/Content.tsx";
 export { TreeItem, type TreeNode, TreeView } from "./data/TreeView.tsx";
 export { Code } from "./data/Code.tsx";
 
-export { LayoutSimple } from "./layout/LayoutSimple.ts";
+export { LayoutSimple } from "./layout/LayoutSimple.tsx";

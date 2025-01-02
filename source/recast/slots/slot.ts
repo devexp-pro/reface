@@ -1,12 +1,13 @@
 import { createTemplateFactory } from "@reface/recast";
 import type { SlotAttributes, SlotMethods, SlotPayload } from "./types.ts";
+import { SLOT_TEMPLATE_NAME } from "./constants.ts";
 
 const slotTemplate = createTemplateFactory<
   SlotAttributes,
   SlotPayload,
   SlotMethods
 >({
-  type: "slot",
+  type: SLOT_TEMPLATE_NAME,
   create: {
     defaults: {
       strategy: "append",
@@ -23,7 +24,6 @@ export function createSlot(name: string, render?: SlotRender) {
   const symbol = Symbol(name);
 
   return slotTemplate({
-    tag: "slot",
     payload: {
       slot: {
         name: symbol,

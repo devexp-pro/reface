@@ -7,6 +7,34 @@ const toCSSVarName = (path: string) =>
     path.replace(/\./g, "-").replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)
   }`;
 
+// Базовый размер
+export const BASE_SIZE = 2;
+
+// Функция округления к ближайшему числу, кратному BASE_SIZE
+const roundToBase = (value: number) =>
+  Math.round(value / BASE_SIZE) * BASE_SIZE;
+
+// Функции для разных типов прогрессий
+const sizeUtils = {
+  // Линейная прогрессия (n * BASE_SIZE)
+  linear: (n: number) => `${roundToBase(n * BASE_SIZE)}px`,
+
+  // Квадратичная прогрессия (n^2 * BASE_SIZE)
+  square: (n: number) => `${roundToBase(Math.pow(n, 2) * BASE_SIZE)}px`,
+
+  // Золотое сечение (phi^n * BASE_SIZE)
+  golden: (n: number) => `${roundToBase(Math.pow(1.618, n) * BASE_SIZE)}px`,
+
+  // Логарифмическая прогрессия (log2(n+1) * BASE_SIZE)
+  log: (n: number) => `${roundToBase(Math.log2(n + 1) * BASE_SIZE)}px`,
+
+  // Фибоначчи (fib(n) * BASE_SIZE)
+  fibonacci: (n: number) => {
+    const fib = (n: number): number => n <= 1 ? n : fib(n - 1) + fib(n - 2);
+    return `${roundToBase(fib(n) * BASE_SIZE)}px`;
+  },
+};
+
 // Base theme configuration
 const themeConfig = {
   colors: {
@@ -64,16 +92,16 @@ const themeConfig = {
     },
   },
   spacing: {
-    xs: "0.25rem",
-    sm: "0.5rem",
-    md: "0.75rem",
-    lg: "1rem",
+    xs: sizeUtils.linear(1), // 2px
+    sm: sizeUtils.linear(2), // 4px
+    md: sizeUtils.linear(3), // 6px
+    lg: sizeUtils.linear(4), // 8px
   },
   sizes: {
-    xs: "16px",
-    sm: "24px",
-    md: "32px",
-    lg: "40px",
+    xs: sizeUtils.golden(2), // ≈ 5px
+    sm: sizeUtils.golden(3), // ≈ 8px
+    md: sizeUtils.golden(4), // ≈ 13px
+    lg: sizeUtils.golden(5), // ≈ 21px
   },
   typography: {
     fonts: {
@@ -92,6 +120,12 @@ const themeConfig = {
       semibold: "600",
       bold: "700",
     },
+  },
+  containers: {
+    xs: sizeUtils.log(4), // более плавный рост
+    sm: sizeUtils.log(8),
+    md: sizeUtils.log(16),
+    lg: sizeUtils.log(32),
   },
 };
 
@@ -200,4 +234,7 @@ export const globalStyles = `
 ${baseStyles}
 `;
 
-export const theme = themeVars;
+export const theme = {
+  ...themeVars,
+  sizeUtils,
+};

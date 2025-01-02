@@ -1,6 +1,6 @@
 import { component, styled } from "@reface/recast";
 import { Stack } from "./layout/Stack.tsx";
-import { Grid } from "./layout/Grid.tsx";
+import { Grid, GridCol } from "./layout/Grid.tsx";
 import { theme } from "./theme.ts";
 
 const ColorPreview = styled.div /*css*/`
@@ -47,7 +47,59 @@ const SizePreview = styled.div /*css*/`
   }
 `;
 
+const ProgressionPreview = styled.div /*css*/`
+  & {
+    height: 24px;
+    background: ${theme.colors.accent.base};
+    border-radius: 4px;
+  }
+`;
+
+const ProgressionRow = styled.div /*css*/`
+  & {
+    display: flex;
+    align-items: center;
+    padding: ${theme.spacing.xs};
+  }
+`;
+
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+export const ProgressionsStory = component(() => {
+  const steps = Array.from({ length: 10 }, (_, i) => i + 1);
+
+  const progressions = [
+    { name: "Linear", fn: theme.sizeUtils.linear },
+    { name: "Square", fn: theme.sizeUtils.square },
+    { name: "Golden", fn: theme.sizeUtils.golden },
+    { name: "Log", fn: theme.sizeUtils.log },
+    { name: "Fibonacci", fn: theme.sizeUtils.fibonacci },
+  ];
+
+  return (
+    <Stack gap="lg" direction="vertical">
+      <h2>Size Progressions</h2>
+      <Grid columns={2} gap="lg">
+        {progressions.map(({ name, fn }) => (
+          <GridCol>
+            <h3>{name}</h3>
+            <Stack gap="xs" direction="vertical">
+              {steps.map((step) => {
+                const value = fn(step);
+                return (
+                  <ProgressionRow>
+                    <ProgressionPreview style={{ width: value }} />
+                    <span>Step {step}: {value}</span>
+                  </ProgressionRow>
+                );
+              })}
+            </Stack>
+          </GridCol>
+        ))}
+      </Grid>
+    </Stack>
+  );
+});
 
 export const ThemeStory = component(() => {
   const colorGroups = Object.entries(theme.colors).map(

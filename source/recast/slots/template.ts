@@ -1,12 +1,11 @@
 import { createTemplateFactory } from "@reface/recast";
 import type { TemplatePayload } from "./types.ts";
+import { TEMPLATE_TEMPLATE_NAME } from "./constants.ts";
 
 export const createTemplate = createTemplateFactory<TemplatePayload>({
-  type: "template",
-  tag: "template",
+  type: TEMPLATE_TEMPLATE_NAME,
   create: {
     defaults: {
-      tag: "template",
       payload: {
         template: {
           slot: "",

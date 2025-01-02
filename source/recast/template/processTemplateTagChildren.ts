@@ -1,7 +1,7 @@
 import type { ElementChildType } from "./types.ts";
 import { escapeHTML, isEmptyValue, isTemplate } from "./utils.ts";
 
-export function processChildren(
+export function processTemplateTagChildren(
   strings: TemplateStringsArray,
   values: unknown[],
 ): ElementChildType[] {

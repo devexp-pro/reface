@@ -1,12 +1,10 @@
 import type {
   BaseAttributes,
   ComponentFn,
-  ElementChildType,
   Template,
   TemplatePayload,
 } from "@reface/recast";
 import { createElement } from "./createElement.ts";
-import type * as HTML from "../types/elements.types.ts";
 
 type JsxFn = <
   P extends BaseAttributes,
@@ -22,21 +20,13 @@ export const jsx: JsxFn = function <
   T extends TemplatePayload,
 >(
   tag: string | ComponentFn<P> | Template<P, T>,
-  props: P | null,
+  { children = [], ...attrs }: P,
   _key?: string,
 ): Template<P, T> {
-  if (!props || !("children" in props)) {
-    return createElement(tag, props, []) as unknown as Template<P, T>;
-  }
-
-  const { children, ...rest } =
-    props as (P & { children?: ElementChildType | ElementChildType[] });
-  const normalizedChildren = Array.isArray(children) ? children : [children];
-
   return createElement(
     tag,
-    rest as P,
-    ...normalizedChildren,
+    attrs as P,
+    ...(Array.isArray(children) ? children : [children]),
   ) as unknown as Template<P, T>;
 };
 

@@ -1,4 +1,8 @@
-import { processChildren, type Template, template } from "@reface/recast";
+import {
+  processTemplateTagChildren,
+  type Template,
+  template,
+} from "@reface/recast";
 
 // Создаем тип для шаблона без атрибутов
 type NoAttributes = Record<never, never>;
@@ -9,6 +13,6 @@ export const html = (
   ...values: any[]
 ): HtmlTemplate => {
   return template({
-    children: processChildren(strings, values),
+    children: processTemplateTagChildren(strings, values),
   }) as HtmlTemplate;
 };

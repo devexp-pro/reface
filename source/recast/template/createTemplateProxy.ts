@@ -11,7 +11,7 @@ import type {
   TemplatePayload,
 } from "./types.ts";
 import { REFACE_TEMPLATE } from "./constants.ts";
-import { processChildren } from "./processChildren.ts";
+import { processTemplateTagChildren } from "./processTemplateTagChildren.ts";
 import { isComponentFn } from "./utils.ts";
 import { normalizeAttributes } from "./normalizeAttributes.ts";
 
@@ -37,6 +37,22 @@ type ProxyHandler<
     | undefined;
 };
 
+const defaultProcessChildren = ({
+  oldChildren,
+  newChildren,
+}: {
+  oldChildren: JSX.Element[];
+  newChildren: JSX.Element[];
+}) => [...oldChildren, ...newChildren];
+
+const defaultProcessAttributes = ({
+  oldAttrs,
+  newAttrs,
+}: {
+  oldAttrs: NormalizeAttributes<A>;
+  newAttrs: NormalizeAttributes<A>;
+}) => ({ ...oldAttrs, ...newAttrs });
+
 export function createTemplateProxy<
   A extends BaseAttributes,
   P extends TemplatePayload,
@@ -57,43 +73,40 @@ export function createTemplateProxy<
     apply(_target, _thisArg, args) {
       const [first, ...rest] = args;
 
-      if (first?.raw) {
-        const processedChildren =
-          createTemplateFactoryConfig.process?.children?.({
-            oldChildren: rawTemplate.children,
-            newChildren: processChildren(first as TemplateStringsArray, rest),
-            template: rawTemplate,
-          }) ||
-          [
-            ...rawTemplate.children,
-            ...processChildren(first as TemplateStringsArray, rest),
-          ];
+      const processChildren = createTemplateFactoryConfig.process?.children ||
+        defaultProcessChildren;
+      const processAttributes =
+        createTemplateFactoryConfig.process?.attributes ||
+        defaultProcessAttributes;
 
+      if (first?.raw) {
         return createTemplateProxy({
           rawTemplate: {
             ...rawTemplate,
-            children: processedChildren,
+            children: processChildren({
+              oldChildren: rawTemplate.children,
+              newChildren: processTemplateTagChildren(
+                first as TemplateStringsArray,
+                rest,
+              ),
+              template: rawTemplate,
+            }),
           },
           createTemplateFactoryConfig,
           templateFactoryConfig,
         });
       }
 
-      const attributes = normalizeAttributes(
-        createTemplateFactoryConfig.process?.attributes?.({
-          oldAttrs: rawTemplate.attributes,
-          newAttrs: normalizeAttributes(first as A),
-          template: rawTemplate,
-        }) || {
-          ...rawTemplate.attributes,
-          ...(first as A),
-        },
-      );
-
       return createTemplateProxy({
         rawTemplate: {
           ...rawTemplate,
-          attributes,
+          attributes: normalizeAttributes(
+            processAttributes({
+              oldAttrs: rawTemplate.attributes,
+              newAttrs: normalizeAttributes(first as A),
+              template: rawTemplate,
+            }),
+          ),
         },
         createTemplateFactoryConfig,
         templateFactoryConfig,
