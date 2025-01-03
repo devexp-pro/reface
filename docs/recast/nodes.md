@@ -1,66 +1,125 @@
-## Node
+# Primitive Content
 
-```jsx
-// Template to Node conversion
-const template = div({ class: "box" })`Hello`;
+## TextContent
 
-// Creates node tree
-const node: Node = {
-  type: "element",
-  tag: "div",
-  attributes: {
-    class: ["box"]
-  },
-  children: [{
-    type: "text",
-    content: "Hello"
-  }],
-  meta: {}
-}
+Simple text or number values that will be escaped in HTML:
 
-// Final HTML
-"<div class="box">Hello</div>"
+```typescript
+type TextContent = string | number;
+
+// Examples
+("Hello world"); // -> "Hello world"
+42; // -> "42"
 ```
 
-### Node Types
+## HtmlContent
 
-The template system is built on a unified Node type that can represent different kinds of content:
+Raw HTML content that will be inserted as-is:
 
-```ts
-type Node = NodeText | NodeHtml | NodeElement | NodeComponent;
-
-type Meta = Record<string, any>;
-
-// Text content
-type NodeText = string | number;
-
-// HTML string content with possible children
-interface NodeHtml {
+```typescript
+interface HtmlContent {
   type: "html";
   content: string;
+  meta: Meta;
+}
+
+// Example
+html("<div>Raw HTML</div>");
+```
+
+# Nodes
+
+## Fragment
+
+Container for multiple nodes without creating an element:
+
+```typescript
+interface FragmentNode extends BaseNode {
+  type: "fragment";
   children: Node[];
   meta: Meta;
 }
 
-// HTML and custom elements
-interface NodeElement<T extends HTMLAttributes> {
+// Example
+<>
+  <div>First</div>
+  <div>Second</div>
+</>;
+```
+
+## Element
+
+Basic HTML element node:
+
+```typescript
+interface ElementNode extends BaseNode {
   type: "element";
   tag: string;
+  attributes: ElementAttributes;
   children: Node[];
-  attributes: T;
   meta: Meta;
 }
+```
 
-// Component instances
-interface NodeComponent<T extends Record<string, any>> {
-  type: "component";
-  children: Node[];
-  attributes: T;
-  meta: Meta & {
+### Attributes Normalization
+
+The system normalizes attributes for consistent processing:
+
+1. Class attributes:
+
+   ```typescript
+   // Input variants
+   { class: "foo bar" }
+   { class: ["foo", "bar"] }
+   { class: { foo: true, bar: false } }
+   { className: "foo" }
+
+   // Normalized output
+   { class: ["foo", "bar"] }
+   ```
+
+2. Style attributes:
+
+   ```typescript
+   // Input variants
+   { style: "color: red; margin-top: 10px" }
+   { style: { color: "red", marginTop: "10px" } }
+   { style: ["color: red", { marginTop: "10px" }] }
+
+   // Normalized output
+   { style: {
+     "color": "red",
+     "margin-top": "10px"
+   }}
+   ```
+
+3. Other attributes:
+   - CamelCase converted to kebab-case
+   - CSS variables (--custom-prop) preserved
+   - data-\* attributes preserved
+   - Boolean attributes simplified
+   - null/undefined values removed
+
+## Component
+
+Custom component node with its own render logic:
+
+```typescript
+interface ComponentNode<T extends Record<string, any>>
+  extends BaseNode<{
     component: {
       id: string;
       render: (attrs: T, children?: Node[]) => Node;
     };
-  };
+  }> {
+  type: "component";
+  attributes: T;
+  children: Node[];
+  meta: Meta;
 }
+
+// Example
+const Button = component<ButtonProps>((props) => (
+  <button class={["btn", `btn-${props.variant}`]}>{props.children}</button>
+));
 ```
