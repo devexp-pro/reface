@@ -343,6 +343,7 @@ export const ReStory = component(
                       variant="dark"
                       style="max-height: 400px; flex: none;"
                       collapsible
+                      defaultCollapsed
                       slots={{
                         header: <GroupHeader>Source Code</GroupHeader>,
                       }}

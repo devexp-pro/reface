@@ -8,15 +8,22 @@ const StyledPanel = styled.div /*css*/`
   & {
     background: ${theme.colors.surface.base};
     border: 1px solid ${theme.colors.border.base};
-    overflow: hidden;
     display: flex;
     flex-direction: column;
     flex: 1;
   }
 
+  & .panel-content,
+  & .panel-footer {
+    overflow: hidden;
+    max-height: var(--panel-max-height, 2000px);
+    transition: all 0.3s ease-out;
+  }
+
   &[data-collapsed="true"] .panel-content,
   &[data-collapsed="true"] .panel-footer {
-    display: none;
+    max-height: 0;
+    padding: 0;
   }
 
   &.variant-light {
@@ -61,11 +68,11 @@ const PanelHeader = styled.div /*css*/`
 
   & .collapse-icon {
     color: ${theme.colors.text.dimmed};
-    transition: transform 0.2s;
+    transition: transform 0.3s ease;
   }
 
-  &[data-collapsed="true"] .collapse-icon {
-    transform: rotate(-90deg);
+  [data-collapsed="true"] & .collapse-icon {
+    transform: rotate(-180deg);
   }
 `;
 
@@ -74,6 +81,7 @@ const PanelContent = styled.div /*css*/`
     padding: ${theme.spacing.md};
     flex: 1;
     overflow: auto;
+    transition: all 0.3s ease-out;
   }
 `;
 
@@ -81,6 +89,7 @@ const PanelFooter = styled.div /*css*/`
   & {
     padding: ${theme.spacing.md};
     background: ${theme.colors.bg.input};
+    transition: padding 0.3s ease-out;
   }
 
   .variant-light & {
@@ -104,12 +113,12 @@ type PanelProps = {
 };
 
 const clientScript = /*js*/ `
-  document.querySelectorAll('[data-component="Panel"][data-collapsible="true"] .panel-header').forEach(header => {
-    header.addEventListener('click', () => {
+  document.addEventListener('click', (e) => {
+    const header = e.target.closest('[data-component="Panel"][data-collapsible="true"] .panel-header');
+    if (header) {
       const panel = header.closest('.panel');
-      const isCollapsed = panel.getAttribute('data-collapsed') === 'true';
-      panel.setAttribute('data-collapsed', !isCollapsed);
-    });
+      panel.setAttribute('data-collapsed', panel.getAttribute('data-collapsed') !== 'true');
+    }
   });
 `;
 
