@@ -113,13 +113,18 @@ type PanelProps = {
 };
 
 const clientScript = /*js*/ `
-  document.addEventListener('click', (e) => {
-    const header = e.target.closest('[data-component="Panel"][data-collapsible="true"] .panel-header');
-    if (header) {
-      const panel = header.closest('.panel');
-      panel.setAttribute('data-collapsed', panel.getAttribute('data-collapsed') !== 'true');
-    }
-  });
+  (() => {
+    const componentId = document.currentScript.getAttribute('data-component');
+    if (!componentId) return;
+
+    document.addEventListener('click', (e) => {
+      const header = e.target.closest('[__rcc*="' + componentId + '"][data-collapsible="true"] .panel-header');
+      if (header) {
+        const panel = header.closest('.panel');
+        panel.setAttribute('data-collapsed', panel.getAttribute('data-collapsed') !== 'true');
+      }
+    });
+  })();
 `;
 
 export const Panel = component((

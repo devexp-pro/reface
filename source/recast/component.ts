@@ -6,6 +6,7 @@ import {
   type TemplateAttributes,
   type TemplatePayload,
 } from "@reface/recast";
+import { $, Traverser } from "./query/mod.ts";
 
 export type ComponentProps = TemplateAttributes;
 
@@ -21,22 +22,34 @@ export const component = <
   render: ComponentFn<P>,
 ): Template<P, T> => {
   const id = generateId();
+  const traverser = new Traverser();
 
   function rendered(attrs: P, children: ElementChildType[]) {
     const result = render(attrs, children);
+
     if (isTemplate(result)) {
+      // Добавляем id компонента в корневой элемент
       if (!result.raw.attributes.__rcc) {
         result.raw.attributes.__rcc = [id];
-      }
-      if (!result.raw.attributes.__rcc.includes(id)) {
+      } else if (!result.raw.attributes.__rcc.includes(id)) {
         result.raw.attributes.__rcc.push(id);
       }
-      result.raw.children.forEach((child) => {
-        if (isTemplate(child) && child.raw.type === "slot") {
-          // TODO:
-        }
-      });
+
+      // Находим все вложенные Template и добавляем им атрибут __rcc
+      traverser.transform(
+        result,
+        $().type("template"),
+        (template) => {
+          if (!template.raw.attributes.__rcc) {
+            template.raw.attributes.__rcc = [id];
+          } else if (!template.raw.attributes.__rcc.includes(id)) {
+            template.raw.attributes.__rcc.push(id);
+          }
+          return template;
+        },
+      );
     }
+
     return result;
   }
 
