@@ -15,6 +15,7 @@ Recast is a string-based HTML Element engine designed for server-side rendering.
 7. **Render** - Render API to transform Elements into Nodes into HTML
 8. **Test Utils** - Test utils
 9. **HTMX** - HTMX integration
+10. **Types** - TypeScript types for all API
 
 ## Element API
 
@@ -277,6 +278,81 @@ html`
 `;
 ```
 
+### Element API Types
+
+Elements support full TypeScript typing:
+
+```typescript
+// Define custom attributes interface
+interface ButtonAttributes {
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  onClick?: () => void;
+}
+
+// Create typed element
+const button = createElement<ButtonAttributes>("button");
+
+// Type checking works
+button({ type: "submit" }); // ✓ OK
+button({ type: "invalid" }); // ✗ Error
+button({ unknown: true }); // ✗ Error
+
+// Extend HTML attributes
+interface CardAttributes extends HTMLAttributes {
+  variant?: "primary" | "secondary";
+}
+
+const Card = createElement<CardAttributes>("div");
+Card({
+  class: "card", // ✓ from HTMLAttributes
+  variant: "primary", // ✓ from CardAttributes
+});
+```
+
+### Component Types
+
+Components can be strictly typed:
+
+```typescript
+// Define props interface
+interface ButtonProps {
+  variant: "primary" | "secondary";
+  size?: "small" | "large";
+  disabled?: boolean;
+  onClick?: () => void;
+}
+
+// Create typed component
+const Button = component<ButtonProps>((props) => (
+  <button
+    class={[
+      "button",
+      `button-${props.variant}`,
+      props.size && `button-${props.size}`,
+    ]}
+    disabled={props.disabled}
+    onClick={props.onClick}
+  />
+));
+
+// Usage with type checking
+<Button
+  variant="primary" // ✓ required
+  size="small" // ✓ optional
+  disabled={true} // ✓ optional
+  invalid={true} // ✗ Error: unknown prop
+/>;
+```
+
+Key TypeScript features:
+
+1. Full type inference
+2. Props validation
+3. HTML attributes support
+4. Custom attributes
+5. Method typing
+
 ## Component System
 
 ### Component Features
@@ -286,7 +362,7 @@ Components are special Elements that:
 ```typescript
 const script = /*js*/ `
   const componentId = document.currentScript.getAttribute('data-component');
-  const root = document.querySelector(`[(__rcc *= "${componentId}")]`);
+  const root = document.querySelector('[__rcc="' + componentId + '"]');
   
   // Component-scoped client code
   root.querySelector('.button').addEventListener('click', () => {
@@ -434,70 +510,3 @@ During render:
 2. Content is deduplicated by keys
 3. Optional render transforms are applied
 4. Content is injected into slot placeholders
-
-## Node
-
-```jsx
-// Template to Node conversion
-const template = div({ class: "box" })`Hello`;
-
-// Creates node tree
-const node: Node = {
-  type: "element",
-  tag: "div",
-  attributes: {
-    class: ["box"]
-  },
-  children: [{
-    type: "text",
-    content: "Hello"
-  }],
-  meta: {}
-}
-
-// Final HTML
-"<div class="box">Hello</div>"
-```
-
-### Node Types
-
-The template system is built on a unified Node type that can represent different kinds of content:
-
-```ts
-type Node = NodeText | NodeHtml | NodeElement | NodeComponent;
-
-type Meta = Record<string, any>;
-
-// Text content
-type NodeText = string | number;
-
-// HTML string content with possible children
-interface NodeHtml {
-  type: "html";
-  content: string;
-  children: Node[];
-  meta: Meta;
-}
-
-// HTML and custom elements
-interface NodeElement<T extends HTMLAttributes> {
-  type: "element";
-  tag: string;
-  children: Node[];
-  attributes: T;
-  meta: Meta;
-}
-
-// Component instances
-interface NodeComponent<T extends Record<string, any>> {
-  type: "component";
-  children: Node[];
-  attributes: T;
-  meta: Meta & {
-    component: {
-      id: string;
-      render: (attrs: T, children?: Node[]) => Node;
-    };
-  };
-}
-```
