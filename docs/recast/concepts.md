@@ -3,11 +3,18 @@
 Recast is a string-based HTML Element engine designed for server-side rendering. It consists of several key systems:
 
 1. **Element API** - Core API for creating and manipulating HTML elements
+
+   - **Prebuilt html tags** - `import {a, div, span, script, style ...other} from "@reface/recast/elements"`
+   - **Element factory** - `createElement('custom-tag')`
+
 2. **JSX Support** - Syntactic sugar for Element API
 3. **Component System** - Reusable Elements with unique instance IDs
 4. **Styling System** - Built-in CSS-in-JS solution
 5. **Slots System** - Content distribution mechanism
 6. **Plugin System** - Extensible render pipeline
+7. **Render** - Render API to transform Elements into Nodes into HTML
+8. **Test Utils** - Test utils
+9. **HTMX** - HTMX integration
 
 ## Element API
 
