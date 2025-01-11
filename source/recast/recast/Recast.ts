@@ -18,6 +18,7 @@ import {
   asyncExpression,
   type AsyncNode,
 } from "../expressions/async/AsyncExpression.ts";
+import { RecastPlugin } from "@recast";
 
 type PromiseChild = Promise<Child | Children | Promise<Child | Children>>;
 
@@ -61,6 +62,12 @@ export class Recast {
 
     this.plugins.set(plugin.name, plugin);
     await plugin.setup(this);
+  }
+
+  getPlugin<T extends RecastPlugin>(
+    plugin: T,
+  ): T | undefined {
+    return this.plugins.get(plugin.name) as T | undefined;
   }
 
   async render(

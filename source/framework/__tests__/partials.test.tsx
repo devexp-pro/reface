@@ -31,7 +31,7 @@ Deno.test("Parital - automatic registration and execution", async () => {
     `<div data-partial="test-handler">Content</div>`,
   );
 
-  const plugin = utils.reface.getPlugin(PartialsPlugin);
+  const plugin = utils.recast.getPlugin<PartialsPlugin>(PartialsPlugin);
   const registeredHandler = plugin?.getHandler("test-handler");
   assertEquals(typeof registeredHandler, "function");
 
@@ -107,6 +107,6 @@ Deno.test("Parital - multiple partials", () => {
     </div>`,
   );
 
-  const plugin = utils.reface.getPlugin(PartialsPlugin);
+  const plugin = utils.recast.getPlugin(PartialsPlugin);
   assertEquals(plugin?.getPartials().size, 2);
 });
