@@ -1,5 +1,6 @@
 import {
   arrayExpression,
+  asyncExpression,
   type Child,
   type Children,
   componentExpression,
@@ -12,13 +13,9 @@ import {
   type RenderContext,
   textContentExpression,
 } from "@recast/expressions";
-import type { RenderOptions, RenderResult } from "./types.ts";
 import type { RecastPluginInterface } from "@recast/plugin";
-import {
-  asyncExpression,
-  type AsyncNode,
-} from "../expressions/async/AsyncExpression.ts";
-import { RecastPlugin } from "@recast";
+
+import type { RenderOptions, RenderResult } from "./types.ts";
 
 type PromiseChild = Promise<Child | Children | Promise<Child | Children>>;
 
@@ -64,7 +61,7 @@ export class Recast {
     await plugin.setup(this);
   }
 
-  getPlugin<T extends RecastPlugin>(
+  getPlugin<T extends RecastPluginInterface>(
     plugin: T,
   ): T | undefined {
     return this.plugins.get(plugin.name) as T | undefined;

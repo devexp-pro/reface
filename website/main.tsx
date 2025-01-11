@@ -1,8 +1,7 @@
 import * as path from "jsr:@std/path";
-import { Hono } from "@hono/hono";
+import { LiveReloadPlugin, reface, setupReface } from "@reface";
 import { serveStatic } from "@hono/hono/deno";
 
-import { LiveReloadPlugin, Reface } from "@reface";
 import { component, html } from "@recast";
 import { loadStories, ReStory } from "@restory";
 import { loadDocs, loadScriptFiles, ReDocs } from "@redocs";
@@ -43,7 +42,7 @@ const Layout = component((_, children) => (
   </LayoutSimple>
 ));
 
-const reface = new Reface({
+setupReface({
   layout: Layout,
 });
 
@@ -51,23 +50,20 @@ if (IS_DEV) {
   reface.recast.use(new LiveReloadPlugin({ watchPaths: ["./"] }));
 }
 
-const app = new Hono();
-reface.hono(app);
-
-app.use(
+reface.router.use(
   "/assets/*",
   serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
 );
-app.use(
+reface.router.use(
   "/styles/*",
   serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
 );
 
-app.get("/", (c) => {
+reface.router.get("/", (c) => {
   return c.html(reface.render(<HomePage />));
 });
 
-app.get("/docs/:path{.*}?", async (c) => {
+reface.router.get("/docs/:path{.*}?", async (c) => {
   const currentPath = c.req.param("path");
   return c.html(
     reface.render(
@@ -82,7 +78,7 @@ app.get("/docs/:path{.*}?", async (c) => {
   );
 });
 
-app.get("/restory/iframe/:path{.*}", async (c) => {
+reface.router.get("/restory/iframe/:path{.*}", async (c) => {
   const storyFile = stories.find((storyFile) =>
     storyFile.filePath === c.req.param("path")
   );
@@ -101,7 +97,7 @@ app.get("/restory/iframe/:path{.*}", async (c) => {
   );
 });
 
-app.get("/restory/:path{.*}?", async (c) => {
+reface.router.get("/restory/:path{.*}?", async (c) => {
   return c.html(
     reface.render(
       ReStory({
@@ -114,4 +110,4 @@ app.get("/restory/:path{.*}?", async (c) => {
   );
 });
 
-Deno.serve(app.fetch);
+Deno.serve(reface.fetch);

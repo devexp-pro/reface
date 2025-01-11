@@ -1,4 +1,4 @@
-import type { Context, Hono } from "@hono/hono";
+import { type Context, Hono } from "@hono/hono";
 import type { ContentfulStatusCode } from "@hono/hono/utils/http-status";
 import {
   componentExpression,
@@ -7,39 +7,37 @@ import {
   RecastStyledPlugin,
   SlotsPlugin,
 } from "@recast";
-import { partial, type PartialHandler } from "./partials/mod.ts";
-import { PartialsPlugin } from "./partials/PartialsPlugin.ts";
-import { IslandPlugin } from "./island/mod.ts";
-import { createErrorView } from "./errorScreen/mod.ts";
-import type { Island, IslandPayload, RpcResponse } from "./island/types.ts";
+import { partial, type PartialHandler } from "../partials/mod.ts";
+import { PartialsPlugin } from "../partials/PartialsPlugin.ts";
+import { IslandPlugin } from "../island/mod.ts";
+import { createErrorView } from "../errorScreen/mod.ts";
+import type { Island, IslandPayload, RpcResponse } from "../island/types.ts";
 import type { Child } from "@recast";
 import type { RefaceLayout, RefaceOptions } from "./types.ts";
-import { island } from "./island/island.ts";
+import { island } from "../island/island.ts";
 
 const PARTIAL_API_PREFIX = "/reface/partial";
 
 export class Reface {
+  private static instance: Reface;
   public readonly recast: Recast;
   private islandPlugin: IslandPlugin;
   private partialsPlugin: PartialsPlugin;
   private layout?: RefaceLayout;
   private islands = new Map<string, Island<any, any, any>>();
   private islandProps = new Map<string, unknown>();
+  public router: Hono;
+  public fetch: Fetch;
 
-  static partial(
-    handler: PartialHandler<any>,
-    name: string,
-  ): Element {
-    return partial(handler, name);
-  }
-
-  constructor({
+  private constructor({
     layout,
     plugins = [],
     partialApiPrefix = PARTIAL_API_PREFIX,
   }: RefaceOptions) {
     this.recast = new Recast();
+    this.router = new Hono();
     this.layout = layout;
+    this.fetch = this.router.fetch;
 
     this.islandPlugin = new IslandPlugin();
     this.partialsPlugin = new PartialsPlugin({
@@ -53,6 +51,26 @@ export class Reface {
       this.partialsPlugin,
       ...plugins,
     ]);
+
+    this.initRouter();
+  }
+
+  static setup(options: RefaceOptions = {}): Reface {
+    if (!Reface.instance) {
+      Reface.instance = new Reface(options);
+      return Reface.instance;
+    }
+    throw new Error("Reface already initialized");
+  }
+
+  static getReface(): Reface {
+    if (!Reface.instance) {
+      throw new Error("Reface not initialized. Call init() first.");
+    }
+    return Reface.instance;
+  }
+  static get reface(): Reface {
+    return Reface.getReface();
   }
 
   private async handlePartial(c: Context): Promise<Response> {
@@ -97,8 +115,8 @@ export class Reface {
     return component;
   }
 
-  hono(hono: Hono): Hono<any, any, any> {
-    hono.onError((err, c) => {
+  private initRouter(): void {
+    this.router.onError((err, c) => {
       console.error("Hono Error Handler:", err);
       const title = err instanceof TypeError
         ? "Type Error"
@@ -115,7 +133,7 @@ export class Reface {
       return c.html(errorHtml, 500);
     });
 
-    hono.use("*", async (c, next) => {
+    this.router.use("*", async (c, next) => {
       try {
         return await next();
       } catch (e) {
@@ -124,8 +142,11 @@ export class Reface {
       }
     });
 
-    hono.get(`${PARTIAL_API_PREFIX}/:partial`, (c) => this.handlePartial(c));
-    hono.post("/rpc/:island/:method", async (c) => {
+    this.router.get(
+      `${PARTIAL_API_PREFIX}/:partial`,
+      (c) => this.handlePartial(c),
+    );
+    this.router.post("/rpc/:island/:method", async (c) => {
       const { island, method } = c.req.param();
       const args = c.req.header("content-type")?.includes("application/json")
         ? await c.req.json()
@@ -136,8 +157,6 @@ export class Reface {
         status: response.status as ContentfulStatusCode,
       });
     });
-
-    return hono;
   }
 
   async handleRpc(

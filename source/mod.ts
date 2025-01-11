@@ -1,6 +1,6 @@
 // Reface
-export { island, partial, Reface } from "./framework/mod.ts";
-export { LiveReloadPlugin } from "./framework/liveReload/LiveReloadPlugin.ts";
+export { island, LiveReloadPlugin, partial } from "./framework/mod.ts";
+export { reface, setupReface } from "./reface.ts";
 
 // Recast
 export {

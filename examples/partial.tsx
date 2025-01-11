@@ -1,7 +1,8 @@
-import { Reface } from "@reface";
+import { reface } from "@reface/setup";
+import { partial } from "@reface";
 
-const JokePartial = Reface.partial(
-  async (_context) => {
+const JokePartial = partial(
+  async () => {
     const joke = await (await fetch(
       "https://icanhazdadjoke.com/",
       { headers: { "Accept": "text/plain" } },
@@ -32,3 +33,9 @@ export function DemoPartial() {
     </div>
   );
 }
+
+reface.router.get("/", (c) => {
+  return c.html(reface.render(<DemoPartial />));
+});
+
+export default reface;

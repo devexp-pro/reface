@@ -29,6 +29,7 @@
   "imports": {
     "@common/": "./source/common/",
     "@reface": "./source/mod.ts",
+    "@reface/setup": "./source/setup.ts",
     "@reface/framework": "./source/framework/mod.ts",
     "@reface-ui": "./source/reface-ui/mod.ts",
     "@reface/restory": "./source/restory/mod.tsx",
@@ -71,7 +72,7 @@
     "reface-ui:story": "deno run -A ./source/restory/cli.ts ./source/reface-ui",
     "redocs:serve": "deno run -A ./source/redocs/cli.ts ./docs",
     "example:todo": "DEV=true deno serve -A examples/TodoApp/mod.tsx",
-    "example:partial": "DEV=true deno serve -A --watch examples/partial/mod.tsx"
+    "example:partial": "DEV=true deno serve -A --watch examples/partial.tsx"
   },
   "fmt": {
     "exclude": [
