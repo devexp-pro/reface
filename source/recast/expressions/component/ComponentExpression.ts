@@ -39,7 +39,7 @@ class ComponentExpression<
   }
 
   render(
-    { node, context, userContext }: {
+    { node, context, userContext = {} }: {
       node: T;
       context: RenderContext;
       userContext?: RenderOptions;

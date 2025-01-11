@@ -1,54 +1,58 @@
 import type { Context, Hono } from "@hono/hono";
 import type { ContentfulStatusCode } from "@hono/hono/utils/http-status";
-import { Recast } from "@recast/recast";
-import { RecastStyledPlugin } from "@recast/styled";
-import { SlotsPlugin } from "@recast/slots";
-import type { Element } from "@recast/expressions";
-
+import {
+  componentExpression,
+  type Element,
+  Recast,
+  RecastStyledPlugin,
+  SlotsPlugin,
+} from "@recast";
 import { partial, type PartialHandler } from "./partials/mod.ts";
 import { PartialsPlugin } from "./partials/PartialsPlugin.ts";
-import { IslandPlugin } from "./island/IslandPlugin.ts";
+import { IslandPlugin } from "./island/mod.ts";
 import { createErrorView } from "./errorScreen/mod.ts";
 import type { Island, IslandPayload, RpcResponse } from "./island/types.ts";
-
-export interface RefaceOptions {
-  plugins?: Array<typeof StyledPlugin | typeof SlotsPlugin>;
-  layout?: Element;
-  partialApiPrefix?: string;
-}
+import type { Child } from "@recast";
+import type { RefaceLayout, RefaceOptions } from "./types.ts";
+import { island } from "./island/island.ts";
 
 const PARTIAL_API_PREFIX = "/reface/partial";
 
 export class Reface {
-  private recast: Recast;
+  public readonly recast: Recast;
   private islandPlugin: IslandPlugin;
   private partialsPlugin: PartialsPlugin;
-  private layout?: Element;
+  private layout?: RefaceLayout;
   private islands = new Map<string, Island<any, any, any>>();
   private islandProps = new Map<string, unknown>();
 
   static partial(
     handler: PartialHandler<any>,
     name: string,
-  ): Element<any, any> {
-    return partial(handler, name) as Element<any, any>;
+  ): Element {
+    return partial(handler, name);
   }
 
-  constructor(options: RefaceOptions = {}) {
+  constructor({
+    layout,
+    plugins = [],
+    partialApiPrefix = PARTIAL_API_PREFIX,
+  }: RefaceOptions) {
     this.recast = new Recast();
-    this.layout = options.layout;
+    this.layout = layout;
 
     this.islandPlugin = new IslandPlugin();
     this.partialsPlugin = new PartialsPlugin({
-      apiPrefix: options.partialApiPrefix || PARTIAL_API_PREFIX,
+      apiPrefix: partialApiPrefix,
     });
 
-    this.recast.use(this.islandPlugin);
-    this.recast.use(this.partialsPlugin);
-    this.recast.use(new RecastStyledPlugin());
-    this.recast.use(new SlotsPlugin());
-
-    options.plugins?.forEach((Plugin) => this.recast.use(new Plugin()));
+    this.recast.use([
+      new RecastStyledPlugin(),
+      new SlotsPlugin(),
+      this.islandPlugin,
+      this.partialsPlugin,
+      ...plugins,
+    ]);
   }
 
   private async handlePartial(c: Context): Promise<Response> {
@@ -61,13 +65,36 @@ export class Reface {
       }
 
       const template = await handler(c);
-      const content = this.recast.render(template as Element);
+      const content = this.recast.renderHtml(template as Element);
 
       return c.html(content);
     } catch (error) {
       console.error(`Error rendering partial ${partialName}:`, error);
       return c.text("Internal server error", 500);
     }
+  }
+
+  island<
+    State,
+    Props,
+    RPC extends Record<
+      string,
+      (args: { state: State; args: unknown }) => Promise<{
+        state?: Partial<State>;
+        html?: string;
+        status?: number;
+      }>
+    >,
+  >(
+    islandConfig: Island<State, Props, RPC>,
+  ): (props: Props) => Template<TemplateAttributes, IslandPayload> {
+    if (!islandConfig.name) {
+      throw new Error("Island must have a name");
+    }
+
+    const component = island(islandConfig, this.islandPlugin);
+    this.islands.set(islandConfig.name, islandConfig);
+    return component;
   }
 
   hono(hono: Hono): Hono<any, any, any> {
@@ -170,14 +197,24 @@ export class Reface {
     this.islandPlugin.clearIslandState(islandName);
   }
 
-  async render(template: Template): Promise<string> {
+  async render(template: Child | Child[]): Promise<string> {
     let content = template;
-    if (this.layout) {
+    if (componentExpression.is(this.layout)) {
       content = this.layout`${content}`;
     }
 
     try {
-      const result = await this.recast.render(content);
+      const result = await this.recast.render(content, {
+        reface: {
+          islandPlugin: this.islandPlugin,
+        },
+      });
+      if (
+        typeof this.layout === "function" &&
+        !componentExpression.is(this.layout)
+      ) {
+        return this.layout(result);
+      }
       return result.html;
     } catch (e) {
       console.error(`Render Error:`, e);
@@ -191,9 +228,5 @@ export class Reface {
         throw e;
       }
     }
-  }
-
-  getRecast(): Recast {
-    return this.recast;
   }
 }

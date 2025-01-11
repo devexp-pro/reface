@@ -1,9 +1,11 @@
-import { RecastPlugin } from "@recast/plugin";
-import type { Element } from "@recast/expressions";
+import { RecastPlugin, type RecastPluginInterface } from "@recast/plugin";
+import { elementExpression } from "@recast/expressions";
 import type { PartialHandler } from "./types.ts";
 import type { MetaPartial } from "./types.ts";
+import type { ElementNode } from "@recast";
 
-export class PartialsPlugin extends RecastPlugin {
+export class PartialsPlugin extends RecastPlugin
+  implements RecastPluginInterface {
   readonly name = "partials";
   private partials = new Map<string, PartialHandler<any>>();
   private apiPrefix: string;
@@ -15,21 +17,23 @@ export class PartialsPlugin extends RecastPlugin {
 
   setup(): void {
     this.partials.clear();
-  }
 
-  renderTemplateBefore(template: TemplateData): TemplateData {
-    const meta = template.node.meta?.partial as MetaPartial | undefined;
-    if (!meta?.name) {
-      return template;
-    }
+    this.before<ElementNode<any>, typeof elementExpression>(
+      elementExpression,
+      ({ template }) => {
+        const { meta, attributes } = elementExpression.getPayload(template);
+        const partialMeta = meta?.partial as MetaPartial | undefined;
+        if (!partialMeta?.name) {
+          return template;
+        }
 
-    if (!this.partials.has(meta.name)) {
-      this.partials.set(meta.name, meta.handler);
-    }
+        if (!this.partials.has(partialMeta.name)) {
+          this.partials.set(partialMeta.name, partialMeta.handler);
+        }
 
-    template.node.attributes["data-partial"] = meta.name;
-
-    return template;
+        attributes["data-partial"] = partialMeta.name;
+      },
+    );
   }
 
   getHandler<C = any>(name: string): PartialHandler<C> | undefined {

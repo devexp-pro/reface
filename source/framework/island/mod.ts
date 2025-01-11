@@ -1,5 +1,5 @@
 export { IslandPlugin } from "./IslandPlugin.ts";
-export { createIsland, createIslandComponent } from "./island.ts";
+export { island } from "./island.ts";
 export type {
   Island,
   IslandContext,

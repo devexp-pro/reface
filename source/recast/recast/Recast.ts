@@ -45,10 +45,20 @@ export class Recast {
     asyncExpression,
   ];
 
-  async use(plugin: RecastPluginInterface): Promise<void> {
+  async use(
+    plugin: RecastPluginInterface | RecastPluginInterface[],
+  ): Promise<void> {
+    if (Array.isArray(plugin)) {
+      for (const p of plugin) {
+        await this.use(p);
+      }
+      return;
+    }
+
     if (this.plugins.has(plugin.name)) {
       throw new Error(`Plugin "${plugin.name}" is already registered`);
     }
+
     this.plugins.set(plugin.name, plugin);
     await plugin.setup(this);
   }

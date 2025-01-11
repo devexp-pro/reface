@@ -1,6 +1,5 @@
-import { Reface } from "@reface";
+import { LiveReloadPlugin, Reface } from "@reface";
 import { Hono } from "@hono/hono";
-import { LiveReloadPlugin } from "@reface/plugins/liveReload";
 import { loadStories, loadStory, ReStory } from "@restory";
 import { RefaceUI } from "./RefaceUI.tsx";
 const IS_DEV = true;

@@ -38,7 +38,7 @@ export async function loadStoryFile(
 
       return {
         name: key,
-        component: component as () => Template,
+        component: component,
         source: componentSource,
       };
     });

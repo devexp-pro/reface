@@ -1,6 +1,7 @@
 import { type Child, component, styled } from "@recast";
 import { BodyEndSlot, Template as SlotTemplate } from "@recast/slots";
 import { Icon, theme } from "@reface-ui";
+import { HTMLAttributes } from "@recast/expressions";
 
 type PanelVariant = "base" | "light" | "dark";
 
@@ -109,7 +110,7 @@ type PanelProps = {
     header?: Child;
     footer?: Child;
   };
-};
+} & HTMLAttributes;
 
 const clientScript = /*js*/ `
   (() => {

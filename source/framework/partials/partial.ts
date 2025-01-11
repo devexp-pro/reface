@@ -1,19 +1,23 @@
-import { elementExpression } from "@recast/expressions";
-import { hx } from "../htmx/mod.ts";
-import type { MetaPartial, PartialHandler, PartialTemplate } from "./types.ts";
+import {
+  elementExpression,
+  type ElementNode,
+  type HTMLAttributes,
+} from "@recast/expressions";
+import { hx, type HxBuilder } from "../htmx/mod.ts";
+import type { MetaPartial, PartialMethods } from "./types.ts";
 
 export function createPartial<T = unknown>(
   name: string,
-  handler: PartialHandler<T>,
+  handler: any,
   apiPrefix: string = "/reface/partial",
-): PartialTemplate {
+): ElementNode<HTMLAttributes, PartialMethods> {
   const meta: MetaPartial = {
     name,
     handler,
     apiPrefix,
   };
 
-  return elementExpression.create({
+  return elementExpression.create<PartialMethods>({
     tag: "div",
     attributes: {
       "data-partial": name,
@@ -23,13 +27,12 @@ export function createPartial<T = unknown>(
       partial: meta,
     },
     methods: {
-      async execute(): Promise<T> {
-        return this.meta?.partial?.handler({});
-      },
-      trigger(): Record<string, string> {
-        const meta = this.meta?.partial;
-        if (!meta) return {};
-
+      trigger(this: ElementNode<HTMLAttributes, PartialMethods>): HxBuilder {
+        const payload = elementExpression.getPayload(this);
+        const meta = payload.meta?.partial as MetaPartial | undefined;
+        if (!meta) {
+          throw new Error("Partial meta not found");
+        }
         return hx()
           .get(`${meta.apiPrefix}/${meta.name}`)
           .target(`[data-partial='${meta.name}']`)
@@ -40,8 +43,8 @@ export function createPartial<T = unknown>(
 }
 
 export function partial<T = unknown>(
-  handler: PartialHandler<T>,
+  handler: any,
   name: string,
-): PartialTemplate {
+): ElementNode<HTMLAttributes, PartialMethods> {
   return createPartial(name, handler);
 }

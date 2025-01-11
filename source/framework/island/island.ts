@@ -1,58 +1,63 @@
-// import { type Template, TEMPLATE_COPY } from "@recast/template";
-import { element } from "@recast/element";
-import type { IslandTemplate, MetaIsland, RpcMethod } from "./types.ts";
+import { componentExpression } from "@recast/expressions";
+import type { ComponentNode } from "@recast";
+import type { IslandPlugin } from "./IslandPlugin.ts";
+import type { Island, IslandPayload, RpcMethod, RpcResponse } from "./types.ts";
 
-export function createIsland<State = unknown>(
-  name: string,
-  state?: State,
-  rpc?: Record<string, RpcMethod<State>>,
-): IslandTemplate {
-  const meta: MetaIsland = {
+export function island<
+  State = void,
+  Props = void,
+  RPC extends Record<string, RpcMethod<State>> = Record<string, never>,
+>(
+  config: Island<State, Props, RPC>,
+  plugin: IslandPlugin,
+): ComponentNode<Props> {
+  const name = config.name || `island-${crypto.randomUUID()}`;
+
+  // Initialize state if provided
+  if (config.initialState) {
+    plugin.setIslandState(name, config.initialState);
+  }
+
+  return componentExpression.create({
     name,
-    state,
-    rpc,
-  };
+    render: (props: Props) => {
+      // Get current state or use initial
+      const state = plugin.getIslandState<State>(name) || config.initialState;
 
-  return element.div[TEMPLATE_COPY](
-    (template) => ({
-      ...template,
-      node: {
-        ...template.node,
-        meta: {
-          ...template.node.meta,
-          island: meta,
-        },
-      },
-      getState<T>(): T {
-        return this.node.meta?.island?.state as T;
-      },
-      setState<T>(state: T): void {
-        if (this.node.meta?.island) {
-          this.node.meta.island.state = state;
-        }
-      },
-      getRpc<T>(): T {
-        return this.node.meta?.island?.rpc as T;
-      },
-    }),
-  ) as IslandTemplate;
-}
+      // Create RPC proxy for methods
+      const rpc = plugin.createRpcProxy<RPC>(name);
 
-export function createIslandComponent<State = unknown>(
-  name: string,
-  content: Template,
-  state?: State,
-  rpc?: Record<string, RpcMethod<State>>,
-): IslandTemplate {
-  const island = createIsland(name, state, rpc);
+      // Create template context
+      const context = {
+        props,
+        state: state as State,
+        rpc,
+      };
 
-  return island[TEMPLATE_COPY](
-    (template) => ({
-      ...template,
-      node: {
-        ...template.node,
-        children: [content],
-      },
-    }),
-  ) as IslandTemplate;
+      // Render template with context
+      const content = config.template(context);
+
+      return componentExpression.create({
+        name: `${name}-container`,
+        render: () => ({
+          tag: "div",
+          attributes: {
+            "data-island": name,
+            id: `island-${name}`,
+          },
+          children: [content],
+          meta: {
+            island: {
+              name,
+              state,
+              rpc: config.rpc as Record<
+                string,
+                (args: unknown) => Promise<RpcResponse<unknown>>
+              >,
+            },
+          },
+        }),
+      });
+    },
+  });
 }

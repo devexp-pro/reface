@@ -1,40 +1,38 @@
 import { component, html } from "@reface";
-import type { ElementChildType } from "@recast";
-import { body, head, meta, script, title } from "@reface/elements";
-import type { Template } from "@recast";
+import type { Child } from "@recast";
+import { body, head, meta, script, title } from "@recast/element";
 
 export type LayoutTWAProps = {
   title?: string;
   script?: string;
   themeParams?: boolean;
-  head?: ElementChildType;
+  head?: Child;
 };
 
-export const LayoutTWA: Template<LayoutTWAProps, Record<string, any>> =
-  component<LayoutTWAProps>((props, children) => {
-    const {
-      title: pageTitle,
-      script: pageScript,
-      themeParams,
-      head: pageHead,
-    } = props;
+export const LayoutTWA = component<LayoutTWAProps>((props, children) => {
+  const {
+    title: pageTitle,
+    script: pageScript,
+    themeParams,
+    head: pageHead,
+  } = props;
 
-    return html`
+  return html`
     <!DOCTYPE html>
     <html>
       ${head`
         ${meta({ charset: "UTF-8" })}
         ${
-      meta({
-        name: "viewport",
-        content:
-          "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no",
-      })
-    }
+    meta({
+      name: "viewport",
+      content:
+        "width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no",
+    })
+  }
         ${pageTitle && title`${pageTitle}`}
         ${script({ src: "https://telegram.org/js/telegram-web-app.js" })``}
         ${
-      themeParams && script`
+    themeParams && script`
           const params = new URLSearchParams(window.location.search);
           if (params.has("tgWebAppThemeParams")) {
             document.documentElement.style.setProperty(
@@ -43,11 +41,11 @@ export const LayoutTWA: Template<LayoutTWAProps, Record<string, any>> =
             );
           }
         `
-    }
+  }
         ${pageScript && script`${pageScript}`}
         ${pageHead}
       `}
       ${body`${children}`}
     </html>
   `;
-  });
+});

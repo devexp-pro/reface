@@ -69,7 +69,9 @@
     "website:dev": "DEV=true deno run -A --watch website/main.tsx",
     "check": "deno check ./source",
     "reface-ui:story": "deno run -A ./source/restory/cli.ts ./source/reface-ui",
-    "redocs:serve": "deno run -A ./source/redocs/cli.ts ./docs"
+    "redocs:serve": "deno run -A ./source/redocs/cli.ts ./docs",
+    "example:todo": "DEV=true deno serve -A examples/TodoApp/mod.tsx",
+    "example:partial": "DEV=true deno serve -A --watch examples/partial/mod.tsx"
   },
   "fmt": {
     "exclude": [

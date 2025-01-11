@@ -10,8 +10,7 @@ export function createSlot(
   name: string,
   render?: (content: string[]) => string,
 ): ElementNode<SlotAttributes & HTMLAttributes, SlotMethods> {
-  // @ts-expect-error FIXME
-  return elementExpression.create({
+  return elementExpression.create<SlotMethods>({
     tag: SLOT_TEMPLATE_NAME,
     meta: {
       slot: {

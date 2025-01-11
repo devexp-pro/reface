@@ -52,11 +52,12 @@ class ElementExpression<
     return `<${tag}${attrs}>${renderedChildren}</${tag}>`;
   }
 
-  create(
+  // @ts-ignore FIXME
+  create<Methods extends Record<string, any> = EmptyRecord>(
     value:
       & { tag: keyof HTMLElementTagAttributes; attributes?: HTMLAttributes }
       & Partial<Omit<ElementPayload, "tag" | "attributes">>,
-  ): ElementNode<HTMLElementTagAttributes[typeof value.tag]> {
+  ): ElementNode<HTMLElementTagAttributes[typeof value.tag], Methods> {
     const node: ElementPayload = {
       type: this.type,
       tag: value.tag as string,

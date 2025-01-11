@@ -124,4 +124,8 @@ export class ExpressionProxy<
 
     return new Proxy(nodeProxy, handler as any) as ProxyNode<T, Props, Methods>;
   }
+
+  getPayload(node: ProxyNode<T, any, any>) {
+    return (node as any)[PROXY_PAYLOAD] as T;
+  }
 }

@@ -1,7 +1,7 @@
 import { assertEquals } from "@std/assert";
-import { TestUtils } from "./testUtils.ts";
-import { partial } from "@reface/plugins/partials";
-import { PartialsPlugin } from "@reface/plugins/partials";
+import { TestUtils } from "@recast/test-utils";
+import { partial } from "@reface/framework";
+import { PartialsPlugin } from "@reface/framework";
 
 Deno.test("Parital - markup rendering", () => {
   const utils = new TestUtils({ plugins: [new PartialsPlugin()] });

@@ -1,20 +1,20 @@
-import type { Template } from "@recast";
+import type { Child, Element } from "@recast";
 
 export type StoryMeta = {
   path?: `${string}/${string}`;
   title?: string;
   description?: string;
-  component?: Template | Record<string, Template>;
+  component?: Element | Record<string, Element>;
 };
 
 export type StoryModule = {
   meta?: StoryMeta;
-  [key: string]: Template | (() => Template);
+  [key: string]: Child | Child[] | Story["component"];
 };
 
 export type Story = {
   name: string;
-  component: () => Template;
+  component: () => Child | Child[];
   source: string;
 };
 

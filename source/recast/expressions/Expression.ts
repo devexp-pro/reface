@@ -1,6 +1,7 @@
 import type { Child, Children } from "@recast";
 import type { ExpressionType } from "./types.ts";
 import type { RenderOptions } from "@recast/recast";
+import { EmptyRecord } from "@common/utility.types.ts";
 
 export interface RenderContext {
   render: (value: Children | Child) => string;
@@ -18,6 +19,8 @@ export interface ExpressionInterface<Node = unknown> {
     userContext?: RenderOptions;
     context: RenderContext;
   }): string;
-  create?(value: unknown): Node;
+  create?<Methods extends Record<string, any> = EmptyRecord>(
+    value: unknown,
+  ): Node;
   copy?(template: Node): Node;
 }

@@ -106,8 +106,7 @@ const TreeLink = styled.a`
 `;
 
 export const TreeItem = component(
-  ({ id, label, icon, selected, expanded, href }: {
-    id: string;
+  ({ label, icon, selected, expanded, href }: {
     label: string;
     icon?: Child;
     selected?: boolean;

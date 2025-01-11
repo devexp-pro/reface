@@ -1,4 +1,4 @@
-import { component, styled } from "@recast";
+import { Child, component, styled } from "@recast";
 import {
   Button,
   Code,
@@ -142,14 +142,14 @@ type ReStoryProps = {
   stories?: StoryFile[];
   currentPath?: string;
   currentStory?: string;
-  logo?: Template;
+  logo?: Child;
   publicPath?: string;
 };
 
 type TreeNode = {
   id: string;
   label: string;
-  type: "folder" | "file" | "story";
+  type: "folder" | "file" | "story" | "components" | "component";
   expanded: boolean;
   children?: TreeNode[];
   story?: Story;
@@ -172,7 +172,9 @@ export const ReStory = component(
 
     const componentMeta = currentFile?.meta;
 
-    const buildTree = (storyFiles: StoryFile[]): TreeNode[] => {
+    const buildTree = (storyFiles?: StoryFile[]): TreeNode[] => {
+      if (!storyFiles) return [];
+
       const root: Record<string, TreeNode> = {};
 
       storyFiles.forEach((group) => {
@@ -291,7 +293,7 @@ export const ReStory = component(
           {/* Основной контент */}
           <GridCol span={10}>
             <Content>
-              {currentStory
+              {currentStory && currentFile
                 ? (
                   <Stack direction="vertical" gap={theme.spacing.lg}>
                     <Panel
@@ -345,8 +347,6 @@ export const ReStory = component(
                       }}
                     >
                       <Code
-                        language="tsx"
-                        showLineNumbers
                         code={currentStory.source}
                       />
                     </Panel>
