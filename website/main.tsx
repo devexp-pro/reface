@@ -29,7 +29,6 @@ const Layout = component((_, children) => (
     description="Type-safe template engine for HTML with JSX support"
     favicon="/assets/logo.png"
     normalizeCss
-    htmx
     head={
       <>
         <link rel="stylesheet" href="/styles/index.css" />

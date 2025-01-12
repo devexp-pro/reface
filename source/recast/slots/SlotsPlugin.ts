@@ -1,33 +1,30 @@
 import { RecastPlugin, type RecastPluginInterface } from "@recast/plugin";
-import {
-  elementExpression,
-  type ElementNode,
-  PROXY_PAYLOAD,
-} from "@recast/expressions";
-import { SLOT_TEMPLATE_NAME } from "./constants.ts";
+import { componentExpression, type ComponentNode } from "@recast/expressions";
 
 export class SlotsPlugin extends RecastPlugin implements RecastPluginInterface {
   name = "slots";
   private slots = new Map<string, Map<string, string>>();
+  private slotsFn = new Map<string, (content: string[]) => string>();
 
   renderBefore() {
     this.slots.clear();
   }
 
   setup() {
-    this.after<ElementNode<any, any>, typeof elementExpression>(
-      elementExpression,
+    this.after<ComponentNode<any, any>, typeof componentExpression>(
+      componentExpression,
       ({ template, html }) => {
-        const { tag, meta, attributes } = template[PROXY_PAYLOAD];
+        const { meta, attributes } = componentExpression.getPayload(template);
 
-        if (tag === SLOT_TEMPLATE_NAME) {
-          const name = meta?.slot?.name;
-          if (!name) return html;
-
+        if (meta?.slot?.name) {
+          const name = meta.slot.name;
+          if (meta.slot?.render) {
+            this.slotsFn.set(name, meta.slot.render);
+          }
           return `<!--recast-slot-${name}-->`;
         }
 
-        if (tag === "template" && attributes?.slot) {
+        if (meta?.template === true) {
           const slot = attributes.slot;
           const key = attributes.key ?? "default";
 
@@ -35,10 +32,7 @@ export class SlotsPlugin extends RecastPlugin implements RecastPluginInterface {
             this.slots.set(slot, new Map());
           }
 
-          this.slots.get(slot)?.set(
-            key,
-            html.replace(/<template[^>]*>(.*)<\/template>/g, "$1"),
-          );
+          this.slots.get(slot)?.set(key, html);
           return "";
         }
 
@@ -50,8 +44,14 @@ export class SlotsPlugin extends RecastPlugin implements RecastPluginInterface {
   renderAfter(_: undefined, html: string) {
     return html.replace(
       /<!--recast-slot-([\w.]+)-->/g,
-      (_: string, name: string) =>
-        this.slots.get(name)?.values().toArray()?.join("\n") ?? "",
+      (_: string, name: string) => {
+        const fn = this.slotsFn.get(name);
+        const values = this.slots.get(name)?.values().toArray() ?? [];
+        if (fn) {
+          return fn(values);
+        }
+        return values.join("\n");
+      },
     );
   }
 }

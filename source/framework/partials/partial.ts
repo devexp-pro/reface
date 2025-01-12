@@ -1,5 +1,11 @@
 import { Reface } from "../Reface/Reface.ts";
-import { component, type ComponentNode, element } from "@recast";
+import {
+  component,
+  type ComponentNode,
+  element,
+  HeadSlot,
+  Template,
+} from "@recast";
 import { hx, type HxBuilder } from "../htmx/mod.ts";
 import type { MetaPartial, PartialMethods } from "./types.ts";
 import type { PartialsPlugin } from "./PartialsPlugin.ts";
@@ -26,7 +32,12 @@ export function createPartial<T = unknown>(
       element.div({
         ...props,
         "data-partial": meta.name,
-      })`${children}`
+      })`
+      ${children}
+      ${Template({ slot: HeadSlot.getSlot(), key: "htmx" })`
+        ${element.script({ src: "https://unpkg.com/htmx.org@1.9.6" })}
+      `}
+      `
     ),
     {
       meta: {

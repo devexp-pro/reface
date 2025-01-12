@@ -12,4 +12,5 @@ export {
   html,
   styled,
   Template,
+  TitleSlot,
 } from "./recast/mod.ts";

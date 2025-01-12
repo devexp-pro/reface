@@ -1,35 +1,36 @@
-import type { Children, ElementNode } from "@recast/expressions";
-export type SlotStrategy = "append" | "replace" | "merge";
+import type {
+  Children,
+  ComponentNode,
+  HTMLAttributes,
+} from "@recast/expressions";
 
 export type SlotAttributes = {
   name?: symbol | string;
 };
 
-export type SlotPayload = {
+export type SlotMeta = {
   slot: {
     name: symbol | string;
-    content: Children;
-    strategy?: SlotStrategy;
+    render?: (content: string[]) => string;
   };
 };
 
 export type SlotMethods = {
   getSlot: () => symbol | string;
 };
+export type SlotComponent = ComponentNode<
+  SlotAttributes & HTMLAttributes,
+  SlotMethods
+>;
 
 export type TemplateAttributes = {
   slot?: symbol | string;
   key?: string;
 };
 
-export type TemplatePayload = {
-  template: {
-    slot: symbol | string;
-    children: Children;
-    scope?: "global" | "component";
-    priority?: number;
-  };
+export type TemplateMeta = {
+  template: true;
 };
-
-export type SlotComponent = ElementNode<any, SlotPayload>;
-export type TemplateComponent = ElementNode<any, TemplatePayload>;
+export type TemplateComponent = ComponentNode<
+  TemplateAttributes
+>;

@@ -1,5 +1,5 @@
 import { reface } from "@reface/setup";
-import { partial } from "@reface";
+import { partial, Template, TitleSlot } from "@reface";
 
 const JokePartial = partial(
   async () => {
@@ -34,6 +34,14 @@ export function DemoPartial() {
   );
 }
 
-reface.router.get("/", (c) => c.render(<DemoPartial />));
+reface.router.get("/", (c) =>
+  c.render(
+    <>
+      <Template slot={TitleSlot.getSlot()}>
+        Reface Example: Partial and HTMX
+      </Template>
+      <DemoPartial />
+    </>,
+  ));
 
 export default reface;

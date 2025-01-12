@@ -37,6 +37,7 @@ export {
   HeadSlot,
   SlotsPlugin,
   Template,
+  TitleSlot,
 } from "./slots/mod.ts";
 
 // Plugins

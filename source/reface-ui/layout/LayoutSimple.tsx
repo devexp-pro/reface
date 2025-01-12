@@ -1,5 +1,5 @@
 import { type Child, component, type ComponentNode } from "@recast";
-import { BodyEndSlot, HeadSlot } from "@recast/slots";
+import { BodyEndSlot, HeadSlot, TitleSlot } from "@recast/slots";
 
 export type LayoutSimpleProps = {
   htmx?: boolean;
@@ -20,7 +20,7 @@ export const LayoutSimple: ComponentNode<
     title: pageTitle,
     description,
     favicon,
-    htmx = true,
+    htmx,
     normalizeCss = true,
     alpine,
     bootstrap,
@@ -35,7 +35,7 @@ export const LayoutSimple: ComponentNode<
           name="viewport"
           content="width=device-width, initial-scale=1.0"
         />
-        <title>{pageTitle}</title>
+        <TitleSlot defaultTitle={pageTitle} />
 
         {description && <meta name="description" content={description} />}
 

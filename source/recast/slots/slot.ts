@@ -1,27 +1,33 @@
-import {
-  elementExpression,
-  type ElementNode,
-  type HTMLAttributes,
-} from "@recast/expressions";
-import type { SlotAttributes, SlotMethods } from "./types.ts";
-import { SLOT_TEMPLATE_NAME } from "./constants.ts";
+import type { HTMLAttributes } from "@recast/expressions";
+import { component } from "@recast/component";
+
+import type {
+  SlotAttributes,
+  SlotComponent,
+  SlotMeta,
+  SlotMethods,
+} from "./types.ts";
 
 export function createSlot(
   name: string,
   render?: (content: string[]) => string,
-): ElementNode<SlotAttributes & HTMLAttributes, SlotMethods> {
-  return elementExpression.create<SlotMethods>({
-    tag: SLOT_TEMPLATE_NAME,
-    meta: {
-      slot: {
-        name,
-        render,
+): SlotComponent {
+  return component<SlotAttributes & HTMLAttributes, SlotMethods>(
+    () => {
+      return "";
+    },
+    {
+      meta: {
+        slot: {
+          name,
+          render,
+        },
+      } as SlotMeta,
+      methods: {
+        getSlot() {
+          return name;
+        },
       },
     },
-    methods: {
-      getSlot() {
-        return name;
-      },
-    },
-  });
+  );
 }
