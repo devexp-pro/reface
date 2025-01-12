@@ -5,11 +5,33 @@ Complete project restructuring with separation into independent modules.
 ## Major Changes
 
 - Project divided into independent modules in monorepo style
-- Improved modularity and component reusability
+- `@reface` sepoarated into `@recast` and `@framework`
+- added modules `@reface-ui`, `@restory`, `@redocs` and common code between them in `@common`
+- `@reface` is now a facade for `@recast` and `@framework`
 
 ## Modules
 
-### @recast
+### @framework – all about routing and web server
+
+- saved after sporated in `@framework`
+  - `htmx`, `partials`, `islands`
+- Migrated to singleton pattern
+- `setupReface({...options})` is now a function that returns a singleton instance of `Reface`
+- added autosetup when imported `reface` from `@reface/setup`
+- added import of `reface` from `@reface`, proxy for access to current instance of `Reface`
+- hono is now a dependency, and access to `reface` is now available via `reface.router`
+- added reface render support to hono `c.render(Element | FragmentNode)`
+- partial
+  - rewrtite to use `ComponentNode` instead of `ElementNode`
+  - auto-register partial handler for hono when called `createPartial(name, partial)`
+- errors
+  - added `errorScreen` component and handling hono errors for displaying pretty error messages and stack trace in browser
+- liveReload
+  - added `liveReload` plugin for hono and browser, for live reloading of changes in browser
+
+`@framework` is shallow module, use not needed for import in direct, we always use it via `reface` facade
+
+### `@recast` – all about templating, components, proccessing and rendering html
 
 Core templating engine:
 
@@ -44,15 +66,6 @@ Core templating engine:
 - Slots and Fragments
 - Component Styling
 - Testing Utilities
-
-### @reface/framework
-
-Web application framework:
-
-- Server-side rendering
-- Routing
-- State management
-- API integration
 
 ### @reface-ui
 
