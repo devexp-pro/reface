@@ -12,7 +12,7 @@ import { PartialsPlugin } from "../partials/PartialsPlugin.ts";
 import { IslandPlugin } from "../island/mod.ts";
 import { createErrorView } from "../errorScreen/mod.ts";
 import type { Island, IslandPayload, RpcResponse } from "../island/types.ts";
-import type { Child } from "@recast";
+import type { Child, FragmentNode, FunctionNode } from "@recast";
 import type { RefaceLayout, RefaceOptions } from "./types.ts";
 import { island } from "../island/island.ts";
 import { LayoutSimple } from "@reface-ui";
@@ -29,7 +29,7 @@ export class Reface {
   private layout?: RefaceLayout;
   private islands = new Map<string, Island<any, any, any>>();
   private islandProps = new Map<string, unknown>();
-  public router: Hono;
+  private router: Hono;
   public fetch: Fetch;
 
   private constructor({
@@ -56,6 +56,22 @@ export class Reface {
     ]);
 
     this.initRouter();
+  }
+
+  public use(
+    path: string,
+    handler: any,
+  ): Reface {
+    this.router.use(path, handler);
+    return this;
+  }
+
+  public page(
+    path: string,
+    handler: Element | FragmentNode | FunctionNode,
+  ): Reface {
+    this.router.get(path, (c) => c.render(handler));
+    return this;
   }
 
   static setup(options: RefaceOptions = {}): Reface {

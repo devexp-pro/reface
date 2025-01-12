@@ -34,14 +34,12 @@ export function DemoPartial() {
   );
 }
 
-reface.router.get("/", (c) =>
-  c.render(
-    <>
-      <Template slot={TitleSlot.getSlot()}>
-        Reface Example: Partial and HTMX
-      </Template>
-      <DemoPartial />
-    </>,
-  ));
-
-export default reface;
+export default reface.page(
+  "/",
+  <>
+    <Template slot={TitleSlot.getSlot()}>
+      Reface Example: Partial and HTMX
+    </Template>
+    <DemoPartial />
+  </>,
+);

@@ -49,52 +49,44 @@ if (IS_DEV) {
   reface.recast.use(new LiveReloadPlugin({ watchPaths: ["./"] }));
 }
 
-reface.router.use(
-  "/assets/*",
-  serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
-);
-reface.router.use(
-  "/styles/*",
-  serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
-);
-
-reface.router.get("/", (c) => c.render(<HomePage />));
-
-reface.router.get("/docs/:path{.*}?", (c) =>
-  c.render(
+reface
+  .page("/", <HomePage />)
+  .page("/docs/:path{.*}?", ({ router }) =>
     ReDocs({
       sections: docs.sections,
       pages: docs.pages,
       scripts,
-      currentPath: c.req.param("path") || "readme",
+      currentPath: router.req.param("path") || "readme",
       publicPath: "/docs/",
-    }),
-  ));
+    }))
+  .use(
+    "/assets/*",
+    serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
+  )
+  .use(
+    "/styles/*",
+    serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
+  )
+  .page("/restory/iframe/:path{.*}", ({ router }) => {
+    const storyFile = stories.find((storyFile) =>
+      storyFile.filePath === router.req.param("path")
+    );
+    const story = storyFile?.stories.find((story) =>
+      story.name === router.req.query("story")
+    );
 
-reface.router.get("/restory/iframe/:path{.*}", (c) => {
-  const storyFile = stories.find((storyFile) =>
-    storyFile.filePath === c.req.param("path")
-  );
-  const story = storyFile?.stories.find((story) =>
-    story.name === c.req.query("story")
-  );
+    if (!story) {
+      return router.text("Story not found", 404);
+    }
 
-  if (!story) {
-    return c.text("Story not found", 404);
-  }
-
-  return c.render(RefaceUI`${story.component()}`);
-});
-
-reface.router.get("/restory/:path{.*}?", (c) => {
-  return c.render(
+    return RefaceUI`${story.component()}`;
+  })
+  .page("/restory/:path{.*}?", ({ router }) =>
     ReStory({
       stories,
-      currentPath: c.req.param("path"),
-      currentStory: c.req.query("story"),
+      currentPath: router.req.param("path"),
+      currentStory: router.req.query("story"),
       publicPath: "/restory/",
-    }),
-  );
-});
+    }));
 
 Deno.serve(reface.fetch);
