@@ -4,7 +4,7 @@ import type { RecastPlugin } from "./RecastPlugin.ts";
 export interface RecastPluginInterface extends RecastPlugin {
   readonly name: string;
 
-  setup(recast: Recast): Promise<void> | void;
+  setup(recast: Recast): void;
   renderBefore?<T extends Child | Children = Child | Children>(
     template: T,
   ): T | void;

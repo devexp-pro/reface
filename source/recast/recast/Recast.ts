@@ -43,12 +43,12 @@ export class Recast {
     asyncExpression,
   ];
 
-  async use(
+  use(
     plugin: RecastPluginInterface | RecastPluginInterface[],
-  ): Promise<void> {
+  ): void {
     if (Array.isArray(plugin)) {
       for (const p of plugin) {
-        await this.use(p);
+        this.use(p);
       }
       return;
     }
@@ -58,7 +58,7 @@ export class Recast {
     }
 
     this.plugins.set(plugin.name, plugin);
-    await plugin.setup(this);
+    plugin.setup(this);
   }
 
   getPlugin<T extends RecastPluginInterface>(
