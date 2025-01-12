@@ -1,14 +1,18 @@
 import * as path from "jsr:@std/path";
-import { LiveReloadPlugin, reface, setupReface } from "@reface";
-import { serveStatic } from "@hono/hono/deno";
-
-import { component, html } from "@recast";
+import {
+  component,
+  html,
+  LiveReloadPlugin,
+  reface,
+  setupReface,
+} from "@reface";
 import { loadStories, ReStory } from "@restory";
 import { loadDocs, loadScriptFiles, ReDocs } from "@redocs";
 import { LayoutSimple, RefaceUI } from "@reface-ui";
 import { globalStyles } from "@reface-ui/theme";
 
-import { resolveFromFile } from "./utils/resolveFromFile.ts";
+import { serveStatic } from "@hono/hono/deno";
+
 import HomePage from "./home/Home.tsx";
 
 import "../source/reface-ui/stories.ts";
@@ -61,11 +65,11 @@ reface
     }))
   .use(
     "/assets/*",
-    serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
+    serveStatic({ root: path.resolve(Deno.cwd(), "./website/public") }),
   )
   .use(
     "/styles/*",
-    serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
+    serveStatic({ root: path.resolve(Deno.cwd(), "./website/public") }),
   )
   .page("/restory/iframe/:path{.*}", ({ router }) => {
     const storyFile = stories.find((storyFile) =>
