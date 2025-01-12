@@ -8,52 +8,71 @@
     }
   },
   "exports": {
-    ".": "./@reface/mod.ts",
-    "./htmx": "./@reface/htmx/mod.ts",
-    "./elements": "./@reface/elements.ts",
-    "./jsx": "./@reface/jsx/mod.ts",
-    "./jsx/jsx-runtime": "./@reface/jsx/jsx-runtime.ts",
-    "./template": "./@reface/template/mod.ts",
-    "./plugins/styled": "./@reface/plugins/styled/mod.ts",
-    "./plugins/partials": "./@reface/plugins/partials/mod.ts",
-    "./plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
-    "./plugins/liveReload": "./@reface/plugins/liveReload/mod.ts",
-    "./components/LayoutSimple": "./@reface/components/LayoutSimple.ts",
-    "./components/LayoutTWA": "./@reface/components/LayoutTWA.ts"
+    ".": "./source/mod.ts",
+    "./htmx": "./source/framework/htmx/mod.ts",
+    "./recast": "./source/recast/mod.ts",
+    "./recast/html": "./source/recast/html/mod.ts",
+    "./recast/plugin": "./source/recast/plugin/mod.ts",
+    "./recast/styled": "./source/recast/styled/mod.ts",
+    "./recast/template": "./source/recast/template/mod.ts",
+    "./recast/component": "./source/recast/component/mod.ts",
+    "./recast/jsx": "./source/recast/jsx/mod.ts",
+    "./recast/jsx-runtime": "./source/recast/jsx/jsx-runtime.ts",
+    "./recast/query": "./source/recast/query/mod.ts",
+    "./recast/test-utils": "./source/recast/test-utils/mod.ts",
+    "./recast/recast": "./source/recast/recast/mod.ts",
+    "./recast/element": "./source/recast/element/mod.ts",
+    "./elements": "./source/recast/element/mod.ts",
+    "./recast/nodes": "./source/recast/nodes/mod.ts",
+    "./recast/slots": "./source/recast/slots/mod.ts"
   },
   "imports": {
-    "@reface": "./@reface/mod.ts",
-    "@reface/jsx": "./@reface/jsx/mod.ts",
-    "@reface/jsx/jsx-runtime": "./@reface/jsx/jsx-runtime.ts",
-    "@reface/types": "./@reface/types/mod.ts",
-    "@reface/constants": "./@reface/constants.ts",
-    "@reface/island": "./@reface/island/mod.ts",
-    "@reface/htmx": "./@reface/htmx/mod.ts",
-    "@reface/elements": "./@reface/elements.ts",
-    "@reface/template": "./@reface/template/mod.ts",
-    "@reface/plugins/styled": "./@reface/plugins/styled/mod.ts",
-    "@reface/plugins/partials": "./@reface/plugins/partials/mod.ts",
-    "@reface/plugins/LoggerPlugin": "./@reface/plugins/LoggerPlugin.ts",
-    "@reface/plugins/liveReload": "./@reface/plugins/liveReload/mod.ts",
-    "@reface/components/LayoutSimple": "./@reface/components/LayoutSimple.ts",
+    "@common/": "./source/common/",
+    "@reface": "./source/mod.ts",
+    "@reface/setup": "./source/setup.ts",
+    "@reface/framework": "./source/framework/mod.ts",
+    "@reface-ui": "./source/reface-ui/mod.ts",
+    "@reface/restory": "./source/restory/mod.tsx",
+    "@reface/restory/cli": "./source/restory/cli.ts",
+    "@recast": "./source/recast/mod.ts",
+    "@recast/expressions": "./source/recast/expressions/mod.ts",
+    "@recast/html": "./source/recast/html/mod.ts",
+    "@recast/plugin": "./source/recast/plugin/mod.ts",
+    "@recast/styled": "./source/recast/styled/mod.ts",
+    "@recast/htmx": "./source/recast/htmx/mod.ts",
+    "@recast/template": "./source/recast/template/mod.ts",
+    "@recast/component": "./source/recast/component/mod.ts",
+    "@recast/jsx": "./source/recast/jsx/mod.ts",
+    "@recast/query": "./source/recast/query/mod.ts",
+    "@recast/test-utils": "./source/recast/test-utils/mod.ts",
+    "@recast/recast": "./source/recast/recast/mod.ts",
+    "@recast/element": "./source/recast/element/mod.ts",
+    "@recast/nodes": "./source/recast/nodes/mod.ts",
+    "@recast/slots": "./source/recast/slots/mod.ts",
+    "@recast/jsx-runtime": "./source/recast/jsx/jsx-runtime.ts",
+    "@restory": "./source/restory/mod.tsx",
+    "@redocs": "./source/redocs/mod.ts",
     "@std/assert": "jsr:@std/assert@^1.0.1",
     "@std/crypto": "jsr:@std/crypto@^1.0.2",
-    "@hono/hono": "jsr:@hono/hono@^4.6.15"
+    "@hono/hono": "jsr:@hono/hono@^4.6.15",
+    "marked": "https://esm.sh/marked@9.1.5",
+    "unified": "npm:unified",
+    "remark-parse": "npm:remark-parse",
+    "remark-gfm": "npm:remark-gfm",
+    "mdast": "npm:@types/mdast"
   },
   "tasks": {
-    "ex1": "deno run --allow-all --unstable-ffi --watch=./examples/ex1.ts ./examples/ex1.ts",
-    "ex2": "deno run --allow-all --watch=./examples/ex2.ts ./examples/ex2.ts",
-    "ex3": "deno run --allow-all --unstable-kv --watch=./examples/ex3.ts ./examples/ex3.ts",
-    "ex4": "deno run --allow-all --watch=./examples/ex4.tsx ./examples/ex4.tsx",
-    "ex5": "deno run --allow-all --watch=./examples/ex5.ts ./examples/ex5.ts",
-    "ex6": "deno run --allow-all --watch=./examples/ex6.ts ./examples/ex6.ts",
-    "pub-dry": "deno publish --dry-run --allow-slow-types",
-    "test": "deno test -A --no-check @reface/",
+    "pub-dry": "deno publish --dry-run --allow-dirty --allow-slow-types",
+    "recast:test": "deno test -A --no-check ./source/recast/",
     "test:watch": "deno test -A --watch --no-check @reface/",
     "test:coverage": "deno test -A --coverage=coverage && deno coverage coverage",
     "test:ci": "deno test -A --coverage=coverage --junit-path=junit.xml",
     "website:dev": "DEV=true deno run -A --watch website/main.tsx",
-    "check": "deno check ./@reface/"
+    "check": "deno check ./source",
+    "reface-ui:story": "deno run -A ./source/restory/cli.ts ./source/reface-ui",
+    "redocs:serve": "deno run -A ./source/redocs/cli.ts ./docs",
+    "example:todo": "DEV=true deno serve -A examples/TodoApp/mod.tsx",
+    "example:partial": "DEV=true deno serve -A --watch examples/partial.tsx"
   },
   "fmt": {
     "exclude": [
@@ -70,16 +89,17 @@
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@reface/jsx"
+    "jsxImportSource": "@recast"
   },
   "publish": {
     "include": [
-      "./@reface/**",
+      "./source/**",
       "./README.md",
       "./LICENSE"
     ],
     "exclude": [
-      "./**/__tests__"
+      "./**/__tests__",
+      "./**/*.{test,story}.{ts,tsx}"
     ]
   }
 }

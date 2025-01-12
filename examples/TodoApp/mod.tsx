@@ -1,8 +1,8 @@
-import { component, createElement, Fragment } from "@reface";
 import { Hono } from "@hono/hono";
-import { Reface } from "../../@reface/Reface.ts";
+import { component, Reface } from "@reface";
+import { LayoutSimple } from "@reface-ui";
+
 import { TodoApp } from "./TodoApp.tsx";
-import { LayoutSimple } from "../../@reface/components/LayoutSimple.ts";
 
 const Layout = component((_, children) => (
   <LayoutSimple
@@ -21,25 +21,17 @@ const Layout = component((_, children) => (
   </LayoutSimple>
 ));
 
-const app = new Hono();
 const reface = new Reface({
   layout: Layout,
 });
 
-app.route("/", reface.hono());
+const app = new Hono();
+reface.hono(app);
 
 const Todo = reface.island(TodoApp);
 
-function App() {
-  return (
-    <div>
-      <Todo title="My Todos" />
-    </div>
-  );
-}
-
 app.get("/", (c) => {
-  return c.html(reface.render(<App />));
+  return c.html(reface.render(<Todo title="My Todos" />));
 });
 
 export default app;

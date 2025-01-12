@@ -1,5 +1,5 @@
 import type { Template } from "@reface";
-import { styled } from "@reface/plugins/styled";
+import { styled } from "@reface";
 import type { DocSection } from "../utils/docs.tsx";
 
 interface NavigationProps {

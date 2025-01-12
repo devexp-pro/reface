@@ -1,23 +1,31 @@
-import { Hono } from "@hono/hono";
-import { serveStatic } from "@hono/hono/deno";
-import { Reface } from "@reface";
-import { LiveReloadPlugin } from "@reface/plugins/liveReload";
-import { LayoutSimple } from "@reface/components/LayoutSimple";
-import { loadDocs } from "./utils/docs.tsx";
-import { resolveFromFile } from "./utils/resolveFromFile.ts";
+import * as path from "jsr:@std/path";
+import {
+  component,
+  html,
+  LiveReloadPlugin,
+  reface,
+  setupReface,
+} from "@reface";
+import { loadStories, ReStory } from "@restory";
+import { loadDocs, loadScriptFiles, ReDocs } from "@redocs";
+import { LayoutSimple, RefaceUI } from "@reface-ui";
+import { globalStyles } from "@reface-ui/theme";
 
-import DocsPage from "./pages/DocsPage.tsx";
-import HomePage from "./pages/HomePage.tsx";
-import { component } from "../@reface/component.ts";
+import { serveStatic } from "@hono/hono/deno";
+
+import HomePage from "./home/Home.tsx";
+
+import "../source/reface-ui/stories.ts";
 
 const IS_DEV = Deno.env.get("DEV") === "true";
 
-const { sections, pages } = await loadDocs();
-
-if (!pages.size) {
-  console.error("No documentation found!");
-  console.log("Make sure you have documentation files in ./docs directory");
-}
+const docsRootPath = path.resolve(Deno.cwd(), "./docs");
+const restoryRootPath = path.resolve(Deno.cwd(), "./source/reface-ui");
+const docs = await loadDocs(docsRootPath);
+const scripts = await loadScriptFiles([
+  path.resolve(Deno.cwd(), "./source/recast/mod.ts"),
+]);
+const stories = await loadStories(restoryRootPath);
 
 const Layout = component((_, children) => (
   <LayoutSimple
@@ -25,11 +33,11 @@ const Layout = component((_, children) => (
     description="Type-safe template engine for HTML with JSX support"
     favicon="/assets/logo.png"
     normalizeCss
-    htmx
     head={
       <>
-        <link rel="stylesheet" href="/styles/fonts.css" />
+        <link rel="stylesheet" href="/styles/index.css" />
         <link rel="icon" type="image/png" href="/assets/logo.png" />
+        <style>{html(globalStyles)}</style>
       </>
     }
   >
@@ -37,47 +45,52 @@ const Layout = component((_, children) => (
   </LayoutSimple>
 ));
 
-const reface = new Reface({
+setupReface({
   layout: Layout,
 });
 
 if (IS_DEV) {
-  reface.composer.use(new LiveReloadPlugin({ watchPaths: ["./"] }));
+  reface.recast.use(new LiveReloadPlugin({ watchPaths: ["./"] }));
 }
 
-const app = new Hono();
-reface.hono(app);
+reface
+  .page("/", <HomePage />)
+  .page("/docs/:path{.*}?", ({ router }) =>
+    ReDocs({
+      sections: docs.sections,
+      pages: docs.pages,
+      scripts,
+      currentPath: router.req.param("path") || "readme",
+      publicPath: "/docs/",
+    }))
+  .use(
+    "/assets/*",
+    serveStatic({ root: path.resolve(Deno.cwd(), "./website/public") }),
+  )
+  .use(
+    "/styles/*",
+    serveStatic({ root: path.resolve(Deno.cwd(), "./website/public") }),
+  )
+  .page("/restory/iframe/:path{.*}", ({ router }) => {
+    const storyFile = stories.find((storyFile) =>
+      storyFile.filePath === router.req.param("path")
+    );
+    const story = storyFile?.stories.find((story) =>
+      story.name === router.req.query("story")
+    );
 
-app.use(
-  "/assets/*",
-  serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
-);
-app.use(
-  "/styles/*",
-  serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
-);
+    if (!story) {
+      return router.text("Story not found", 404);
+    }
 
-app.get("/", (c) => {
-  return c.html(reface.render(<HomePage />));
-});
+    return RefaceUI`${story.component()}`;
+  })
+  .page("/restory/:path{.*}?", ({ router }) =>
+    ReStory({
+      stories,
+      currentPath: router.req.param("path"),
+      currentStory: router.req.query("story"),
+      publicPath: "/restory/",
+    }));
 
-app.get("/docs", (c) => {
-  return c.html(reface.render(
-    <DocsPage
-      sections={sections}
-      pages={pages}
-    />,
-  ));
-});
-
-app.get("/docs/:page", (c) => {
-  return c.html(reface.render(
-    <DocsPage
-      sections={sections}
-      pages={pages}
-      currentPath={c.req.param("page")}
-    />,
-  ));
-});
-
-await Deno.serve(app.fetch);
+Deno.serve(reface.fetch);

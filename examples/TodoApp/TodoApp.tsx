@@ -1,5 +1,4 @@
-import { createElement, Fragment } from "@reface";
-import { Island } from "@reface/island";
+import { Island } from "@reface";
 import type { Todo, TodoProps, TodoRPC, TodoState } from "./types.ts";
 import { Container, Counter, FilterContainer, Form, List } from "./ui.tsx";
 
