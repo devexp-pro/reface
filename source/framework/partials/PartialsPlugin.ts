@@ -1,5 +1,6 @@
 import { RecastPlugin, type RecastPluginInterface } from "@recast/plugin";
 import { ComponentRenderFn } from "@recast/expressions";
+import { RefaceError } from "../RefaceError.ts";
 
 export class PartialsPlugin extends RecastPlugin
   implements RecastPluginInterface {
@@ -13,6 +14,9 @@ export class PartialsPlugin extends RecastPlugin
   }
 
   public register(name: string, handler: ComponentRenderFn<any>): void {
+    if (this.partials.has(name)) {
+      throw new RefaceError(`Partial ${name} already registered`);
+    }
     this.partials.set(name, handler);
   }
 

@@ -2,6 +2,7 @@ import { assertEquals } from "@std/assert";
 import { TestUtils } from "@recast/test-utils";
 import { partial } from "@reface/framework";
 import { PartialsPlugin } from "@reface/framework";
+import { RefaceError } from "../RefaceError.ts";
 
 Deno.test("Parital - markup rendering", () => {
   const utils = new TestUtils({ plugins: [new PartialsPlugin()] });
@@ -36,7 +37,7 @@ Deno.test("Parital - automatic registration and execution", async () => {
   assertEquals(typeof registeredHandler, "function");
 
   if (!registeredHandler) {
-    throw new Error("Handler not found");
+    throw new RefaceError("Handler not found");
   }
 
   const result = utils.reface.render(await registeredHandler({}));
@@ -61,7 +62,7 @@ Deno.test("Parital - data passing", async () => {
   assertEquals(typeof registeredHandler, "function");
 
   if (!registeredHandler) {
-    throw new Error("Handler not found");
+    throw new RefaceError("Handler not found");
   }
   const result = utils.reface.render(await registeredHandler({ name: "John" }));
 

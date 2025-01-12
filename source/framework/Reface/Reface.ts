@@ -17,6 +17,7 @@ import type { RefaceLayout, RefaceOptions } from "./types.ts";
 import { island } from "../island/island.ts";
 import { LayoutSimple } from "@reface-ui";
 import { recastMiddleware } from "../hono/recastMiddleware.ts";
+import { RefaceError } from "../RefaceError.ts";
 
 const PARTIAL_API_PREFIX = "/reface/partial";
 
@@ -62,12 +63,12 @@ export class Reface {
       Reface.instance = new Reface(options);
       return Reface.instance;
     }
-    throw new Error("Reface already initialized");
+    throw new RefaceError("Reface already initialized");
   }
 
   static getReface(): Reface {
     if (!Reface.instance) {
-      throw new Error("Reface not initialized. Call init() first.");
+      throw new RefaceError("Reface not initialized. Call init() first.");
     }
     return Reface.instance;
   }
@@ -109,7 +110,7 @@ export class Reface {
     islandConfig: Island<State, Props, RPC>,
   ): (props: Props) => Template<TemplateAttributes, IslandPayload> {
     if (!islandConfig.name) {
-      throw new Error("Island must have a name");
+      throw new RefaceError("Island must have a name");
     }
 
     const component = island(islandConfig, this.islandPlugin);
@@ -171,17 +172,17 @@ export class Reface {
     try {
       const island = this.islands.get(islandName);
       if (!island) {
-        throw new Error(`Island "${islandName}" not found`);
+        throw new RefaceError(`Island "${islandName}" not found`);
       }
 
       const state = this.islandPlugin.getIslandState(islandName);
       if (!state) {
-        throw new Error(`State for island "${islandName}" not found`);
+        throw new RefaceError(`State for island "${islandName}" not found`);
       }
 
       const rpcMethod = island.rpc?.[method];
       if (!rpcMethod) {
-        throw new Error(
+        throw new RefaceError(
           `RPC method "${method}" not found in island "${islandName}"`,
         );
       }
