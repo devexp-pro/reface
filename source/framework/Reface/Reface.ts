@@ -15,6 +15,8 @@ import type { Island, IslandPayload, RpcResponse } from "../island/types.ts";
 import type { Child } from "@recast";
 import type { RefaceLayout, RefaceOptions } from "./types.ts";
 import { island } from "../island/island.ts";
+import { LayoutSimple } from "@reface-ui";
+import { recastMiddleware } from "../hono/recastMiddleware.ts";
 
 const PARTIAL_API_PREFIX = "/reface/partial";
 
@@ -30,7 +32,7 @@ export class Reface {
   public fetch: Fetch;
 
   private constructor({
-    layout,
+    layout = LayoutSimple,
     plugins = [],
     partialApiPrefix = PARTIAL_API_PREFIX,
   }: RefaceOptions) {
@@ -133,6 +135,8 @@ export class Reface {
       return c.html(errorHtml, 500);
     });
 
+    this.router.use("*", recastMiddleware());
+
     this.router.use("*", async (c, next) => {
       try {
         return await next();
@@ -216,7 +220,10 @@ export class Reface {
     this.islandPlugin.clearIslandState(islandName);
   }
 
-  async render(template: Child | Child[]): Promise<string> {
+  async render(
+    template: Child | Child[],
+    userOptions?: Record<string, any>,
+  ): Promise<string> {
     let content = template;
     if (componentExpression.is(this.layout)) {
       content = this.layout`${content}`;
@@ -224,6 +231,7 @@ export class Reface {
 
     try {
       const result = await this.recast.render(content, {
+        ...userOptions,
         reface: {
           islandPlugin: this.islandPlugin,
         },

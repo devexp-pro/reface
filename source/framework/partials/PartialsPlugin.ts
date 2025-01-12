@@ -15,6 +15,10 @@ export class PartialsPlugin extends RecastPlugin
     this.apiPrefix = options.apiPrefix || "/reface/partial";
   }
 
+  public register(name: string, handler: PartialHandler<any>): void {
+    this.partials.set(name, handler);
+  }
+
   setup(): void {
     this.partials.clear();
 
@@ -25,10 +29,6 @@ export class PartialsPlugin extends RecastPlugin
         const partialMeta = meta?.partial as MetaPartial | undefined;
         if (!partialMeta?.name) {
           return template;
-        }
-
-        if (!this.partials.has(partialMeta.name)) {
-          this.partials.set(partialMeta.name, partialMeta.handler);
         }
 
         attributes["data-partial"] = partialMeta.name;

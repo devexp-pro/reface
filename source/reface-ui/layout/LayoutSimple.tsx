@@ -20,10 +20,10 @@ export const LayoutSimple: ComponentNode<
     title: pageTitle,
     description,
     favicon,
-    htmx,
-    bootstrap,
-    normalizeCss,
+    htmx = true,
+    normalizeCss = true,
     alpine,
+    bootstrap,
     head: pageHead,
   } = props;
 

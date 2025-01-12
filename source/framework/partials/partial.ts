@@ -1,3 +1,4 @@
+import { Reface } from "../Reface/Reface.ts";
 import {
   elementExpression,
   type ElementNode,
@@ -5,6 +6,7 @@ import {
 } from "@recast/expressions";
 import { hx, type HxBuilder } from "../htmx/mod.ts";
 import type { MetaPartial, PartialMethods } from "./types.ts";
+import type { PartialsPlugin } from "./PartialsPlugin.ts";
 
 export function createPartial<T = unknown>(
   name: string,
@@ -16,6 +18,11 @@ export function createPartial<T = unknown>(
     handler,
     apiPrefix,
   };
+
+  Reface.getReface().recast.getPlugin<PartialsPlugin>("partials")?.register(
+    name,
+    handler,
+  );
 
   return elementExpression.create<PartialMethods>({
     tag: "div",

@@ -34,8 +34,6 @@ export function DemoPartial() {
   );
 }
 
-reface.router.get("/", (c) => {
-  return c.html(reface.render(<DemoPartial />));
-});
+reface.router.get("/", (c) => c.render(<DemoPartial />));
 
 export default reface;

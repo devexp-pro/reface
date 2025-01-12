@@ -62,9 +62,11 @@ export class Recast {
   }
 
   getPlugin<T extends RecastPluginInterface>(
-    plugin: T,
+    plugin: T | string,
   ): T | undefined {
-    return this.plugins.get(plugin.name) as T | undefined;
+    return this.plugins.get(
+      typeof plugin === "string" ? plugin : plugin.name,
+    ) as T | undefined;
   }
 
   async render(

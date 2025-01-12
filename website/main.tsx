@@ -59,26 +59,20 @@ reface.router.use(
   serveStatic({ root: resolveFromFile("./public", import.meta.url) }),
 );
 
-reface.router.get("/", (c) => {
-  return c.html(reface.render(<HomePage />));
-});
+reface.router.get("/", (c) => c.render(<HomePage />));
 
-reface.router.get("/docs/:path{.*}?", async (c) => {
-  const currentPath = c.req.param("path");
-  return c.html(
-    reface.render(
-      ReDocs({
-        sections: docs.sections,
-        pages: docs.pages,
-        scripts,
-        currentPath: currentPath || "readme",
-        publicPath: "/docs/",
-      }),
-    ),
-  );
-});
+reface.router.get("/docs/:path{.*}?", (c) =>
+  c.render(
+    ReDocs({
+      sections: docs.sections,
+      pages: docs.pages,
+      scripts,
+      currentPath: c.req.param("path") || "readme",
+      publicPath: "/docs/",
+    }),
+  ));
 
-reface.router.get("/restory/iframe/:path{.*}", async (c) => {
+reface.router.get("/restory/iframe/:path{.*}", (c) => {
   const storyFile = stories.find((storyFile) =>
     storyFile.filePath === c.req.param("path")
   );
@@ -90,23 +84,17 @@ reface.router.get("/restory/iframe/:path{.*}", async (c) => {
     return c.text("Story not found", 404);
   }
 
-  return c.html(
-    reface.render(
-      RefaceUI`${story.component()}`,
-    ),
-  );
+  return c.render(RefaceUI`${story.component()}`);
 });
 
-reface.router.get("/restory/:path{.*}?", async (c) => {
-  return c.html(
-    reface.render(
-      ReStory({
-        stories,
-        currentPath: c.req.param("path"),
-        currentStory: c.req.query("story"),
-        publicPath: "/restory/",
-      }),
-    ),
+reface.router.get("/restory/:path{.*}?", (c) => {
+  return c.render(
+    ReStory({
+      stories,
+      currentPath: c.req.param("path"),
+      currentStory: c.req.query("story"),
+      publicPath: "/restory/",
+    }),
   );
 });
 
