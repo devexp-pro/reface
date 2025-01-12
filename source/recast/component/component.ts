@@ -11,7 +11,7 @@ export const component = <
   E extends Record<string, any> = Record<string, any>,
 >(
   render: ComponentRenderFn<P>,
-  options?: ComponentPayload,
+  options?: Partial<Omit<ComponentPayload, "render">>,
 ): ComponentNode<P, E> => {
   return componentExpression.create({
     render: render as ComponentRenderFn<ComponentAttributes>,

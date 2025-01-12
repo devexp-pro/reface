@@ -1,18 +1,15 @@
 import { Reface } from "../Reface/Reface.ts";
-import {
-  elementExpression,
-  type ElementNode,
-  type HTMLAttributes,
-} from "@recast/expressions";
+import { component, type ComponentNode, element } from "@recast";
 import { hx, type HxBuilder } from "../htmx/mod.ts";
 import type { MetaPartial, PartialMethods } from "./types.ts";
 import type { PartialsPlugin } from "./PartialsPlugin.ts";
+import type { ComponentRenderFn, HTMLAttributes } from "@recast/expressions";
 
 export function createPartial<T = unknown>(
   name: string,
-  handler: any,
+  handler: ComponentRenderFn<any>,
   apiPrefix: string = "/reface/partial",
-): ElementNode<HTMLAttributes, PartialMethods> {
+) {
   const meta: MetaPartial = {
     name,
     handler,
@@ -24,34 +21,32 @@ export function createPartial<T = unknown>(
     handler,
   );
 
-  return elementExpression.create<PartialMethods>({
-    tag: "div",
-    attributes: {
-      "data-partial": name,
-    },
-    children: [],
-    meta: {
-      partial: meta,
-    },
-    methods: {
-      trigger(this: ElementNode<HTMLAttributes, PartialMethods>): HxBuilder {
-        const payload = elementExpression.getPayload(this);
-        const meta = payload.meta?.partial as MetaPartial | undefined;
-        if (!meta) {
-          throw new Error("Partial meta not found");
-        }
-        return hx()
-          .get(`${meta.apiPrefix}/${meta.name}`)
-          .target(`[data-partial='${meta.name}']`)
-          .trigger("click");
+  return component<HTMLAttributes, PartialMethods>(
+    (props, children) => (
+      element.div({
+        ...props,
+        "data-partial": meta.name,
+      })`${children}`
+    ),
+    {
+      meta: {
+        partial: meta,
+      },
+      methods: {
+        trigger(): HxBuilder {
+          return hx()
+            .get(`${meta.apiPrefix}/${meta.name}`)
+            .target(`[data-partial='${meta.name}']`)
+            .trigger("click");
+        },
       },
     },
-  });
+  );
 }
 
 export function partial<T = unknown>(
-  handler: any,
+  handler: ComponentRenderFn<any>,
   name: string,
-): ElementNode<HTMLAttributes, PartialMethods> {
+): ComponentNode<HTMLAttributes, PartialMethods> {
   return createPartial(name, handler);
 }
