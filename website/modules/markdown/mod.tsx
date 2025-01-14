@@ -7,9 +7,8 @@ import type {
   ParsedMarkdown,
   TableOfContentsHeading,
 } from "./types.ts";
-import type { Template } from "../../../@reface/mod.ts";
 import { components } from "./components/mod.ts";
-import { component } from "@reface";
+import { component, type Template } from "@reface";
 
 const parser = unified()
   .use(remarkParse)

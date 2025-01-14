@@ -1,8 +1,8 @@
 import { component, createElement, Fragment } from "@reface";
 import { Hono } from "@hono/hono";
-import { Reface } from "../../@reface/Reface.ts";
+import { Reface } from "@reface";
 import { TodoApp } from "./TodoApp.tsx";
-import { LayoutSimple } from "../../@reface/components/LayoutSimple.ts";
+import { LayoutSimple } from "@reface/components/LayoutSimple";
 
 const Layout = component((_, children) => (
   <LayoutSimple
