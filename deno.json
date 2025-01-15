@@ -22,7 +22,7 @@
     "./components/LayoutTWA": "./source/reface/components/LayoutTWA.ts"
   },
   "imports": {
-    "@reface": "./source/reface/mod.ts",
+    "@reface": "./source/mod.ts",
     "@reface/jsx": "./source/reface/jsx/mod.ts",
     "@reface/jsx/jsx-runtime": "./source/reface/jsx/jsx-runtime.ts",
     "@reface/types": "./source/reface/types/mod.ts",
