@@ -1,6 +1,6 @@
 import { Hono } from "@hono/hono";
 import { serveStatic } from "@hono/hono/deno";
-import { Reface } from "@reface";
+import { component, Reface } from "@reface";
 import { LiveReloadPlugin } from "@reface/plugins/liveReload";
 import { LayoutSimple } from "@reface/components/LayoutSimple";
 import { loadDocs } from "./utils/docs.tsx";
@@ -8,7 +8,6 @@ import { resolveFromFile } from "./utils/resolveFromFile.ts";
 
 import DocsPage from "./pages/DocsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
-import { component } from "../@reface/component.ts";
 
 const IS_DEV = Deno.env.get("DEV") === "true";
 

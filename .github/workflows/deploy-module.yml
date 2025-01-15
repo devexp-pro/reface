@@ -3,11 +3,11 @@ on:
   push:
     branches: main
     paths:
-      - \@reface/**
+      - source/reface/**
   pull_request:
     branches: main
     paths:
-      - \@reface/**
+      - source/reface/**
 
 jobs:
   release:

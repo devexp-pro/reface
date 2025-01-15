@@ -20,7 +20,7 @@ import type {
   Text,
   ThematicBreak,
 } from "mdast";
-import type { Template } from "../../../@reface/mod.ts";
+import type { Template } from "@reface";
 
 export type TableOfContentsHeading = {
   level: number;
