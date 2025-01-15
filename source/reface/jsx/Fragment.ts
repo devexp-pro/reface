@@ -1,5 +1,5 @@
-import { createTemplateFactory } from "../template/createTemplateFactory.ts";
-import type { ElementChildType, Template } from "../template/types.ts";
+import { createTemplateFactory } from "@recast";
+import type { ElementChildType, Template } from "@recast";
 const fragmentTemplate = createTemplateFactory({
   type: "fragment",
   create: {

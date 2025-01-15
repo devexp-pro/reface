@@ -1,4 +1,4 @@
-import { component, elementFactory, html } from "@reface";
+import { component, elementFactory, html } from "@recast";
 import type { ElementChildType } from "@reface/template";
 import { TestUtils } from "./testUtils.ts";
 
