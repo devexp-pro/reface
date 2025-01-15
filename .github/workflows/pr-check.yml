@@ -4,7 +4,7 @@ on:
     branches:
       - main
     paths:
-      - "source/reface/**"
+      - "source/**"
       - "website/**"
 jobs:
   check:

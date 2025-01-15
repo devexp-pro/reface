@@ -22,7 +22,7 @@
     "./plugins/styled": "./source/recast/styled/mod.ts"
   },
   "imports": {
-    "@reface": "./mod.ts",
+    "@reface": "./source/mod.ts",
     "@framework": "./source/reface/mod.ts",
     "@framework/": "./source/reface/",
     "@recast": "./source/recast/mod.ts",
