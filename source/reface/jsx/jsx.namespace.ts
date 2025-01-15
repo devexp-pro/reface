@@ -5,7 +5,7 @@ import type {
   TemplatePayload,
 } from "@reface/template";
 
-import type * as HTML from "../types/elements.types.ts";
+import type * as HTML from "@recast/types/elements.types.ts";
 
 type WithChildren = {
   children?: ElementChildType | ElementChildType[];

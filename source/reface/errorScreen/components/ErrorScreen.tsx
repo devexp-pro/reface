@@ -1,5 +1,4 @@
-import { component } from "@reface";
-import { styled } from "@reface/plugins/styled";
+import { component, styled } from "@recast";
 import { LayoutSimple } from "@reface/components/LayoutSimple";
 
 import { ErrorPageHeader } from "./ErrorPageHeader.tsx";

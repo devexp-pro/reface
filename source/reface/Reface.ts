@@ -3,13 +3,13 @@ import type { ContentfulStatusCode } from "@hono/hono/utils/http-status";
 import type { IRefaceComposerPlugin } from "@reface/types";
 import type { Template, TemplateAttributes } from "@reface/template";
 
-import { RefaceComposer } from "./RefaceComposer.ts";
+import { RefaceComposer } from "@recast";
 import {
   partial,
   type PartialHandler,
   PartialsPlugin,
-} from "./plugins/partials/mod.ts";
-import { StyledPlugin } from "./plugins/styled/mod.ts";
+} from "./partials/mod.ts";
+import { StyledPlugin } from "@recast";
 import {
   createIsland,
   createIslandComponent,

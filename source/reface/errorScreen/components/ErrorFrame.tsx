@@ -1,4 +1,4 @@
-import { component } from "@reface";
+import { component } from "@recast";
 import { styled } from "@reface/plugins/styled";
 import type { StackFrame } from "../utils.ts";
 import { CodeContextFrame } from "./CodeContextFrame.tsx";

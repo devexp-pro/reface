@@ -2,7 +2,7 @@ import { assertEquals } from "@std/assert";
 import type { Template } from "@reface/template";
 import { RefaceComposer } from "../RefaceComposer.ts";
 import type { IRefaceComposerPlugin } from "@reface/types";
-import { LoggerPlugin } from "../plugins/LoggerPlugin.ts";
+import { LoggerPlugin } from "@framework";
 
 export interface TestUtilsOptions {
   plugins?: IRefaceComposerPlugin[];
