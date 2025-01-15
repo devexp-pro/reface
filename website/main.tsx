@@ -1,7 +1,7 @@
 import { Hono } from "@hono/hono";
 import { serveStatic } from "@hono/hono/deno";
 import { component, Reface } from "@reface";
-import { LiveReloadPlugin } from "@reface/plugins/liveReload";
+import { LiveReloadPlugin } from "../source/reface/liveReload/mod.ts";
 import { LayoutSimple } from "@reface/components/LayoutSimple";
 import { loadDocs } from "./utils/docs.tsx";
 import { resolveFromFile } from "./utils/resolveFromFile.ts";

@@ -6,7 +6,6 @@ import type {
   TemplatePayload,
 } from "@reface/template";
 import { createElement } from "./createElement.ts";
-import type * as HTML from "../types/elements.types.ts";
 
 type JsxFn = <
   P extends BaseAttributes,

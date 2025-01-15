@@ -1,4 +1,4 @@
-import { component } from "@reface";
+import { component } from "@recast";
 import { styled } from "@reface/plugins/styled";
 
 const Header = styled.div /* css */`

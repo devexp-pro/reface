@@ -1,4 +1,4 @@
-import { RefaceRenderManager } from "@reface";
+import { RefaceRenderManager } from "@recast";
 import type {
   IRefaceComposer,
   IRefaceComposerPlugin,

@@ -1,5 +1,5 @@
 import { i } from "@reface/elements";
-import { component, html } from "@reface";
+import { component, html } from "@recast";
 import { TestUtils } from "./testUtils.ts";
 
 interface ButtonProps {

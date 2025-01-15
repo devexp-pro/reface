@@ -1,4 +1,4 @@
-import { component, html } from "@reface";
+import { component, html } from "@recast";
 import type { ElementChildType } from "@reface/types";
 import { body, head, meta, script, title } from "@reface/elements";
 import type { Template } from "@reface/template";

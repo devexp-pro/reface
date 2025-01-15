@@ -1,5 +1,5 @@
-import { RefaceComposer } from "../RefaceComposer.ts";
-import { StyledPlugin } from "@reface/plugins/styled";
+import { RefaceComposer } from "@recast";
+import { StyledPlugin } from "@recast";
 
 import { fallbackErrorScreen } from "./fallbackErrorScreen.ts";
 import { parseErrorStack } from "./utils.ts";

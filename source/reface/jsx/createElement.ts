@@ -9,8 +9,8 @@ import {
   TemplateHtmlAttributes,
   TemplateMethods,
   type TemplatePayload,
-} from "@reface/template";
-import { createTemplateFactory } from "../template/createTemplateFactory.ts";
+} from "@recast";
+import { createTemplateFactory } from "@recast";
 
 const jsxTemplate = createTemplateFactory<
   TemplateHtmlAttributes,

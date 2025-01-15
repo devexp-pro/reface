@@ -1,6 +1,6 @@
 import { REFACE_EVENT } from "@reface/constants";
 import type { IRefaceComposerPlugin } from "@reface/types";
-import type { RefaceComposer } from "../../RefaceComposer.ts";
+import type { RefaceComposer } from "@recast";
 import type { Template } from "@reface/template";
 import type { PartialHandler, PartialPayload } from "./types.ts";
 
