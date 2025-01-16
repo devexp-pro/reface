@@ -1,100 +1,106 @@
-import type { StyledComponent, StyledFn, StyledTagFn } from "./types.ts";
-import { generateClassName } from "./classGenerator.ts";
-import { parseCSS } from "./cssParser.ts";
 import {
-  createTemplateFactory,
-  type NormalizeAttributes,
-  type RawTemplate,
-  type TemplateAttributes,
-  VOID_ELEMENTS,
-} from "@reface/template";
+  arrayExpression,
+  componentExpression,
+  type ComponentNode,
+  elementExpression,
+  type ElementNode,
+  fragmentExpression,
+  PROXY_COPY,
+  PROXY_PAYLOAD,
+} from "@recast/expressions";
+import { parseCSS } from "./cssParser.ts";
+import type { MetaStyled } from "./types.ts";
 
-interface StyledPayload {
-  styled: {
-    styles: string;
-    rootClass: string;
-    tag: string;
+function createStyledElement<T extends ElementNode | ComponentNode>(
+  template: T,
+) {
+  return (css: TemplateStringsArray, ...values: any[]) => {
+    const className = `styled-${Math.random().toString(36).slice(2)}`;
+    const styleContent = parseCSS(
+      String.raw({ raw: css }, ...values),
+      className,
+    );
+
+    const methods = {
+      getStyledClass: () => className,
+    };
+
+    const existingMeta = template[PROXY_PAYLOAD]?.meta?.styled as
+      | MetaStyled
+      | undefined;
+    const styledMeta: MetaStyled = {
+      styledClass: className,
+      styles: [
+        ...(existingMeta?.styles || []),
+        {
+          class: className,
+          css: styleContent,
+        },
+      ],
+    };
+
+    if (elementExpression.is(template)) {
+      return template[PROXY_COPY]((payload) => ({
+        ...payload,
+        methods: {
+          ...payload.methods,
+          ...methods,
+        },
+        meta: {
+          ...payload.meta,
+          styled: styledMeta,
+        },
+      }));
+    }
+
+    if (componentExpression.is(template)) {
+      return componentExpression.copy(template, {
+        meta: {
+          styled: styledMeta,
+        },
+        methods,
+      });
+    }
+
+    if (fragmentExpression.is(template)) {
+      return elementExpression.create({
+        tag: "div",
+        // @ts-expect-error FIXME: what is never ?
+        children: template[PROXY_PAYLOAD].children,
+        meta: {
+          styled: styledMeta,
+        },
+        methods: {
+          ...methods,
+        },
+      });
+    }
+
+    if (arrayExpression.is(template)) {
+      return elementExpression.create({
+        tag: "div",
+        children: template,
+        meta: {
+          styled: styledMeta,
+        },
+        methods: {
+          ...methods,
+        },
+      });
+    }
+
+    throw new Error("Invalid template type");
   };
 }
 
-const styledTemplate = createTemplateFactory<TemplateAttributes, StyledPayload>(
-  {
-    type: "styled",
-    create: {
-      defaults: {
-        attributes: {},
-      },
-    },
-    process: {
-      attributes: ({
-        oldAttrs,
-        newAttrs,
-      }: {
-        oldAttrs: NormalizeAttributes<TemplateAttributes>;
-        newAttrs: NormalizeAttributes<TemplateAttributes>;
-      }) => {
-        const currentClasses = (oldAttrs.class || []) as string[];
-        const newClasses = (newAttrs.class || []) as string[];
-
-        return {
-          ...oldAttrs,
-          ...newAttrs,
-          class: [...currentClasses, ...newClasses].filter(Boolean),
-        };
-      },
-    },
-    methods: {
-      getRootClass: ({ template }: { template: RawTemplate }) =>
-        template.payload.styled.rootClass,
-    },
+export const styled = new Proxy(createStyledElement, {
+  get(_, prop: string) {
+    if (typeof prop === "string") {
+      const element = elementExpression.create({
+        tag: prop,
+      });
+      return createStyledElement(element);
+    }
+    return createStyledElement;
   },
-);
-
-function createStyledElement(
-  tagOrComponent: string | StyledComponent,
-  css: TemplateStringsArray,
-  values: unknown[],
-  parentComponent?: StyledComponent,
-): StyledComponent {
-  const rootClass = generateClassName();
-  const rawCss = String.raw({ raw: css }, ...values);
-  const styles = parseCSS(rawCss, rootClass);
-
-  const tag: string | undefined = typeof tagOrComponent === "string"
-    ? tagOrComponent
-    : tagOrComponent.raw.tag;
-
-  const combinedStyles = parentComponent
-    ? `${parentComponent.raw.payload.styled.styles}\n${styles}`
-    : styles;
-
-  if (!tag) {
-    throw new Error("Tag is required");
-  }
-
-  return styledTemplate({
-    tag,
-    void: VOID_ELEMENTS.has(tag),
-    attributes: {
-      class: [
-        parentComponent?.raw.payload.styled.rootClass,
-        rootClass,
-      ].filter(Boolean),
-    },
-    payload: {
-      styled: { styles: combinedStyles, rootClass, tag },
-    },
-  });
-}
-
-const styledFunction = (baseComponent: StyledComponent): StyledTagFn => {
-  return (strings, ...values) =>
-    createStyledElement(baseComponent, strings, values, baseComponent);
-};
-
-export const styled: StyledFn = new Proxy(styledFunction, {
-  get(_target, tag: string) {
-    return (strings: TemplateStringsArray, ...values: unknown[]) =>
-      createStyledElement(tag, strings, values);
-  },
-}) as StyledFn;
+}) as any;

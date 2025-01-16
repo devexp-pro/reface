@@ -1,32 +1,51 @@
 import type {
-  Template,
-  TemplateAttributes,
-  TemplatePayload,
-} from "@reface/template";
+  ComponentNode,
+  ElementNode,
+  FragmentNode,
+  HTMLAttributes,
+  HTMLElementTagAttributes,
+} from "@recast/expressions";
 
-export interface StyledPayload extends TemplatePayload {
-  styled: {
-    styles: string;
-    rootClass: string;
-    tag: string;
-  };
+interface StyledMethods {
+  getStyledClass(): string;
 }
 
-export type StyledComponent = Template<TemplateAttributes, StyledPayload>;
+type HasClassAttribute<P> = P extends { class?: any } ? P : never;
 
-export type StyledTagFn = (
-  strings: TemplateStringsArray,
-  ...values: unknown[]
-) => StyledComponent;
-
-export type StyledFn = {
-  (component: StyledComponent): StyledTagFn;
-
-  [tag: string]: StyledTagFn;
+type StyledComponent<T> = {
+  (
+    template: TemplateStringsArray,
+    ...values: any[]
+  ): T extends ElementNode<infer P, infer E> ? ElementNode<P, E & StyledMethods>
+    : T extends ComponentNode<infer P, infer E>
+      ? ComponentNode<HasClassAttribute<P>, E & StyledMethods>
+    : T extends FragmentNode ? ElementNode<HTMLAttributes, StyledMethods>
+    : never;
 };
 
-export interface StyledAttributes extends TemplateAttributes {
-  class?: string | string[];
-  style?: string | Record<string, string | number>;
-  [key: string]: unknown;
+type Styled =
+  & {
+    <
+      T extends
+        | ElementNode<any, any>
+        | ComponentNode<any, any>
+        | FragmentNode,
+    >(
+      template: T,
+    ): StyledComponent<T>;
+  }
+  & {
+    [Tag in keyof HTMLElementTagAttributes]: StyledComponent<
+      ElementNode<HTMLElementTagAttributes[Tag]>
+    >;
+  };
+
+export interface MetaStyled {
+  styledClass: string;
+  styles: {
+    class: string;
+    css: string;
+  }[];
 }
+
+export type { HasClassAttribute, Styled, StyledComponent, StyledMethods };

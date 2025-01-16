@@ -69,8 +69,8 @@ import {
   tr,
   ul,
   video,
-} from "@reface/elements";
-import { TestUtils } from "./testUtils.ts";
+} from "@recast/element";
+import { TestUtils } from "@recast/test-utils";
 
 Deno.test("elements - basic usage", () => {
   const utils = new TestUtils();
@@ -94,15 +94,8 @@ Deno.test("elements - nested elements", () => {
 Deno.test("elements - handles primitives", () => {
   const utils = new TestUtils();
   utils.assertRender(
-    div({ class: "container" })`
-      ${false}
-      ${null}
-      ${undefined}
-      ${0}
-      ${true}
-      ${""}
-    `,
-    '<div class="container"> 0 </div>',
+    div({ class: "container" })`${false}${null}${undefined}${0}${true}${""}`,
+    '<div class="container">0</div>',
   );
 });
 

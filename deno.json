@@ -22,11 +22,27 @@
     "./plugins/styled": "./source/recast/styled/mod.ts"
   },
   "imports": {
+    "@common/": "./source/common/",
     "@reface": "./source/mod.ts",
     "@framework": "./source/reface/mod.ts",
     "@framework/": "./source/reface/",
     "@recast": "./source/recast/mod.ts",
     "@recast/": "./source/recast/",
+    "@recast/expressions": "./source/recast/expressions/mod.ts",
+    "@recast/html": "./source/recast/html/mod.ts",
+    "@recast/plugin": "./source/recast/plugin/mod.ts",
+    "@recast/styled": "./source/recast/styled/mod.ts",
+    "@recast/htmx": "./source/recast/htmx/mod.ts",
+    "@recast/template": "./source/recast/template/mod.ts",
+    "@recast/component": "./source/recast/component/mod.ts",
+    "@recast/jsx": "./source/recast/jsx/mod.ts",
+    "@recast/jsx-runtime": "./source/recast/jsx/jsx-runtime.ts",
+    "@recast/query": "./source/recast/query/mod.ts",
+    "@recast/test-utils": "./source/recast/test-utils/mod.ts",
+    "@recast/recast": "./source/recast/recast/mod.ts",
+    "@recast/element": "./source/recast/element/mod.ts",
+    "@recast/nodes": "./source/recast/nodes/mod.ts",
+    "@recast/slots": "./source/recast/slots/mod.ts",
     "@reface/jsx": "./source/reface/jsx/mod.ts",
     "@reface/jsx/jsx-runtime": "./source/reface/jsx/jsx-runtime.ts",
     "@reface/types": "./source/recast/types/mod.ts",
@@ -74,7 +90,7 @@
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@reface/jsx"
+    "jsxImportSource": "@recast"
   },
   "publish": {
     "include": [

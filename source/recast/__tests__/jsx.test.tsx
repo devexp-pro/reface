@@ -1,4 +1,4 @@
-import { TestUtils } from "./testUtils.ts";
+import { TestUtils } from "@recast/test-utils";
 
 Deno.test("JSX - basic element rendering", () => {
   const utils = new TestUtils();
