@@ -1,50 +1,38 @@
-import { REFACE_EVENT } from "@reface/constants";
-import type { IRefaceComposerPlugin } from "@reface/types";
-import type { RefaceComposer } from "@recast";
-import type { Template } from "@reface/template";
-import type { PartialHandler, PartialPayload } from "./types.ts";
+import {
+  ComponentAttributes,
+  type ComponentRenderFn,
+  RecastPlugin,
+  type RecastPluginInterface,
+} from "@recast";
+import { PartialHandler } from "@reface/plugins/partials";
 
-export class PartialsPlugin implements IRefaceComposerPlugin {
+export class PartialsPlugin extends RecastPlugin
+  implements RecastPluginInterface {
   readonly name = "partials";
-  private partials = new Map<
-    string,
-    PartialHandler<any, Template<any, any, any>>
-  >();
+  private partials = new Map<string, PartialHandler>();
   private apiPrefix: string;
 
   constructor(options: { apiPrefix?: string } = {}) {
-    this.apiPrefix = options.apiPrefix || "/reface-partial";
+    super();
+    this.apiPrefix = options.apiPrefix || "/reface/partial";
   }
 
-  setup(composer: RefaceComposer): Promise<void> {
-    const manager = composer.getRenderManager();
-
-    manager.on(
-      REFACE_EVENT.RENDER.TEMPLATE.START,
-      ({ template }) => {
-        const partialTemplate = template as Template<any, PartialPayload>;
-        if (partialTemplate.raw.type === "partial") {
-          this.registerPartial(partialTemplate);
-        }
-      },
-    );
-    return Promise.resolve();
-  }
-
-  private registerPartial(template: Template<any, PartialPayload>) {
-    const name = template.raw.payload.partial.name;
-    if (!this.partials.has(name)) {
-      this.partials.set(name, template.raw.payload.partial.handler);
+  public register(name: string, handler: PartialHandler): void {
+    if (this.partials.has(name)) {
+      throw new Error(`Partial ${name} already registered`);
     }
+    this.partials.set(name, handler);
   }
 
-  getHandler<C = any>(
-    name: string,
-  ): PartialHandler<C, Template<any, any, any>> | undefined {
+  setup(): void {
+    this.partials.clear();
+  }
+
+  getHandler(name: string): PartialHandler | undefined {
     return this.partials.get(name);
   }
 
-  getPartials(): Map<string, PartialHandler<any, Template<any, any, any>>> {
+  getPartials(): Map<string, PartialHandler> {
     return new Map(this.partials);
   }
 

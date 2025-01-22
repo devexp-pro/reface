@@ -1,51 +1,42 @@
-import { REFACE_EVENT } from "@reface/constants";
-import type { IRefaceComposer, IRefaceComposerPlugin } from "@reface/types";
+import { type Recast, RecastPlugin } from "@recast";
 import type { LiveReloadOptions } from "./types.ts";
 
 const DEFAULT_PORT = 35729;
 const DEFAULT_HOST = "localhost";
 
-export class LiveReloadPlugin implements IRefaceComposerPlugin {
-  name = "liveReload" as const;
+export class LiveReloadPlugin extends RecastPlugin {
+  readonly name = "liveReload";
   private abortController: AbortController | null = null;
   private clients: Set<WebSocket> = new Set();
   private clientScript: string;
   private watchers: Deno.FsWatcher[] = [];
+  private port: number;
+  private host: string;
+  private watchPaths: string[];
 
-  constructor(private options: LiveReloadOptions = {}) {
-    this.options.port = options.port || DEFAULT_PORT;
-    this.options.host = options.host || DEFAULT_HOST;
+  constructor(options: LiveReloadOptions = {}) {
+    super();
+    this.port = options.port || DEFAULT_PORT;
+    this.host = options.host || DEFAULT_HOST;
+    this.watchPaths = options.watchPaths || [];
 
     console.log(
-      `[LiveReload] Initializing on ${this.options.host}:${this.options.port}`,
+      `[LiveReload] Initializing on ${this.host}:${this.port}`,
     );
 
-    // Read client script
     this.clientScript = Deno.readTextFileSync(
       new URL("./client/liveReload.js", import.meta.url),
     );
   }
 
-  async setup(composer: IRefaceComposer): Promise<void> {
-    const manager = composer.getRenderManager();
-
-    const self = this;
-    // Inject client script
-    manager.on(
-      REFACE_EVENT.RENDER.RENDER.END,
-      function liveReloadPluginInjectScript({ html }) {
-        console.log("[LiveReload] Injecting client script");
-        return self.injectScript(html as string);
-      },
-    );
-
+  async setup(recast: Recast): Promise<void> {
     this.abortController = new AbortController();
 
-    console.log("[LiveReload] Starting server...");
+    console.log("[LiveReload] Starting server...", this.port);
 
     Deno.serve({
-      port: this.options.port,
-      hostname: this.options.host,
+      port: this.port,
+      hostname: this.host,
       signal: this.abortController.signal,
       onError: (error) => {
         console.error("[LiveReload] Server error:", error);
@@ -57,16 +48,10 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
 
         socket.onopen = () => {
           this.clients.add(socket);
-          console.log(
-            `[LiveReload] Client connected (total: ${this.clients.size})`,
-          );
         };
 
         socket.onclose = () => {
           this.clients.delete(socket);
-          console.log(
-            `[LiveReload] Client disconnected (total: ${this.clients.size})`,
-          );
         };
 
         return response;
@@ -74,12 +59,8 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
       return new Response("Not found", { status: 404 });
     });
 
-    console.log("[LiveReload] Server started successfully");
-
-    // Watch for file changes
-    if (this.options.watchPaths?.length) {
-      console.log("[LiveReload] Starting file watchers...");
-      for (const path of this.options.watchPaths) {
+    if (this?.watchPaths?.length) {
+      for (const path of this.watchPaths) {
         console.log(`[LiveReload] Watching path: ${path}`);
         await this.watchPath(path);
       }
@@ -103,11 +84,6 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
   }
 
   private reload() {
-    const clientCount = this.clients.size;
-    console.log(
-      `[LiveReload] Sending reload signal to ${clientCount} client(s)`,
-    );
-
     for (const client of this.clients) {
       try {
         client.send("reload");
@@ -118,12 +94,11 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
     }
   }
 
-  private injectScript(html: string): string {
-    console.log("[LiveReload] Injecting client script");
+  renderAfter(_: unknown, html: string): string {
     const script = `
       <script>
-        const REFACE_LIVE_RELOAD_PORT = ${this.options.port};
-        const REFACE_LIVE_RELOAD_HOST = "${this.options.host}";
+        const REFACE_LIVE_RELOAD_PORT = ${this.port};
+        const REFACE_LIVE_RELOAD_HOST = "${this.host}";
         ${this.clientScript}
       </script>
     `;
@@ -131,14 +106,9 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
     return html.replace("</body>", `${script}</body>`);
   }
 
-  // Cleanup method
   async destroy() {
-    console.log("[LiveReload] Shutting down...");
-
     this.abortController?.abort();
 
-    // Close all watchers
-    console.log("[LiveReload] Closing file watchers...");
     for (const watcher of this.watchers) {
       try {
         await watcher.close();
@@ -148,10 +118,6 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
     }
     this.watchers = [];
 
-    // Close all WebSocket connections
-    console.log(
-      `[LiveReload] Closing ${this.clients.size} client connection(s)...`,
-    );
     for (const client of this.clients) {
       try {
         client.close();
@@ -160,7 +126,5 @@ export class LiveReloadPlugin implements IRefaceComposerPlugin {
       }
     }
     this.clients.clear();
-
-    console.log("[LiveReload] Shutdown complete");
   }
 }

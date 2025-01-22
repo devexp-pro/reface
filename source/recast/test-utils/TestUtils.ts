@@ -1,7 +1,10 @@
 import { assertEquals } from "@std/assert";
 
 import { Recast } from "@recast/recast/mod.ts";
-import type { RecastPlugin, RecastPluginInterface } from "@recast/plugin/mod.ts";
+import type {
+  RecastPlugin,
+  RecastPluginInterface,
+} from "@recast/plugin/mod.ts";
 import type { Child, Children } from "@recast/expressions/mod.ts";
 import type { RenderOptions } from "@recast/recast/mod.ts";
 

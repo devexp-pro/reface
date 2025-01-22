@@ -1,4 +1,4 @@
-import type { Children, FragmentNode } from "@recast/expressions";
+import type { Children, FragmentNode } from "@recast/expressions/mod.ts";
 
 export type Html = {
   (trustedHtml: string): FragmentNode;

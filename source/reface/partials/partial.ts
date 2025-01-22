@@ -1,66 +1,62 @@
 import {
-  createTemplateFactory,
-  type Template,
-  type TemplateAttributes,
-  type TemplatePayload,
-} from "@reface/template";
-import { hx } from "@reface/htmx";
-import type { PartialFn, PartialHandler } from "./types.ts";
+  component,
+  type ComponentNode,
+  element,
+  HeadSlot,
+  type HTMLAttributes,
+  Template,
+} from "@recast";
+import { Reface } from "../Reface.ts";
+import { hx, type HxBuilder } from "../htmx/mod.ts";
+import type { MetaPartial, PartialHandler, PartialMethods } from "./types.ts";
+import type { PartialsPlugin } from "./PartialsPlugin.ts";
 
-interface PartialPayload extends TemplatePayload {
-  partial: {
-    name: string;
-    handler: PartialHandler<any>;
-    apiPrefix: string;
-  };
-}
-
-const partialTemplate = createTemplateFactory<
-  TemplateAttributes,
-  PartialPayload
->({
-  type: "partial",
-  create: {
-    defaults: {
-      tag: "div",
-      attributes: {},
-    },
-  },
-  methods: {
-    execute: ({ template }) => {
-      return template.payload.partial.handler({});
-    },
-    trigger: ({ template }) => {
-      return hx()
-        .get(
-          `${template.payload.partial.apiPrefix}/${template.payload.partial.name}`,
-        )
-        .target(`[data-partial='${template.payload.partial.name}']`)
-        .trigger("click");
-    },
-  },
-});
-
-function createPartial<T>(
-  handler: PartialHandler<T>,
+export function createPartial<T = unknown>(
   name: string,
-  apiPrefix: string = "/reface/partial", // TODO: setup on plugin handler, for can dunamic api prefix
+  handler: PartialHandler,
+  apiPrefix: string = "/reface/partial",
 ) {
-  return partialTemplate({
-    tag: "div",
-    attributes: {
-      "data-partial": name,
-    },
-    payload: {
-      partial: {
+  const meta: MetaPartial = {
+    name,
+    handler,
+    apiPrefix,
+  };
+
+  return component<HTMLAttributes, PartialMethods>(
+    (props, children) => {
+      Reface.reface.recast.getPlugin<PartialsPlugin>("partials")?.register(
         name,
         handler,
-        apiPrefix,
+      );
+      return element.div({
+        ...props,
+        "data-partial": meta.name,
+      })`
+      ${children}
+      ${Template({ slot: HeadSlot.getSlot(), key: "htmx" })`
+        ${element.script({ src: "https://unpkg.com/htmx.org@1.9.6" })}
+      `}
+      `;
+    },
+    {
+      meta: {
+        partial: meta,
+      },
+      methods: {
+        trigger(): HxBuilder {
+          return hx()
+            .get(`${meta.apiPrefix}/${meta.name}`)
+            .target(`[data-partial='${meta.name}']`)
+            .trigger("click");
+        },
       },
     },
-  });
+  );
 }
 
-export const partial: PartialFn<any, Template> = (handler, name) => {
-  return createPartial(handler, name);
-};
+export function partial<T = unknown>(
+  handler: PartialHandler,
+  name: string,
+): ComponentNode<HTMLAttributes, PartialMethods> {
+  return createPartial(name, handler);
+}
