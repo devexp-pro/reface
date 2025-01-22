@@ -1,5 +1,5 @@
-import type { Template } from "@reface/template";
-import { styled } from "@reface/plugins/styled";
+import type { Child } from "@reface";
+import { styled } from "@reface";
 
 const LogoIcon = styled.div`
   & {
@@ -53,6 +53,6 @@ export const BrandTagline = styled.div`
 
 export function Logo(
   { size = "default" }: { size?: "default" | "large" },
-): Template {
+): Child {
   return <LogoIcon class={`size-${size}`}>R</LogoIcon>;
 }

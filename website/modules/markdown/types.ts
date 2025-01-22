@@ -20,7 +20,7 @@ import type {
   Text,
   ThematicBreak,
 } from "mdast";
-import type { Template } from "@reface";
+import type { Child } from "@reface";
 
 export type TableOfContentsHeading = {
   level: number;
@@ -29,7 +29,7 @@ export type TableOfContentsHeading = {
 };
 
 export type ParsedMarkdown = {
-  content: Template;
+  content: Child;
   headings: TableOfContentsHeading[];
 };
 
