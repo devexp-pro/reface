@@ -1,16 +1,14 @@
-import { component, html } from "@recast";
-import type { ElementChildType } from "@reface/types";
-import { body, head, meta, script, title } from "@reface/elements";
-import type { Template } from "@reface/template";
+import { type Child, component, type ComponentNode, html } from "@recast";
+import { body, head, meta, script, title } from "@recast/element/mod.ts";
 
 export type LayoutTWAProps = {
   title?: string;
   script?: string;
   themeParams?: boolean;
-  head?: ElementChildType;
+  head?: Child;
 };
 
-export const LayoutTWA: Template<LayoutTWAProps, Record<string, any>> =
+export const LayoutTWA: ComponentNode<LayoutTWAProps, Record<string, any>> =
   component<LayoutTWAProps>((props, children) => {
     const {
       title: pageTitle,

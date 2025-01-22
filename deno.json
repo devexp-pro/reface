@@ -9,26 +9,18 @@
   },
   "exports": {
     ".": "./source/mod.ts",
-    "./htmx": "./source/reface/htmx/mod.ts",
-    "./jsx": "./source/reface/jsx/mod.ts",
-    "./jsx/jsx-runtime": "./source/reface/jsx/jsx-runtime.ts",
-    "./plugins/partials": "./source/reface/partials/mod.ts",
-    "./plugins/LoggerPlugin": "./source/reface/LoggerPlugin.ts",
-    "./plugins/liveReload": "./source/reface/liveReload/mod.ts",
-    "./components/LayoutSimple": "./source/reface/components/LayoutSimple.ts",
-    "./components/LayoutTWA": "./source/reface/components/LayoutTWA.ts",
-    "./elements": "./source/recast/elements.ts",
-    "./template": "./source/recast/template/mod.ts",
-    "./plugins/styled": "./source/recast/styled/mod.ts"
+    "./recast": "./source/recast/mod.ts",
+    "./jsx-runtime": "./source/recast/jsx/jsx-runtime.ts",
+    "./element": "./source/recast/element/mod.ts"
   },
   "imports": {
     "@reface": "./source/mod.ts",
+    "@reface/jsx-runtime": "./source/recast/jsx/jsx-runtime.ts",
+    "@common/": "./source/common/",
     "@framework": "./source/reface/mod.ts",
     "@framework/": "./source/reface/",
     "@recast": "./source/recast/mod.ts",
     "@recast/": "./source/recast/",
-    "@reface/jsx": "./source/reface/jsx/mod.ts",
-    "@reface/jsx/jsx-runtime": "./source/reface/jsx/jsx-runtime.ts",
     "@reface/types": "./source/recast/types/mod.ts",
     "@reface/constants": "./source/recast/constants.ts",
     "@reface/island": "./source/reface/island/mod.ts",
@@ -74,7 +66,7 @@
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@reface/jsx"
+    "jsxImportSource": "@reface"
   },
   "publish": {
     "include": [

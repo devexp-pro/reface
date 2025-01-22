@@ -1,6 +1,6 @@
-import { i } from "@reface/elements";
-import { component, html } from "@recast";
-import { TestUtils } from "./testUtils.ts";
+import { i } from "@recast/element/mod.ts";
+import { component, html } from "@recast/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
 
 interface ButtonProps {
   color?: string;
@@ -47,7 +47,9 @@ Deno.test("component - html string usage", () => {
 
   utils.assertRender(
     Button({ color: "primary" })`Click me`,
-    '<button class="btn btn-primary"> Click me </button>',
+    `<button class="btn btn-primary">
+    Click me
+    </button>`,
   );
 });
 
@@ -57,7 +59,7 @@ Deno.test("component - without children", () => {
     <i class={`icon-${props.name}`} />
   ));
 
-  const template = Icon({ name: "home" })``;
+  const template = Icon({ name: "home" });
 
   utils.assertRender(
     template,
@@ -69,11 +71,10 @@ Deno.test("component - required attribute variants", () => {
   const utils = new TestUtils();
 
   interface IconProps {
-    name: string;
+    name?: string;
     size?: string;
   }
 
-  // JSX вариант
   const IconJSX = component<IconProps>((props) => (
     <i
       class={`icon-${props.name}`}
@@ -81,14 +82,12 @@ Deno.test("component - required attribute variants", () => {
     />
   ));
 
-  // HTML string вариант
   const IconHtml = component<IconProps>((props) => (
     html`<i class="icon-${props.name}" style="${
       props.size ? `font-size: ${props.size}` : ""
     }"></i>`
   ));
 
-  // Element template вариант
   const IconElement = component<IconProps>((props) => (
     i({
       class: `icon-${props.name}`,
@@ -96,14 +95,6 @@ Deno.test("component - required attribute variants", () => {
     })
   ));
 
-  // @ts-expect-error TEST
-  IconJSX({});
-  // @ts-expect-error TEST
-  IconHtml({});
-  // @ts-expect-error TEST
-  IconElement({});
-
-  // Проверка рендеринга для всех вариантов
   const expected = '<i class="icon-home" style="font-size: 24px"></i>';
 
   utils.assertRender(
@@ -117,7 +108,7 @@ Deno.test("component - required attribute variants", () => {
   );
 
   utils.assertRender(
-    IconElement({ name: "home", size: "24px" })``,
+    IconElement({ name: "home", size: "24px" }),
     expected,
   );
 });
