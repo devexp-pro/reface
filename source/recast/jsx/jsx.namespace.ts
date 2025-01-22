@@ -5,7 +5,7 @@ import type {
   Element as RecastElement,
   HTMLAttributes,
   HTMLElementTagAttributes,
-} from "@recast/expressions";
+} from "@recast/expressions/mod.ts";
 
 type WithChildren = {
   children?: Children | Child;

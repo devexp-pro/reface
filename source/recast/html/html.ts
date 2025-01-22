@@ -1,7 +1,10 @@
 import type { Html } from "./types.ts";
 import type { Child, Children } from "@recast/expressions/mod.ts";
 import { isTemplateLiteralCall } from "@common/templateLiteral.ts";
-import { fragmentExpression, htmlContentExpression } from "@recast/expressions/mod.ts";
+import {
+  fragmentExpression,
+  htmlContentExpression,
+} from "@recast/expressions/mod.ts";
 
 function processHtmlContent(
   strings: TemplateStringsArray,

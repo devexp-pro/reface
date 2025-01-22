@@ -4,7 +4,7 @@ import type {
   Children,
   ExpressionInterface,
   RenderContext,
-} from "@recast/expressions";
+} from "@recast/expressions/mod.ts";
 
 export type BeforeRenderHook<T = any> = (params: {
   template: T;

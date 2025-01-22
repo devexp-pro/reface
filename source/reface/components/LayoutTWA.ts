@@ -1,5 +1,5 @@
 import { type Child, component, type ComponentNode, html } from "@recast";
-import { body, head, meta, script, title } from "@recast/elements";
+import { body, head, meta, script, title } from "@recast/element/mod.ts";
 
 export type LayoutTWAProps = {
   title?: string;

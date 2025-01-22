@@ -1,10 +1,18 @@
-import { RecastPlugin, type RecastPluginInterface } from "@recast/plugin/mod.ts";
-import { componentExpression, type ComponentNode } from "@recast/expressions/mod.ts";
+import {
+  RecastPlugin,
+  type RecastPluginInterface,
+} from "@recast/plugin/mod.ts";
+import {
+  componentExpression,
+  type ComponentNode,
+} from "@recast/expressions/mod.ts";
+
+import type { SlotMeta, TemplateMeta } from "./types.ts";
 
 export class SlotsPlugin extends RecastPlugin implements RecastPluginInterface {
   name = "slots";
-  private slots = new Map<string, Map<string, string>>();
-  private slotsFn = new Map<string, (content: string[]) => string>();
+  private slots = new Map<string | symbol, Map<string, string>>();
+  private slotsFn = new Map<string | symbol, (content: string[]) => string>();
 
   renderBefore() {
     this.slots.clear();
@@ -14,17 +22,19 @@ export class SlotsPlugin extends RecastPlugin implements RecastPluginInterface {
     this.after<ComponentNode<any, any>, typeof componentExpression>(
       componentExpression,
       ({ template, html }) => {
-        const { meta, attributes } = componentExpression.getPayload(template);
+        const payload = componentExpression.getPayload(template);
+        const meta = payload.meta as SlotMeta | TemplateMeta;
+        const attributes = payload.attributes;
 
-        if (meta?.slot?.name) {
+        if ("slot" in meta && meta?.slot?.name) {
           const name = meta.slot.name;
           if (meta.slot?.render) {
             this.slotsFn.set(name, meta.slot.render);
           }
-          return `<!--recast-slot-${name}-->`;
+          return `<!--recast-slot-${name.toString()}-->`;
         }
 
-        if (meta?.template === true) {
+        if ("template" in meta && meta.template === true) {
           const slot = attributes.slot;
           const key = attributes.key ?? "default";
 

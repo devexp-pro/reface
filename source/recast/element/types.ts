@@ -4,7 +4,7 @@ import type {
   ElementNode,
   HTMLAttributes,
   HTMLElementTagAttributes,
-} from "@recast/expressions";
+} from "@recast/expressions/mod.ts";
 
 export type ElementFn = {
   <
@@ -20,7 +20,7 @@ export type ElementFn = {
   >;
 };
 
-export type Element =
+export type ElementProxy =
   & {
     <
       P extends HTMLAttributes = HTMLAttributes,

@@ -1,5 +1,9 @@
 import { createElement } from "./createElement.ts";
-import type { ComponentNode, Element, ElementNode } from "@recast/expressions";
+import type {
+  ComponentNode,
+  Element,
+  ElementNode,
+} from "@recast/expressions/mod.ts";
 
 type BaseAttributes = Record<string, any>;
 

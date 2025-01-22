@@ -9,17 +9,9 @@
   },
   "exports": {
     ".": "./source/mod.ts",
-    "./htmx": "./source/reface/htmx/mod.ts",
-    "./jsx": "./source/reface/jsx/mod.ts",
-    "./jsx/jsx-runtime": "./source/reface/jsx/jsx-runtime.ts",
-    "./plugins/partials": "./source/reface/partials/mod.ts",
-    "./plugins/LoggerPlugin": "./source/reface/LoggerPlugin.ts",
-    "./plugins/liveReload": "./source/reface/liveReload/mod.ts",
-    "./components/LayoutSimple": "./source/reface/components/LayoutSimple.ts",
-    "./components/LayoutTWA": "./source/reface/components/LayoutTWA.ts",
-    "./elements": "./source/recast/elements.ts",
-    "./template": "./source/recast/template/mod.ts",
-    "./plugins/styled": "./source/recast/styled/mod.ts"
+    "./recast": "./source/recast/mod.ts",
+    "./jsx-runtime": "./source/recast/jsx/jsx-runtime.ts",
+    "./element": "./source/recast/element/mod.ts"
   },
   "imports": {
     "@reface": "./source/mod.ts",

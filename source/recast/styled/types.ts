@@ -4,7 +4,7 @@ import type {
   FragmentNode,
   HTMLAttributes,
   HTMLElementTagAttributes,
-} from "@recast/expressions";
+} from "@recast/expressions/mod.ts";
 
 interface StyledMethods {
   getStyledClass(): string;

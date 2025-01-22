@@ -1,6 +1,6 @@
 import type { Child, Children } from "@recast";
 import type { ExpressionType } from "./types.ts";
-import type { RenderOptions } from "@recast/recast";
+import type { RenderOptions } from "@recast/recast/mod.ts";
 import { EmptyRecord } from "@common/utility.types.ts";
 
 export interface RenderContext {

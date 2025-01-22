@@ -1,5 +1,5 @@
-import type { RecastPlugin } from "@recast/plugin";
-import type { Children } from "@recast/expressions";
+import type { RecastPlugin } from "@recast/plugin/mod.ts";
+import type { Children } from "@recast/expressions/mod.ts";
 
 export interface RecastStore {
   get<T>(pluginName: string): T | undefined;

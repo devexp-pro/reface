@@ -1,8 +1,11 @@
 import type { EmptyRecord } from "@common/utility.types.ts";
 
-import type { Element, ElementFn } from "./types.ts";
+import type { ElementFn, ElementProxy } from "./types.ts";
 import type { HTMLElementTagAttributes } from "@recast/expressions/mod.ts";
-import { elementExpression, type HTMLAttributes } from "@recast/expressions/mod.ts";
+import {
+  elementExpression,
+  type HTMLAttributes,
+} from "@recast/expressions/mod.ts";
 
 const elementFn: ElementFn = <
   P extends HTMLAttributes = HTMLAttributes,
@@ -34,4 +37,4 @@ export const element = new Proxy(elementFn, {
     }
     return target[prop as keyof typeof target];
   },
-}) as Element;
+}) as ElementProxy;

@@ -7,7 +7,7 @@ import type {
   ComponentNode,
   ComponentPayload,
 } from "./types.ts";
-import type { RenderOptions } from "@recast/recast";
+import type { RenderOptions } from "@recast/recast/mod.ts";
 
 class ComponentExpression<
   Attrs extends ComponentAttributes = ComponentAttributes,

@@ -1,5 +1,4 @@
-import { RefaceComposer } from "@recast";
-import { StyledPlugin } from "@recast";
+import { Recast, RecastStyledPlugin } from "@recast";
 
 import { fallbackErrorScreen } from "./fallbackErrorScreen.ts";
 import { parseErrorStack } from "./utils.ts";
@@ -11,15 +10,15 @@ export interface ErrorViewOptions {
   error: Error;
 }
 
-export function createErrorView(
+export async function createErrorView(
   { title = "Render Error", error }: ErrorViewOptions,
-): string {
+): Promise<string> {
   try {
-    const errorViewComposer = new RefaceComposer();
-    errorViewComposer.use(new StyledPlugin());
+    const errorViewRecast = new Recast();
+    errorViewRecast.use(new RecastStyledPlugin());
     const stackFrames = parseErrorStack(error);
 
-    return errorViewComposer.render(
+    return await errorViewRecast.renderHtml(
       ErrorScreen({ title, error, stackFrames }),
     );
   } catch (e) {

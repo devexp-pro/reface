@@ -1,6 +1,6 @@
 import type { EmptyRecord } from "@common/utility.types.ts";
 import type { Child, Children, ProxyNode } from "../types.ts";
-import type { RenderOptions } from "@recast/recast";
+import type { RenderOptions } from "@recast/recast/mod.ts";
 
 export interface ComponentAttributes extends Record<string, any> {
 }

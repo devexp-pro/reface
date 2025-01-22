@@ -31,7 +31,7 @@
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@reface/jsx"
+    "jsxImportSource": "@reface"
   },
   "deploy": {
     "exclude": [],

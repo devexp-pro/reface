@@ -1,8 +1,4 @@
-import type {
-  Children,
-  ComponentNode,
-  HTMLAttributes,
-} from "@recast/expressions";
+import type { ComponentNode, HTMLAttributes } from "@recast/expressions/mod.ts";
 
 export type SlotAttributes = {
   name?: symbol | string;
@@ -32,5 +28,6 @@ export type TemplateMeta = {
   template: true;
 };
 export type TemplateComponent = ComponentNode<
-  TemplateAttributes
+  TemplateAttributes,
+  Record<string, any>
 >;
