@@ -1,8 +1,8 @@
 import type { EmptyRecord } from "@common/utility.types.ts";
 
 import type { Element, ElementFn } from "./types.ts";
-import type { HTMLElementTagAttributes } from "@recast/expressions";
-import { elementExpression, type HTMLAttributes } from "@recast/expressions";
+import type { HTMLElementTagAttributes } from "@recast/expressions/mod.ts";
+import { elementExpression, type HTMLAttributes } from "@recast/expressions/mod.ts";
 
 const elementFn: ElementFn = <
   P extends HTMLAttributes = HTMLAttributes,

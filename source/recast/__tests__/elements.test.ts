@@ -69,8 +69,8 @@ import {
   tr,
   ul,
   video,
-} from "@recast/element";
-import { TestUtils } from "@recast/test-utils";
+} from "@recast/element/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
 
 Deno.test("elements - basic usage", () => {
   const utils = new TestUtils();

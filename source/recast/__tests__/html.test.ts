@@ -1,5 +1,5 @@
-import { html } from "@recast";
-import { TestUtils } from "@recast/test-utils";
+import { html } from "@recast/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
 
 Deno.test("html template literal - basic rendering", () => {
   const utils = new TestUtils();

@@ -1,5 +1,5 @@
-import type { HTMLAttributes } from "@recast/expressions";
-import { component } from "@recast/component";
+import type { HTMLAttributes } from "@recast/expressions/mod.ts";
+import { component } from "@recast/component/mod.ts";
 
 import type {
   SlotAttributes,

@@ -7,7 +7,7 @@ import {
   fragmentExpression,
   PROXY_COPY,
   PROXY_PAYLOAD,
-} from "@recast/expressions";
+} from "@recast/expressions/mod.ts";
 import { parseCSS } from "./cssParser.ts";
 import type { MetaStyled } from "./types.ts";
 

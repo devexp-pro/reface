@@ -1,5 +1,5 @@
-import { RecastPlugin, type RecastPluginInterface } from "@recast/plugin";
-import { componentExpression, type ComponentNode } from "@recast/expressions";
+import { RecastPlugin, type RecastPluginInterface } from "@recast/plugin/mod.ts";
+import { componentExpression, type ComponentNode } from "@recast/expressions/mod.ts";
 
 export class SlotsPlugin extends RecastPlugin implements RecastPluginInterface {
   name = "slots";

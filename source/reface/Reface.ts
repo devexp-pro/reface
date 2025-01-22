@@ -1,15 +1,18 @@
 import type { Context, Hono, HonoRequest } from "@hono/hono";
 import type { ContentfulStatusCode } from "@hono/hono/utils/http-status";
-import type { IRefaceComposerPlugin } from "@reface/types";
-import type { Template, TemplateAttributes } from "@reface/template";
 
-import { RefaceComposer } from "@recast";
+import {
+  ComponentNode,
+  Element,
+  Recast,
+  RecastPluginInterface,
+  RecastStyledPlugin,
+} from "@recast";
 import {
   partial,
   type PartialHandler,
   PartialsPlugin,
 } from "./partials/mod.ts";
-import { StyledPlugin } from "@recast";
 import {
   createIsland,
   createIslandComponent,
@@ -21,33 +24,30 @@ import {
 import { createErrorView } from "./errorScreen/mod.ts";
 
 export interface RefaceOptions {
-  plugins?: IRefaceComposerPlugin[];
-  layout?: Template;
+  plugins?: RecastPluginInterface[];
+  layout?: Element;
   partialApiPrefix?: string;
 }
 
 const PARTIAL_API_PREFIX = "/reface/partial";
 
 export class Reface {
-  public composer: RefaceComposer;
+  public recast: Recast;
   private islandPlugin: IslandPlugin;
   private partialsPlugin: PartialsPlugin;
-  private layout?: Template;
+  private layout?: Element;
   private islands = new Map<string, Island<any, any, any>>();
   private islandProps = new Map<string, unknown>();
 
   static partial(
     handler: PartialHandler<HonoRequest>,
     name: string,
-  ): Template<any, any> {
-    return partial(handler, name) as Template<
-      any,
-      any
-    >;
+  ): ComponentNode<any, any> {
+    return partial(handler, name) as ComponentNode<any, any>;
   }
 
   constructor(options: RefaceOptions = {}) {
-    this.composer = new RefaceComposer();
+    this.recast = new Recast();
     this.layout = options.layout;
 
     this.islandPlugin = new IslandPlugin();
@@ -55,11 +55,11 @@ export class Reface {
       apiPrefix: PARTIAL_API_PREFIX,
     });
 
-    this.composer.use(this.islandPlugin);
-    this.composer.use(this.partialsPlugin);
-    this.composer.use(new StyledPlugin());
+    this.recast.use(this.islandPlugin);
+    this.recast.use(this.partialsPlugin);
+    this.recast.use(new RecastStyledPlugin());
 
-    options.plugins?.forEach((plugin) => this.composer.use(plugin));
+    options.plugins?.forEach((plugin) => this.recast.use(plugin));
   }
 
   private async handlePartial(c: Context): Promise<Response> {
@@ -72,7 +72,7 @@ export class Reface {
       }
 
       const template = await handler(c);
-      const content = this.composer.render(template as Template);
+      const content = this.recast.render(template as Template);
 
       return c.html(content);
     } catch (error) {
@@ -195,7 +195,7 @@ export class Reface {
           island.template(context),
           newState,
         );
-        response.html = this.composer.render(template);
+        response.html = this.recast.render(template);
       }
 
       return {
@@ -223,7 +223,7 @@ export class Reface {
       content = this.layout`${content}`;
     }
     try {
-      return this.composer.render(content);
+      return this.recast.render(content);
     } catch (e) {
       const error = e as Error;
       console.error(`Render Error:`, error);
@@ -239,6 +239,6 @@ export class Reface {
     }
   }
   getComposer(): RefaceComposer {
-    return this.composer;
+    return this.recast;
   }
 }

@@ -16,7 +16,7 @@ import {
   VOID_ELEMENTS,
 } from "./constants.ts";
 import type { HTMLAttributes, HTMLElementTagAttributes } from "./html.types.ts";
-import { RenderOptions } from "@recast/recast";
+import type { RenderOptions } from "@recast/recast/mod.ts";
 
 class ElementExpression<
   Attrs extends HTMLAttributes = HTMLAttributes,

@@ -4,7 +4,7 @@ import {
   type ComponentNode,
   type ComponentPayload,
   type ComponentRenderFn,
-} from "@recast/expressions";
+} from "@recast/expressions/mod.ts";
 
 export const component = <
   P extends ComponentAttributes = ComponentAttributes,

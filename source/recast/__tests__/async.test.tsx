@@ -1,5 +1,5 @@
-import { component, element } from "@recast";
-import { TestUtils } from "@recast/test-utils";
+import { component, element } from "@recast/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 const fail = () => Promise.reject(new Error("Async error"));

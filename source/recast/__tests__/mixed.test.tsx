@@ -1,5 +1,5 @@
-import { component, element, html } from "@recast";
-import { TestUtils } from "@recast/test-utils";
+import { component, element, html } from "@recast/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
 
 Deno.test("mixed usage - components with html and createElement", () => {
   const utils = new TestUtils();

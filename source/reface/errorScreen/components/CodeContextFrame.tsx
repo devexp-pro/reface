@@ -1,6 +1,6 @@
 import { component } from "@recast";
 import { styled } from "@reface/plugins/styled";
-import { span } from "@reface/elements";
+import { span } from "@recast/elements";
 import { tokenize } from "../tokenize.ts";
 
 const StyledCodeContext = styled.div /* css */`

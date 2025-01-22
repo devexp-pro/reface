@@ -1,6 +1,6 @@
-import { styled } from "@recast/styled";
-import { RecastStyledPlugin } from "@recast/styled";
-import { TestUtils } from "@recast/test-utils";
+import { styled } from "@recast/styled/mod.ts";
+import { RecastStyledPlugin } from "@recast/styled/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
 
 const utils = new TestUtils({ plugins: [new RecastStyledPlugin()] });
 Deno.test("styled.div - should create basic styled div", () => {

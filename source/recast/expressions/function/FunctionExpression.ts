@@ -1,7 +1,7 @@
 import type { ExpressionInterface, RenderContext } from "../Expression.ts";
-import { PROXY_PAYLOAD } from "@recast/expressions";
+import { PROXY_PAYLOAD } from "@recast/expressions/mod.ts";
 import type { ExpressionType } from "../types.ts";
-import type { RenderOptions } from "@recast/recast";
+import type { RenderOptions } from "@recast/recast/mod.ts";
 import type { Child, Children } from "../types.ts";
 
 export type FunctionNode = (userContext?: RenderOptions) => Child[] | Child;

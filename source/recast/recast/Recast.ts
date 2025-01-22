@@ -12,8 +12,8 @@ import {
   primitiveExpression,
   type RenderContext,
   textContentExpression,
-} from "@recast/expressions";
-import type { RecastPluginInterface } from "@recast/plugin";
+} from "@recast/expressions/mod.ts";
+import type { RecastPluginInterface } from "@recast/plugin/mod.ts";
 
 import type { RenderOptions, RenderResult } from "./types.ts";
 

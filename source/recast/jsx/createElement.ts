@@ -6,7 +6,7 @@ import {
   type Element,
   elementExpression,
   type ElementNode,
-} from "@recast/expressions";
+} from "@recast/expressions/mod.ts";
 
 export function createElement<
   P extends Record<string, any>,

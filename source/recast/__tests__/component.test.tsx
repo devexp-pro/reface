@@ -1,6 +1,6 @@
-import { i } from "@recast/element";
-import { component, html } from "@recast";
-import { TestUtils } from "@recast/test-utils";
+import { i } from "@recast/element/mod.ts";
+import { component, html } from "@recast/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
 
 interface ButtonProps {
   color?: string;

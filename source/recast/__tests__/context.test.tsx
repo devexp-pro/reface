@@ -1,7 +1,7 @@
-import { component, element } from "@recast";
-import { TestUtils } from "@recast/test-utils";
+import { component, element } from "@recast/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
 import { PROXY_PAYLOAD } from "../expressions/types.ts";
-import type { RenderOptions } from "@recast/recast";
+import type { RenderOptions } from "@recast/recast/mod.ts";
 
 Deno.test("context - function access", async () => {
   const utils = new TestUtils();
