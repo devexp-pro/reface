@@ -30,4 +30,5 @@ class PrimitiveExpression implements ExpressionInterface<PrimitiveValue> {
   }
 }
 
-export const primitiveExpression = new PrimitiveExpression();
+export const primitiveExpression: PrimitiveExpression =
+  new PrimitiveExpression();

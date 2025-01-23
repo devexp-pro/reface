@@ -19,10 +19,10 @@ class FunctionExpression implements ExpressionInterface<FunctionNode> {
       context: RenderContext;
       userContext?: RenderOptions;
     },
-  ) {
+  ): string {
     const result = node(userContext);
     return context.render(result);
   }
 }
 
-export const functionExpression = new FunctionExpression();
+export const functionExpression: FunctionExpression = new FunctionExpression();

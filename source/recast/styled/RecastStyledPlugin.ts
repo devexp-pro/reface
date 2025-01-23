@@ -34,7 +34,7 @@ export class RecastStyledPlugin extends RecastPlugin
     );
   }
 
-  renderAfter(_: Child | Children, html: string) {
+  renderAfter(_: Child | Children, html: string): string {
     if (!this.styles.size) {
       return html;
     }

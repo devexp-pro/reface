@@ -18,8 +18,8 @@ export type AfterRenderHook<T = any> = (params: {
 }) => string | void;
 
 export class RecastPlugin {
-  beforeHooks = new Map<ExpressionInterface, BeforeRenderHook[]>();
-  afterHooks = new Map<ExpressionInterface, AfterRenderHook[]>();
+  beforeHooks: Map<ExpressionInterface, BeforeRenderHook[]> = new Map();
+  afterHooks: Map<ExpressionInterface, AfterRenderHook[]> = new Map();
 
   before<N, T extends ExpressionInterface<N>>(
     expression: T,

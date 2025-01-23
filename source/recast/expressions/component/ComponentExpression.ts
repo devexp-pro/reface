@@ -44,7 +44,7 @@ class ComponentExpression<
       context: RenderContext;
       userContext?: RenderOptions;
     },
-  ) {
+  ): string {
     const { render, attributes, children, id } = node[PROXY_PAYLOAD];
 
     const result = context.render(
@@ -104,4 +104,5 @@ class ComponentExpression<
   }
 }
 
-export const componentExpression = new ComponentExpression();
+export const componentExpression: ComponentExpression =
+  new ComponentExpression();

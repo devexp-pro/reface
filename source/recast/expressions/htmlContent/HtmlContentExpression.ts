@@ -51,4 +51,5 @@ export class HtmlContentExpression<T extends HtmlContent = HtmlContent>
   }
 }
 
-export const htmlContentExpression = new HtmlContentExpression();
+export const htmlContentExpression: HtmlContentExpression =
+  new HtmlContentExpression();

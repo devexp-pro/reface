@@ -15,7 +15,7 @@ export function createPartial<T = unknown>(
   name: string,
   handler: PartialHandler,
   apiPrefix: string = "/reface/partial",
-) {
+): ComponentNode<HTMLAttributes, PartialMethods> {
   const meta: MetaPartial = {
     name,
     handler,

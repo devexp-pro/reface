@@ -16,7 +16,7 @@ class FragmentExpression<
     return (value as T)?.type === "fragment";
   }
 
-  render({ node, context }: { node: T; context: RenderContext }) {
+  render({ node, context }: { node: T; context: RenderContext }): string {
     return node.children
       ?.map((child) => context.render(child as Child))
       .join("");
@@ -39,4 +39,4 @@ class FragmentExpression<
   }
 }
 
-export const fragmentExpression = new FragmentExpression();
+export const fragmentExpression: FragmentExpression = new FragmentExpression();

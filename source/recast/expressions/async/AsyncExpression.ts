@@ -18,7 +18,9 @@ class AsyncExpression implements ExpressionInterface<AsyncNode> {
     this.asyncQueue.clear();
   }
 
-  render({ node, context }: { node: AsyncNode; context: RenderContext }) {
+  render(
+    { node, context }: { node: AsyncNode; context: RenderContext },
+  ): string {
     const id = `async-${Math.random().toString(36).slice(2)}`;
     const marker = `<!-- recast-async:${id} -->`;
 
@@ -75,4 +77,4 @@ class AsyncExpression implements ExpressionInterface<AsyncNode> {
   }
 }
 
-export const asyncExpression = new AsyncExpression();
+export const asyncExpression: AsyncExpression = new AsyncExpression();

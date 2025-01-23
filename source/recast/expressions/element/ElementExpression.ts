@@ -121,7 +121,7 @@ class ElementExpression<
     };
   }
 
-  processStyleString(styleStr: string) {
+  processStyleString(styleStr: string): Record<string, string> {
     const styles: Record<string, string> = {};
     styleStr.split(";").forEach((style) => {
       const [prop, value] = style.split(":").map((s) => s.trim());
@@ -266,4 +266,4 @@ class ElementExpression<
   }
 }
 
-export const elementExpression = new ElementExpression();
+export const elementExpression: ElementExpression = new ElementExpression();

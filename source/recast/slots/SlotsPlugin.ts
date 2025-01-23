@@ -51,7 +51,7 @@ export class SlotsPlugin extends RecastPlugin implements RecastPluginInterface {
     );
   }
 
-  renderAfter(_: undefined, html: string) {
+  renderAfter(_: undefined, html: string): string {
     return html.replace(
       /<!--recast-slot-([\w.]+)-->/g,
       (_: string, name: string) => {

@@ -10,11 +10,13 @@ class ArrayExpression implements ExpressionInterface<ArrayNode> {
     return Array.isArray(value);
   }
 
-  render({ node, context }: { node: ArrayNode; context: RenderContext }) {
+  render(
+    { node, context }: { node: ArrayNode; context: RenderContext },
+  ): string {
     return node
       .map((item) => context.render(item as Child))
       .join("");
   }
 }
 
-export const arrayExpression = new ArrayExpression();
+export const arrayExpression: ArrayExpression = new ArrayExpression();

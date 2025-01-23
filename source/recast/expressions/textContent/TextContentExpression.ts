@@ -27,4 +27,5 @@ export class TextContentExpression<T extends TextContent>
   }
 }
 
-export const textContentExpression = new TextContentExpression();
+export const textContentExpression: TextContentExpression<TextContent> =
+  new TextContentExpression();

@@ -69,7 +69,7 @@ export class ExpressionProxy<
     return result;
   }
 
-  proccessChildren(payload: T, children: Children) {
+  proccessChildren(payload: T, children: Children): Children {
     return [
       ...payload.children,
       ...children,
@@ -125,7 +125,7 @@ export class ExpressionProxy<
     return new Proxy(nodeProxy, handler as any) as ProxyNode<T, Props, Methods>;
   }
 
-  getPayload(node: ProxyNode<T, any, any>) {
+  getPayload(node: ProxyNode<T, any, any>): T {
     return (node as any)[PROXY_PAYLOAD] as T;
   }
 }

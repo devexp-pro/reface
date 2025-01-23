@@ -1,3 +1,5 @@
+import type { SlotComponent } from "../types.ts";
+
 import { createSlot } from "../slot.ts";
 
-export const HeadSlot = createSlot("head");
+export const HeadSlot: SlotComponent = createSlot("head");
