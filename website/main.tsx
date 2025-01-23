@@ -41,7 +41,7 @@ const reface = new Reface({
 });
 
 if (IS_DEV) {
-  reface.composer.use(new LiveReloadPlugin({ watchPaths: ["./"] }));
+  reface.recast.use(new LiveReloadPlugin({ watchPaths: ["./"] }));
 }
 
 const app = new Hono();

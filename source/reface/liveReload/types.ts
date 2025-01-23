@@ -1,5 +1,3 @@
-import type { IRefaceComposerPlugin } from "@reface/types";
-
 export interface LiveReloadOptions {
   /**
    * WebSocket server port
@@ -18,8 +16,4 @@ export interface LiveReloadOptions {
    * @default []
    */
   watchPaths?: string[];
-}
-
-export interface LiveReloadPlugin extends IRefaceComposerPlugin {
-  name: "liveReload";
 }

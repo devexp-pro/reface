@@ -1,7 +1,7 @@
 import { component } from "@recast";
 import { styled } from "@reface/plugins/styled";
-import { span } from "@reface/elements";
 import { tokenize } from "../tokenize.ts";
+import { element as e } from "@recast";
 
 const StyledCodeContext = styled.div /* css */`
   & {
@@ -117,9 +117,9 @@ export const CodeContextFrame = component((attr: {
                       token.posStart < attr.errorCol &&
                       token.posEnd >= attr.errorCol
                     ) {
-                      return span({ class: "error-char" })`${token.value}`;
+                      return e.span({ class: "error-char" })`${token.value}`;
                     }
-                    return span({
+                    return e.span({
                       style: { color: token.color },
                     })`${token.value}`;
                   })}
@@ -141,7 +141,7 @@ export const CodeContextFrame = component((attr: {
             <span class="line-number">{lineNum}</span>
             <span class="line-content">
               {tokenize(line).map((token) =>
-                span({ style: { color: token.color } })`${token.value}`
+                e.span({ style: { color: token.color } })`${token.value}`
               )}
             </span>
           </div>

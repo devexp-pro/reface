@@ -1,12 +1,11 @@
-import { component, elementFactory, html } from "@recast";
-import type { ElementChildType } from "@reface/template";
-import { TestUtils } from "./testUtils.ts";
+import { component, element, html } from "@recast/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
 
 Deno.test("mixed usage - components with html and createElement", () => {
   const utils = new TestUtils();
-  const div = elementFactory("div");
+  const div = element("div");
 
-  const Layout = component<{ title: string; children: ElementChildType[] }>((
+  const Layout = component<{ title: string }>((
     props,
     children,
   ) => (
@@ -37,10 +36,10 @@ Deno.test("mixed usage - components with html and createElement", () => {
 
 Deno.test("mixed usage - html with components and createElement", () => {
   const utils = new TestUtils();
-  const span = elementFactory("span");
+  const span = element("span");
 
   const Button = component<
-    { color: string; children: ElementChildType[] | ElementChildType }
+    { color: string }
   >((props, children) => (
     <button class={`btn-${props.color}`}>{children}</button>
   ));
@@ -61,7 +60,7 @@ Deno.test("mixed usage - html with components and createElement", () => {
 
 Deno.test("mixed usage - handles primitives", () => {
   const utils = new TestUtils();
-  const div = elementFactory("div");
+  const div = element("div");
 
   const Content = component(() =>
     html`<span>${false}${null}${undefined}${0}${true}${""}</span>`

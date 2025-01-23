@@ -1,20 +1,19 @@
-import { styled } from "@reface/plugins/styled";
-import { StyledPlugin } from "@reface/plugins/styled";
-import { TestUtils } from "./testUtils.ts";
-// Tag based components
+import { styled } from "@recast/styled/mod.ts";
+import { RecastStyledPlugin } from "@recast/styled/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
+
+const utils = new TestUtils({ plugins: [new RecastStyledPlugin()] });
 Deno.test("styled.div - should create basic styled div", () => {
-  const utils = new TestUtils({ plugins: [new StyledPlugin()] });
   const StyledDiv = styled.div`
     & {
       color: red;
     }
   `;
-
   utils.assertRender(
     <StyledDiv></StyledDiv>,
-    `<div class="${StyledDiv.raw.payload.styled.rootClass}"></div>
+    `<div class="${StyledDiv.getStyledClass()}"></div>
 <style>
-  .${StyledDiv.raw.payload.styled.rootClass} {
+.${StyledDiv.getStyledClass()} {
     color: red;
   }
 </style>`,
@@ -22,7 +21,6 @@ Deno.test("styled.div - should create basic styled div", () => {
 });
 
 Deno.test("styled.button - should handle props", () => {
-  const utils = new TestUtils({ plugins: [new StyledPlugin()] });
   const Button = styled.button`
     & {
       background: blue;
@@ -31,9 +29,9 @@ Deno.test("styled.button - should handle props", () => {
 
   utils.assertRender(
     <Button class="primary"></Button>,
-    `<button class="${Button.raw.payload.styled.rootClass} primary"></button>
+    `<button class="${Button.getStyledClass()} primary"></button>
 <style>
-  .${Button.raw.payload.styled.rootClass} {
+  .${Button.getStyledClass()} {
     background: blue;
   }
 </style>`,
@@ -41,7 +39,6 @@ Deno.test("styled.button - should handle props", () => {
 });
 
 Deno.test("styled.h1 - should handle children", () => {
-  const utils = new TestUtils({ plugins: [new StyledPlugin()] });
   const Title = styled.h1`
     & {
       font-size: 2em;
@@ -50,9 +47,9 @@ Deno.test("styled.h1 - should handle children", () => {
 
   utils.assertRender(
     Title`Hello`,
-    `<h1 class="${Title.raw.payload.styled.rootClass}">Hello</h1>
+    `<h1 class="${Title.getStyledClass()}">Hello</h1>
 <style>
-  .${Title.raw.payload.styled.rootClass} {
+  .${Title.getStyledClass()} {
     font-size: 2em;
   }
 </style>`,
@@ -61,7 +58,6 @@ Deno.test("styled.h1 - should handle children", () => {
 
 // Component extension
 Deno.test("styled(Component) - should extend existing component", () => {
-  const utils = new TestUtils({ plugins: [new StyledPlugin()] });
   const BaseButton = styled.button`
     & {
       padding: 1rem;
@@ -77,12 +73,12 @@ Deno.test("styled(Component) - should extend existing component", () => {
 
   utils.assertRender(
     PrimaryButton,
-    `<button class="${BaseButton.getRootClass()} ${PrimaryButton.getRootClass()}"></button>
+    `<button class="${BaseButton.getStyledClass()} ${PrimaryButton.getStyledClass()}"></button>
 <style>
-  .${BaseButton.getRootClass()} {
+  .${BaseButton.getStyledClass()} {
     padding: 1rem;
   }
-  .${PrimaryButton.raw.payload.styled.rootClass} {
+  .${PrimaryButton.getStyledClass()} {
     background: blue;
     color: white;
   }
@@ -91,7 +87,6 @@ Deno.test("styled(Component) - should extend existing component", () => {
 });
 
 Deno.test("styled(Component) - should handle props in extended component", () => {
-  const utils = new TestUtils({ plugins: [new StyledPlugin()] });
   const BaseInput = styled.input`
     & {
       border: 1px solid gray;
@@ -106,12 +101,12 @@ Deno.test("styled(Component) - should handle props in extended component", () =>
 
   utils.assertRender(
     SearchInput({ type: "search", placeholder: "Search..." })``,
-    `<input class="${BaseInput.getRootClass()} ${SearchInput.getRootClass()}" type="search" placeholder="Search..."/>
+    `<input  class="${BaseInput.getStyledClass()} ${SearchInput.getStyledClass()}" type="search" placeholder="Search..."/>
 <style>
-  .${BaseInput.getRootClass()} {
+  .${BaseInput.getStyledClass()} {
     border: 1px solid gray;
   }
-  .${SearchInput.getRootClass()} {
+  .${SearchInput.getStyledClass()} {
     padding-left: 2rem;
   }
 </style>`,
@@ -120,7 +115,6 @@ Deno.test("styled(Component) - should handle props in extended component", () =>
 
 // CSS features
 Deno.test("styled CSS - should handle pseudo-classes", () => {
-  const utils = new TestUtils({ plugins: [new StyledPlugin()] });
   const Button = styled.button`
     & {
       color: blue;
@@ -132,12 +126,12 @@ Deno.test("styled CSS - should handle pseudo-classes", () => {
 
   utils.assertRender(
     <Button></Button>,
-    `<button class="${Button.getRootClass()}"></button>
+    `<button class="${Button.getStyledClass()}"></button>
 <style>
-  .${Button.getRootClass()} {
+  .${Button.getStyledClass()} {
     color: blue;
   }
-  .${Button.getRootClass()}:hover {
+  .${Button.getStyledClass()}:hover {
     color: darkblue;
   }
 </style>`,
@@ -145,7 +139,6 @@ Deno.test("styled CSS - should handle pseudo-classes", () => {
 });
 
 Deno.test("styled CSS - should handle nested selectors", () => {
-  const utils = new TestUtils({ plugins: [new StyledPlugin()] });
   const Card = styled.div`
     & {
       padding: 1rem;
@@ -157,12 +150,12 @@ Deno.test("styled CSS - should handle nested selectors", () => {
 
   utils.assertRender(
     <Card></Card>,
-    `<div class="${Card.getRootClass()}"></div>
+    `<div class="${Card.getStyledClass()}"></div>
 <style>
-  .${Card.getRootClass()} {
+  .${Card.getStyledClass()} {
     padding: 1rem;
   }
-  .${Card.getRootClass()} h1 {
+  .${Card.getStyledClass()} h1 {
     font-size: 2em;
   }
 </style>`,
@@ -170,7 +163,6 @@ Deno.test("styled CSS - should handle nested selectors", () => {
 });
 
 Deno.test("styled CSS - should handle media queries", () => {
-  const utils = new TestUtils({ plugins: [new StyledPlugin()] });
   const Container = styled.div`
     & {
       width: 100%;
@@ -184,13 +176,13 @@ Deno.test("styled CSS - should handle media queries", () => {
 
   utils.assertRender(
     <Container></Container>,
-    `<div class="${Container.getRootClass()}"></div>
+    `<div class="${Container.getStyledClass()}"></div>
 <style>
-  .${Container.getRootClass()} {
+  .${Container.getStyledClass()} {
     width: 100%;
   }
   @media (min-width: 768px) {
-    .${Container.getRootClass()} {
+    .${Container.getStyledClass()} {
       width: 50%;
     }
   }
@@ -199,7 +191,6 @@ Deno.test("styled CSS - should handle media queries", () => {
 });
 
 Deno.test("styled with custom element", () => {
-  const utils = new TestUtils({ plugins: [new StyledPlugin()] });
   const CustomEl = styled["custom-element"]`
     & {
       color: blue;
@@ -208,9 +199,9 @@ Deno.test("styled with custom element", () => {
 
   utils.assertRender(
     <CustomEl>Custom content</CustomEl>,
-    `<custom-element class="${CustomEl.raw.payload.styled.rootClass}">Custom content</custom-element>
+    `<custom-element class="${CustomEl.getStyledClass()}">Custom content</custom-element>
 <style>
-  .${CustomEl.getRootClass()} {
+  .${CustomEl.getStyledClass()} {
     color: blue;
   }
 </style>`,
@@ -218,7 +209,6 @@ Deno.test("styled with custom element", () => {
 });
 
 Deno.test("styled component - should handle empty call for template literals", () => {
-  const utils = new TestUtils({ plugins: [new StyledPlugin()] });
   const Title = styled.h1`
     & {
       font-size: 2em;
@@ -228,9 +218,9 @@ Deno.test("styled component - should handle empty call for template literals", (
   const withEmptyCall = Title`Hello`;
   utils.assertRender(
     withEmptyCall,
-    `<h1 class="${withEmptyCall.getRootClass()}">Hello</h1>
+    `<h1 class="${withEmptyCall.getStyledClass()}">Hello</h1>
 <style>
-  .${withEmptyCall.getRootClass()} {
+  .${withEmptyCall.getStyledClass()} {
     font-size: 2em;
   }
 </style>`,
@@ -239,9 +229,9 @@ Deno.test("styled component - should handle empty call for template literals", (
   const withEmptyProps = Title({})`Hello`;
   utils.assertRender(
     withEmptyProps,
-    `<h1 class="${withEmptyProps.getRootClass()}">Hello</h1>
+    `<h1 class="${withEmptyProps.getStyledClass()}">Hello</h1>
 <style>
-  .${withEmptyProps.getRootClass()} {
+  .${withEmptyProps.getStyledClass()} {
     font-size: 2em;
   }
 </style>`,

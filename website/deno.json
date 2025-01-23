@@ -6,10 +6,12 @@
     "@hono/hono": "jsr:@hono/hono",
     "@hono/hono/deno": "jsr:@hono/hono/deno",
     "@reface": "../source/mod.ts",
+    "@reface/jsx-runtime": "../source/recast/jsx/jsx-runtime.ts",
+    "@common/": "../source/common/",
     "@recast": "../source/recast/mod.ts",
+    "@recast/": "../source/recast/",
     "@framework": "../source/reface/mod.ts",
     "@framework/": "../source/reface/",
-    "@recast/": "../source/recast/",
     "@reface/types": "../source/recast/types/mod.ts",
     "@reface/template": "../source/recast/template/mod.ts",
     "@reface/htmx": "../source/reface/htmx/mod.ts",
@@ -29,7 +31,7 @@
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "@reface/jsx"
+    "jsxImportSource": "@reface"
   },
   "deploy": {
     "exclude": [],

@@ -1,20 +1,21 @@
-import type { Template } from "@reface/template";
+import type { Context } from "@hono/hono";
+import type { Child, Children } from "@recast/expressions/mod.ts";
 
-export interface PartialPayload {
-  partial: {
-    name: string;
-    handler: PartialHandler<any, Template<any, any>>;
-  };
+export type PartialHandler = (context: Context) => Children | Child;
+
+export interface MetaPartial {
+  /** Уникальное имя partial */
+  name: string;
+  /** Обработчик partial запроса */
+  handler: PartialHandler;
+  /** Префикс API пути */
+  apiPrefix: string;
 }
 
-export type PartialHandler<
-  C,
-  T extends Template<any, any> = Template<any, any>,
-> = (
-  context: C,
-) => Promise<T>;
+export interface PartialsPluginOptions {
+  apiPrefix?: string;
+}
 
-export type PartialFn<C, T extends Template = Template> = (
-  handler: PartialHandler<C, T>,
-  name: string,
-) => T;
+export interface PartialMethods {
+  trigger(): Record<string, string>;
+}

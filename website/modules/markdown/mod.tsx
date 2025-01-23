@@ -8,13 +8,13 @@ import type {
   TableOfContentsHeading,
 } from "./types.ts";
 import { components } from "./components/mod.ts";
-import { component, type Template } from "@reface";
+import { type Child, component } from "@reface";
 
 const parser = unified()
   .use(remarkParse)
   .use(remarkGfm);
 
-function processNode(node: MdNode): Template {
+function processNode(node: MdNode): Child {
   switch (node.type) {
     case "text":
       return <>{node.value}</>;

@@ -1,5 +1,5 @@
-import { html } from "@recast";
-import { TestUtils } from "./testUtils.ts";
+import { html } from "@recast/mod.ts";
+import { TestUtils } from "@recast/test-utils/mod.ts";
 
 Deno.test("html template literal - basic rendering", () => {
   const utils = new TestUtils();
@@ -32,6 +32,15 @@ Deno.test("html string - renders raw HTML", () => {
   const utils = new TestUtils();
   utils.assertRender(
     html`<div>Static HTML</div>`,
+    "<div>Static HTML</div>",
+  );
+});
+
+Deno.test("html string - safe value HTML", () => {
+  const utils = new TestUtils();
+  const value = "<div>Static HTML</div>";
+  utils.assertRender(
+    html(value),
     "<div>Static HTML</div>",
   );
 });
