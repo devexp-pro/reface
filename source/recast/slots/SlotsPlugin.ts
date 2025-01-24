@@ -11,8 +11,8 @@ import type { SlotMeta, TemplateMeta } from "./types.ts";
 
 export class SlotsPlugin extends RecastPlugin implements RecastPluginInterface {
   name = "slots";
-  private slots = new Map<string | symbol, Map<string, string>>();
-  private slotsFn = new Map<string | symbol, (content: string[]) => string>();
+  private slots = new Map<string, Map<string, string>>();
+  private slotsFn = new Map<string, (content: string[]) => string>();
 
   renderBefore() {
     this.slots.clear();
