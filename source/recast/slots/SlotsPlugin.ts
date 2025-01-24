@@ -56,7 +56,7 @@ export class SlotsPlugin extends RecastPlugin implements RecastPluginInterface {
       /<!--recast-slot-([\w.]+)-->/g,
       (_: string, name: string) => {
         const fn = this.slotsFn.get(name);
-        const values = this.slots.get(name)?.values().toArray() ?? [];
+        const values = [...(this.slots.get(name)?.values() || [])];
         if (fn) {
           return fn(values);
         }
