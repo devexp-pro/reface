@@ -1,18 +1,18 @@
 import type { ComponentNode, HTMLAttributes } from "@recast/expressions/mod.ts";
 
 export type SlotAttributes = {
-  name?: symbol | string;
+  name?: string;
 };
 
 export type SlotMeta = {
   slot: {
-    name: symbol | string;
+    name: string;
     render?: (content: string[]) => string;
   };
 };
 
 export type SlotMethods = {
-  getSlot: () => symbol | string;
+  getSlot: () => string;
 };
 export type SlotComponent = ComponentNode<
   SlotAttributes & HTMLAttributes,
@@ -20,7 +20,7 @@ export type SlotComponent = ComponentNode<
 >;
 
 export type TemplateAttributes = {
-  slot?: symbol | string;
+  slot?: string;
   key?: string;
 };
 
